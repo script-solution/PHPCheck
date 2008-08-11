@@ -1,0 +1,19 @@
+<?php
+############### Connection ################
+define('PC_MYSQL_HOST','host');
+define('PC_MYSQL_LOGIN','login');
+define('PC_MYSQL_PASSWORD','password');
+define('PC_MYSQL_DATABASE','dbname');
+##########################################
+
+############## Tables ############
+define('PC_TB_CALLS','pc_calls');
+define('PC_TB_CLASSES','pc_classes');
+define('PC_TB_CLASS_FIELDS','pc_class_fields');
+define('PC_TB_CONSTANTS','pc_constants');
+define('PC_TB_ERRORS','pc_errors');
+define('PC_TB_FUNCTIONS','pc_functions');
+define('PC_TB_PROJECTS','pc_projects');
+define('PC_TB_VARS','pc_vars');
+##########################################
+?>
