@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains the variable-class
+ * Contains the field-class
  *
  * @version			$Id$
  * @package			PHPCheck
@@ -10,19 +10,19 @@
  */
 
 /**
- * Is used to store all properties of class-fields and method-/function-parameters
+ * Is used for class-fields
  *
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Variable extends FWS_Object implements PC_Visible
+class PC_Field extends PC_Variable implements PC_Visible
 {
 	/**
-	 * The name of the variable
+	 * The visibility
 	 *
 	 * @var string
 	 */
-	private $name;
+	private $visibility = self::V_PUBLIC;
 	
 	/**
 	 * The type of the variable
@@ -32,13 +32,6 @@ class PC_Variable extends FWS_Object implements PC_Visible
 	private $type;
 	
 	/**
-	 * The visibility
-	 *
-	 * @var string
-	 */
-	private $visibility = self::V_PUBLIC;
-	
-	/**
 	 * Constructor
 	 */
 	public function __construct()
@@ -46,24 +39,6 @@ class PC_Variable extends FWS_Object implements PC_Visible
 		parent::__construct();
 		
 		$this->type = PC_Type::$UNKNOWN;
-	}
-	
-	/**
-	 * @return string the name
-	 */
-	public function get_name()
-	{
-		return $this->name;
-	}
-	
-	/**
-	 * Sets the name
-	 *
-	 * @param string $name the new value
-	 */
-	public function set_name($name)
-	{
-		$this->name = $name;
 	}
 	
 	/**
@@ -81,6 +56,9 @@ class PC_Variable extends FWS_Object implements PC_Visible
 	 */
 	public function set_type($type)
 	{
+		if(!($type instanceof PC_Type))
+			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		
 		$this->type = $type;
 	}
 	
@@ -108,9 +86,14 @@ class PC_Variable extends FWS_Object implements PC_Visible
 		$this->visibility = $visibility;
 	}
 	
-	protected function get_print_vars()
+	protected function get_dump_vars()
 	{
-		return get_object_vars($this);
+		return array_merge(parent::get_dump_vars(),get_object_vars($this));
+	}
+	
+	public function __ToString()
+	{
+		return $this->get_name().'['.$this->type.']';
 	}
 }
 ?>

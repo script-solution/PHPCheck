@@ -1,0 +1,51 @@
+{include "inc_header.htm"}
+
+<script type="text/javascript" src="{js.get_file('js/basic.js','fws')}"></script>
+<script type="text/javascript" src="{js.get_file('js/table_sorter.js','fws')}">';
+</script>
+<table id="sql_debug" width="100%">
+	<thead>
+		<tr>
+			<th onmouseover="this.style.cursor = 'pointer';"
+				 onmouseout="this.style.cursor = 'default';"
+				 onclick="sorter.sortTable(this.cellIndex);" title="Sort by column">Call</th>
+			<th onmouseover="this.style.cursor = 'pointer';"
+				 onmouseout="this.style.cursor = 'default';"
+				 onclick="sorter.sortTable(this.cellIndex);" title="Sort by column">Location</th>
+		</tr>
+	</thead>
+	<tbody>
+	{loop calls as call}
+		<tr>
+			<td>{call:call}</td>
+			<td>{call:file}, line {call:line}</td>
+		</tr>
+	{endloop}
+	</tbody>
+</table>
+
+<script type="text/javascript">
+<!--
+var sorter = new FWS_TableSorter("sql_debug");
+//-->
+</script>
+
+{if errors.length > 0}
+<h2>Possible errors found:</h2>
+<table>
+	<tr>
+		<th>ErrNo</th>
+		<th>ErrMsg</th>
+		<th>Location</th>
+	</tr>
+	{loop errors as error}
+	<tr>
+		<td>{error:type}</td>
+		<td>{error:msg}</td>
+		<td>{error:file}, {error:line}</td>
+	</tr>
+	{endloop}
+</table>
+{endif}
+
+{include "inc_footer.htm"}

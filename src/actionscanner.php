@@ -82,6 +82,14 @@ class PC_ActionScanner extends FWS_Object
 	private $classes = array();
 	
 	/**
+	 * The known constants
+	 * TODO maybe we should put this somewhere else..
+	 *
+	 * @var array
+	 */
+	private $constants = array();
+	
+	/**
 	 * The current scope
 	 *
 	 * @var string
@@ -117,11 +125,12 @@ class PC_ActionScanner extends FWS_Object
 	 * @param string $file the file to scan
 	 * @param array $funcs the known functions
 	 * @param array $classes the known classes
+	 * @param array $constants the known constants
 	 */
-	public function scan_file($file,$funcs,$classes)
+	public function scan_file($file,$funcs,$classes,$constants)
 	{
 		$this->file = $file;
-		$this->scan(FWS_FileUtils::read($file),$funcs,$classes);
+		$this->scan(FWS_FileUtils::read($file),$funcs,$classes,$constants);
 	}
 	
 	/**
@@ -130,11 +139,13 @@ class PC_ActionScanner extends FWS_Object
 	 * @param string $source the string to scan
 	 * @param array $funcs the known functions
 	 * @param array $classes the known classes
+	 * @param array $constants the known constants
 	 */
-	public function scan($source,$funcs,$classes)
+	public function scan($source,$funcs,$classes,$constants)
 	{
 		$this->funcs = $funcs;
 		$this->classes = $classes;
+		$this->constants = $constants;
 		
 		$state = self::ST_WAIT_FOR_VAR;
 		$curlystack = array();
@@ -157,13 +168,13 @@ class PC_ActionScanner extends FWS_Object
 						else if($t === '}')
 						{
 							$curlycount--;
-							if(($dp = strpos($this->scope,'::')) !== false)
+							if(($dp = FWS_String::strpos($this->scope,'::')) !== false)
 							{
 								// the end of methods means: 1 bracket left
 								if($curlycount == 1)
 								{
 									// restore class scope
-									$this->scope = substr($this->scope,0,$dp);
+									$this->scope = FWS_String::substr($this->scope,0,$dp);
 									$state = self::ST_WAIT_FOR_METHOD;
 								}
 							}
@@ -185,14 +196,17 @@ class PC_ActionScanner extends FWS_Object
 					{
 						$res = $this->_handle_variable();
 						if($res !== null)
-							$this->vars[$this->scope][$str] = $res;
+							$this->_set_local_var($str,$res);
 					}
+					// handle 'global $v1,$v2,...,$vn;'
+					else if($t == T_GLOBAL)
+						$this->_handle_global();
 					// handle instantiations (for "return new ..." or simply "new ...")
 					else if($t == T_NEW)
 						$this->_handle_new();
 					// detect function-calls
 					else if($t == T_STRING)
-						$this->_handle_func_call();
+						$res = $this->_handle_func_call();
 					// detect classes and functions (may be nested)
 					else if($t == T_CLASS)
 						$state = self::ST_WAIT_FOR_CLASS;
@@ -209,6 +223,11 @@ class PC_ActionScanner extends FWS_Object
 						$curlycount = 0;
 						array_push($this->scopestack,$this->scope);
 						$this->scope = $str;
+						
+						// add function parameters, if known
+						if(isset($this->funcs[$str]))
+							$this->_add_parameters_to_local($this->funcs[$str]->get_params());
+						
 						$state = self::ST_WAIT_FOR_METHOD_BODY;
 					}
 					break;
@@ -249,7 +268,16 @@ class PC_ActionScanner extends FWS_Object
 					if($t == T_STRING)
 					{
 						$state = self::ST_WAIT_FOR_METHOD_BODY;
+						$classname = $this->scope;
 						$this->scope .= '::'.$str;
+						
+						// add method parameters, if known
+						if(isset($this->classes[$classname]))
+						{
+							$method = $this->classes[$classname]->get_method($str);
+							if($method !== null)
+								$this->_add_parameters_to_local($method->get_params());
+						}
 					}
 					break;
 				
@@ -267,20 +295,57 @@ class PC_ActionScanner extends FWS_Object
 	}
 	
 	/**
+	 * Adds the given parameters to local variables
+	 *
+	 * @param array $params the parameters
+	 */
+	private function _add_parameters_to_local($params)
+	{
+		foreach($params as $param)
+		{
+			$mtype = $param->get_mtype();
+			if(!$mtype->is_multiple() && !$mtype->is_unknown())
+			{
+				$ts = $mtype->get_types();
+				$this->_set_local_var($param->get_name(),$ts[0]);
+			}
+			else
+				$this->_set_local_var($param->get_name(),PC_Type::$UNKNOWN);
+		}
+	}
+	
+	/**
+	 * Sets the local variable with given name to given type
+	 *
+	 * @param string $name the variable-name
+	 * @param PC_Type $type the type
+	 */
+	private function _set_local_var($name,$type)
+	{
+		if(!($type instanceof PC_Type))
+			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		
+		$this->vars[$this->scope][$name] = $type;
+	}
+	
+	/**
 	 * Determines the type of the given variable in the current scope
 	 *
 	 * @param string $name the variable-name
+	 * @param string $scope optional the scope (by default the current one)
 	 * @return PC_Type the type or null if not found
 	 */
-	private function _get_var_type($name)
+	private function _get_var_type($name,$scope = null)
 	{
+		$scope = $scope === null ? $this->scope : $scope;
+		
 		// known variable
-		if(isset($this->vars[$this->scope][$name]))
-			return $this->vars[$this->scope][$name];
+		if(isset($this->vars[$scope][$name]))
+			return $this->vars[$scope][$name];
 		
 		// handle $this
-		if($name == '$this' && ($dp = FWS_String::strpos($this->scope,'::')) !== false)
-			return new PC_Type(PC_Type::OBJECT,FWS_String::substr($this->scope,0,$dp));
+		if($name == '$this' && ($dp = FWS_String::strpos($scope,'::')) !== false)
+			return new PC_Type(PC_Type::OBJECT,FWS_String::substr($scope,0,$dp));
 		
 		return null;
 	}
@@ -367,44 +432,113 @@ class PC_ActionScanner extends FWS_Object
 			// if we are in an inner call, assign the result to the variable
 			// this handles stuff like $a = $b = $c = 3;
 			if($c > 0)
-				$this->vars[$this->scope][$var] = $res;
+				$this->_set_local_var($var,$res);
 		}
-		// $foo->bar() ?
+		// $foo->bar() or $foo->bar ?
 		else if($t == T_OBJECT_OPERATOR)
 		{
-			$this->_skip_rubbish();
-			list($t,$str,$line) = $this->tokens[$this->pos++];
-			
-			// build function-call; use the type of the variable
-			$call = new PC_Call($this->file,$line);
-			$vartype = $this->_get_var_type($var);
-			// is it an object?
-			if($vartype !== null && $vartype->get_type() == PC_Type::OBJECT)
-				$cname = $vartype->get_class();
-			else
-				// TODO how to handle that?
-				$cname = '__UNKNOWN__';
-			$call->set_class($cname);
-			$call->set_function($str);
-			
-			// ensure that we are at '('
-			$this->_skip_rubbish();
-			$res = $this->_handle_func_call_rec($call);
+			$type = $this->_get_var_type($var);
+			$res = $this->_handle_object_access($type);
 			
 			// just store the result if we are in a sub-call
 			if($c == 0)
 				$res = null;
 		}
+		// we don't know array-element-types
+		else if($t == '[')
+			$res = PC_Type::$UNKNOWN;
 		// in all other cases we skip the variable
 		else
 		{
 			$this->pos = $oldpos;
-			$res = null;
+			if($c > 0)
+			{
+				$res = $this->_get_var_type($var);
+				// we don't want to get null here
+				if($res === null)
+					$res = PC_Type::$UNKNOWN;
+			}
+			else
+				$res = null;
 		}
 		
 		// do not run to ';' in inner calls; the same when this was no var-def
-		if($c == 0 && $this->pos != $oldpos)
-			$this->_run_to_sep();
+		//if($c == 0 && $this->pos != $oldpos)
+		//	$this->_run_to_sep();
+		return $res;
+	}
+	
+	/**
+	 * Handles a function-call or field-access on an object with given type. The method assumes
+	 * that we are behind the object-operator.
+	 *
+	 * @param PC_Type $type the type of the object
+	 * @return PC_Type the return-type (of the call or the field)
+	 */
+	private function _handle_object_access($type)
+	{
+		// function-name or field-name
+		$this->_skip_rubbish();
+		list(,$str,$line) = $this->tokens[$this->pos++];
+		
+		// ensure that we are at '('
+		$this->_skip_rubbish();
+		list($t,,) = $this->tokens[$this->pos];
+		
+		// $foo->funcName() ?
+		if($t == '(')
+		{
+			// build function-call; use the type of the variable
+			$call = new PC_Call($this->file,$line);
+			// is it an object?
+			if($type !== null && $type->get_type() == PC_Type::OBJECT)
+				$cname = $type->get_class();
+			else
+				$cname = PC_Class::UNKNOWN;
+			$call->set_class($cname);
+			$call->set_function($str);
+			
+			$res = $this->_handle_func_call_rec($call);
+		}
+		// $foo->fieldName... ?
+		else
+			$res = $this->_handle_class_field($type,$str);
+		
+		return $res;
+	}
+	
+	/**
+	 * Handles a class-field-access. Assumes that we are behind the field-name.
+	 * 
+	 * @param PC_Type $vartype the found variable-type for this class-field-access
+	 * @param string $fieldname the name of the field
+	 * @return PC_Type the return-type
+	 */
+	private function _handle_class_field($vartype,$fieldname)
+	{
+		list($t,,) = $this->tokens[$this->pos];
+
+		// determine type of $var->$fieldName
+		$fieldtype = PC_Type::$UNKNOWN;
+		if($vartype !== null && $vartype->get_type() == PC_Type::OBJECT &&
+			isset($this->classes[$vartype->get_class()]))
+		{
+			$class = $this->classes[$vartype->get_class()];
+			$field = $class->get_field('$'.$fieldname);
+			if($field !== null)
+				$fieldtype = $field->get_type();
+		}
+		
+		// it is an object
+		if($t == T_OBJECT_OPERATOR)
+		{
+			$this->pos++; // go to next token
+			$res = $this->_handle_object_access($fieldtype);
+		}
+		// simple access
+		else
+			$res = $fieldtype;
+		
 		return $res;
 	}
 	
@@ -447,24 +581,24 @@ class PC_ActionScanner extends FWS_Object
 	 * Assumes that the current token is T_STRING and the value the function-name / class-name.
 	 * Returns the return-type of the call.
 	 *
-	 * @param boolean $runtosep wether the method should run to the ';' after the call
 	 * @return PC_Type the return-type
 	 */
-	private function _handle_func_call($runtosep = true)
+	private function _handle_func_call()
 	{
 		$call = $this->_handle_func_name();
 		if($call !== null)
 		{
+			// no call, but type (class-constant or constant) ?
+			if($call instanceof PC_Type)
+				return $call;
+			
 			$rettype = $this->_handle_func_call_rec($call);
 			// TODO if $rettype is null we have to handle class-constants, right?
-			// if the function-call is in another function call, for example, we may not want to
-			// walk to ';'
-			if($runtosep)
-				$this->_run_to_sep();
 			return $rettype;
 		}
 		
-		return PC_Type::$UNKNOWN;
+		//return PC_Type::$UNKNOWN;
+		return null;
 	}
 	
 	/**
@@ -498,8 +632,7 @@ class PC_ActionScanner extends FWS_Object
 			if($rettype !== null && $rettype->get_type() == PC_Type::OBJECT)
 				$cname = $rettype->get_class();
 			else
-				// TODO how to handle that?
-				$cname = '__UNKNOWN__';
+				$cname = PC_Class::UNKNOWN;
 			$subcall->set_class($cname);
 			$subcall->set_function($str);
 			
@@ -523,6 +656,8 @@ class PC_ActionScanner extends FWS_Object
 	 */
 	private function _handle_func_name()
 	{
+		$oldpos = $this->pos;
+		
 		// grab name
 		list($t,$str,$line) = $this->tokens[$this->pos++];
 		if($t != T_STRING)
@@ -537,6 +672,9 @@ class PC_ActionScanner extends FWS_Object
 		list($t,$str,$line) = $this->tokens[$this->pos++];
 		if($t == T_DOUBLE_COLON)
 		{
+			// the call is static
+			$call->set_static(true);
+			
 			// grab real func-name
 			$this->_skip_rubbish();
 			list($t,$str,$line) = $this->tokens[$this->pos++];
@@ -544,7 +682,19 @@ class PC_ActionScanner extends FWS_Object
 				$second = $str;
 			// if this is e.g. a variable, we can't handle the func-call
 			else
+			{
+				$this->pos = $oldpos;
 				return null;
+			}
+		}
+		// no func-call
+		else if($t != '(')
+		{
+			$this->pos -= 2;
+			if(isset($this->constants[$first]))
+				return $this->constants[$first];
+			
+			return null;
 		}
 		// walk backwards to scan the token again
 		else
@@ -558,11 +708,24 @@ class PC_ActionScanner extends FWS_Object
 			$call->set_function($first);
 		else
 		{
+			list($t,,) = $this->tokens[$this->pos];
+			if($t != '(')
+			{
+				// TODO handle class-constants
+				$this->pos--;
+				if(isset($this->classes[$first]))
+				{
+					$class = $this->classes[$first];
+					if($class->get_constant($second) !== null)
+						return $class->get_constant($second);
+				}
+				return null;
+			}
+			
 			$call->set_function($second);
 			if(strcasecmp($first,'parent') == 0)
 			{
-				// TODO improve that!
-				$first = '__UNKNOWN__';
+				$first = PC_Class::UNKNOWN;
 				$cclass = $this->_get_var_type('$this');
 				if($cclass !== null && $cclass->get_type() == PC_Type::OBJECT)
 				{
@@ -570,13 +733,47 @@ class PC_ActionScanner extends FWS_Object
 					{
 						$cclassobj = $this->classes[$cclass->get_class()];
 						if($cclassobj->get_super_class() !== null)
+						{
 							$first = $cclassobj->get_super_class();
+							// by default we mark the call as not-static
+							$call->set_static(false);
+							// if the parent-method is known we set it static if that method is static
+							// because parent::<method> may be static and not-static.
+							if(isset($this->classes[$first]))
+							{
+								$method = $this->classes[$first]->get_method($second);
+								if($method !== null)
+									$call->set_static($method->is_static());
+							}
+						}
 					}
 				}
 			}
 			$call->set_class($first);
 		}
 		return $call;
+	}
+	
+	/**
+	 * Handles the global-keyword. The method assumes that we are at the global-keyword.
+	 * It will stop on the ';'.
+	 */
+	private function _handle_global()
+	{
+		for($this->pos++;$this->pos < $this->end;$this->pos++)
+		{
+			$this->_skip_rubbish();
+			list($t,$str,) = $this->tokens[$this->pos];
+			if($t == ';')
+				break;
+			if($t == ',')
+				continue;
+			if($t == T_VARIABLE)
+			{
+				$type = $this->_get_var_type($str,self::SCOPE_GLOBAL);
+				$this->_set_local_var($str,$type === null ? PC_Type::$UNKNOWN : $type);
+			}
+		}
 	}
 	
 	/**
@@ -611,11 +808,10 @@ class PC_ActionScanner extends FWS_Object
 				switch($t)
 				{
 					case T_VARIABLE:
+						$res = $this->_handle_variable(1);
 						if(!$arg_finished)
-						{
-							// do not run to ';'
-							$arg = $this->_handle_variable(1);
-						}
+							$arg = $res;
+						$arg_finished = true;
 						break;
 					case T_CONSTANT_ENCAPSED_STRING:
 						if(!$arg_finished)
@@ -639,15 +835,13 @@ class PC_ActionScanner extends FWS_Object
 						break;
 					case T_STRING:
 						// we'll get true and false here
-						if(strcasecmp($str,'true') == 0 || strcasecmp($str,'false') == 0)
+						if(!$arg_finished && (strcasecmp($str,'true') == 0 || strcasecmp($str,'false') == 0))
 							$arg = PC_Type::$BOOL;
 						else
 						{
-							// do not walk to ';' here, because it is a sub-call
-							$arg = $this->_handle_func_call(false);
-							// TODO keep this here?
-							if($arg === null)
-								$this->pos--;
+							$res = $this->_handle_func_call();
+							if(!$arg_finished)
+								$arg = $res;
 							$arg_finished = true;
 						}
 						break;
@@ -711,7 +905,7 @@ class PC_ActionScanner extends FWS_Object
 		}
 	}
 	
-	protected function get_print_vars()
+	protected function get_dump_vars()
 	{
 		return get_object_vars($this);
 	}

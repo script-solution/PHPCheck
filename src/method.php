@@ -24,6 +24,13 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	private $visibility = self::V_PUBLIC;
 	
 	/**
+	 * Wether the method is static
+	 *
+	 * @var boolean
+	 */
+	private $static = false;
+	
+	/**
 	 * The return-type
 	 *
 	 * @var PC_Type
@@ -49,6 +56,24 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 		
 		$this->params = array();
 		$this->return = PC_Type::$UNKNOWN;
+	}
+	
+	/**
+	 * @return boolean wether the method is static
+	 */
+	public function is_static()
+	{
+		return $this->static;
+	}
+	
+	/**
+	 * Sets wether the method is static
+	 *
+	 * @param boolean $static the new value
+	 */
+	public function set_static($static)
+	{
+		$this->static = (bool)$static;
 	}
 	
 	/**
@@ -90,17 +115,39 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	 */
 	public function set_return_type($type)
 	{
+		if(!($type instanceof PC_Type))
+			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		
 		$this->return = $type;
 	}
 	
 	/**
 	 * Puts the parameter to the method
 	 *
-	 * @param PC_Variable $param the param
+	 * @param PC_Parameter $param the param
 	 */
 	public function put_param($param)
 	{
+		if(!($param instanceof PC_Parameter))
+			FWS_Helper::def_error('instance','param','PC_Parameter',$param);
+		
 		$this->params[$param->get_name()] = $param;
+	}
+	
+	/**
+	 * Determines the number of required parameters
+	 *
+	 * @return int the number
+	 */
+	public function get_required_param_count()
+	{
+		$n = 0;
+		foreach($this->params as $param)
+		{
+			if(!$param->is_optional())
+				$n++;
+		}
+		return $n;
 	}
 	
 	/**
@@ -115,7 +162,7 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	 * Returns the parameter with given name
 	 *
 	 * @param string $name the param-name
-	 * @return PC_Variable the param or null
+	 * @return PC_Parameter the param or null
 	 */
 	public function get_param($name)
 	{
@@ -133,9 +180,24 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 		return isset($this->params[$name]);
 	}
 	
-	protected function get_print_vars()
+	protected function get_dump_vars()
 	{
-		return array_merge(parent::get_print_vars(),get_object_vars($this));
+		return array_merge(parent::get_dump_vars(),get_object_vars($this));
+	}
+	
+	public function __ToString()
+	{
+		$str = $this->get_visibility().' ';
+		if($this->is_static())
+			$str .= 'static ';
+		if($this->is_abstract())
+			$str .= 'abstract ';
+		if($this->is_final())
+			$str .= 'final ';
+		$str .= 'function <b>'.$this->get_name().'</b>(';
+		$str .= implode(', ',$this->get_params());
+		$str .= ')';
+		return $str;
 	}
 }
 ?>

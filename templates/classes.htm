@@ -1,0 +1,18 @@
+{include "inc_header.htm"}
+
+<table>
+	<tr>
+		<th>Name</th>
+		<th>File</th>
+		<th>Line</th>
+	</tr>
+	{loop classes as class}
+	<tr>
+		<td><a href="{class:url}">{class:name}</a></td>
+		<td>{class:file}</td>
+		<td>{class:line}</td>
+	</tr>
+	{endloop}
+</table>
+
+{include "inc_footer.htm"}

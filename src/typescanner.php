@@ -48,18 +48,28 @@ class PC_TypeScanner extends FWS_Object
 	private $file = null;
 	
 	/**
-	 * The functions
+	 * The functions:
+	 * <code>array(<name> => PC_Method,...)</code>
 	 *
 	 * @var array
 	 */
 	private $functions = array();
 	
 	/**
-	 * The classes
+	 * The classes:
+	 * <code>array(<name> => PC_Class,...)</code>
 	 *
 	 * @var array
 	 */
 	private $classes = array();
+	
+	/**
+	 * The constants:
+	 * <code>array(<name> => PC_Type,...)</code>
+	 *
+	 * @var array
+	 */
+	private $constants = array();
 	
 	/**
 	 * @return array the collected functions: <code>array(<name> => <obj>)</code>
@@ -75,6 +85,14 @@ class PC_TypeScanner extends FWS_Object
 	public function get_classes()
 	{
 		return $this->classes;
+	}
+	
+	/**
+	 * @return array the collected contants: <code>array(<name> => <type>)</code>
+	 */
+	public function get_constants()
+	{
+		return $this->constants;
 	}
 	
 	/**
@@ -133,11 +151,87 @@ class PC_TypeScanner extends FWS_Object
 			else
 			{
 				$this->_skip_rubbish();
-				$res = $this->_handle_function();
-				if($res === false)
+				list($t,$str,) = $this->tokens[$this->pos];
+				
+				$res = false;
+				if($t == T_STRING && strcasecmp($str,'define') == 0)
+					$res = $this->_handle_define();
+				if(!$res)
+					$res = $this->_handle_function();
+				if(!$res)
 					$this->_handle_class();
 			}
 		}
+	}
+	
+	/**
+	 * Determines the type from the given token
+	 *
+	 * @param int|string $t the token
+	 * @param string $str the token-value
+	 * @return PC_Type the type
+	 */
+	private function _get_type_from_token($t,$str)
+	{
+		switch($t)
+		{
+			case T_CONSTANT_ENCAPSED_STRING:
+				return PC_Type::$STRING;
+			
+			case T_STRING:
+				if(strcasecmp($str,'true') == 0 || strcasecmp($str,'false') == 0)
+					return PC_Type::$BOOL;
+				// TODO handle constants / func-calls
+
+			case T_DNUMBER:
+				return PC_Type::$FLOAT;
+			
+			case T_LNUMBER:
+				return PC_Type::$INT;
+		}
+		
+		return PC_Type::$UNKNOWN;
+	}
+	
+	/**
+	 * Handles a constant-definition. The method assumes that the current token is a string with the
+	 * value 'define'. If it is no valid define, the method restores the position.
+	 *
+	 * @return boolean true if a constant has been found.
+	 */
+	private function _handle_define()
+	{
+		$oldpos = $this->pos++;
+		$this->_skip_rubbish();
+		list($t,,$line) = $this->tokens[$this->pos++];
+		if($t != '(')
+		{
+			$this->pos = $oldpos;
+			return false;
+		}
+		
+		// get constant name
+		$this->_skip_rubbish();
+		list($t,$str,) = $this->tokens[$this->pos++];
+		$name = FWS_String::substr($str,1,-1);
+		
+		// skip stuff until ','
+		$this->_skip_rubbish();
+		// skip ','
+		$this->pos++;
+		// skip rubbish until value
+		$this->_skip_rubbish();
+		
+		list($t,$str,) = $this->tokens[$this->pos++];
+		$type = $this->_get_type_from_token($t,$str);
+		
+		$this->constants[$name] = $type;
+		
+		// skip rubbish until ')'
+		$this->_skip_rubbish();
+		// skip ')'
+		$this->pos++;
+		return true;
 	}
 	
 	/**
@@ -248,14 +342,47 @@ class PC_TypeScanner extends FWS_Object
 				$this->doc = $str;
 			else
 			{
-				if(!$class->is_interface())
-					$this->_handle_field($class);
-				$this->_handle_function($class);
+				if($t == T_CONST)
+					$this->_handle_class_const($class);
+				else
+				{
+					if(!$class->is_interface())
+						$this->_handle_field($class);
+					$this->_handle_function($class);
+				}
 			}
 		}
 		
 		$this->classes[$class->get_name()] = $class;
 		return true;
+	}
+	
+	/**
+	 * Handles a const-definition. The method assumes that the current token is T_CONST.
+	 *
+	 * @param PC_Class $class the class in which we are currently
+	 */
+	private function _handle_class_const($class)
+	{
+		// to const-name
+		$this->pos++;
+		$this->_skip_rubbish();
+		
+		list(,$str,) = $this->tokens[$this->pos++];
+		$name = $str;
+		
+		// go to '='
+		$this->_skip_rubbish();
+		
+		// go to value
+		$this->pos++;
+		$this->_skip_rubbish();
+		list($t,$str,) = $this->tokens[$this->pos];
+		
+		$type = $this->_get_type_from_token($t,$str);
+		$class->add_constant($name,$type);
+		
+		$this->_run_to(';');
 	}
 	
 	/**
@@ -276,7 +403,7 @@ class PC_TypeScanner extends FWS_Object
 			case T_VAR:
 			case T_PRIVATE:
 			case T_PROTECTED:
-				$field = new PC_Variable();
+				$field = new PC_Field();
 				if($t == T_PROTECTED)
 					$field->set_visibity(PC_Visible::V_PROTECTED);
 				else if($t == T_PRIVATE)
@@ -382,7 +509,7 @@ class PC_TypeScanner extends FWS_Object
 					$method->set_final(true);
 					break;
 				case T_STATIC:
-					// TODO to be implemented
+					$method->set_static(true);
 					break;
 				
 				case T_COMMENT:
@@ -442,7 +569,7 @@ class PC_TypeScanner extends FWS_Object
 			for($this->pos++;$this->pos < $this->end;$this->pos++)
 			{
 				$this->_skip_rubbish();
-				list($t,,) = $this->tokens[$this->pos];
+				list($t,$str,) = $this->tokens[$this->pos];
 				if($t == '{')
 					$curlies++;
 				else if($t == '}')
@@ -452,8 +579,12 @@ class PC_TypeScanner extends FWS_Object
 						break;
 				}
 				
+				$res = false;
+				if($t == T_STRING && strcasecmp($str,'define') == 0)
+					$res = $this->_handle_define();
 				// there may be nested functions
-				$this->_handle_function();
+				if(!$res)
+					$this->_handle_function();
 			}
 		}
 		
@@ -491,6 +622,9 @@ class PC_TypeScanner extends FWS_Object
 			// skip default values
 			if($t == '=')
 			{
+				// make the last parameter optional
+				$param->set_optional(true);
+				
 				$round = 0;
 				for($this->pos++;$this->pos < $this->end;$this->pos++)
 				{
@@ -512,7 +646,7 @@ class PC_TypeScanner extends FWS_Object
 				continue;
 			}
 			
-			$param = new PC_Variable();
+			$param = new PC_Parameter();
 			
 			// handle references
 			// TODO store references!
@@ -526,7 +660,7 @@ class PC_TypeScanner extends FWS_Object
 			// type hinting?
 			if($t == T_STRING)
 			{
-				$param->set_type(PC_Type::get_type_by_name($str));
+				$param->set_mtype(PC_MultiType::get_type_by_name($str));
 				$this->pos++;
 				$this->_skip_rubbish();
 				list(,$str,) = $this->tokens[$this->pos];
@@ -655,13 +789,8 @@ class PC_TypeScanner extends FWS_Object
 		{
 			$param = $matches[2][$k];
 			// does the param exist?
-			if($func->contains_param($param))
-			{
-				$p = new PC_Variable();
-				$p->set_name($param);
-				$p->set_type(PC_Type::get_type_by_name($match));
-				$func->put_param($p);
-			}
+			if(($fp = $func->get_param($param)) !== null)
+				$fp->set_mtype(PC_MultiType::get_type_by_name($match));
 		}
 		
 		// look for return-type
@@ -683,6 +812,7 @@ class PC_TypeScanner extends FWS_Object
 		{
 			if($class != $data->get_name())
 			{
+				// methods
 				foreach($this->classes[$class]->get_methods() as $function)
 				{
 					if($function->get_visibility() != PC_Visible::V_PRIVATE)
@@ -692,12 +822,13 @@ class PC_TypeScanner extends FWS_Object
 						if(!$overwrite && ($f = $data->get_method($function->get_name())) !== null)
 						{
 							/* @var $f PC_Method */
-							if($f->get_return_type()->get_type() == PC_Type::UNKNOWN)
+							if($f->get_return_type()->is_unknown())
 								$f->set_return_type($function->get_return_type());
 							foreach($function->get_params() as $param)
 							{
 								$fparam = $f->get_param($param->get_name());
-								if($fparam === null || $fparam->get_type()->get_type() == PC_Type::UNKNOWN)
+								// just replace the parameter if it exists and the type is unknown yet
+								if($fparam !== null && $fparam->get_mtype()->is_unknown())
 									$f->put_param($param);
 							}
 						}
@@ -705,11 +836,17 @@ class PC_TypeScanner extends FWS_Object
 							$data->add_method($function);
 					}
 				}
+				
+				// fields
 				foreach($this->classes[$class]->get_fields() as $field)
 				{
 					if($field->get_visibility() != PC_Visible::V_PRIVATE)
 						$data->add_field($field);
 				}
+				
+				// constants
+				foreach($this->classes[$class]->get_constants() as $name => $ctype)
+					$data->add_constant($name,$ctype);
 			}
 			
 			$this->_add_members($data,$this->classes[$class]->get_super_class(),false);
@@ -718,7 +855,7 @@ class PC_TypeScanner extends FWS_Object
 		}
 	}
 	
-	protected function get_print_vars()
+	protected function get_dump_vars()
 	{
 		return get_object_vars($this);
 	}

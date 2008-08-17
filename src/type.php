@@ -111,6 +111,9 @@ final class PC_Type extends FWS_Object
 	{
 		parent::__construct();
 		
+		if(!FWS_Helper::is_integer($type))
+			FWS_Helper::def_error('int','type',$type);
+		
 		$this->_type = $type;
 		$this->_class = $class;
 	}
@@ -130,6 +133,14 @@ final class PC_Type extends FWS_Object
 			return false;
 		
 		return $o->get_class() == $o->get_class();
+	}
+	
+	/**
+	 * @return boolean true if the type is unknown
+	 */
+	public function is_unknown()
+	{
+		return $this->_type == self::UNKNOWN;
 	}
 	
 	/**
@@ -176,11 +187,11 @@ final class PC_Type extends FWS_Object
 	}
 	
 	/**
-	 * @see FWS_Object::get_print_vars()
+	 * @see FWS_Object::get_dump_vars()
 	 *
 	 * @return array
 	 */
-	protected function get_print_vars()
+	protected function get_dump_vars()
 	{
 		return get_object_vars($this);
 	}
@@ -188,12 +199,11 @@ final class PC_Type extends FWS_Object
 	/**
 	 * The string-representation of the type
 	 *
-	 * @param boolean $use_html dummy param
 	 * @return string the string
 	 */
-	public function __toString($use_html = false)
+	public function __toString()
 	{
-		return $this->_type == self::OBJECT ? $this->_class : $this->_get_type_name($this->_type);
+		return $this->_type == self::OBJECT ? (string)$this->_class : $this->_get_type_name($this->_type);
 	}
 }
 ?>

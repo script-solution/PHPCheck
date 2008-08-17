@@ -17,6 +17,9 @@
  */
 class PC_Class extends PC_Modifiable
 {
+	// use an invalid identifier for an unknown class
+	const UNKNOWN = '#UNKNOWN';
+	
 	/**
 	 * Is it an interface?
 	 *
@@ -40,7 +43,14 @@ class PC_Class extends PC_Modifiable
 	private $interfaces;
 	
 	/**
-	 * An array of fields of the class, represented as PC_Variable
+	 * An array of class-constants
+	 *
+	 * @var array
+	 */
+	private $constants;
+	
+	/**
+	 * An array of fields of the class, represented as PC_Field
 	 *
 	 * @var array
 	 */
@@ -66,6 +76,7 @@ class PC_Class extends PC_Modifiable
 		$this->interfaces = array();
 		$this->fields = array();
 		$this->methods = array();
+		$this->constants = array();
 	}
 	
 	/**
@@ -83,7 +94,7 @@ class PC_Class extends PC_Modifiable
 	 */
 	public function set_interface($if)
 	{
-		$this->interface = $if;
+		$this->interface = (bool)$if;
 	}
 	
 	/**
@@ -123,17 +134,40 @@ class PC_Class extends PC_Modifiable
 	}
 	
 	/**
-	 * Adds the given field to the class
-	 *
-	 * @param PC_Varible $field the field
+	 * @return array the class-constants: <code>array(<name> => <type>)</code>
 	 */
-	public function add_field($field)
+	public function get_constants()
 	{
-		$this->fields[$field->get_name()] = $field;
+		return $this->constants;
 	}
 	
 	/**
-	 * @return array an array of PC_Variable's
+	 * Returns the constant with given name
+	 *
+	 * @param string $name the constant-name
+	 * @param PC_Type $type the type or null
+	 */
+	public function get_constant($name)
+	{
+		return isset($this->constants[$name]) ? $this->constants[$name] : null;
+	}
+	
+	/**
+	 * Adds the given constant to the class
+	 *
+	 * @param string $name the constant-name
+	 * @param PC_Type $type the type
+	 */
+	public function add_constant($name,$type)
+	{
+		if(!($type instanceof PC_Type))
+			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		
+		$this->constants[$name] = $type;
+	}
+	
+	/**
+	 * @return array an array of PC_Field's
 	 */
 	public function get_fields()
 	{
@@ -141,26 +175,27 @@ class PC_Class extends PC_Modifiable
 	}
 	
 	/**
-	 * Adds the given method to the class
+	 * Returns the class-field with given name
 	 *
-	 * @param PC_Method $method the method
+	 * @param string $name the name (including "$"!)
+	 * @return PC_Field the field or null
 	 */
-	public function add_method($method)
+	public function get_field($name)
 	{
-		$this->methods[$method->get_name()] = $method;
+		return isset($this->fields[$name]) ? $this->fields[$name] : null;
 	}
 	
 	/**
-	 * Returns with method with given name
+	 * Adds the given field to the class
 	 *
-	 * @param string $name the method-name
-	 * @return PC_Method the method or null
+	 * @param PC_Field $field the field
 	 */
-	public function get_method($name)
+	public function add_field($field)
 	{
-		if(!isset($this->methods[$name]))
-			return null;
-		return $this->methods[$name];
+		if(!($field instanceof PC_Field))
+			FWS_Helper::def_error('instance','field','PC_Field',$field);
+		
+		$this->fields[$field->get_name()] = $field;
 	}
 	
 	/**
@@ -182,9 +217,35 @@ class PC_Class extends PC_Modifiable
 		return isset($this->methods[$name]);
 	}
 	
-	protected function get_print_vars()
+	/**
+	 * Returns with method with given name
+	 *
+	 * @param string $name the method-name
+	 * @return PC_Method the method or null
+	 */
+	public function get_method($name)
 	{
-		return array_merge(parent::get_print_vars(),get_object_vars($this));
+		if(!isset($this->methods[$name]))
+			return null;
+		return $this->methods[$name];
+	}
+	
+	/**
+	 * Adds the given method to the class
+	 *
+	 * @param PC_Method $method the method
+	 */
+	public function add_method($method)
+	{
+		if(!($method instanceof PC_Method))
+			FWS_Helper::def_error('instance','method','PC_Method',$method);
+		
+		$this->methods[$method->get_name()] = $method;
+	}
+	
+	protected function get_dump_vars()
+	{
+		return array_merge(parent::get_dump_vars(),get_object_vars($this));
 	}
 }
 ?>

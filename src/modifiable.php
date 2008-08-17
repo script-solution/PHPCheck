@@ -102,5 +102,10 @@ class PC_Modifiable extends PC_Location
 	{
 		$this->abstract = (bool)$abstract;
 	}
+	
+	protected function get_dump_vars()
+	{
+		return array_merge(parent::get_dump_vars(),get_object_vars($this));
+	}
 }
 ?>

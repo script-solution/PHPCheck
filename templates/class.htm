@@ -1,0 +1,58 @@
+{include "inc_header.htm"}
+
+<table>
+	<tr>
+		<th colspan="2">{classname}</th>
+	</tr>
+	<tr>
+		<td>Declaration</td>
+		<td>{declaration}</td>
+	</tr>
+	<tr>
+		<td align="center" class="pc_coldesc" colspan="2">Constants</td>
+	</tr>
+	{if consts.length == 0}
+	<tr>
+		<td colspan="2">-</td>
+	</tr>
+	{endif}
+	{loop consts as name => type}
+	<tr>
+		<td>{name}</td>
+		<td>{type}</td>
+	</tr>
+	{endloop}
+	<tr>
+		<td align="center" class="pc_coldesc" colspan="2">Fields</td>
+	</tr>
+	{if fields.length == 0}
+	<tr>
+		<td colspan="2">-</td>
+	</tr>
+	{endif}
+	{loop fields as field}
+	<tr>
+		<td><a href="#l{field:line}">{field:name}</a></td>
+		<td>{field:type}</td>
+	</tr>
+	{endloop}
+	<tr>
+		<td align="center" class="pc_coldesc" colspan="2">Methods</td>
+	</tr>
+	{if methods.length == 0}
+	<tr>
+		<td colspan="2">-</td>
+	</tr>
+	{endif}
+	{loop methods as method}
+	<tr>
+		<td><a href="#l{method:line}">{method:name}</a>:</td>
+		<td>{method:type}</td>
+	</tr>
+	{endloop}
+</table>
+
+<br />
+<code>{source}</code>
+
+{include "inc_footer.htm"}
