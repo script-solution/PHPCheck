@@ -83,7 +83,7 @@ final class PC_Analyzer extends FWS_Object
 								PC_Error::E_METHOD_MISSING
 							);
 						}
-						else if($name == '__construct' && $c->is_abstract())
+						else if($call->is_object_creation() && $c->is_abstract())
 						{
 							$this->_report(
 								$call,
@@ -234,18 +234,20 @@ final class PC_Analyzer extends FWS_Object
 	{
 		$arguments = $call->get_arguments();
 		$nparams = $method->get_required_param_count();
-		if(count($arguments) < $nparams)
+		$nmaxparams = $method->get_param_count();
+		if(count($arguments) < $nparams || count($arguments) > $nmaxparams)
 		{
+			$reqparams = $nparams != $nmaxparams ? $nparams.' to '.$nmaxparams : $nparams;
 			$this->_report(
 				$call,
-				'The function/method called by "'.$this->_get_call_link($call).'" requires '.$nparams
+				'The function/method called by "'.$this->_get_call_link($call).'" requires '.$reqparams
 					.' arguments but you have given '.count($arguments),
 				PC_Error::E_WRONG_ARGUMENT_COUNT
 			);
 		}
 		else
 		{
-			$tmixed = new PC_Type(PC_Type::OBJECT,'mixed');
+			$tmixed = new PC_Type(PC_Type::OBJECT,null,'mixed');
 			$tunknown = PC_Type::$UNKNOWN;
 			$i = 0;
 			foreach($method->get_params() as $param)
@@ -265,8 +267,8 @@ final class PC_Analyzer extends FWS_Object
 							$this->_report(
 								$call,
 								'The argument '.($i + 1).' in "'.$this->_get_call_link($call).'" requires '
-									.$this->_get_article($tactual).' "'.$tactual.'" but you have given '
-									.$this->_get_article($trequired).' "'.$trequired.'"',
+									.$this->_get_article($trequired).' "'.$trequired.'" but you have given '
+									.$this->_get_article($tactual).' "'.$tactual.'"',
 								PC_Error::E_WRONG_ARGUMENT_TYPE
 							);
 						}
@@ -336,7 +338,7 @@ final class PC_Analyzer extends FWS_Object
 	private function _get_article($type)
 	{
 		$str = $type === null ? 'x' : $type->__ToString();
-		return in_array($str[0],array('i','a','o','u','e')) ? 'an' : 'a';
+		return isset($str[0]) && in_array($str[0],array('i','a','o','u','e')) ? 'an' : 'a';
 	}/*
 	
 	private function _error($msg,$loc)

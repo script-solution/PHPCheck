@@ -100,6 +100,10 @@ class PC_MultiType extends FWS_Object
 		if(!($type instanceof PC_Type))
 			FWS_Helper::def_error('instance','type','PC_Type',$type);
 		
+		// special case
+		if($type->get_type() == PC_Type::UNKNOWN && count($this->types) == 0)
+			return true;
+		
 		foreach($this->types as $t)
 		{
 			if($t->equals($type))
@@ -115,7 +119,7 @@ class PC_MultiType extends FWS_Object
 	
 	public function __ToString()
 	{
-		return implode(' or ',$this->types);
+		return $this->is_unknown() ? 'unknown' : implode(' or ',$this->types);
 	}
 }
 ?>

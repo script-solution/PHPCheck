@@ -40,7 +40,7 @@ final class PC_Module_Index extends FWS_Module
 				'line' => $call->get_line()
 			);
 		}
-		$tpl->add_array('calls',$tplcalls);
+		$tpl->add_variable_ref('calls',$tplcalls);
 		
 		// analyze everything
 		$analyzer = new PC_Analyzer();
@@ -56,7 +56,7 @@ final class PC_Module_Index extends FWS_Module
 				'type' => $error->get_type()
 			);
 		}
-		$tpl->add_array('errors',$tplerrors);
+		$tpl->add_variable_ref('errors',$tplerrors);
 	}
 }
 ?>

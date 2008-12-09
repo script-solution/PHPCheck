@@ -32,6 +32,13 @@ class PC_Call extends PC_Location
 	private $class = null;
 	
 	/**
+	 * Indicates wether this function-call is an object-creation (new)
+	 *
+	 * @var boolean
+	 */
+	private $objcreation = false;
+	
+	/**
 	 * Wether the method is static
 	 *
 	 * @var boolean
@@ -72,6 +79,24 @@ class PC_Call extends PC_Location
 	public function set_static($static)
 	{
 		$this->static = (bool)$static;
+	}
+	
+	/**
+	 * @return boolean wether the call is an object-creation
+	 */
+	public function is_object_creation()
+	{
+		return $this->objcreation;
+	}
+	
+	/**
+	 * Sets wether the call is an object-creation
+	 *
+	 * @param boolean $val the new value
+	 */
+	public function set_object_creation($val)
+	{
+		$this->objcreation = (bool)$val;
 	}
 
 	/**

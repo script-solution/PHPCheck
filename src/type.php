@@ -53,7 +53,7 @@ final class PC_Type extends FWS_Object
 	 */
 	public static function get_type_by_name($name)
 	{
-		switch($name)
+		switch(FWS_String::strtolower($name))
 		{
 			case 'integer':
 			case 'int':
@@ -95,6 +95,13 @@ final class PC_Type extends FWS_Object
 	private $_type;
 	
 	/**
+	 * The value (if known)
+	 *
+	 * @var mixed
+	 */
+	private $_value;
+	
+	/**
 	 * The class-name (for self::OBJECT)
 	 *
 	 * @var string
@@ -102,12 +109,20 @@ final class PC_Type extends FWS_Object
 	private $_class;
 	
 	/**
+	 * The elements for self::TARRAY (instances of PC_Type)
+	 *
+	 * @var array
+	 */
+	private $_array_elements = array();
+	
+	/**
 	 * Constructor
 	 *
 	 * @param int $type the type
+	 * @param mixed $value if known the value
 	 * @param string $class the class-name (for self::OBJECT)
 	 */
-	public function __construct($type,$class = '')
+	public function __construct($type,$value = null,$class = '')
 	{
 		parent::__construct();
 		
@@ -115,6 +130,7 @@ final class PC_Type extends FWS_Object
 			FWS_Helper::def_error('int','type',$type);
 		
 		$this->_type = $type;
+		$this->_value = $value;
 		$this->_class = $class;
 	}
 	
@@ -136,6 +152,43 @@ final class PC_Type extends FWS_Object
 	}
 	
 	/**
+	 * Returns the type of the array-element with given key
+	 *
+	 * @param mixed $key the key
+	 * @return PC_Type the type of the element
+	 */
+	public function get_array_type($key)
+	{
+		if($this->_type == self::TARRAY && isset($this->_array_elements[$key]))
+			return $this->_array_elements[$key];
+		return PC_Type::$UNKNOWN;
+	}
+	
+	/**
+	 * Sets the array-element-type for the given key to given type
+	 *
+	 * @param mixed $key the key
+	 * @param PC_Type $type the element-type
+	 */
+	public function set_array_type($key,$type)
+	{
+		if($type !== null && !($type instanceof PC_Type))
+			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		
+		// an access like $var[x] = y converts $var implicitly to an array
+		$this->_type = self::TARRAY;
+		$this->_array_elements[$key] = $type === null ? PC_Type::$UNKNOWN : $type;
+	}
+	
+	/**
+	 * @return boolean wether this type is a scalar type
+	 */
+	public function is_scalar()
+	{
+		return in_array($this->_type,array(self::BOOL,self::FLOAT,self::INT,self::STRING));
+	}
+	
+	/**
 	 * @return boolean true if the type is unknown
 	 */
 	public function is_unknown()
@@ -149,6 +202,14 @@ final class PC_Type extends FWS_Object
 	public function get_type()
 	{
 		return $this->_type;
+	}
+	
+	/**
+	 * @return mixed value (null may mean unknown or the value is null)
+	 */
+	public function get_value()
+	{
+		return $this->_value;
 	}
 	
 	/**
@@ -203,7 +264,15 @@ final class PC_Type extends FWS_Object
 	 */
 	public function __toString()
 	{
-		return $this->_type == self::OBJECT ? (string)$this->_class : $this->_get_type_name($this->_type);
+		if($this->_type == self::OBJECT)
+			return (string)$this->_class;
+		if($this->_type == self::TARRAY)
+			return 'array='.FWS_PrintUtils::to_string($this->_array_elements,true,false);
+		
+		$str = $this->_get_type_name($this->_type);
+		if($this->_value !== null)
+			$str .= '='.FWS_PrintUtils::to_string($this->_value,true,false);
+		return $str;
 	}
 }
 ?>

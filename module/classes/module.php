@@ -47,7 +47,7 @@ final class PC_Module_Classes extends FWS_Module
 				'url' => $url->set('name',$class->get_name())->to_url()
 			);
 		}
-		$tpl->add_array('classes',$tplclasses);
+		$tpl->add_variable_ref('classes',$tplclasses);
 	}
 }
 ?>

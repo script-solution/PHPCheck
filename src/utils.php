@@ -25,7 +25,8 @@ class PC_Utils extends FWS_UtilBase
 	 */
 	public static function get_data()
 	{
-		define('DEBUG_MODE',false);
+		$input = FWS_Props::get()->input();
+		define('DEBUG_MODE',$input->isset_var('debug','get'));
 		define('USE_CACHE',!DEBUG_MODE);
 		define('REPORT_MIXED',DEBUG_MODE);
 		define('REPORT_UNKNOWN',DEBUG_MODE);
@@ -40,12 +41,13 @@ class PC_Utils extends FWS_UtilBase
 			//'../Boardsolution/src/auth.php',
 		);
 		if(DEBUG_MODE)
-			$files[] = 'test2.php';
+			$files[] = 'test.php';
 		else
 		{
-			foreach(FWS_FileUtils::get_dir_content('../Boardsolution/front/module/calendar',true,true) as $item)
+			foreach(FWS_FileUtils::get_dir_content('../Boardsolution/',true,true) as $item)
 			{
-				if(preg_match('/\.php$/',$item) && strpos($item,'.svn/') === false)
+				if(preg_match('/\.php$/',$item) && strpos($item,'.svn/') === false &&
+						strpos($item,'/cache/') === false && strpos($item,'/tests/') === false)
 					$files[] = $item;
 			}
 		}

@@ -88,7 +88,7 @@ final class PC_Module_Class extends FWS_Module
 		// constants
 		$consts = $class->get_constants();
 		ksort($consts);
-		$tpl->add_array('consts',$consts);
+		$tpl->add_variable_ref('consts',$consts);
 		
 		// fields
 		$fields = array();
@@ -102,7 +102,7 @@ final class PC_Module_Class extends FWS_Module
 				'line' => 1//$field->get_line()
 			);
 		}
-		$tpl->add_array('fields',$fields);
+		$tpl->add_variable_ref('fields',$fields);
 		
 		// methods
 		$methods = array();
@@ -116,7 +116,7 @@ final class PC_Module_Class extends FWS_Module
 				'line' => $method->get_line()
 			);
 		}
-		$tpl->add_array('methods',$methods);
+		$tpl->add_variable_ref('methods',$methods);
 		
 		// source-lines
 		if(is_file($class->get_file()))

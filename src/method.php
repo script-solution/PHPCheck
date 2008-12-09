@@ -135,6 +135,14 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	}
 	
 	/**
+	 * @return int the total number of params (including optional ones)
+	 */
+	public function get_param_count()
+	{
+		return count($this->params);
+	}
+	
+	/**
 	 * Determines the number of required parameters
 	 *
 	 * @return int the number

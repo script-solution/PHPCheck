@@ -22,6 +22,7 @@ FWS_Props::get()->set_loader(new PC_PropLoader());
 // TODO use static for fields
 // TODO handle case-sensitivy correctly
 // TODO handle list() so that it declares the variables as unknown?
+// TODO type-hinting in catch-blocks is not supported yet
 // FIXME the parameters of BS_User_Current->login() are wrong
 // FIXME parameters like $foo = array(1 => 'true') are not recognized correctly
 

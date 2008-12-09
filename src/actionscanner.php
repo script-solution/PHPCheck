@@ -345,7 +345,7 @@ class PC_ActionScanner extends FWS_Object
 		
 		// handle $this
 		if($name == '$this' && ($dp = FWS_String::strpos($scope,'::')) !== false)
-			return new PC_Type(PC_Type::OBJECT,FWS_String::substr($scope,0,$dp));
+			return new PC_Type(PC_Type::OBJECT,null,FWS_String::substr($scope,0,$dp));
 		
 		return null;
 	}
@@ -371,71 +371,9 @@ class PC_ActionScanner extends FWS_Object
 		
 		$res = PC_Type::$UNKNOWN;
 		list($t,,) = $this->tokens[$this->pos++];
-		
-		// assignment?
-		if($t == '=')
-		{
-			$this->_skip_rubbish();
-			
-			// TODO this section does not take care of e.g. "2 + 1.4" or similar stuff.
-			// we just take the first token and use it's type.
-			list($t,$str,) = $this->tokens[$this->pos];
-			switch($t)
-			{
-				case T_VARIABLE:
-					// handle something like $a = $b = 2; or $a = $b->foo();
-					$res = $this->_handle_variable($c + 1);
-					break;
-				
-				// detect simple type assignments
-				case T_CONSTANT_ENCAPSED_STRING:
-					$res = PC_Type::$STRING;
-					break;
-				case T_DNUMBER:
-					$res = PC_Type::$FLOAT;
-					break;
-				case T_LNUMBER:
-					$res = PC_Type::$INT;
-					break;
-				case T_ARRAY:
-					$res = PC_Type::$TARRAY;
-					break;
-				case T_STRING:
-					// we'll get true and false here
-					if(strcasecmp($str,'true') == 0 || strcasecmp($str,'false') == 0)
-						$res = PC_Type::$BOOL;
-					else
-					{
-						// this may be a function-call
-						$res = $this->_handle_func_call();
-						
-						// if the call was no call, we have to walk one step back, so that we are in front of ';'
-						if($res === null)
-						{
-							$res = PC_Type::$UNKNOWN;
-							$this->pos = $oldpos;
-						}
-					}
-					break;
-				
-				// handle instantiations
-				case T_NEW:
-					$res = $this->_handle_new();
-					break;
-				
-				// by default we don't know the type
-				default:
-					$res = PC_Type::$UNKNOWN;
-					break;
-			}
-			
-			// if we are in an inner call, assign the result to the variable
-			// this handles stuff like $a = $b = $c = 3;
-			if($c > 0)
-				$this->_set_local_var($var,$res);
-		}
+	
 		// $foo->bar() or $foo->bar ?
-		else if($t == T_OBJECT_OPERATOR)
+		if($t == T_OBJECT_OPERATOR)
 		{
 			$type = $this->_get_var_type($var);
 			$res = $this->_handle_object_access($type);
@@ -443,10 +381,38 @@ class PC_ActionScanner extends FWS_Object
 			// just store the result if we are in a sub-call
 			if($c == 0)
 				$res = null;
+			
+			// go to next interesting token. It might be a '='
+			$this->_skip_rubbish();
+			// just continue if we have a '='
+			if(!isset($this->tokens[$this->pos]) || $this->tokens[$this->pos][0] != '=')
+				return $res;
+			
+			list($t,,) = $this->tokens[$this->pos++];
 		}
-		// we don't know array-element-types
+		
+		// assignment?
+		if($t == '=')
+		{
+			$this->_skip_rubbish();
+			
+			// determine type
+			$casttype = null;
+			$res = $this->_get_type_from_token($casttype,null,$c);
+			if($res === null)
+				$res = PC_Type::$UNKNOWN;
+			
+			// if we are in an inner call, assign the result to the variable
+			// this handles stuff like $a = $b = $c = 3;
+			if($c > 0)
+				$this->_set_local_var($var,$res);
+		}
+		// handle array accesses
 		else if($t == '[')
-			$res = PC_Type::$UNKNOWN;
+		{
+			$type = $this->_get_var_type($var);
+			$res = $this->_handle_array_access($type);
+		}
 		// in all other cases we skip the variable
 		else
 		{
@@ -479,6 +445,7 @@ class PC_ActionScanner extends FWS_Object
 	{
 		// function-name or field-name
 		$this->_skip_rubbish();
+		$oldpos = $this->pos;
 		list(,$str,$line) = $this->tokens[$this->pos++];
 		
 		// ensure that we are at '('
@@ -502,21 +469,28 @@ class PC_ActionScanner extends FWS_Object
 		}
 		// $foo->fieldName... ?
 		else
-			$res = $this->_handle_class_field($type,$str);
+		{
+			// step back to field-name
+			$this->pos = $oldpos;
+			$res = $this->_handle_class_field($type);
+		}
 		
 		return $res;
 	}
 	
 	/**
-	 * Handles a class-field-access. Assumes that we are behind the field-name.
+	 * Handles a class-field-access. Assumes that we are on the field-name.
 	 * 
 	 * @param PC_Type $vartype the found variable-type for this class-field-access
-	 * @param string $fieldname the name of the field
 	 * @return PC_Type the return-type
 	 */
-	private function _handle_class_field($vartype,$fieldname)
+	private function _handle_class_field($vartype)
 	{
-		list($t,,) = $this->tokens[$this->pos];
+		$oldpos = $this->pos;
+		list($t,$str,) = $this->tokens[$this->pos++];
+		// just strings as field-names supported
+		if($t != T_STRING)
+			return PC_Type::$UNKNOWN;
 
 		// determine type of $var->$fieldName
 		$fieldtype = PC_Type::$UNKNOWN;
@@ -524,10 +498,13 @@ class PC_ActionScanner extends FWS_Object
 			isset($this->classes[$vartype->get_class()]))
 		{
 			$class = $this->classes[$vartype->get_class()];
-			$field = $class->get_field('$'.$fieldname);
+			$field = $class->get_field('$'.$str);
 			if($field !== null)
 				$fieldtype = $field->get_type();
 		}
+		
+		$this->_skip_rubbish();
+		list($t,,) = $this->tokens[$this->pos];
 		
 		// it is an object
 		if($t == T_OBJECT_OPERATOR)
@@ -537,7 +514,11 @@ class PC_ActionScanner extends FWS_Object
 		}
 		// simple access
 		else
+		{
 			$res = $fieldtype;
+			// we walked to far
+			$this->pos = $oldpos;
+		}
 		
 		return $res;
 	}
@@ -562,7 +543,11 @@ class PC_ActionScanner extends FWS_Object
 		{
 			// build constructor-call
 			$call = new PC_Call($this->file,$line);
-			$call->set_class($str);
+			$call->set_object_creation(true);
+			if(strcasecmp($str,'self') == 0)
+				$call->set_class($this->_get_var_type('$this')->get_class());
+			else
+				$call->set_class($str);
 			$call->set_function('__construct');
 			
 			// go to '('
@@ -570,7 +555,7 @@ class PC_ActionScanner extends FWS_Object
 			$this->_skip_rubbish();
 			
 			$this->_handle_call_args($call);
-			return new PC_Type(PC_Type::OBJECT,$str);
+			return new PC_Type(PC_Type::OBJECT,null,$str);
 		}
 		// variables are not supported here yet!
 		
@@ -711,11 +696,20 @@ class PC_ActionScanner extends FWS_Object
 			list($t,,) = $this->tokens[$this->pos];
 			if($t != '(')
 			{
-				// TODO handle class-constants
 				$this->pos--;
-				if(isset($this->classes[$first]))
+				
+				// determine classname
+				$classname = $first;
+				if(strcasecmp($first,'self') == 0)
 				{
-					$class = $this->classes[$first];
+					$dp = FWS_String::strpos($this->scope,'::');
+					if($dp !== false)
+						$classname = FWS_String::substr($this->scope,0,$dp);
+				}
+				
+				if(isset($this->classes[$classname]))
+				{
+					$class = $this->classes[$classname];
 					if($class->get_constant($second) !== null)
 						return $class->get_constant($second);
 				}
@@ -723,6 +717,8 @@ class PC_ActionScanner extends FWS_Object
 			}
 			
 			$call->set_function($second);
+			
+			// handle 'parent::'
 			if(strcasecmp($first,'parent') == 0)
 			{
 				$first = PC_Class::UNKNOWN;
@@ -749,6 +745,14 @@ class PC_ActionScanner extends FWS_Object
 					}
 				}
 			}
+			// handle 'self::'
+			else if(strcasecmp($first,'self') == 0)
+			{
+				$selftype = $this->_get_var_type('$this');
+				if($selftype !== null)
+					$first = $selftype->get_class();
+			}
+			
 			$call->set_class($first);
 		}
 		return $call;
@@ -790,7 +794,7 @@ class PC_ActionScanner extends FWS_Object
 		
 		$this->pos++;
 		$arg = null;
-		$arg_finished = false;
+		$casttype = null;
 		$curlies = 1;
 		for(;$this->pos < $this->end;$this->pos++)
 		{
@@ -805,54 +809,16 @@ class PC_ActionScanner extends FWS_Object
 			// an argument? (we may have subcalls or similar...)
 			if($curlies == 1)
 			{
-				switch($t)
+				if($t == ',')
 				{
-					case T_VARIABLE:
-						$res = $this->_handle_variable(1);
-						if(!$arg_finished)
-							$arg = $res;
-						$arg_finished = true;
-						break;
-					case T_CONSTANT_ENCAPSED_STRING:
-						if(!$arg_finished)
-							$arg = PC_Type::$STRING;
-						break;
-					case T_DNUMBER:
-						if(!$arg_finished)
-							$arg = PC_Type::$FLOAT;
-						break;
-					case T_LNUMBER:
-						if(!$arg_finished)
-							$arg = PC_Type::$INT;
-						break;
-					case T_ARRAY:
-						if(!$arg_finished)
-							$arg = PC_Type::$TARRAY;
-						break;
-					case T_NEW:
-						if(!$arg_finished)
-							$arg = $this->_handle_new();
-						break;
-					case T_STRING:
-						// we'll get true and false here
-						if(!$arg_finished && (strcasecmp($str,'true') == 0 || strcasecmp($str,'false') == 0))
-							$arg = PC_Type::$BOOL;
-						else
-						{
-							$res = $this->_handle_func_call();
-							if(!$arg_finished)
-								$arg = $res;
-							$arg_finished = true;
-						}
-						break;
-					case ',':
-						// walk to next argument
-						if($arg !== null)
-							$call->add_argument($arg);
-						$arg = null;
-						$arg_finished = false;
-						break;
+					// walk to next argument
+					if($arg !== null)
+						$call->add_argument($arg);
+					$arg = null;
+					$casttype = null;
 				}
+				else
+					$arg = $this->_get_type_from_token($casttype,$arg);
 			}
 			// arguments finished..
 			else if($curlies == 0)
@@ -870,6 +836,325 @@ class PC_ActionScanner extends FWS_Object
 		
 		// there must be something wrong here..
 		return null;
+	}
+	
+	/**
+	 * Handles a definition of an array. Assumes that we are on the T_ARRAY token
+	 */
+	private function _handle_array_def()
+	{
+		$type = new PC_Type(PC_Type::TARRAY);
+		
+		// go to '('
+		$this->pos++;
+		$this->_skip_rubbish();
+		
+		$numkey = 0;
+		$key = null;
+		$assoc = false;
+		$curlies = 1;
+		$casttype = null;
+		$arg = null;
+		$val = null;
+		$valchecked = false;
+		for($this->pos++;$this->pos < $this->end;$this->pos++)
+		{
+			list($t,$str,) = $this->tokens[$this->pos];
+			
+			// count curlies, so we know when we're done
+			if($t == '(')
+				$curlies++;
+			else if($t == ')')
+				$curlies--;
+			
+			// an argument? (we may have subcalls or similar...)
+			if($curlies == 1)
+			{
+				if($t == T_DOUBLE_ARROW)
+				{
+					// save that we may have a valid key
+					$assoc = true;
+					$key = $val;
+					
+					// reset
+					$valchecked = false;
+					$val = null;
+					$arg = null;
+					$casttype = null;
+				}
+				else if($t == ',')
+				{
+					// insert element
+					if($assoc && $key !== null)
+					{
+						$type->set_array_type($key,$arg);
+						if(FWS_Helper::is_integer($key))
+							$numkey = $key + 1;
+					}
+					else if(!$assoc)
+						$type->set_array_type($numkey++,$arg);
+					
+					// reset
+					$valchecked = false;
+					$assoc = false;
+					$val = null;
+					$key = null;
+					$arg = null;
+					$casttype = null;
+				}
+				else
+				{
+					// determine value (will just be valid if it is a single token)
+					if(!$valchecked)
+					{
+						$val = $this->_get_value_from_token();
+						$valchecked = true;
+					}
+					else if($t != T_WHITESPACE && $t != T_COMMENT && $t != T_DOC_COMMENT)
+						$val = null;
+					
+					// determine type
+					$arg = $this->_get_type_from_token($casttype,$arg);
+				}
+			}
+			// end of array-def?
+			else if($curlies == 0)
+			{
+				if($valchecked)
+				{
+					// insert element
+					if($assoc && $key !== null)
+					{
+						$type->set_array_type($key,$arg);
+						if(FWS_Helper::is_integer($key))
+							$numkey = $key + 1;
+					}
+					else if(!$assoc)
+						$type->set_array_type($numkey++,$arg);
+				}
+				break;
+			}
+		}
+		
+		return $type;
+	}
+	
+	/**
+	 * Handles an array-access ('$array[...]'). Assumes that we are on the '[' token
+	 * 
+	 * @param PC_Type $var the array to access (has not to be an array)
+	 * @return PC_Type the resulting type of the access
+	 */
+	private function _handle_array_access($var)
+	{
+		$arg = null;
+		$casttype = null;
+		$valchecked = false;
+		for(;$this->pos < $this->end;$this->pos++)
+		{
+			list($t,,) = $this->tokens[$this->pos];
+			if($t == ']')
+				break;
+			
+			// we allow just a single token atm
+			if(!$valchecked)
+			{
+				$arg = $this->_get_type_from_token($casttype,$arg);
+				if($arg !== null)
+					$valchecked = true;
+			}
+			// otherwise the type is unknown
+			else
+				$arg = PC_Type::$UNKNOWN;
+		}
+		
+		// access
+		$subvar = null;
+		if($var !== null && $var->get_type() == PC_Type::TARRAY && $arg !== null &&
+				$arg->get_value() !== null)
+		{
+			if($arg->is_scalar())
+				$subvar = $var->get_array_type($arg->get_value());
+		}
+		if($subvar === null)
+			$subvar = PC_Type::$UNKNOWN;
+		
+		// handle multi-dimensional arrays
+		$this->pos++;
+		$this->_skip_rubbish();
+		if($this->tokens[$this->pos][0] == '[')
+			return $this->_handle_array_access($subvar);
+		
+		$this->pos--;
+		return $subvar;
+	}
+	
+	/**
+	 * Determines the type from the current token
+	 *
+	 * @param PC_Type $casttype the casttype. will be set by the function
+	 * @param PC_Type $arg the current type you've detected for the expression
+	 * @param int $c the recursion-count for handle_variable (1 will be added)
+	 * @return PC_Type the type
+	 */
+	private function _get_type_from_token(&$casttype,$arg,$c = 0)
+	{
+		list($t,$str,) = $this->tokens[$this->pos];
+		switch($t)
+		{
+			case T_BOOL_CAST:
+			case T_ARRAY_CAST:
+			case T_DOUBLE_CAST:
+			case T_INT_CAST:
+			case T_OBJECT_CAST:
+			case T_UNSET_CAST:
+			case T_STRING_CAST:
+				if($casttype === null)
+					$casttype = $this->_get_type_from_cast($t);
+				break;
+			
+			case T_VARIABLE:
+				$res = $this->_handle_variable($c + 1);
+				if($arg === null)
+					$arg = $casttype === null ? $res : $casttype;
+				break;
+			
+			case T_FUNC_C:
+			case T_CLASS_C:
+			case T_METHOD_C:
+			case T_FILE:
+				if($arg === null)
+					$arg = $casttype === null ? PC_Type::$STRING : $casttype;
+				break;
+			
+			case T_CONSTANT_ENCAPSED_STRING:
+				if($arg === null)
+					$arg = $casttype === null ? new PC_Type(PC_Type::STRING,$str) : $casttype;
+				break;
+			
+			case T_DNUMBER:
+				if($arg === null)
+					$arg = $casttype === null ? new PC_Type(PC_Type::FLOAT,(double)$str) : $casttype;
+				break;
+			
+			case T_LINE:
+				if($arg === null)
+					$arg = $casttype === null ? PC_Type::$INT : $casttype;
+				break;
+			
+			case T_LNUMBER:
+				if($arg === null)
+					$arg = $casttype === null ? new PC_Type(PC_Type::INT,(int)$str) : $casttype;
+				break;
+			
+			case T_ARRAY:
+				$arg = $this->_handle_array_def();
+				if($casttype !== null)
+					$arg = $casttype;
+				break;
+			
+			case T_NEW:
+				if($arg === null)
+				{
+					$arg = $this->_handle_new();
+					if($casttype !== null)
+						$arg = $casttype;
+				}
+				break;
+			
+			case T_STRING:
+				if($arg === null)
+				{
+					// true
+					if(strcasecmp($str,'true') == 0)
+					{
+						$arg = $casttype === null ? new PC_Type(PC_Type::BOOL,true) : $casttype;
+						break;
+					}
+					// false
+					else if(strcasecmp($str,'false') == 0)
+					{
+						$arg = $casttype === null ? new PC_Type(PC_Type::BOOL,false) : $casttype;
+						break;
+					}
+					// null
+					else if(strcasecmp($str,'null') == 0)
+					{
+						$arg = $casttype === null ? PC_Type::$UNKNOWN : $casttype;
+						break;
+					}
+				}
+				
+				// handle func call
+				$res = $this->_handle_func_call();
+				if($arg === null)
+					$arg = $casttype === null ? $res : $casttype;
+				break;
+		}
+		return $arg;
+	}
+	
+	/**
+	 * Determines the value of the current token, if possible
+	 *
+	 * @return mixed the value or null if not known
+	 */
+	private function _get_value_from_token()
+	{
+		list($t,$str,) = $this->tokens[$this->pos];
+		$val = null;
+		switch($t)
+		{
+			case T_DNUMBER:
+			case T_LNUMBER:
+			case T_CONSTANT_ENCAPSED_STRING:
+				$val = $str;
+				break;
+			
+			// look if we know the value of the variable
+			case T_VARIABLE:
+				$var = $this->_get_var_type($str);
+				if($var !== null && $var->get_value() !== null)
+					$val = $var->get_value();
+				break;
+			
+			case T_STRING:
+				if(strcasecmp($str,'true') == 0)
+					$val = true;
+				else if(strcasecmp($str,'false') == 0)
+					$val = false;
+				// we can skip null here since null can't be distinguished from "unknown"
+				break;
+		}
+		return $val;
+	}
+	
+	/**
+	 * Determines the type of the given cast
+	 *
+	 * @param int $cast the cast-type
+	 * @return PC_Type the type-instance
+	 */
+	private function _get_type_from_cast($cast)
+	{
+		switch($cast)
+		{
+			case T_BOOL_CAST:
+				return PC_Type::$BOOL;
+			case T_ARRAY_CAST:
+				return PC_Type::$TARRAY;
+			case T_DOUBLE_CAST:
+				return PC_Type::$FLOAT;
+			case T_INT_CAST:
+				return PC_Type::$INT;
+			case T_STRING_CAST:
+				return PC_Type::$STRING;
+			
+			case T_OBJECT_CAST:
+			case T_UNSET_CAST:
+			default:
+				return PC_Type::$UNKNOWN;
+		}
 	}
 	
 	/**
@@ -900,7 +1185,7 @@ class PC_ActionScanner extends FWS_Object
 				$heredoc = true;
 			else if($t == T_END_HEREDOC)
 				$heredoc = false;
-			else if(!$heredoc && $t != T_WHITESPACE && $t != T_COMMENT && $t != T_DOC_COMMENT)
+			else if(!$heredoc && $t != T_WHITESPACE && $t != T_COMMENT && $t != T_DOC_COMMENT && $t != '@')
 				return;
 		}
 	}
