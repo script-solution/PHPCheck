@@ -22,7 +22,7 @@ class PC_Field extends PC_Variable implements PC_Visible
 	 *
 	 * @var string
 	 */
-	private $visibility = self::V_PUBLIC;
+	private $visibility;
 	
 	/**
 	 * The type of the variable
@@ -32,13 +32,43 @@ class PC_Field extends PC_Variable implements PC_Visible
 	private $type;
 	
 	/**
-	 * Constructor
+	 * Wether the field is static
+	 *
+	 * @var boolean
 	 */
-	public function __construct()
+	private $static = false;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param string $name the name of the field
+	 * @param PC_Type $type the type of the field
+	 * @param string $visibility the visibility
+	 */
+	public function __construct($name = '',$type = null,$visibility = self::V_PUBLIC)
 	{
-		parent::__construct();
+		parent::__construct($name);
 		
-		$this->type = PC_Type::$UNKNOWN;
+		$this->visibility = $visibility;
+		$this->type = $type === null ? PC_Type::$UNKNOWN : $type;
+	}
+	
+	/**
+	 * @return boolean wether the method is static
+	 */
+	public function is_static()
+	{
+		return $this->static;
+	}
+	
+	/**
+	 * Sets wether the method is static
+	 *
+	 * @param boolean $static the new value
+	 */
+	public function set_static($static)
+	{
+		$this->static = (bool)$static;
 	}
 	
 	/**
@@ -93,7 +123,7 @@ class PC_Field extends PC_Variable implements PC_Visible
 	
 	public function __ToString()
 	{
-		return $this->get_name().'['.$this->type.']';
+		return $this->visibility.' '.($this->static ? 'static ' : '').$this->get_name().'['.$this->type.']';
 	}
 }
 ?>

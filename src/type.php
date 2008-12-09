@@ -83,7 +83,7 @@ final class PC_Type extends FWS_Object
 			
 			default:
 				// TODO check if we know the class?
-				return new PC_Type(self::OBJECT,$name);
+				return new PC_Type(self::OBJECT,null,$name);
 		}
 	}
 	
@@ -113,7 +113,7 @@ final class PC_Type extends FWS_Object
 	 *
 	 * @var array
 	 */
-	private $_array_elements = array();
+	private $_array_elements = null;
 	
 	/**
 	 * Constructor
@@ -177,6 +177,8 @@ final class PC_Type extends FWS_Object
 		
 		// an access like $var[x] = y converts $var implicitly to an array
 		$this->_type = self::TARRAY;
+		if($this->_array_elements === null)
+			$this->_array_elements = array();
 		$this->_array_elements[$key] = $type === null ? PC_Type::$UNKNOWN : $type;
 	}
 	
@@ -210,6 +212,16 @@ final class PC_Type extends FWS_Object
 	public function get_value()
 	{
 		return $this->_value;
+	}
+	
+	/**
+	 * Sets the value
+	 *
+	 * @param mixed $value the new value
+	 */
+	public function set_value($value)
+	{
+		$this->_value = $value;
 	}
 	
 	/**
@@ -267,11 +279,16 @@ final class PC_Type extends FWS_Object
 		if($this->_type == self::OBJECT)
 			return (string)$this->_class;
 		if($this->_type == self::TARRAY)
-			return 'array='.FWS_PrintUtils::to_string($this->_array_elements,true,false);
+		{
+			$str = 'array';
+			if($this->_array_elements !== null)
+				$str .= '='.FWS_PrintUtils::to_string($this->_array_elements,PHP_SAPI != 'cli',false);
+			return $str;
+		}
 		
 		$str = $this->_get_type_name($this->_type);
 		if($this->_value !== null)
-			$str .= '='.FWS_PrintUtils::to_string($this->_value,true,false);
+			$str .= '='.FWS_PrintUtils::to_string($this->_value,PHP_SAPI != 'cli',false);
 		return $str;
 	}
 }

@@ -176,18 +176,23 @@ class PC_TypeScanner extends FWS_Object
 		switch($t)
 		{
 			case T_CONSTANT_ENCAPSED_STRING:
-				return PC_Type::$STRING;
+				return new PC_Type(PC_Type::STRING,$str);
 			
 			case T_STRING:
-				if(strcasecmp($str,'true') == 0 || strcasecmp($str,'false') == 0)
-					return PC_Type::$BOOL;
+				if(strcasecmp($str,'true') == 0)
+					return new PC_Type(PC_Type::BOOL,true);
+				else if(strcasecmp($str,'false') == 0)
+					return new PC_Type(PC_Type::BOOL,false);
 				// TODO handle constants / func-calls
 
+			case T_ARRAY:
+				return PC_Type::$TARRAY;
+			
 			case T_DNUMBER:
-				return PC_Type::$FLOAT;
+				return new PC_Type(PC_Type::FLOAT,(double)$str);
 			
 			case T_LNUMBER:
-				return PC_Type::$INT;
+				return new PC_Type(PC_Type::INT,(int)$str);
 		}
 		
 		return PC_Type::$UNKNOWN;
@@ -421,6 +426,16 @@ class PC_TypeScanner extends FWS_Object
 		$this->_skip_rubbish();
 		list($t,$str,) = $this->tokens[$this->pos];
 		
+		// handle static
+		if($t == T_STATIC)
+		{
+			$field->set_static(true);
+			// to next interesting token
+			$this->pos++;
+			$this->_skip_rubbish();
+			list($t,$str,) = $this->tokens[$this->pos];
+		}
+				
 		// is it a function?
 		if($t != T_VARIABLE)
 		{
@@ -428,11 +443,21 @@ class PC_TypeScanner extends FWS_Object
 			return;
 		}
 		
-		// TODO handle static
-		if($t == T_STATIC)
-			list(,$str,) = $this->tokens[++$this->pos];
-		
 		$field->set_name($str);
+		
+		// look for default type
+		$this->pos++;
+		$this->_skip_rubbish();
+		list($t,$str,) = $this->tokens[$this->pos];
+		if($t == '=')
+		{
+			$this->pos++;
+			$this->_skip_rubbish();
+			
+			list($t,$str,) = $this->tokens[$this->pos];
+			$type = $this->_get_type_from_token($t,$str);
+			$field->set_type($type);
+		}
 		
 		// run to the end
 		$this->_run_to(';');

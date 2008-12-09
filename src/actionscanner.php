@@ -398,7 +398,17 @@ class PC_ActionScanner extends FWS_Object
 			
 			// determine type
 			$casttype = null;
-			$res = $this->_get_type_from_token($casttype,null,$c);
+			$res = null;
+			for(;$this->pos < $this->end;$this->pos++)
+			{
+				list($t,,) = $this->tokens[$this->pos];
+				if($t == ';')
+					break;
+				
+				$res = $this->_get_type_from_token($casttype,$res,$c);
+			}
+			
+			// null = unknown
 			if($res === null)
 				$res = PC_Type::$UNKNOWN;
 			
@@ -1002,6 +1012,50 @@ class PC_ActionScanner extends FWS_Object
 		list($t,$str,) = $this->tokens[$this->pos];
 		switch($t)
 		{
+			// arithmetic
+			case '+':
+			case '-':
+			case '/':
+			case '*':
+			case '%':
+			case T_SL:
+			case T_SR:
+				$arg = $casttype === null ? PC_Type::$FLOAT : $casttype;
+				break;
+			
+			// bool ops
+			case '&':
+			case '|':
+			case '~':
+			case '^':
+				$arg = $casttype === null ? PC_Type::$INT : $casttype;
+				break;
+			
+			// concatenation
+			case '.':
+				$arg = $casttype === null ? PC_Type::$STRING : $casttype;
+				break;
+			
+			// condition
+			case T_IS_EQUAL:
+			case T_IS_IDENTICAL:
+			case T_IS_NOT_EQUAL:
+			case T_IS_NOT_IDENTICAL:
+			case T_IS_GREATER_OR_EQUAL:
+			case T_IS_SMALLER_OR_EQUAL:
+			case '>':
+			case '<':
+				$arg = $casttype === null ? PC_Type::$BOOL : $casttype;
+				break;
+			
+			// expr ? expr : expr
+			case ':':
+			case '?':
+				// use the type from the next token
+				// TODO is it ok to use the exact value here? at least it is one of the two options...
+				$arg = null;
+				break;
+			
 			case T_BOOL_CAST:
 			case T_ARRAY_CAST:
 			case T_DOUBLE_CAST:

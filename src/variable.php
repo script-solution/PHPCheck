@@ -27,9 +27,11 @@ class PC_Variable extends FWS_Object
 	/**
 	 * Constructor
 	 */
-	public function __construct()
+	public function __construct($name = '')
 	{
 		parent::__construct();
+		
+		$this->name = $name;
 	}
 	
 	/**
