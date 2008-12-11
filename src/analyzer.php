@@ -248,7 +248,7 @@ final class PC_Analyzer extends FWS_Object
 		else
 		{
 			$tmixed = new PC_Type(PC_Type::OBJECT,null,'mixed');
-			$tunknown = PC_Type::$UNKNOWN;
+			$tunknown = new PC_Type(PC_Type::UNKNOWN);
 			$i = 0;
 			foreach($method->get_params() as $param)
 			{
@@ -259,8 +259,7 @@ final class PC_Analyzer extends FWS_Object
 				{
 					if(REPORT_UNKNOWN || $arg === null || !$arg->equals($tunknown))
 					{
-						if(($arg === null && !$param->is_optional()) ||
-								($arg !== null && !$param->get_mtype()->contains($arg)))
+						if(!$this->_is_argument_ok($arg,$param))
 						{
 							$trequired = $param->get_mtype();
 							$tactual = $arg;
@@ -277,6 +276,34 @@ final class PC_Analyzer extends FWS_Object
 				$i++;
 			}
 		}
+	}
+	
+	/**
+	 * Checks wether $arg is ok for $param
+	 *
+	 * @param PC_Type $arg the argument
+	 * @param PC_Parameter $param the parameter
+	 * @return boolean true if so
+	 */
+	private function _is_argument_ok($arg,$param)
+	{
+		// not present but required?
+		if($arg === null && !$param->is_optional())
+			return false;
+		
+		// unknown / not present
+		if($arg === null)
+			return true;
+		
+		// arg in the allowed types?
+		if($param->get_mtype()->contains($arg))
+			return true;
+		
+		// every int can be converted to float
+		if($arg->get_type() == PC_Type::INT && $param->get_mtype()->contains(new PC_Type(PC_Type::FLOAT)))
+			return true;
+		
+		return false;
 	}
 	
 	/**

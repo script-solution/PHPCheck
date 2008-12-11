@@ -44,12 +44,18 @@ class PC_Utils extends FWS_UtilBase
 			$files[] = 'test.php';
 		else
 		{
-			foreach(FWS_FileUtils::get_dir_content('../Boardsolution/',true,true) as $item)
+			foreach(FWS_FileUtils::get_dir_content('../PHPLib/',true,true) as $item)
 			{
 				if(preg_match('/\.php$/',$item) && strpos($item,'.svn/') === false &&
 						strpos($item,'/cache/') === false && strpos($item,'/tests/') === false)
 					$files[] = $item;
 			}
+			/*foreach(FWS_FileUtils::get_dir_content('../Boardsolution/',true,true) as $item)
+			{
+				if(preg_match('/\.php$/',$item) && strpos($item,'.svn/') === false &&
+						strpos($item,'/cache/') === false && strpos($item,'/tests/') === false)
+					$files[] = $item;
+			}*/
 		}
 		
 		if(USE_CACHE)
@@ -156,7 +162,7 @@ class PC_Utils extends FWS_UtilBase
 					return $cfuncs[$function]->get_return_type();
 			}
 		}
-		return PC_Type::$UNKNOWN;
+		return new PC_Type(PC_Type::UNKNOWN);
 	}
 	
 	/**

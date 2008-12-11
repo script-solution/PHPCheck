@@ -42,6 +42,21 @@ final class PC_Module_Index extends FWS_Module
 		}
 		$tpl->add_variable_ref('calls',$tplcalls);
 		
+		$tplvars = array();
+		foreach($vars as $scope => $svars)
+		{
+			$scope = $scope == PC_ActionScanner::SCOPE_GLOBAL ? '<i>global</i>' : $scope;
+			foreach($svars as $name => $type)
+			{
+				$tplvars[] = array(
+					'scope' => $scope,
+					'name' => $name,
+					'type' => $type
+				);
+			}
+		}
+		$tpl->add_variable_ref('vars',$tplvars);
+		
 		// analyze everything
 		$analyzer = new PC_Analyzer();
 		$analyzer->analyze($constants,$functions,$classes,$vars,$calls);

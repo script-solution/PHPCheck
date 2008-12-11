@@ -10,12 +10,13 @@
  * @link				http://www.script-solution.de
  */
 
-define('FWS_PATH','../../PHPLib/');
+define('ROOT','../');
+define('FWS_PATH',dirname(__FILE__).'/../../PHPLib/');
 
 // init the framework
 include_once(FWS_PATH.'init.php');
 
-FWS_Path::set_server_app('../');
+FWS_Path::set_server_app(ROOT);
 
 /**
  * The autoloader for the test-cases
@@ -28,7 +29,7 @@ function PC_UnitTest_autoloader($item)
 	if(FWS_String::starts_with($item,'PC_Tests_'))
 	{
 		$item = FWS_String::substr($item,FWS_String::strlen('PC_Tests_'));
-		$path = FWS_String::strtolower($item).'.php';
+		$path = dirname(__FILE__).'/'.FWS_String::strtolower($item).'.php';
 		if(is_file($path))
 		{
 			include($path);

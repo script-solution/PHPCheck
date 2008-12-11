@@ -173,6 +173,7 @@ class PC_TypeScanner extends FWS_Object
 	 */
 	private function _get_type_from_token($t,$str)
 	{
+		// TODO we have to do some expression evaluation here or at least a detection of arithmetic...
 		switch($t)
 		{
 			case T_CONSTANT_ENCAPSED_STRING:
@@ -183,10 +184,14 @@ class PC_TypeScanner extends FWS_Object
 					return new PC_Type(PC_Type::BOOL,true);
 				else if(strcasecmp($str,'false') == 0)
 					return new PC_Type(PC_Type::BOOL,false);
+				// constants
+				else if(isset($this->constants[$str]))
+					return new PC_Type($this->constants[$str]->get_type());
+				break;
 				// TODO handle constants / func-calls
 
 			case T_ARRAY:
-				return PC_Type::$TARRAY;
+				return new PC_Type(PC_Type::TARRAY);
 			
 			case T_DNUMBER:
 				return new PC_Type(PC_Type::FLOAT,(double)$str);
@@ -195,7 +200,7 @@ class PC_TypeScanner extends FWS_Object
 				return new PC_Type(PC_Type::INT,(int)$str);
 		}
 		
-		return PC_Type::$UNKNOWN;
+		return new PC_Type(PC_Type::UNKNOWN);
 	}
 	
 	/**

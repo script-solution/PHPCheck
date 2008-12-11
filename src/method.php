@@ -55,7 +55,7 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 		parent::__construct($file,$line);
 		
 		$this->params = array();
-		$this->return = PC_Type::$UNKNOWN;
+		$this->return = new PC_Type(PC_Type::UNKNOWN);
 	}
 	
 	/**
@@ -204,7 +204,7 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 			$str .= 'final ';
 		$str .= 'function <b>'.$this->get_name().'</b>(';
 		$str .= implode(', ',$this->get_params());
-		$str .= ')';
+		$str .= '): '.$this->get_return_type();
 		return $str;
 	}
 }

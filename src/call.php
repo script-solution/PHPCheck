@@ -153,7 +153,7 @@ class PC_Call extends PC_Location
 		if(!($type instanceof PC_Type))
 			FWS_Helper::def_error('instance','type','PC_Type',$type);
 		
-		$this->arguments[] = $type;
+		$this->arguments[] = clone $type;
 	}
 	
 	/**

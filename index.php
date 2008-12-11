@@ -25,6 +25,7 @@ FWS_Props::get()->set_loader(new PC_PropLoader());
 // TODO type-hinting in catch-blocks is not supported yet
 // FIXME the parameters of BS_User_Current->login() are wrong
 // FIXME parameters like $foo = array(1 => 'true') are not recognized correctly
+// FIXME octal numbers are not detected correctly?
 
 $doc = FWS_Props::get()->doc();
 echo $doc->render();

@@ -3,6 +3,13 @@
 <script type="text/javascript" src="{js.get_file('js/basic.js','fws')}"></script>
 <script type="text/javascript" src="{js.get_file('js/table_sorter.js','fws')}">';
 </script>
+
+<a href="#funcs">Detected function-calls</a> &middot;
+<a href="#vars">Detected variables</a> &middot;
+<a href="#errors">Possible errors</a>
+<br />
+
+<h2><a name="funcs">Detected function-calls ({calls.length}):</a></h2>
 <table id="sql_debug" width="100%">
 	<thead>
 		<tr>
@@ -24,6 +31,22 @@
 	</tbody>
 </table>
 
+<h2><a name="vars">Detected variables ({vars.length}):</a></h2>
+<table width="100%">
+	<tr>
+		<th>Scope</th>
+		<th>Name</th>
+		<th>Type</th>
+	</tr>
+	{loop vars as var}
+	<tr>
+		<td>{var:scope}</td>
+		<td>{var:name}</td>
+		<td>{var:type}</td>
+	</tr>
+	{endloop}
+</table>
+
 <script type="text/javascript">
 <!--
 var sorter = new FWS_TableSorter("sql_debug");
@@ -31,7 +54,7 @@ var sorter = new FWS_TableSorter("sql_debug");
 </script>
 
 {if errors.length > 0}
-<h2>Possible errors found ({errors.length}):</h2>
+<h2><a name="errors">Possible errors found ({errors.length}):</a></h2>
 <table>
 	<tr>
 		<th>ErrNo</th>

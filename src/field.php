@@ -50,7 +50,7 @@ class PC_Field extends PC_Variable implements PC_Visible
 		parent::__construct($name);
 		
 		$this->visibility = $visibility;
-		$this->type = $type === null ? PC_Type::$UNKNOWN : $type;
+		$this->type = $type === null ? new PC_Type(PC_Type::UNKNOWN) : $type;
 	}
 	
 	/**

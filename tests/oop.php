@@ -34,6 +34,9 @@ abstract class b extends a {
 }
 
 interface i {
+	/**
+	 * @return string
+	 */
 	public function doSomething();
 }
 final class x extends b implements i {
@@ -89,15 +92,15 @@ $e = $d->test2($d);
 			(string)$a->get_field('$p')
 		);
 		self::assertEquals(
-			'public function <b>__construct</b>()',
+			'public function <b>__construct</b>(): unknown',
 			(string)$a->get_method('__construct')
 		);
 		self::assertEquals(
-			'private function <b>test</b>()',
+			'private function <b>test</b>(): unknown',
 			(string)$a->get_method('test')
 		);
 		self::assertEquals(
-			'protected function <b>test2</b>(a)',
+			'protected function <b>test2</b>(a): a',
 			(string)$a->get_method('test2')
 		);
 		
@@ -121,7 +124,7 @@ $e = $d->test2($d);
 		self::assertEquals(true,$i->is_interface());
 		self::assertEquals(false,$i->is_final());
 		self::assertEquals(
-			'public function <b>doSomething</b>()',
+			'public function <b>doSomething</b>(): string',
 			(string)$i->get_method('doSomething')
 		);
 		
@@ -133,15 +136,15 @@ $e = $d->test2($d);
 		self::assertEquals('b',$x->get_super_class());
 		self::assertEquals(array('i'),$x->get_interfaces());
 		self::assertEquals(
-			'public function <b>doSomething</b>()',
+			'public function <b>doSomething</b>(): string',
 			(string)$x->get_method('doSomething')
 		);
 		self::assertEquals(
-			'protected function <b>test2</b>(b)',
+			'protected function <b>test2</b>(b): b',
 			(string)$x->get_method('test2')
 		);
 		self::assertEquals(
-			'public static function <b>mystatic</b>()',
+			'public static function <b>mystatic</b>(): unknown',
 			(string)$x->get_method('mystatic')
 		);
 		$field = new PC_Field('$var',new PC_Type(PC_Type::INT,4),PC_Field::V_PRIVATE);

@@ -9,15 +9,6 @@
  * @link				http://www.script-solution.de
  */
 
-// init static fields
-PC_Type::$UNKNOWN = new PC_Type(PC_Type::UNKNOWN);
-PC_Type::$INT = new PC_Type(PC_Type::INT);
-PC_Type::$BOOL = new PC_Type(PC_Type::BOOL);
-PC_Type::$FLOAT = new PC_Type(PC_Type::FLOAT);
-PC_Type::$STRING = new PC_Type(PC_Type::STRING);
-PC_Type::$TARRAY = new PC_Type(PC_Type::TARRAY);
-PC_Type::$RESOURCE = new PC_Type(PC_Type::RESOURCE);
-
 /**
  * This class is used to store the type of a variable, class-field or method-return-type
  *
@@ -36,15 +27,6 @@ final class PC_Type extends FWS_Object
 	const RESOURCE	= 6;
 	const UNKNOWN		= 7;
 	
-	// some static ones that are always the same
-	public static $INT;
-	public static $BOOL;
-	public static $FLOAT;
-	public static $STRING;
-	public static $TARRAY;
-	public static $RESOURCE;
-	public static $UNKNOWN;
-	
 	/**
 	 * Determines the type-instance by the given type-name
 	 *
@@ -60,30 +42,31 @@ final class PC_Type extends FWS_Object
 			case 'long':
 			case 'short':
 			case 'byte':
-				return self::$INT;
+				return new self(self::INT);
 			
 			case 'bool':
 			case 'boolean':
-				return self::$BOOL;
+				return new self(self::BOOL);
 			
 			case 'float':
 			case 'double':
-				return self::$FLOAT;
+				return new self(self::FLOAT);
 			
 			case 'string':
 			case 'str':
-				return self::$STRING;
+			case 'char':
+				return new self(self::STRING);
 			
 			case 'array':
-				return self::$TARRAY;
+				return new self(self::TARRAY);
 			
 			case 'resource':
 			case 'res':
-				return self::$RESOURCE;
+				return new self(self::RESOURCE);
 			
 			default:
 				// TODO check if we know the class?
-				return new PC_Type(self::OBJECT,null,$name);
+				return new self(self::OBJECT,null,$name);
 		}
 	}
 	
@@ -135,6 +118,21 @@ final class PC_Type extends FWS_Object
 	}
 	
 	/**
+	 * Clones an object of this class. Ensures that references will be cloned, too.
+	 */
+	public function __clone()
+	{
+		parent::__clone();
+		
+		// clone array-types
+		if(is_array($this->_array_elements))
+		{
+			foreach($this->_array_elements as $k => $v)
+				$this->_array_elements[$k] = clone $v;
+		}
+	}
+	
+	/**
 	 * Checks wether this type is equal to the given one
 	 *
 	 * @param object $o the object to compare with
@@ -152,6 +150,16 @@ final class PC_Type extends FWS_Object
 	}
 	
 	/**
+	 * @return int the number of elements in the array
+	 */
+	public function get_array_count()
+	{
+		if($this->_type == self::TARRAY && $this->_array_elements !== null)
+			return count($this->_array_elements);
+		return 0;
+	}
+	
+	/**
 	 * Returns the type of the array-element with given key
 	 *
 	 * @param mixed $key the key
@@ -161,7 +169,7 @@ final class PC_Type extends FWS_Object
 	{
 		if($this->_type == self::TARRAY && isset($this->_array_elements[$key]))
 			return $this->_array_elements[$key];
-		return PC_Type::$UNKNOWN;
+		return new PC_Type(PC_Type::UNKNOWN);
 	}
 	
 	/**
@@ -175,11 +183,11 @@ final class PC_Type extends FWS_Object
 		if($type !== null && !($type instanceof PC_Type))
 			FWS_Helper::def_error('instance','type','PC_Type',$type);
 		
-		// an access like $var[x] = y converts $var implicitly to an array
+		// convert implicitly to an array
 		$this->_type = self::TARRAY;
 		if($this->_array_elements === null)
 			$this->_array_elements = array();
-		$this->_array_elements[$key] = $type === null ? PC_Type::$UNKNOWN : $type;
+		$this->_array_elements[$key] = $type === null ? new PC_Type(PC_Type::UNKNOWN) : $type;
 	}
 	
 	/**
@@ -207,10 +215,57 @@ final class PC_Type extends FWS_Object
 	}
 	
 	/**
+	 * Sets the type
+	 *
+	 * @param int $type the new value
+	 */
+	public function set_type($type)
+	{
+		if(!FWS_Helper::is_integer($type))
+			FWS_Helper::def_error('int','type',$type);
+		
+		$this->_type = $type;
+	}
+	
+	/**
 	 * @return mixed value (null may mean unknown or the value is null)
 	 */
 	public function get_value()
 	{
+		return $this->_value;
+	}
+	
+	/**
+	 * @return mixed the value that should be used for arithmethic (+,-,...)
+	 */
+	public function get_value_as_number()
+	{
+		if($this->_value === null || !in_array($this->_type,array(self::BOOL,self::FLOAT,self::INT)))
+			return 0;
+		return $this->_value;
+	}
+	
+	/**
+	 * @return string the value as string
+	 */
+	public function get_value_as_str()
+	{
+		if($this->_value === null || $this->_type == self::UNKNOWN)
+			return '\'\'';
+		if($this->_type == self::STRING)
+			return (string)$this->_value;
+		return '\''.(string)$this->_value.'\'';
+	}
+	
+	/**
+	 * @return mixed a value that can be used (will take care of unknown values)
+	 */
+	public function get_value_for_use()
+	{
+		if($this->_value === null || $this->_type == self::UNKNOWN)
+			return 0;
+		if($this->_type == self::STRING)
+			return (string)$this->_value;
 		return $this->_value;
 	}
 	

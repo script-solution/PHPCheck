@@ -22,6 +22,13 @@ func($c[3][0][0]);
 func($c[3][0][1]);
 func($c[4]);
 func($c[3][0][1][0]);
+$a = array();
+$a[] = new a(1);
+$a[] = 4;
+$a[] = 5;
+$a["Abc"] = "me";
+$b = 0;
+$b[] = 4;
 ?>';
 	
 	public function testArrays()
@@ -41,7 +48,6 @@ func($c[3][0][1][0]);
 		$vars = $ascanner->get_vars();
 		$calls = $ascanner->get_calls();
 		
-		//echo FWS_PrintUtils::to_string($calls,false);
 		$args = $calls[0]->get_arguments();
 		self::assertEquals('integer=1',(string)$args[0]);
 		$args = $calls[1]->get_arguments();
@@ -58,6 +64,15 @@ func($c[3][0][1][0]);
 		self::assertEquals('unknown',(string)$args[0]);
 		$args = $calls[7]->get_arguments();
 		self::assertEquals('unknown',(string)$args[0]);
+		
+		self::assertEquals(
+			'array={0 = a;1 = integer=4;2 = integer=5;"Abc" = string="me";}',
+			(string)$vars[PC_ActionScanner::SCOPE_GLOBAL]['$a']
+		);
+		self::assertEquals(
+			'array={0 = integer=4;}',
+			(string)$vars[PC_ActionScanner::SCOPE_GLOBAL]['$b']
+		);
 	}
 }
 ?>
