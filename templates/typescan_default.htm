@@ -1,0 +1,31 @@
+{include "inc_header.htm"}
+
+<form method="post" action="{gurl.build_submod_url()}">
+<input type="hidden" name="action_id" value="{action_id}" />
+<div class="pc_border">
+	<h1 class="pc_topic">Type scanner</h1>
+	<fieldset class="pc_form">
+		<dl>
+			<dt>Additional folders:</dt>
+			<dd>
+				{form.get_textarea('add_folders','../Boardsolution
+../PHPLib','90%','120px')}
+				<div class="pc_desc">One line per folder!</div>
+			</dd>
+		</dl>
+		<dl>
+			<dt>Exclude files/folders:</dt>
+			<dd>
+				{form.get_textarea('exclude','/.svn/
+/cache/','90%','120px')}
+				<div class="pc_desc">One line per file/folder!</div>
+			</dd>
+		</dl>
+	</fieldset>
+</div>
+<center>
+	<input type="submit" value="Start!" />
+</center>
+</form>
+
+{include "inc_footer.htm"}

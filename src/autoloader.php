@@ -20,11 +20,22 @@ function PC_autoloader($item)
 {
 	if(FWS_String::starts_with($item,'PC_'))
 	{
-		$item = FWS_String::substr($item,3);
-		$item = str_replace('_','/',$item);
-		$item = FWS_String::strtolower($item);
-		$item .= '.php';
-		$path = FWS_Path::server_app().'src/'.$item;
+		$nitem = substr($item,3);
+		$folder = strtolower(strtok($nitem,'_'));
+		$subfolder = 'src/';
+		if(!FWS_String::starts_with($item,'PC_Module_'))
+			$folder = '';
+		else
+		{
+			$subfolder = '';
+			$folder .= '/';
+			$nitem = substr($nitem,strlen($folder));
+		}
+		
+		$nitem = str_replace('_','/',$nitem);
+		$nitem = strtolower($nitem);
+		$nitem .= '.php';
+		$path = FWS_Path::server_app().$folder.$subfolder.$nitem;
 		if(is_file($path))
 		{
 			include($path);

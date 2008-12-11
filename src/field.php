@@ -15,8 +15,15 @@
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Field extends PC_Variable implements PC_Visible
+class PC_Field extends PC_Location implements PC_Visible
 {
+	/**
+	 * The name of the field
+	 *
+	 * @var string
+	 */
+	private $name;
+	
 	/**
 	 * The visibility
 	 *
@@ -41,16 +48,37 @@ class PC_Field extends PC_Variable implements PC_Visible
 	/**
 	 * Constructor
 	 * 
+	 * @param string $file the file of the field
+	 * @param int $line the line of the field
 	 * @param string $name the name of the field
 	 * @param PC_Type $type the type of the field
 	 * @param string $visibility the visibility
 	 */
-	public function __construct($name = '',$type = null,$visibility = self::V_PUBLIC)
+	public function __construct($file,$line,$name = '',$type = null,$visibility = self::V_PUBLIC)
 	{
-		parent::__construct($name);
+		parent::__construct($file,$line);
 		
+		$this->name = $name;
 		$this->visibility = $visibility;
 		$this->type = $type === null ? new PC_Type(PC_Type::UNKNOWN) : $type;
+	}
+	
+	/**
+	 * @return string the name
+	 */
+	public function get_name()
+	{
+		return $this->name;
+	}
+	
+	/**
+	 * Sets the name
+	 *
+	 * @param string $name the new value
+	 */
+	public function set_name($name)
+	{
+		$this->name = $name;
 	}
 	
 	/**

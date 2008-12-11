@@ -65,7 +65,7 @@ class PC_TypeScanner extends FWS_Object
 	
 	/**
 	 * The constants:
-	 * <code>array(<name> => PC_Type,...)</code>
+	 * <code>array(<name> => PC_Constant,...)</code>
 	 *
 	 * @var array
 	 */
@@ -88,7 +88,7 @@ class PC_TypeScanner extends FWS_Object
 	}
 	
 	/**
-	 * @return array the collected contants: <code>array(<name> => <type>)</code>
+	 * @return array the collected contants: <code>array(<name> => PC_Constant,...)</code>
 	 */
 	public function get_constants()
 	{
@@ -139,6 +139,7 @@ class PC_TypeScanner extends FWS_Object
 	 */
 	public function scan($source)
 	{
+		$this->doc = null;
 		$this->tokens = PC_Utils::get_tokens($source);
 		$this->end = count($this->tokens);
 		for($this->pos = 0;$this->pos < $this->end;$this->pos++)
@@ -186,7 +187,7 @@ class PC_TypeScanner extends FWS_Object
 					return new PC_Type(PC_Type::BOOL,false);
 				// constants
 				else if(isset($this->constants[$str]))
-					return new PC_Type($this->constants[$str]->get_type());
+					return new PC_Type($this->constants[$str]->get_type()->get_type());
 				break;
 				// TODO handle constants / func-calls
 
@@ -235,7 +236,7 @@ class PC_TypeScanner extends FWS_Object
 		list($t,$str,) = $this->tokens[$this->pos++];
 		$type = $this->_get_type_from_token($t,$str);
 		
-		$this->constants[$name] = $type;
+		$this->constants[$name] = new PC_Constant($this->file,$line,$name,$type);
 		
 		// skip rubbish until ')'
 		$this->_skip_rubbish();
@@ -406,14 +407,14 @@ class PC_TypeScanner extends FWS_Object
 		// save position
 		$oldpos = $this->pos;
 		
-		list($t,,) = $this->tokens[$this->pos];
+		list($t,,$line) = $this->tokens[$this->pos];
 		switch($t)
 		{
 			case T_PUBLIC:
 			case T_VAR:
 			case T_PRIVATE:
 			case T_PROTECTED:
-				$field = new PC_Field();
+				$field = new PC_Field($this->file,$line);
 				if($t == T_PROTECTED)
 					$field->set_visibity(PC_Visible::V_PROTECTED);
 				else if($t == T_PRIVATE)

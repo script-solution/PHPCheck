@@ -80,7 +80,7 @@ $e = $d->test2($d);
 		self::assertEquals(array(),$a->get_interfaces());
 		self::assertEquals((string)new PC_Type(PC_Type::INT,0),(string)$a->get_constant('c'));
 		self::assertEquals(
-			(string)new PC_Field('$f',new PC_Type(PC_Type::STRING,'"abc"'),PC_Field::V_PRIVATE),
+			(string)new PC_Field('',0,'$f',new PC_Type(PC_Type::STRING,'"abc"'),PC_Field::V_PRIVATE),
 			(string)$a->get_field('$f')
 		);
 		$array = new PC_Type(PC_Type::TARRAY);
@@ -88,7 +88,7 @@ $e = $d->test2($d);
 		$array->set_array_type(1,2);
 		$array->set_array_type(2,3);*/
 		self::assertEquals(
-			(string)new PC_Field('$p',$array,PC_Field::V_PROTECTED),
+			(string)new PC_Field('',0,'$p',$array,PC_Field::V_PROTECTED),
 			(string)$a->get_field('$p')
 		);
 		self::assertEquals(
@@ -114,7 +114,7 @@ $e = $d->test2($d);
 		self::assertEquals((string)new PC_Type(PC_Type::INT,0),(string)$b->get_constant('c'));
 		self::assertEquals(null,$b->get_field('$f'));
 		self::assertEquals(
-			(string)new PC_Field('$p',$array,PC_Field::V_PROTECTED),
+			(string)new PC_Field('',0,'$p',$array,PC_Field::V_PROTECTED),
 			(string)$b->get_field('$p')
 		);
 		
@@ -147,7 +147,7 @@ $e = $d->test2($d);
 			'public static function <b>mystatic</b>(): unknown',
 			(string)$x->get_method('mystatic')
 		);
-		$field = new PC_Field('$var',new PC_Type(PC_Type::INT,4),PC_Field::V_PRIVATE);
+		$field = new PC_Field('',0,'$var',new PC_Type(PC_Type::INT,4),PC_Field::V_PRIVATE);
 		$field->set_static(true);
 		self::assertEquals(
 			(string)$field,

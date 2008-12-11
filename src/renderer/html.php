@@ -38,6 +38,16 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 	}
 	
 	/**
+	 * @see FWS_Document_Renderer_HTML_Default::load_action_perf()
+	 *
+	 * @return FWS_Actions_Performer
+	 */
+	protected function load_action_perf()
+	{
+		return new PC_Action_Performer();
+	}
+	
+	/**
 	 * @see FWS_Document_Renderer_HTML_Default::before_start()
 	 */
 	protected function before_start()
@@ -63,19 +73,28 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 	protected function before_render()
 	{
 		$tpl = FWS_Props::get()->tpl();
+		$doc = FWS_Props::get()->doc();
 
 		$js = FWS_Javascript::get_instance();
 		$js->set_cache_folder('cache');
 		$tpl->add_global_ref('js',$js);
 		$tpl->add_allowed_method('js','get_file');
-	}
-
-	/**
-	 * @see FWS_Document_Renderer_HTML_Default::footer()
-	 */
-	protected function footer()
-	{
-		// nothing to do yet
+		
+		$url = new PC_URL();
+		$tpl->add_global_ref('gurl',$url);
+		$tpl->add_allowed_method('gurl','build_mod_url');
+		$tpl->add_allowed_method('gurl','build_submod_url');
+		
+		// add redirect information
+		$redirect = $doc->get_redirect();
+		if($redirect)
+			$tpl->add_variable_ref('redirect',$redirect,'inc_header.htm');
+		
+		// notify the template if an error has occurred
+		$tpl->add_global('module_error',$doc->get_module()->error_occurred());
+		
+		$action_result = $this->get_action_result();
+		$tpl->add_global('action_result',$action_result);
 	}
 
 	/**
@@ -85,11 +104,31 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 	{
 		$tpl = FWS_Props::get()->tpl();
 		
+		$this->perform_action();
+		
+		$projects = PC_DAO::get_projects()->get_all();
+		$pronames = array();
+		foreach($projects as $project)
+			$pronames[$project->get_id()] = $project->get_name();
+		
+		$form = new FWS_HTML_Formular();
 		$tpl->set_template('inc_header.htm');
+		$tpl->add_allowed_method('form','*');
 		$tpl->add_variables(array(
-			'location' => $this->get_breadcrumbs()
+			'location' => $this->get_breadcrumbs(),
+			'form' => $form,
+			'projects' => $pronames,
+			'project' => FWS_Props::get()->project()->get_id()
 		));
 		$tpl->restore_template();
+	}
+
+	/**
+	 * @see FWS_Document_Renderer_HTML_Default::footer()
+	 */
+	protected function footer()
+	{
+		// nothing to do yet
 	}
 }
 ?>

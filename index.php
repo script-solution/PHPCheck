@@ -12,11 +12,15 @@
 
 define('FWS_PATH','../PHPLib/');
 include_once(FWS_PATH.'init.php');
+
+include_once('config/actions.php');
 include_once('src/autoloader.php');
 FWS_AutoLoader::register_loader('PC_autoloader');
 
-// set our loader
-FWS_Props::get()->set_loader(new PC_PropLoader());
+// set our loader and accessor
+$accessor = new PC_PropAccessor();
+$accessor->set_loader(new PC_PropLoader());
+FWS_Props::set_accessor($accessor);
 
 // TODO use abstract, final for methods
 // TODO use static for fields
