@@ -1,0 +1,24 @@
+{include "inc_header.htm"}
+
+{if module_error == false}
+<table width="100%" class="pc_table">
+	<tr>
+		<th>Function</th>
+		<th>File</th>
+		<th>Line</th>
+	</tr>
+	{loop funcs as func}
+	<tr>
+		<td>{func:func}</td>
+		<td>{func:file}</td>
+		<td>{func:line}</td>
+	</tr>
+	{endloop}
+</table>
+
+<div class="pc_padtop">
+	{include "inc_pagination.htm"}
+</div>
+{endif}
+
+{include "inc_footer.htm"}

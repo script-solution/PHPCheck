@@ -1,0 +1,26 @@
+{include "inc_header.htm"}
+
+{if module_error == false}
+<table width="100%" class="pc_table">
+	<tr>
+		<th>Name</th>
+		<th>Type</th>
+		<th>File</th>
+		<th>Line</th>
+	</tr>
+	{loop consts as const}
+	<tr>
+		<td>{const:name}</td>
+		<td>{const:type}</td>
+		<td>{const:file}</td>
+		<td>{const:line}</td>
+	</tr>
+	{endloop}
+</table>
+
+<div class="pc_padtop">
+	{include "inc_pagination.htm"}
+</div>
+{endif}
+
+{include "inc_footer.htm"}

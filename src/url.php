@@ -60,7 +60,7 @@ final class PC_URL extends FWS_URL
 	 * @param string|int $mod the module-name (0 = current, -1 = none)
 	 * @param string $separator the separator of the params (default is &amp;)
 	 * @param boolean $force_sid forces the method to append the session-id
-	 * @return BS_URL the url-instance
+	 * @return PC_URL the url-instance
 	 */
 	public static function get_mod_url($mod = 0,$separator = '&amp;',$force_sid = false)
 	{
@@ -101,7 +101,7 @@ final class PC_URL extends FWS_URL
 	 * @param string|int $mod the module-name (0 = current, -1 = none)
 	 * @param string $separator the separator of the params (default is &amp;)
 	 * @param boolean $force_sid forces the method to append the session-id
-	 * @return BS_URL the url-instance
+	 * @return PC_URL the url-instance
 	 */
 	public static function get_submod_url($mod = 0,$sub = 0,$separator = '&amp;',$force_sid = false)
 	{

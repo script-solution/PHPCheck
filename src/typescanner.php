@@ -113,7 +113,7 @@ class PC_TypeScanner extends FWS_Object
 			// add missing constructor
 			if($this->classes[$name]->get_method('__construct') === null)
 			{
-				$method = new PC_Method($this->file,-1);
+				$method = new PC_Method($this->file,-1,false);
 				$method->set_name('__construct');
 				$method->set_visibity(PC_Visible::V_PUBLIC);
 				$this->classes[$name]->add_method($method);
@@ -498,7 +498,7 @@ class PC_TypeScanner extends FWS_Object
 		if(!isset($vtokens[$t]))
 			return false;
 		
-		$method = new PC_Method($this->file,$line);
+		$method = new PC_Method($this->file,$line,$class === null);
 		if($class === null)
 			$method->set_visibity(PC_Visible::V_PUBLIC);
 		

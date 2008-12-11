@@ -5,6 +5,10 @@ body {
 	font-size: 12px;
 }
 
+img {
+	border: 0;
+}
+
 /* links */
 a {
 	text-decoration: none;
@@ -59,11 +63,33 @@ fieldset.pc_form dd {
 	vertical-align: middle;
 }
 
+/* ------------ PAGINATION ------------ */
+
+.pc_pageno {
+	background-color: #f0f0f0;
+	border: 1px solid #ccc;
+}
+
+.pc_pagecurrent {
+	padding: 0px 4px;
+	font-weight: bold;
+}
+
+.pc_pageno a {
+	padding: 1px 4px;
+}
+
+.pc_pageno a:hover {
+	background-color: #3F5E88;
+	color: #fff;
+	text-decoration: none;
+}
+
 /* ------------ THE DIFFERENT CONTENT-STYLES ------------ */
 
 /* for the main content */
 .pc_main {
-	padding: 0.4em;
+	padding: 0.3em;
 	background-color: #ebebeb;
 }
 
@@ -71,7 +97,7 @@ fieldset.pc_form dd {
 	font-size: 1.1em;
 	font-weight: bold;
 	color: #fff;
-	padding: 0.4em;
+	padding: 0.3em;
 	background-color: #637591;
 	text-align: center;
 }
@@ -86,18 +112,19 @@ h1.pc_topic {
 
 /* ------------ TABLES ------------ */
 
-table {
+table.pc_table {
 	border-collapse: collapse;
 	border-spacing: 2px;
 }
-table td {
+table.pc_table td {
 	border: 1px solid #bbb;
 	padding: 0.3em;
 }
-table th {
-	background-color: #008;
+table.pc_table th {
+	background-color: #637591;
 	border: 1px solid #bbb;
 	color: #fff;
+	padding: 0.3em;
 }
 td.pc_coldesc {
 	font-weight: bold;

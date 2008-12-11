@@ -29,6 +29,60 @@ class PC_DAO_Classes extends FWS_Singleton
 	}
 	
 	/**
+	 * Returns the number of classes for the given project
+	 *
+	 * @param int $pid the project-id (0 = current)
+	 * @return int the number
+	 */
+	public function get_count($pid = 0)
+	{
+		if(!FWS_Helper::is_integer($pid) || $pid < 0)
+			FWS_Helper::def_error('intge0','pid',$pid);
+		
+		$db = FWS_Props::get()->db();
+		$project = FWS_Props::get()->project();
+		$pid = $pid === 0 ? $project->get_id() : $pid;
+		return $db->sql_num(PC_TB_CLASSES,'*',' WHERE project_id = '.$pid);
+	}
+	
+	/**
+	 * Returns all classes
+	 *
+	 * @param int $start the start-position (for the LIMIT-statement)
+	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
+	 * @return array all found classes
+	 */
+	public function get_list($start = 0,$count = 0)
+	{
+		$db = FWS_Props::get()->db();
+
+		if(!FWS_Helper::is_integer($start) || $start < 0)
+			FWS_Helper::def_error('intge0','start',$start);
+		if(!FWS_Helper::is_integer($count) || $count < 0)
+			FWS_Helper::def_error('intge0','count',$count);
+		
+		$project = FWS_Props::get()->project();
+		$classes = array();
+		$rows = $db->sql_rows(
+			'SELECT * FROM '.PC_TB_CLASSES.'
+			 WHERE project_id = '.$project->get_id().'
+			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
+		);
+		foreach($rows as $row)
+		{
+			$c = new PC_Class($row['file'],$row['line']);
+			$c->set_name($row['name']);
+			$c->set_super_class($row['superclass']);
+			$c->set_abstract($row['abstract']);
+			$c->set_interface($row['interface']);
+			$c->set_final($row['final']);
+			// TODO add class-constants, fields and methods
+			$classes[] = $c;
+		}
+		return $classes;
+	}
+	
+	/**
 	 * Creates a new entry for given class
 	 *
 	 * @param PC_Class $class the class

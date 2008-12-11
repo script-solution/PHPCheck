@@ -1,0 +1,18 @@
+{include "inc_header.htm"}
+
+{if module_error == false}
+<div class="pc_border">
+	<h1 class="pc_topic">Types</h1>
+	<div class="pc_main">
+		<div class="pc_padbottom">
+			<a href="{gurl.build_submod_url(0,'classes')}">{classcount} classes</a> have been found!
+		</div>
+		<div class="pc_padbottom">
+			<a href="{gurl.build_submod_url(0,'funcs')}">{funccount} functions</a> have been found!
+		</div>
+		<a href="{gurl.build_submod_url(0,'consts')}">{constcount} constants</a> have been found!
+	</div>
+</div>
+{endif}
+
+{include "inc_footer.htm"}

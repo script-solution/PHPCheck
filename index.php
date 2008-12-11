@@ -14,6 +14,7 @@ define('FWS_PATH','../PHPLib/');
 include_once(FWS_PATH.'init.php');
 
 include_once('config/actions.php');
+include_once('config/userdef.php');
 include_once('src/autoloader.php');
 FWS_AutoLoader::register_loader('PC_autoloader');
 

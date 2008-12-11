@@ -29,6 +29,76 @@ class PC_DAO_Functions extends FWS_Singleton
 	}
 	
 	/**
+	 * Returns the number of functions for the given project
+	 *
+	 * @param int $class the class-id (0 = free functions)
+	 * @param int $pid the project-id (0 = current)
+	 * @return int the number
+	 */
+	public function get_count($class = 0,$pid = 0)
+	{
+		if(!FWS_Helper::is_integer($class) || $class < 0)
+			FWS_Helper::def_error('intge0','class',$class);
+		if(!FWS_Helper::is_integer($pid) || $pid < 0)
+			FWS_Helper::def_error('intge0','pid',$pid);
+		
+		$db = FWS_Props::get()->db();
+		$project = FWS_Props::get()->project();
+		$pid = $pid === 0 ? $project->get_id() : $pid;
+		return $db->sql_num(PC_TB_FUNCTIONS,'*',' WHERE project_id = '.$pid.' AND class = '.$class);
+	}
+	
+	/**
+	 * Returns all functions
+	 *
+	 * @param int $class the class-id (0 = free functions)
+	 * @param int $start the start-position (for the LIMIT-statement)
+	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
+	 * @return array all found functions
+	 */
+	public function get_list($class = 0,$start = 0,$count = 0)
+	{
+		$db = FWS_Props::get()->db();
+
+		if(!FWS_Helper::is_integer($start) || $start < 0)
+			FWS_Helper::def_error('intge0','start',$start);
+		if(!FWS_Helper::is_integer($count) || $count < 0)
+			FWS_Helper::def_error('intge0','count',$count);
+		if(!FWS_Helper::is_integer($class) || $class < 0)
+			FWS_Helper::def_error('intge0','class',$class);
+		
+		$project = FWS_Props::get()->project();
+		$funcs = array();
+		$rows = $db->sql_rows(
+			'SELECT * FROM '.PC_TB_FUNCTIONS.'
+			 WHERE project_id = '.$project->get_id().' AND class = '.$class.'
+			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
+		);
+		foreach($rows as $row)
+		{
+			$c = new PC_Method($row['file'],$row['line'],$row['class'] == 0);
+			$c->set_name($row['name']);
+			$c->set_visibity($row['visibility']);
+			$c->set_abstract($row['abstract']);
+			$c->set_static($row['static']);
+			$c->set_final($row['final']);
+			foreach(FWS_Array_Utils::advanced_explode(';',$row['params']) as $param)
+			{
+				list($name,$type) = explode(':',$param);
+				$p = new PC_Parameter();
+				$types = array();
+				foreach(explode('|',$type) as $t)
+					$types[] = new PC_Type($t);
+				$p->set_mtype(PC_MultiType::get_type_by_name(implode('|',$types)));
+				$p->set_name($name);
+				$c->put_param($p);
+			}
+			$funcs[] = $c;
+		}
+		return $funcs;
+	}
+	
+	/**
 	 * Creates a new entry for given function
 	 *
 	 * @param PC_Method $function the function to create
@@ -51,7 +121,10 @@ class PC_DAO_Functions extends FWS_Singleton
 			$types = array();
 			foreach($param->get_mtype()->get_types() as $type)
 				$types[] = $type->get_type() === null ? PC_Type::UNKNOWN : $type->get_type();
-			$params .= implode(',',$types).';';
+			if(count($types) > 0)
+				$params .= implode('|',$types).';';
+			else
+				$params .= PC_Type::UNKNOWN.';';
 		}
 		
 		$project = FWS_Props::get()->project();

@@ -1,10 +1,10 @@
 <?php
 /**
- * TODO: describe the file
+ * Contains the method-class
  *
  * @version			$Id$
- * @package			Boardsolution
- * @subpackage	main
+ * @package			PHPCheck
+ * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  * @copyright		2003-2008 Nils Asmussen
  * @link				http://www.script-solution.de
@@ -13,6 +13,9 @@
 /**
  * Is used to store the properties of a method / function
  *
+ * @package			PHPCheck
+ * @subpackage	src
+ * @author			Nils Asmussen <nils@script-solution.de>
  */
 class PC_Method extends PC_Modifiable implements PC_Visible
 {
@@ -29,6 +32,13 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	 * @var boolean
 	 */
 	private $static = false;
+	
+	/**
+	 * Wether this is a free function (belongs to no class)
+	 *
+	 * @var boolean
+	 */
+	private $free;
 	
 	/**
 	 * The return-type
@@ -49,13 +59,23 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	 *
 	 * @param string $file the file of the def
 	 * @param int $line the line of the def
+	 * @param boolean $free wether it is a free function
 	 */
-	public function __construct($file,$line)
+	public function __construct($file,$line,$free)
 	{
 		parent::__construct($file,$line);
 		
 		$this->params = array();
 		$this->return = new PC_Type(PC_Type::UNKNOWN);
+		$this->free = $free;
+	}
+	
+	/**
+	 * @return boolean wether this is a free function (belongs to no class)
+	 */
+	public function is_free()
+	{
+		return $this->free;
 	}
 	
 	/**
@@ -195,13 +215,17 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	
 	public function __ToString()
 	{
-		$str = $this->get_visibility().' ';
-		if($this->is_static())
-			$str .= 'static ';
-		if($this->is_abstract())
-			$str .= 'abstract ';
-		if($this->is_final())
-			$str .= 'final ';
+		$str = '';
+		if(!$this->free)
+		{
+			$str = $this->get_visibility().' ';
+			if($this->is_static())
+				$str .= 'static ';
+			if($this->is_abstract())
+				$str .= 'abstract ';
+			if($this->is_final())
+				$str .= 'final ';
+		}
 		$str .= 'function <b>'.$this->get_name().'</b>(';
 		$str .= implode(', ',$this->get_params());
 		$str .= '): '.$this->get_return_type();

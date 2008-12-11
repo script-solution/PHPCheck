@@ -1,5 +1,6 @@
 {include "inc_header.htm"}
 
+{if module_error == false}
 <form method="post" action="{gurl.build_submod_url()}">
 <input type="hidden" name="action_id" value="{action_id}" />
 <div class="pc_border">
@@ -27,5 +28,6 @@
 	<input type="submit" value="Start!" />
 </center>
 </form>
+{endif}
 
 {include "inc_footer.htm"}

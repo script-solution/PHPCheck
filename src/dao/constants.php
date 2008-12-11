@@ -29,6 +29,55 @@ class PC_DAO_Constants extends FWS_Singleton
 	}
 	
 	/**
+	 * Returns the number of constants for the given project
+	 *
+	 * @param int $pid the project-id (0 = current)
+	 * @return int the number
+	 */
+	public function get_count($pid = 0)
+	{
+		if(!FWS_Helper::is_integer($pid) || $pid < 0)
+			FWS_Helper::def_error('intge0','pid',$pid);
+		
+		$db = FWS_Props::get()->db();
+		$project = FWS_Props::get()->project();
+		$pid = $pid === 0 ? $project->get_id() : $pid;
+		return $db->sql_num(PC_TB_CONSTANTS,'*',' WHERE project_id = '.$pid);
+	}
+	
+	/**
+	 * Returns all constants
+	 *
+	 * @param int $start the start-position (for the LIMIT-statement)
+	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
+	 * @return array all found constants
+	 */
+	public function get_list($start = 0,$count = 0)
+	{
+		$db = FWS_Props::get()->db();
+
+		if(!FWS_Helper::is_integer($start) || $start < 0)
+			FWS_Helper::def_error('intge0','start',$start);
+		if(!FWS_Helper::is_integer($count) || $count < 0)
+			FWS_Helper::def_error('intge0','count',$count);
+		
+		$project = FWS_Props::get()->project();
+		$consts = array();
+		$rows = $db->sql_rows(
+			'SELECT * FROM '.PC_TB_CONSTANTS.'
+			 WHERE project_id = '.$project->get_id().'
+			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
+		);
+		foreach($rows as $row)
+		{
+			$consts[] = new PC_Constant(
+				$row['file'],$row['line'],$row['name'],new PC_Type($row['type'],$row['value'])
+			);
+		}
+		return $consts;
+	}
+	
+	/**
 	 * Creates a new entry for given function
 	 *
 	 * @param PC_Constant $constant the constant to create
