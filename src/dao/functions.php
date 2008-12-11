@@ -88,7 +88,12 @@ class PC_DAO_Functions extends FWS_Singleton
 				$p = new PC_Parameter();
 				$types = array();
 				foreach(explode('|',$type) as $t)
-					$types[] = new PC_Type($t);
+				{
+					if(FWS_Helper::is_integer($t))
+						$types[] = new PC_Type($t);
+					else
+						$types[] = new PC_Type(PC_Type::OBJECT,null,$t);
+				}
 				$p->set_mtype(PC_MultiType::get_type_by_name(implode('|',$types)));
 				$p->set_name($name);
 				$c->put_param($p);
@@ -120,7 +125,12 @@ class PC_DAO_Functions extends FWS_Singleton
 			$params .= $param->get_name().':';
 			$types = array();
 			foreach($param->get_mtype()->get_types() as $type)
-				$types[] = $type->get_type() === null ? PC_Type::UNKNOWN : $type->get_type();
+			{
+				if($type->get_type() == PC_Type::OBJECT)
+					$types[] = $type->get_class();
+				else
+					$types[] = $type->get_type();
+			}
 			if(count($types) > 0)
 				$params .= implode('|',$types).';';
 			else

@@ -13,6 +13,13 @@
 final class PC_Module_Class extends FWS_Module
 {
 	/**
+	 * The class
+	 *
+	 * @var PC_Class
+	 */
+	private $_class;
+	
+	/**
 	 * @see FWS_Module::init()
 	 *
 	 * @param FWS_Document $doc
@@ -23,15 +30,11 @@ final class PC_Module_Class extends FWS_Module
 		
 		$renderer = $doc->use_default_renderer();
 		
-		$url = new FWS_URL();
-		$url->set('module','classes');
-		$renderer->add_breadcrumb('Classes',$url->to_url());
+		$name = $input->get_var('name','get',FWS_Input::IDENTIFIER);
+		$this->_class = PC_DAO::get_classes()->get_by_name($name);
 		
-		$class = $input->get_var('name','get',FWS_Input::IDENTIFIER);
-		$url = new FWS_URL();
-		$url->set('module','class');
-		$url->set('name',$class);
-		$renderer->add_breadcrumb($class,$url->to_url());
+		$renderer->add_breadcrumb('Classes',PC_URL::build_submod_url('types','classes'));
+		$renderer->add_breadcrumb($name,PC_URL::get_mod_url()->set('name',$name)->to_url());
 	}
 
 	/**
@@ -42,71 +45,65 @@ final class PC_Module_Class extends FWS_Module
 		$tpl = FWS_Props::get()->tpl();
 		$input = FWS_Props::get()->input();
 		
-		$class = $input->get_var('name','get',FWS_Input::IDENTIFIER);
-		list(,,$classes) = PC_Utils::get_data();
-		if(!$class || !isset($classes[$class]))
+		if(!$this->_class)
 		{
 			$this->report_error();
 			return;
 		}
 		
-		$curl = new FWS_URL();
-		$curl->set('module','class');
-		
-		$class = $classes[$class];
-		/* @var $class PC_Class */
+		$curl = PC_URL::get_mod_url();
 		
 		// build class-declaration
 		$declaration = '';
-		if(!$class->is_interface())
+		if(!$this->_class->is_interface())
 		{
-			if($class->is_abstract())
+			if($this->_class->is_abstract())
 				$declaration .= 'abstract ';
-			else if($class->is_final())
+			else if($this->_class->is_final())
 				$declaration .= 'final ';
 			$declaration .= 'class ';
 		}
 		else
 			$declaration .= 'interface ';
-		$declaration .= $class->get_name().' ';
-		if(!$class->is_interface() && ($cn = $class->get_super_class()))
+		$declaration .= $this->_class->get_name().' ';
+		if(!$this->_class->is_interface() && ($cn = $this->_class->get_super_class()))
 			$declaration .= 'extends <a href="'.$curl->set('name',$cn)->to_url().'">'.$cn.'</a> ';
-		if(count($class->get_interfaces()) > 0)
+		if(count($this->_class->get_interfaces()) > 0)
 		{
-			$declaration .= !$class->is_interface() ? 'implements ' : 'extends ';
-			foreach($class->get_interfaces() as $if)
+			$declaration .= !$this->_class->is_interface() ? 'implements ' : 'extends ';
+			foreach($this->_class->get_interfaces() as $if)
 				$declaration .= '<a href="'.$curl->set('name',$if)->to_url().'">'.$if.'</a>, ';
 			$declaration = FWS_String::substr($declaration,0,-1);
 		}
 		$declaration = FWS_String::substr($declaration,0,-1).';';
 		
 		$tpl->add_variables(array(
-			'classname' => $class->get_name(),
+			'classname' => $this->_class->get_name(),
 			'declaration' => $declaration
 		));
 		
 		// constants
-		$consts = $class->get_constants();
+		$consts = $this->_class->get_constants();
 		ksort($consts);
 		$tpl->add_variable_ref('consts',$consts);
 		
 		// fields
 		$fields = array();
-		$cfields = $class->get_fields();
+		$cfields = $this->_class->get_fields();
 		ksort($cfields);
 		foreach($cfields as $field)
 		{
 			$fields[] = array(
 				'name' => $field->get_name(),
-				'type' => $field->get_type(),
-				'line' => 1//$field->get_line()
+				'type' => (string)$field,
+				'line' => $field->get_line()
 			);
 		}
 		$tpl->add_variable_ref('fields',$fields);
 		
 		// methods
 		$methods = array();
-		$cmethods = $class->get_methods();
+		$cmethods = $this->_class->get_methods();
 		ksort($cmethods);
 		foreach($cmethods as $method)
 		{
@@ -119,8 +116,8 @@ final class PC_Module_Class extends FWS_Module
 		$tpl->add_variable_ref('methods',$methods);
 		
 		// source-lines
-		if(is_file($class->get_file()))
-			$source = FWS_FileUtils::read($class->get_file());
+		if(is_file($this->_class->get_file()))
+			$source = FWS_FileUtils::read($this->_class->get_file());
 		else
 			$source = '';
 		

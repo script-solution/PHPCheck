@@ -50,7 +50,7 @@ final class PC_SubModule_types_classes extends PC_SubModule
 				'name' => $class->get_name(),
 				'file' => $class->get_file(),
 				'line' => $class->get_line(),
-				'url' => PC_URL::get_mod_url('class')->set('class',$class->get_name())->to_url()
+				'url' => PC_URL::get_mod_url('class')->set('name',$class->get_name())->to_url()
 			);
 		}
 		

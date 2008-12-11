@@ -1,6 +1,7 @@
 {include "inc_header.htm"}
 
-<table>
+{if module_error == false}
+<table width="100%" class="pc_table">
 	<tr>
 		<th colspan="2">{classname}</th>
 	</tr>
@@ -52,7 +53,9 @@
 	{endloop}
 </table>
 
-<br />
-<code>{source}</code>
+<div class="pc_padtop">
+	<code>{source}</code>
+</div>
+{endif}
 
 {include "inc_footer.htm"}

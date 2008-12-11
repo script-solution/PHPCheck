@@ -151,7 +151,10 @@ class PC_Field extends PC_Location implements PC_Visible
 	
 	public function __ToString()
 	{
-		return $this->visibility.' '.($this->static ? 'static ' : '').$this->get_name().'['.$this->type.']';
+		$str = $this->visibility.' '.($this->static ? 'static ' : '').$this->get_name();
+		if(!$this->type->is_unknown())
+			$str .= '['.$this->type.']';
+		return $str;
 	}
 }
 ?>

@@ -46,13 +46,41 @@ class PC_DAO_Classes extends FWS_Singleton
 	}
 	
 	/**
+	 * Returns the class with given name in the given project
+	 *
+	 * @param string $name the class-name
+	 * @param int $pid the project-id (0 = current)
+	 * @return PC_Class the class or null
+	 */
+	public function get_by_name($name,$pid = 0)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(empty($name))
+			FWS_Helper::def_error('notempty','name',$name);
+		if(!FWS_Helper::is_integer($pid) || $pid < 0)
+			FWS_Helper::def_error('intge0','pid',$pid);
+		
+		$project = FWS_Props::get()->project();
+		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$row = $db->sql_fetch(
+			'SELECT * FROM '.PC_TB_CLASSES.'
+			 WHERE project_id = '.$pid.' AND name = "'.addslashes($name).'"'
+		);
+		if($row)
+			return $this->_build_class($row);
+		return null;
+	}
+	
+	/**
 	 * Returns all classes
 	 *
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
+	 * @param int $pid the project-id (0 = current)
 	 * @return array all found classes
 	 */
-	public function get_list($start = 0,$count = 0)
+	public function get_list($start = 0,$count = 0,$pid = 0)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -60,25 +88,19 @@ class PC_DAO_Classes extends FWS_Singleton
 			FWS_Helper::def_error('intge0','start',$start);
 		if(!FWS_Helper::is_integer($count) || $count < 0)
 			FWS_Helper::def_error('intge0','count',$count);
+		if(!FWS_Helper::is_integer($pid) || $pid < 0)
+			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$project = FWS_Props::get()->project();
+		$pid = $pid === 0 ? $project->get_id() : $pid;
 		$classes = array();
 		$rows = $db->sql_rows(
 			'SELECT * FROM '.PC_TB_CLASSES.'
-			 WHERE project_id = '.$project->get_id().'
+			 WHERE project_id = '.$pid.'
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
-		{
-			$c = new PC_Class($row['file'],$row['line']);
-			$c->set_name($row['name']);
-			$c->set_super_class($row['superclass']);
-			$c->set_abstract($row['abstract']);
-			$c->set_interface($row['interface']);
-			$c->set_final($row['final']);
-			// TODO add class-constants, fields and methods
-			$classes[] = $c;
-		}
+			$classes[] = $this->_build_class($row);
 		return $classes;
 	}
 	
@@ -140,38 +162,27 @@ class PC_DAO_Classes extends FWS_Singleton
 	}
 	
 	/**
-	 * Returns all entries of the acp-access-table. Additionally you get the corresponding
-	 * username (NULL if it is a group-entry)
+	 * Builds an instance of PC_Class from the given row
 	 *
-	 * @return array all rows
+	 * @param array $row the row from the db
+	 * @return PC_Class the class
 	 */
-	public function get_all()
+	private function _build_class($row)
 	{
-		$db = FWS_Props::get()->db();
-
-		return $db->sql_rows(
-			'SELECT a.*,u.`'.BS_EXPORT_USER_NAME.'` user_name
-			 FROM '.BS_TB_ACP_ACCESS.' a
-			 LEFT JOIN '.BS_TB_USER.' u ON u.`'.BS_EXPORT_USER_ID.'` = a.access_value'
-		);
-	}
-	
-	/**
-	 * Returns all entries of the acp-access-table that belong to the given module.
-	 * Additionally you get the corresponding username (NULL if it is a group-entry)
-	 *
-	 * @return array all found rows
-	 */
-	public function get_by_module($module)
-	{
-		$db = FWS_Props::get()->db();
-
-		return $db->sql_rows(
-			'SELECT a.*,u.`'.BS_EXPORT_USER_NAME.'` user_name
-			 FROM '.BS_TB_ACP_ACCESS.' a
-			 LEFT JOIN '.BS_TB_USER.' u ON u.`'.BS_EXPORT_USER_ID.'` = a.access_value
-			 WHERE a.module = "'.$module.'"'
-		);
+		$c = new PC_Class($row['file'],$row['line']);
+		$c->set_name($row['name']);
+		$c->set_super_class($row['superclass']);
+		$c->set_abstract($row['abstract']);
+		$c->set_interface($row['interface']);
+		$c->set_final($row['final']);
+		$fields = PC_DAO::get_classfields()->get_all($row['id']);
+		foreach($fields as $field)
+			$c->add_field($field);
+		$methods = PC_DAO::get_functions()->get_list($row['id']);
+		foreach($methods as $method)
+			$c->add_method($method);
+		// TODO add class-constants
+		return $c;
 	}
 }
 ?>
