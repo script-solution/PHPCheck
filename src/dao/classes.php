@@ -131,6 +131,10 @@ class PC_DAO_Classes extends FWS_Singleton
 		));
 		$cid = $db->get_last_insert_id();
 		
+		// create constants
+		foreach($class->get_constants() as $const)
+			PC_DAO::get_constants()->create($const,$cid);
+		
 		// create fields
 		foreach($class->get_fields() as $field)
 			PC_DAO::get_classfields()->create($field,$cid);
@@ -175,13 +179,12 @@ class PC_DAO_Classes extends FWS_Singleton
 		$c->set_abstract($row['abstract']);
 		$c->set_interface($row['interface']);
 		$c->set_final($row['final']);
-		$fields = PC_DAO::get_classfields()->get_all($row['id']);
-		foreach($fields as $field)
+		foreach(PC_DAO::get_constants()->get_list($row['id']) as $const)
+			$c->add_constant($const);
+		foreach(PC_DAO::get_classfields()->get_all($row['id']) as $field)
 			$c->add_field($field);
-		$methods = PC_DAO::get_functions()->get_list($row['id']);
-		foreach($methods as $method)
+		foreach(PC_DAO::get_functions()->get_list($row['id']) as $method)
 			$c->add_method($method);
-		// TODO add class-constants
 		return $c;
 	}
 }

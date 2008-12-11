@@ -736,7 +736,7 @@ class PC_ActionScanner extends FWS_Object
 				{
 					$class = $this->classes[$classname];
 					if($class->get_constant($second) !== null)
-						return $class->get_constant($second);
+						return $class->get_constant($second)->get_type();
 				}
 				return null;
 			}

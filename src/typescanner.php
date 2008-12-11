@@ -380,7 +380,7 @@ class PC_TypeScanner extends FWS_Object
 		$this->pos++;
 		$this->_skip_rubbish();
 		
-		list(,$str,) = $this->tokens[$this->pos++];
+		list(,$str,$line) = $this->tokens[$this->pos++];
 		$name = $str;
 		
 		// go to '='
@@ -392,7 +392,8 @@ class PC_TypeScanner extends FWS_Object
 		list($t,$str,) = $this->tokens[$this->pos];
 		
 		$type = $this->_get_type_from_token($t,$str);
-		$class->add_constant($name,$type);
+		
+		$class->add_constant(new PC_Constant($this->file,$line,$name,$type));
 		
 		$this->_run_to(';');
 	}
@@ -877,8 +878,8 @@ class PC_TypeScanner extends FWS_Object
 				}
 				
 				// constants
-				foreach($this->classes[$class]->get_constants() as $name => $ctype)
-					$data->add_constant($name,$ctype);
+				foreach($this->classes[$class]->get_constants() as $const)
+					$data->add_constant($const);
 			}
 			
 			$this->_add_members($data,$this->classes[$class]->get_super_class(),false);

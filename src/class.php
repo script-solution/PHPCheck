@@ -145,7 +145,7 @@ class PC_Class extends PC_Modifiable
 	 * Returns the constant with given name
 	 *
 	 * @param string $name the constant-name
-	 * @param PC_Type $type the type or null
+	 * @return PC_Constant the constant or null
 	 */
 	public function get_constant($name)
 	{
@@ -155,15 +155,14 @@ class PC_Class extends PC_Modifiable
 	/**
 	 * Adds the given constant to the class
 	 *
-	 * @param string $name the constant-name
-	 * @param PC_Type $type the type
+	 * @param PC_Constant $const the constant
 	 */
-	public function add_constant($name,$type)
+	public function add_constant($const)
 	{
-		if(!($type instanceof PC_Type))
-			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		if(!($const instanceof PC_Constant))
+			FWS_Helper::def_error('instance','const','PC_Constant',$const);
 		
-		$this->constants[$name] = $type;
+		$this->constants[$const->get_name()] = $const;
 	}
 	
 	/**

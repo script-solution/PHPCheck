@@ -17,10 +17,10 @@
 		<td colspan="2">-</td>
 	</tr>
 	{endif}
-	{loop consts as name => type}
+	{loop consts as const}
 	<tr>
-		<td>{name}</td>
-		<td>{type}</td>
+		<td><a href="#l{const:line}">{const:name}</a></td>
+		<td>{const:type}</td>
 	</tr>
 	{endloop}
 	<tr>

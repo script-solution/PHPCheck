@@ -33,6 +33,7 @@ final class PC_Module_Class extends FWS_Module
 		$name = $input->get_var('name','get',FWS_Input::IDENTIFIER);
 		$this->_class = PC_DAO::get_classes()->get_by_name($name);
 		
+		$renderer->add_breadcrumb('Types',PC_URL::build_submod_url('types'));
 		$renderer->add_breadcrumb('Classes',PC_URL::build_submod_url('types','classes'));
 		$renderer->add_breadcrumb($name,PC_URL::get_mod_url()->set('name',$name)->to_url());
 	}
@@ -83,8 +84,15 @@ final class PC_Module_Class extends FWS_Module
 		));
 		
 		// constants
-		$consts = $this->_class->get_constants();
-		ksort($consts);
+		$consts = array();
+		foreach($this->_class->get_constants() as $const)
+		{
+			$consts[] = array(
+				'name' => $const->get_name(),
+				'type' => $const->get_type(),
+				'line' => $const->get_line()
+			);
+		}
 		$tpl->add_variable_ref('consts',$consts);
 		
 		// fields
