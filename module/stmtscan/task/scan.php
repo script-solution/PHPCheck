@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains the typescan-task
+ * Contains the stmtscan-task
  *
  * @version			$Id$
  * @package			PHPCheck
@@ -11,13 +11,13 @@
  */
 
 /**
- * The task to scan for types
+ * The task to scan for statements
  *
  * @package			PHPCheck
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Module_TypeScan_Task_Scan extends FWS_Object implements FWS_Progress_Task
+final class PC_Module_StmtScan_Task_Scan extends FWS_Object implements FWS_Progress_Task
 {
 	/**
 	 * @see FWS_Progress_Task::get_total_operations()
@@ -27,7 +27,7 @@ final class PC_Module_TypeScan_Task_Scan extends FWS_Object implements FWS_Progr
 	public function get_total_operations()
 	{
 		$user = FWS_Props::get()->user();
-		return count($user->get_session_data('typescan_files',array()));
+		return count($user->get_session_data('stmtscan_files',array()));
 	}
 
 	/**
@@ -40,19 +40,20 @@ final class PC_Module_TypeScan_Task_Scan extends FWS_Object implements FWS_Progr
 	{
 		$user = FWS_Props::get()->user();
 		
-		$tscanner = new PC_TypeScanner();
-		$files = $user->get_session_data('typescan_files',array());
+		$types = new PC_TypeContainer();
+		$ascanner = new PC_StatementScanner();
+		$files = $user->get_session_data('stmtscan_files',array());
 		$end = min($pos + $ops,count($files));
 		for($i = $pos;$i < $end;$i++)
-			$tscanner->scan_file($files[$i]);
-		$tscanner->finish();
+			$ascanner->scan_file($files[$i],$types);
 		
-		foreach($tscanner->get_classes() as $class)
-			PC_DAO::get_classes()->create($class);
-		foreach($tscanner->get_constants() as $const)
-			PC_DAO::get_constants()->create($const);
-		foreach($tscanner->get_functions() as $func)
-			PC_DAO::get_functions()->create($func);
+		foreach($ascanner->get_vars() as $svars)
+		{
+			foreach($svars as $var)
+				PC_DAO::get_vars()->create($var);
+		}
+		foreach($ascanner->get_calls() as $call)
+			PC_DAO::get_calls()->create($call);
 	}
 
 	/**

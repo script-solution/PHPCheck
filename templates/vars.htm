@@ -1,0 +1,24 @@
+{include "inc_header.htm"}
+
+{if module_error == false}
+<table width="100%" class="pc_table">
+	<tr>
+		<th>Scope</th>
+		<th>Name</th>
+		<th>Type</th>
+	</tr>
+	{loop vars as var}
+	<tr>
+		<td>{var:scope}</a></td>
+		<td>{var:name}</td>
+		<td>{var:type}</td>
+	</tr>
+	{endloop}
+</table>
+
+<div class="pc_padtop">
+	{include "inc_pagination.htm"}
+</div>
+{endif}
+
+{include "inc_footer.htm"}

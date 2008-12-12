@@ -1,15 +1,23 @@
 <?php
 /**
- * TODO: describe the file
+ * Contains the type-scanner-class
  *
  * @version			$Id$
- * @package			Boardsolution
- * @subpackage	main
+ * @package			PHPCheck
+ * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  * @copyright		2003-2008 Nils Asmussen
  * @link				http://www.script-solution.de
  */
 
+/**
+ * Scans for types in a given string or file. That means classes, functions and constants will
+ * be collected.
+ *
+ * @package			PHPCheck
+ * @subpackage	src
+ * @author			Nils Asmussen <nils@script-solution.de>
+ */
 class PC_TypeScanner extends FWS_Object
 {
 	/**

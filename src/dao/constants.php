@@ -49,6 +49,33 @@ class PC_DAO_Constants extends FWS_Singleton
 	}
 	
 	/**
+	 * Returns the (free) constant with given name in the given project
+	 *
+	 * @param string $name the constant-name
+	 * @param int $pid the project-id (0 = current)
+	 * @return PC_Constant the constant or null
+	 */
+	public function get_by_name($name,$pid = 0)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(empty($name))
+			FWS_Helper::def_error('notempty','name',$name);
+		if(!FWS_Helper::is_integer($pid) || $pid < 0)
+			FWS_Helper::def_error('intge0','pid',$pid);
+		
+		$project = FWS_Props::get()->project();
+		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$row = $db->sql_fetch(
+			'SELECT * FROM '.PC_TB_CONSTANTS.'
+			 WHERE project_id = '.$pid.' AND class = 0 AND name = "'.addslashes($name).'"'
+		);
+		if($row)
+			return $this->_build_const($row);
+		return null;
+	}
+	
+	/**
 	 * Returns all constants
 	 *
 	 * @param int $class the class-id (0 = freestanding)
@@ -78,11 +105,7 @@ class PC_DAO_Constants extends FWS_Singleton
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
-		{
-			$consts[] = new PC_Constant(
-				$row['file'],$row['line'],$row['name'],new PC_Type($row['type'],$row['value'])
-			);
-		}
+			$consts[] = $this->_build_const($row);
 		return $consts;
 	}
 	
@@ -132,6 +155,19 @@ class PC_DAO_Constants extends FWS_Singleton
 			'DELETE FROM '.PC_TB_CONSTANTS.' WHERE project_id = '.$id
 		);
 		return $db->get_affected_rows();
+	}
+	
+	/**
+	 * Builds a PC_Constant from the given row
+	 *
+	 * @param array $row the row from db
+	 * @return PC_Constant the constant
+	 */
+	private function _build_const($row)
+	{
+		return new PC_Constant(
+			$row['file'],$row['line'],$row['name'],new PC_Type($row['type'],$row['value'])
+		);
 	}
 }
 ?>

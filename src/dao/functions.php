@@ -49,6 +49,33 @@ class PC_DAO_Functions extends FWS_Singleton
 	}
 	
 	/**
+	 * Returns the (free) function with given name in the given project
+	 *
+	 * @param string $name the function-name
+	 * @param int $pid the project-id (0 = current)
+	 * @return PC_Method the function or null
+	 */
+	public function get_by_name($name,$pid = 0)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(empty($name))
+			FWS_Helper::def_error('notempty','name',$name);
+		if(!FWS_Helper::is_integer($pid) || $pid < 0)
+			FWS_Helper::def_error('intge0','pid',$pid);
+		
+		$project = FWS_Props::get()->project();
+		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$row = $db->sql_fetch(
+			'SELECT * FROM '.PC_TB_FUNCTIONS.'
+			 WHERE project_id = '.$pid.' AND class = 0 AND name = "'.addslashes($name).'"'
+		);
+		if($row)
+			return $this->_build_func($row);
+		return null;
+	}
+	
+	/**
 	 * Returns all functions
 	 *
 	 * @param int $class the class-id (0 = free functions)
@@ -75,31 +102,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
-		{
-			$c = new PC_Method($row['file'],$row['line'],$row['class'] == 0);
-			$c->set_name($row['name']);
-			$c->set_visibity($row['visibility']);
-			$c->set_abstract($row['abstract']);
-			$c->set_static($row['static']);
-			$c->set_final($row['final']);
-			foreach(FWS_Array_Utils::advanced_explode(';',$row['params']) as $param)
-			{
-				list($name,$type) = explode(':',$param);
-				$p = new PC_Parameter();
-				$types = array();
-				foreach(explode('|',$type) as $t)
-				{
-					if(FWS_Helper::is_integer($t))
-						$types[] = new PC_Type($t);
-					else
-						$types[] = new PC_Type(PC_Type::OBJECT,null,$t);
-				}
-				$p->set_mtype(PC_MultiType::get_type_by_name(implode('|',$types)));
-				$p->set_name($name);
-				$c->put_param($p);
-			}
-			$funcs[] = $c;
-		}
+			$funcs[] = $this->_build_func($row);
 		return $funcs;
 	}
 	
@@ -122,7 +125,10 @@ class PC_DAO_Functions extends FWS_Singleton
 		$params = '';
 		foreach($function->get_params() as $param)
 		{
-			$params .= $param->get_name().':';
+			$params .= $param->get_name();
+			if($param->is_optional())
+				$params .= '?';
+			$params .= ':';
 			$types = array();
 			foreach($param->get_mtype()->get_types() as $type)
 			{
@@ -132,12 +138,14 @@ class PC_DAO_Functions extends FWS_Singleton
 					$types[] = $type->get_type();
 			}
 			if(count($types) > 0)
-				$params .= implode('|',$types).';';
+				$params .= implode('|',$types);
 			else
-				$params .= PC_Type::UNKNOWN.';';
+				$params .= PC_Type::UNKNOWN;
+			$params .= ';';
 		}
 		
 		$project = FWS_Props::get()->project();
+		$type = $function->get_return_type()->get_type();
 		$db->sql_insert(PC_TB_FUNCTIONS,array(
 			'project_id' => $project->get_id(),
 			'file' => addslashes($function->get_file()),
@@ -148,7 +156,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			'final' => $function->is_final() ? 1 : 0,
 			'static' => $function->is_static() ? 1 : 0,
 			'visibility' => $function->get_visibility(),
-			'return_type' => $function->get_return_type()->get_type(),
+			'return_type' => $type == PC_Type::OBJECT ? $function->get_return_type()->get_class() : $type,
 			'params' => $params
 		));
 		return $db->get_last_insert_id();
@@ -171,6 +179,49 @@ class PC_DAO_Functions extends FWS_Singleton
 			'DELETE FROM '.PC_TB_FUNCTIONS.' WHERE project_id = '.$id
 		);
 		return $db->get_affected_rows();
+	}
+	
+	/**
+	 * Builds a PC_Method from the given row
+	 *
+	 * @param array $row the row from db
+	 * @return PC_Method the method
+	 */
+	private function _build_func($row)
+	{
+		$c = new PC_Method($row['file'],$row['line'],$row['class'] == 0);
+		$c->set_name($row['name']);
+		$c->set_visibity($row['visibility']);
+		$c->set_abstract($row['abstract']);
+		$c->set_static($row['static']);
+		$c->set_final($row['final']);
+		foreach(FWS_Array_Utils::advanced_explode(';',$row['params']) as $param)
+		{
+			list($name,$type) = explode(':',$param);
+			$p = new PC_Parameter();
+			$types = array();
+			foreach(explode('|',$type) as $t)
+			{
+				if(FWS_Helper::is_integer($t))
+					$types[] = new PC_Type($t);
+				else
+					$types[] = new PC_Type(PC_Type::OBJECT,null,$t);
+			}
+			$p->set_mtype(PC_MultiType::get_type_by_name(implode('|',$types)));
+			if(FWS_String::ends_with($name,'?'))
+			{
+				$p->set_optional(true);
+				$name = FWS_String::substr($name,0,-1);
+			}
+			$p->set_name($name);
+			$c->put_param($p);
+		}
+		if(is_numeric($row['return_type']))
+			$rettype = new PC_Type($row['return_type']);
+		else
+			$rettype = new PC_Type(PC_Type::OBJECT,null,$row['return_type']);
+		$c->set_return_type($rettype);
+		return $c;
 	}
 }
 ?>

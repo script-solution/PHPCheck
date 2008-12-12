@@ -1,7 +1,7 @@
 <?php
 /**
- * Contains the typescan-module
- *
+ * Contains the default-stmtscan-submodule
+ * 
  * @version			$Id$
  * @package			PHPCheck
  * @subpackage	module
@@ -11,22 +11,14 @@
  */
 
 /**
- * The typescan-module
- *
+ * The default submodule for module stmtscan
+ * 
  * @package			PHPCheck
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Module_TypeScan extends PC_SubModuleContainer
+final class PC_SubModule_stmtscan_default extends PC_SubModule
 {
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		parent::__construct('typescan',array('default','scan'),'default');
-	}
-	
 	/**
 	 * @see FWS_Module::init()
 	 *
@@ -37,10 +29,19 @@ final class PC_Module_TypeScan extends PC_SubModuleContainer
 		parent::init($doc);
 		
 		$renderer = $doc->use_default_renderer();
-		$renderer->add_breadcrumb('Type scanner',PC_URL::build_mod_url('typescan'));
-		
-		// init submodule
-		$this->_sub->init($doc);
+		$renderer->add_action(PC_ACTION_START_STMNTSCAN,'startscan');
+	}
+
+	/**
+	 * @see FWS_Module::run()
+	 */
+	public function run()
+	{
+		$tpl = FWS_Props::get()->tpl();
+		$this->request_formular();
+		$tpl->add_variables(array(
+			'action_id' => PC_ACTION_START_STMNTSCAN
+		));
 	}
 }
 ?>

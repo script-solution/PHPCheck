@@ -17,7 +17,7 @@
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Action_typescan_startscan extends FWS_Actions_Base
+final class PC_Action_stmtscan_startscan extends FWS_Actions_Base
 {
 	public function perform_action()
 	{
@@ -48,14 +48,12 @@ final class PC_Action_typescan_startscan extends FWS_Actions_Base
 		}
 		
 		// store in session
-		$user->set_session_data('typescan_files',$files);
+		$user->set_session_data('stmtscan_files',$files);
 		
 		// clear previous data in the db
 		$project = FWS_Props::get()->project();
-		PC_DAO::get_classes()->delete_by_project($project->get_id());
-		PC_DAO::get_functions()->delete_by_project($project->get_id());
-		PC_DAO::get_constants()->delete_by_project($project->get_id());
-		PC_DAO::get_classfields()->delete_by_project($project->get_id());
+		PC_DAO::get_vars()->delete_by_project($project->get_id());
+		PC_DAO::get_calls()->delete_by_project($project->get_id());
 		
 		$this->set_redirect(true,PC_URL::get_submod_url(0,'scan'));
 		$this->set_show_status_page(false);

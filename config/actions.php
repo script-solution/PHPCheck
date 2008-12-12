@@ -14,4 +14,9 @@
  * The start-typescan-action
  */
 define('PC_ACTION_START_TYPESCAN',1);
+
+/**
+ * The start-statementscan-action
+ */
+define('PC_ACTION_START_STMNTSCAN',2);
 ?>

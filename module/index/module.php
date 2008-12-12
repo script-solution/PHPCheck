@@ -29,7 +29,7 @@ final class PC_Module_Index extends FWS_Module
 	{
 		$tpl = FWS_Props::get()->tpl();
 		
-		list($constants,$functions,$classes,$vars,$calls) = PC_Utils::get_data();
+		list($types,$vars,$calls) = PC_Utils::get_data();
 		
 		$tplcalls = array();
 		foreach($calls as $call)
@@ -45,13 +45,12 @@ final class PC_Module_Index extends FWS_Module
 		$tplvars = array();
 		foreach($vars as $scope => $svars)
 		{
-			$scope = $scope == PC_ActionScanner::SCOPE_GLOBAL ? '<i>global</i>' : $scope;
-			foreach($svars as $name => $type)
+			foreach($svars as $var)
 			{
 				$tplvars[] = array(
-					'scope' => $scope,
-					'name' => $name,
-					'type' => $type
+					'scope' => $var->get_scope(),
+					'name' => $var->get_name(),
+					'type' => $var->get_type()
 				);
 			}
 		}
@@ -59,7 +58,7 @@ final class PC_Module_Index extends FWS_Module
 		
 		// analyze everything
 		$analyzer = new PC_Analyzer();
-		$analyzer->analyze($constants,$functions,$classes,$vars,$calls);
+		$analyzer->analyze_calls($types,$vars,$calls);
 		$tplerrors = array();
 		foreach($analyzer->get_errors() as $error)
 		{

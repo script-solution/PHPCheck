@@ -44,7 +44,7 @@ class PC_Utils extends FWS_UtilBase
 			$files[] = 'test.php';
 		else
 		{
-			foreach(FWS_FileUtils::get_dir_content('../PHPLib/',true,true) as $item)
+			foreach(FWS_FileUtils::get_dir_content('../Boardsolution/install/',true,true) as $item)
 			{
 				if(preg_match('/\.php$/',$item) && strpos($item,'.svn/') === false &&
 						strpos($item,'/cache/') === false && strpos($item,'/tests/') === false)
@@ -58,7 +58,7 @@ class PC_Utils extends FWS_UtilBase
 			}*/
 		}
 		
-		if(USE_CACHE)
+		/*if(USE_CACHE)
 		{
 			// read cache
 			$scache = FWS_FileUtils::read('cache.php');
@@ -125,44 +125,15 @@ class PC_Utils extends FWS_UtilBase
 			$functions = $tscanner->get_functions();
 			$classes = $tscanner->get_classes();
 			$constants = $tscanner->get_constants();
-		}
+		}*/
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_ActionScanner();
+		$types = new PC_TypeContainer();
+		$ascanner = new PC_StatementScanner();
 		foreach($files as $file)
-			$ascanner->scan_file($file,$functions,$classes,$constants);
-		$vars = $ascanner->get_vars();
-		$calls = $ascanner->get_calls();
+			$ascanner->scan_file($file,$types);
 		
-		return array($constants,$functions,$classes,$vars,$calls);
-	}
-	
-	/**
-	 * Determines the return-type of the given function / class
-	 *
-	 * @param array $funcs an array of all known functions
-	 * @param array $classes an array of all known classes
-	 * @param string $function the function-name
-	 * @param string $class optional, the class-name
-	 * @return PC_Type the type
-	 */
-	public static function get_return_type($funcs,$classes,$function,$class = '')
-	{
-		if(!$class)
-		{
-			if(isset($funcs[$function]))
-				return $funcs[$function]->get_return_type();
-		}
-		else
-		{
-			if(isset($classes[$class]))
-			{
-				$cfuncs = $classes[$class]->get_methods();
-				if(isset($cfuncs[$function]))
-					return $cfuncs[$function]->get_return_type();
-			}
-		}
-		return new PC_Type(PC_Type::UNKNOWN);
+		return array($types,$ascanner->get_vars(),$ascanner->get_calls());
 	}
 	
 	/**

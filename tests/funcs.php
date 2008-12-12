@@ -47,10 +47,8 @@ private function d($a = 0,$b = "a",$c = false) {
 		$constants = $tscanner->get_constants();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_ActionScanner();
+		$ascanner = new PC_StatementScanner();
 		$ascanner->scan(self::$code,$functions,$classes,$constants);
-		$vars = $ascanner->get_vars();
-		$calls = $ascanner->get_calls();
 		
 		$func = $functions['a'];
 		/* @var $func PC_Method */

@@ -35,26 +35,13 @@ final class PC_Analyzer extends FWS_Object
 	}
 	
 	/**
-	 * Analyzes the given elements for possible errors and stores them
-	 *
-	 * @param array $consts an array with constants
-	 * @param array $functions an array with functions
-	 * @param array $classes an array with classes
-	 * @param array $vars an array with variables
-	 * @param array $calls an array with function-/method-calls
-	 */
-	public function analyze($consts,$functions,$classes,$vars,$calls)
-	{
-		$this->_analyze_classes($classes);
-		$this->_analyze_calls($functions,$classes,$vars,$calls);
-	}
-	
-	/**
 	 * Analyzes the given function-/method-calls
 	 *
+	 * @param PC_TypeContainer $types the types
+	 * @param array $vars all known variables
 	 * @param array $calls an array with function-/method-calls
 	 */
-	private function _analyze_calls($functions,$classes,$vars,$calls)
+	public function analyze_calls($types,$vars,$calls)
 	{
 		foreach($calls as $call)
 		{
@@ -66,20 +53,19 @@ final class PC_Analyzer extends FWS_Object
 				if($obj)
 				{
 					if($obj[0] == '$' && isset($vars[$obj]))
-						$class = $vars[$obj];
+						$classname = $vars[$obj];
 					else
-						$class = $obj;
+						$classname = $obj;
 					
-					if(isset($classes[$class]))
+					$c = $types->get_class($classname);
+					if($c !== null)
 					{
-						$c = $classes[$class];
-						/* @var $c PC_Class */
 						if(!$c->contains_method($name))
 						{
 							$this->_report(
 								$call,
 								'The method "'.$name.'" does not exist in the class "'
-									.$this->_get_class_link($class).'"!',
+									.$this->_get_class_link($classname).'"!',
 								PC_Error::E_METHOD_MISSING
 							);
 						}
@@ -118,7 +104,7 @@ final class PC_Analyzer extends FWS_Object
 						}
 					}
 					// check wether it's a buildin-php-class
-					else if($class != PC_Class::UNKNOWN && !class_exists($class,false))
+					else if($classname != PC_Class::UNKNOWN && !class_exists($classname,false))
 					{
 						$this->_report(
 							$call,
@@ -126,7 +112,7 @@ final class PC_Analyzer extends FWS_Object
 							PC_Error::E_CLASS_MISSING
 						);
 					}
-					else if(REPORT_UNKNOWN && $class == PC_Class::UNKNOWN)
+					else if(REPORT_UNKNOWN && $classname == PC_Class::UNKNOWN)
 					{
 						$this->_report(
 							$call,
@@ -138,8 +124,9 @@ final class PC_Analyzer extends FWS_Object
 			}
 			else
 			{
+				$func = $types->get_function($name);
 				// check wether it's either a user-defined and known function or a php-buildin-function
-				if(!isset($functions[$name]) && !function_exists($name))
+				if($func === null && !function_exists($name))
 				{
 					$this->_report(
 						$call,
@@ -147,11 +134,8 @@ final class PC_Analyzer extends FWS_Object
 						PC_Error::E_FUNCTION_MISSING
 					);
 				}
-				else if(isset($functions[$name]))
-				{
-					$f = $functions[$name];
-					$this->_check_params($call,$f);
-				}
+				else if($func !== null)
+					$this->_check_params($call,$func);
 			}
 		}
 	}
@@ -159,9 +143,9 @@ final class PC_Analyzer extends FWS_Object
 	/**
 	 * Analyzes the given classes
 	 *
-	 * @param array $classes an array with classes
+	 * @param array $classes an array with classes (name as key)
 	 */
-	private function _analyze_classes($classes)
+	public function analyze_classes($classes)
 	{
 		// check classes for issues
 		foreach($classes as $class)

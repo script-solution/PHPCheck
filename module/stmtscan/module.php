@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains the typescan-module
+ * Contains the stmtscan-module
  *
  * @version			$Id$
  * @package			PHPCheck
@@ -11,20 +11,20 @@
  */
 
 /**
- * The typescan-module
+ * The stmtscan-module
  *
  * @package			PHPCheck
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Module_TypeScan extends PC_SubModuleContainer
+final class PC_Module_StmtScan extends PC_SubModuleContainer
 {
 	/**
 	 * Constructor
 	 */
 	public function __construct()
 	{
-		parent::__construct('typescan',array('default','scan'),'default');
+		parent::__construct('stmtscan',array('default','scan'),'default');
 	}
 	
 	/**
@@ -37,7 +37,7 @@ final class PC_Module_TypeScan extends PC_SubModuleContainer
 		parent::init($doc);
 		
 		$renderer = $doc->use_default_renderer();
-		$renderer->add_breadcrumb('Type scanner',PC_URL::build_mod_url('typescan'));
+		$renderer->add_breadcrumb('Statement scanner',PC_URL::build_mod_url('stmtscan'));
 		
 		// init submodule
 		$this->_sub->init($doc);

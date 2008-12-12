@@ -43,7 +43,7 @@ $b[] = 4;
 		$constants = $tscanner->get_constants();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_ActionScanner();
+		$ascanner = new PC_StatementScanner();
 		$ascanner->scan(self::$code,$functions,$classes,$constants);
 		$vars = $ascanner->get_vars();
 		$calls = $ascanner->get_calls();
@@ -67,11 +67,11 @@ $b[] = 4;
 		
 		self::assertEquals(
 			'array={0 = a;1 = integer=4;2 = integer=5;"Abc" = string="me";}',
-			(string)$vars[PC_ActionScanner::SCOPE_GLOBAL]['$a']
+			(string)$vars[PC_Variable::SCOPE_GLOBAL]['$a']->get_type()
 		);
 		self::assertEquals(
 			'array={0 = integer=4;}',
-			(string)$vars[PC_ActionScanner::SCOPE_GLOBAL]['$b']
+			(string)$vars[PC_Variable::SCOPE_GLOBAL]['$b']->get_type()
 		);
 	}
 }

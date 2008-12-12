@@ -1,20 +1,25 @@
 <?php
 /**
- * TODO: describe the file
+ * Contains the statement-scanner
  *
  * @version			$Id$
- * @package			Boardsolution
- * @subpackage	main
+ * @package			PHPCheck
+ * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  * @copyright		2003-2008 Nils Asmussen
  * @link				http://www.script-solution.de
  */
 
-class PC_ActionScanner extends FWS_Object
+/**
+ * Scans for statements in a given string or file. That means depending on the given type-container
+ * it collects variable-assignments and function-calls.
+ *
+ * @package			PHPCheck
+ * @subpackage	src
+ * @author			Nils Asmussen <nils@script-solution.de>
+ */
+class PC_StatementScanner extends FWS_Object
 {
-	// global scope
-	const SCOPE_GLOBAL = '__global';
-	
 	// the states
 	const ST_WAIT_FOR_VAR = 0;
 	const ST_WAIT_FOR_CLASS = 1;
@@ -66,35 +71,18 @@ class PC_ActionScanner extends FWS_Object
 	private $vars = array();
 	
 	/**
-	 * The known functions
-	 * TODO maybe we should put this somewhere else..
+	 * The type-container
 	 *
-	 * @var array
+	 * @var PC_TypeContainer
 	 */
-	private $funcs = array();
-	
-	/**
-	 * The known classes
-	 * TODO maybe we should put this somewhere else..
-	 *
-	 * @var array
-	 */
-	private $classes = array();
-	
-	/**
-	 * The known constants
-	 * TODO maybe we should put this somewhere else..
-	 *
-	 * @var array
-	 */
-	private $constants = array();
+	private $types;
 	
 	/**
 	 * The current scope
 	 *
 	 * @var string
 	 */
-	private $scope = self::SCOPE_GLOBAL;
+	private $scope = PC_Variable::SCOPE_GLOBAL;
 	
 	/**
 	 * The scope-stack
@@ -112,7 +100,8 @@ class PC_ActionScanner extends FWS_Object
 	}
 	
 	/**
-	 * @return array all found variables: <code>array(<scope> => array(<var1> => <type1>,...),...)</code>
+	 * @return array all found variables:
+	 * 	<code>array(<scope> => array(<varname1> => <var1>,...),...)</code>
 	 */
 	public function get_vars()
 	{
@@ -123,29 +112,23 @@ class PC_ActionScanner extends FWS_Object
 	 * Scans the given file
 	 *
 	 * @param string $file the file to scan
-	 * @param array $funcs the known functions
-	 * @param array $classes the known classes
-	 * @param array $constants the known constants
+	 * @param PC_TypeContainer $types the type-container
 	 */
-	public function scan_file($file,$funcs,$classes,$constants)
+	public function scan_file($file,$types)
 	{
 		$this->file = $file;
-		$this->scan(FWS_FileUtils::read($file),$funcs,$classes,$constants);
+		$this->scan(FWS_FileUtils::read($file),$types);
 	}
 	
 	/**
 	 * Scannes the given string
 	 *
 	 * @param string $source the string to scan
-	 * @param array $funcs the known functions
-	 * @param array $classes the known classes
-	 * @param array $constants the known constants
+	 * @param PC_TypeContainer $types the type-container
 	 */
-	public function scan($source,$funcs,$classes,$constants)
+	public function scan($source,$types)
 	{
-		$this->funcs = $funcs;
-		$this->classes = $classes;
-		$this->constants = $constants;
+		$this->types = $types;
 		
 		$state = self::ST_WAIT_FOR_VAR;
 		$curlystack = array();
@@ -279,9 +262,10 @@ class PC_ActionScanner extends FWS_Object
 						$this->scope .= '::'.$str;
 						
 						// add method parameters, if known
-						if(isset($this->classes[$classname]))
+						$class = $this->types->get_class($classname);
+						if($class !== null)
 						{
-							$method = $this->classes[$classname]->get_method($str);
+							$method = $class->get_method($str);
 							if($method !== null)
 								$this->_add_parameters_to_local($method->get_params());
 						}
@@ -339,7 +323,16 @@ class PC_ActionScanner extends FWS_Object
 		if(!($type instanceof PC_Type))
 			FWS_Helper::def_error('instance','type','PC_Type',$type);
 		
-		$this->vars[$this->scope][$name] = clone $type;
+		$class = '';
+		if(($dp = FWS_String::strpos($this->scope,'::')) !== false)
+		{
+			$class = FWS_String::substr($this->scope,0,$dp);
+			$func = FWS_String::substr($this->scope,$dp + 2);
+		}
+		else
+			$func = $this->scope;
+		
+		$this->vars[$this->scope][$name] = new PC_Variable($name,clone $type,$func,$class);
 	}
 	
 	/**
@@ -355,7 +348,7 @@ class PC_ActionScanner extends FWS_Object
 		
 		// known variable
 		if(isset($this->vars[$scope][$name]))
-			return $this->vars[$scope][$name];
+			return $this->vars[$scope][$name]->get_type();
 		
 		// handle $this
 		if($name == '$this' && ($dp = FWS_String::strpos($scope,'::')) !== false)
@@ -514,9 +507,8 @@ class PC_ActionScanner extends FWS_Object
 		// determine type of $var->$fieldName
 		$fieldtype = new PC_Type(PC_Type::UNKNOWN);
 		if($vartype !== null && $vartype->get_type() == PC_Type::OBJECT &&
-			isset($this->classes[$vartype->get_class()]))
+			($class = $this->types->get_class($vartype->get_class())) !== null)
 		{
-			$class = $this->classes[$vartype->get_class()];
 			$field = $class->get_field('$'.$str);
 			if($field !== null)
 				$fieldtype = $field->get_type();
@@ -701,10 +693,7 @@ class PC_ActionScanner extends FWS_Object
 		else if($t != '(')
 		{
 			$this->pos = $oldpos;
-			if(isset($this->constants[$first]))
-				return $this->constants[$first];
-			
-			return null;
+			return $this->types->get_constant($first);
 		}
 		// walk backwards to scan the token again
 		else
@@ -732,9 +721,9 @@ class PC_ActionScanner extends FWS_Object
 						$classname = FWS_String::substr($this->scope,0,$dp);
 				}
 				
-				if(isset($this->classes[$classname]))
+				$class = $this->types->get_class($classname);
+				if($class !== null)
 				{
-					$class = $this->classes[$classname];
 					if($class->get_constant($second) !== null)
 						return $class->get_constant($second)->get_type();
 				}
@@ -750,9 +739,9 @@ class PC_ActionScanner extends FWS_Object
 				$cclass = $this->_get_var_type('$this');
 				if($cclass !== null && $cclass->get_type() == PC_Type::OBJECT)
 				{
-					if(isset($this->classes[$cclass->get_class()]))
+					$cclassobj = $this->types->get_class($cclass->get_class());
+					if($cclassobj !== null)
 					{
-						$cclassobj = $this->classes[$cclass->get_class()];
 						if($cclassobj->get_super_class() !== null)
 						{
 							$first = $cclassobj->get_super_class();
@@ -760,9 +749,10 @@ class PC_ActionScanner extends FWS_Object
 							$call->set_static(false);
 							// if the parent-method is known we set it static if that method is static
 							// because parent::<method> may be static and not-static.
-							if(isset($this->classes[$first]))
+							$pclass = $this->types->get_class($first);
+							if($pclass !== null)
 							{
-								$method = $this->classes[$first]->get_method($second);
+								$method = $pclass->get_method($second);
 								if($method !== null)
 									$call->set_static($method->is_static());
 							}
@@ -799,7 +789,7 @@ class PC_ActionScanner extends FWS_Object
 				continue;
 			if($t == T_VARIABLE)
 			{
-				$type = $this->_get_var_type($str,self::SCOPE_GLOBAL);
+				$type = $this->_get_var_type($str,PC_Variable::SCOPE_GLOBAL);
 				$this->_set_local_var($str,$type === null ? new PC_Type(PC_Type::UNKNOWN) : $type);
 			}
 		}
@@ -849,9 +839,7 @@ class PC_ActionScanner extends FWS_Object
 					$call->add_argument($arg);
 				$this->calls[] = $call;
 				// determine return type
-				$rettype = PC_Utils::get_return_type(
-					$this->funcs,$this->classes,$call->get_function(),$call->get_class()
-				);
+				$rettype = $this->_get_return_type($call->get_function(),$call->get_class());
 				return $rettype;
 			}
 		}
@@ -1378,6 +1366,36 @@ class PC_ActionScanner extends FWS_Object
 			else if(!$heredoc && $t != T_WHITESPACE && $t != T_COMMENT && $t != T_DOC_COMMENT && $t != '@')
 				return;
 		}
+	}
+	
+	/**
+	 * Determines the return-type of the given function / class
+	 *
+	 * @param array $funcs an array of all known functions
+	 * @param array $classes an array of all known classes
+	 * @param string $function the function-name
+	 * @param string $classname optional, the class-name
+	 * @return PC_Type the type
+	 */
+	private function _get_return_type($function,$classname = '')
+	{
+		if(!$classname)
+		{
+			$func = $this->types->get_function($function);
+			if($func !== null)
+				return $func->get_return_type();
+		}
+		else
+		{
+			$class = $this->types->get_class($classname);
+			if($class !== null)
+			{
+				$cfuncs = $class->get_methods();
+				if(isset($cfuncs[$function]))
+					return $cfuncs[$function]->get_return_type();
+			}
+		}
+		return new PC_Type(PC_Type::UNKNOWN);
 	}
 	
 	/**

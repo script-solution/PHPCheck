@@ -21,6 +21,14 @@
 final class PC_DAO extends FWS_UtilBase
 {
 	/**
+	 * @return PC_DAO_Calls the DAO for the calls-table
+	 */
+	public static function get_calls()
+	{
+		return PC_DAO_Calls::get_instance();
+	}
+	
+	/**
 	 * @return PC_DAO_Classes the DAO for the classes-table
 	 */
 	public static function get_classes()
@@ -58,6 +66,14 @@ final class PC_DAO extends FWS_UtilBase
 	public static function get_projects()
 	{
 		return PC_DAO_Projects::get_instance();
+	}
+	
+	/**
+	 * @return PC_DAO_Vars the DAO for the vars-table
+	 */
+	public static function get_vars()
+	{
+		return PC_DAO_Vars::get_instance();
 	}
 }
 ?>

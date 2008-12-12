@@ -15,8 +15,15 @@
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Parameter extends PC_Variable
+class PC_Parameter extends FWS_Object
 {
+	/**
+	 * The name of the variable
+	 *
+	 * @var string
+	 */
+	private $name;
+	
 	/**
 	 * Param optional?
 	 *
@@ -39,6 +46,24 @@ class PC_Parameter extends PC_Variable
 		parent::__construct();
 		
 		$this->mtype = new PC_MultiType();
+	}
+	
+	/**
+	 * @return string the name
+	 */
+	public function get_name()
+	{
+		return $this->name;
+	}
+	
+	/**
+	 * Sets the name
+	 *
+	 * @param string $name the new value
+	 */
+	public function set_name($name)
+	{
+		$this->name = $name;
 	}
 	
 	/**

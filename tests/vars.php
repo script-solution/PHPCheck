@@ -59,45 +59,45 @@ function x($a,MyClass $b) {
 		$constants = $tscanner->get_constants();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_ActionScanner();
+		$ascanner = new PC_StatementScanner();
 		$ascanner->scan(self::$code,$functions,$classes,$constants);
 		$vars = $ascanner->get_vars();
 		$calls = $ascanner->get_calls();
 		
-		$global = $vars[PC_ActionScanner::SCOPE_GLOBAL];
-		self::assertEquals((string)new PC_Type(PC_Type::INT,1),(string)$global['$i1']);
-		self::assertEquals((string)new PC_Type(PC_Type::INT,-412),(string)$global['$i2']);
-		self::assertEquals((string)new PC_Type(PC_Type::INT,123),(string)$global['$i3']);
-		self::assertEquals((string)new PC_Type(PC_Type::INT,0),(string)$global['$i4']);
-		self::assertEquals((string)new PC_Type(PC_Type::FLOAT,0.5),(string)$global['$f1']);
-		self::assertEquals((string)new PC_Type(PC_Type::FLOAT,0.123),(string)$global['$f2']);
-		self::assertEquals((string)new PC_Type(PC_Type::FLOAT,1.0),(string)$global['$f3']);
-		self::assertEquals((string)new PC_Type(PC_Type::FLOAT,2.0),(string)$global['$f4']);
-		self::assertEquals((string)new PC_Type(PC_Type::STRING,'"my\'str"'),(string)$global['$s1']);
-		self::assertEquals((string)new PC_Type(PC_Type::STRING,'\'str2\''),(string)$global['$s2']);
-		self::assertEquals((string)new PC_Type(PC_Type::STRING),(string)$global['$s3']);
-		self::assertEquals((string)new PC_Type(PC_Type::BOOL,true),(string)$global['$b1']);
-		self::assertEquals((string)new PC_Type(PC_Type::BOOL,false),(string)$global['$b2']);
-		self::assertEquals((string)new PC_Type(PC_Type::TARRAY),(string)$global['$a1']);
+		$global = $vars[PC_Variable::SCOPE_GLOBAL];
+		self::assertEquals((string)new PC_Type(PC_Type::INT,1),(string)$global['$i1']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::INT,-412),(string)$global['$i2']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::INT,123),(string)$global['$i3']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::INT,0),(string)$global['$i4']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::FLOAT,0.5),(string)$global['$f1']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::FLOAT,0.123),(string)$global['$f2']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::FLOAT,1.0),(string)$global['$f3']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::FLOAT,2.0),(string)$global['$f4']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::STRING,'"my\'str"'),(string)$global['$s1']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::STRING,'\'str2\''),(string)$global['$s2']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::STRING),(string)$global['$s3']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::BOOL,true),(string)$global['$b1']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::BOOL,false),(string)$global['$b2']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::TARRAY),(string)$global['$a1']->get_type());
 		$array = new PC_Type(PC_Type::TARRAY);
 		$array->set_array_type(0,new PC_Type(PC_Type::INT,1));
-		self::assertEquals((string)$array,(string)$global['$a2']);
+		self::assertEquals((string)$array,(string)$global['$a2']->get_type());
 		$array = new PC_Type(PC_Type::TARRAY);
 		$array->set_array_type(0,new PC_Type(PC_Type::INT,1));
 		$array->set_array_type(1,new PC_Type(PC_Type::INT,2));
 		$array->set_array_type(2,new PC_Type(PC_Type::INT,3));
-		self::assertEquals((string)$array,(string)$global['$a3']);
+		self::assertEquals((string)$array,(string)$global['$a3']->get_type());
 		$array = new PC_Type(PC_Type::TARRAY);
 		$array->set_array_type(1,new PC_Type(PC_Type::INT,2));
 		$array->set_array_type(3,new PC_Type(PC_Type::INT,4));
 		$array->set_array_type(5,new PC_Type(PC_Type::INT,6));
-		self::assertEquals((string)$array,(string)$global['$a4']);
+		self::assertEquals((string)$array,(string)$global['$a4']->get_type());
 		$array = new PC_Type(PC_Type::TARRAY);
 		$array->set_array_type("'a'",new PC_Type(PC_Type::INT,1));
 		$array->set_array_type(0,new PC_Type(PC_Type::INT,2));
 		$array->set_array_type(1,new PC_Type(PC_Type::INT,3));
 		$array->set_array_type(2,new PC_Type(PC_Type::STRING,"'4'"));
-		self::assertEquals((string)$array,(string)$global['$a5']);
+		self::assertEquals((string)$array,(string)$global['$a5']->get_type());
 		$array = new PC_Type(PC_Type::TARRAY);
 		$subarray = new PC_Type(PC_Type::TARRAY);
 		$subsubarray = new PC_Type(PC_Type::TARRAY);
@@ -108,14 +108,14 @@ function x($a,MyClass $b) {
 		$subarray->set_array_type(1,new PC_Type(PC_Type::INT,4));
 		$array->set_array_type(0,$subarray);
 		$array->set_array_type(1,new PC_Type(PC_Type::INT,5));
-		self::assertEquals((string)$array,(string)$global['$a6']);
-		self::assertEquals((string)new PC_Type(PC_Type::TARRAY),(string)$global['$a7']);
+		self::assertEquals((string)$array,(string)$global['$a6']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::TARRAY),(string)$global['$a7']->get_type());
 		
 		$x = $vars['x'];
-		self::assertEquals((string)new PC_Type(PC_Type::TARRAY),(string)$x['$a']);
-		self::assertEquals((string)new PC_Type(PC_Type::OBJECT,null,'MyClass'),(string)$x['$b']);
-		self::assertEquals((string)new PC_Type(PC_Type::TARRAY),(string)$x['$i1']);
-		self::assertEquals((string)new PC_Type(PC_Type::TARRAY),(string)$x['$i2']);
+		self::assertEquals((string)new PC_Type(PC_Type::TARRAY),(string)$x['$a']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::OBJECT,null,'MyClass'),(string)$x['$b']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::TARRAY),(string)$x['$i1']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::TARRAY),(string)$x['$i2']->get_type());
 	}
 }
 ?>

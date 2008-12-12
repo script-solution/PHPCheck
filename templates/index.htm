@@ -10,7 +10,7 @@
 <br />
 
 <h2><a name="funcs">Detected function-calls ({calls.length}):</a></h2>
-<table id="sql_debug" width="100%">
+<table class="pc_table" id="sql_debug" width="100%">
 	<thead>
 		<tr>
 			<th onmouseover="this.style.cursor = 'pointer';"
@@ -32,7 +32,7 @@
 </table>
 
 <h2><a name="vars">Detected variables ({vars.length}):</a></h2>
-<table width="100%">
+<table class="pc_table" width="100%">
 	<tr>
 		<th>Scope</th>
 		<th>Name</th>
@@ -55,7 +55,7 @@ var sorter = new FWS_TableSorter("sql_debug");
 
 {if errors.length > 0}
 <h2><a name="errors">Possible errors found ({errors.length}):</a></h2>
-<table>
+<table class="pc_table">
 	<tr>
 		<th>ErrNo</th>
 		<th>ErrMsg</th>

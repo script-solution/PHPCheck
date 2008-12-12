@@ -66,7 +66,7 @@ $e = $d->test2($d);
 		$constants = $tscanner->get_constants();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_ActionScanner();
+		$ascanner = new PC_StatementScanner();
 		$ascanner->scan(self::$code,$functions,$classes,$constants);
 		$vars = $ascanner->get_vars();
 		$calls = $ascanner->get_calls();
@@ -154,12 +154,12 @@ $e = $d->test2($d);
 			(string)$x->get_field('$var')
 		);
 		
-		$global = $vars[PC_ActionScanner::SCOPE_GLOBAL];
-		self::assertEquals('integer=0',(string)$global['$a']);
-		self::assertEquals('a',(string)$global['$b']);
-		self::assertEquals('a',(string)$global['$c']);
-		self::assertEquals('x',(string)$global['$d']);
-		self::assertEquals('b',(string)$global['$e']);
+		$global = $vars[PC_Variable::SCOPE_GLOBAL];
+		self::assertEquals('integer=0',(string)$global['$a']->get_type());
+		self::assertEquals('a',(string)$global['$b']->get_type());
+		self::assertEquals('a',(string)$global['$c']->get_type());
+		self::assertEquals('x',(string)$global['$d']->get_type());
+		self::assertEquals('b',(string)$global['$e']->get_type());
 	}
 }
 ?>

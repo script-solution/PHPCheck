@@ -1,15 +1,22 @@
 <?php
 /**
- * TODO: describe the file
+ * Contains the class-module
  *
  * @version			$Id$
- * @package			Boardsolution
- * @subpackage	main
+ * @package			PHPCheck
+ * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>
  * @copyright		2003-2008 Nils Asmussen
  * @link				http://www.script-solution.de
  */
 
+/**
+ * The module to display properties of a class
+ *
+ * @package			PHPCheck
+ * @subpackage	module
+ * @author			Nils Asmussen <nils@script-solution.de>
+ */
 final class PC_Module_Class extends FWS_Module
 {
 	/**

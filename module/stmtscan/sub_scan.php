@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains the scan-typescan-submodule
+ * Contains the scan-statement-scanner-submodule
  * 
  * @version			$Id$
  * @package			PHPCheck
@@ -11,13 +11,13 @@
  */
 
 /**
- * The scan submodule for module typescan
+ * The scan submodule for module statement-scanner
  * 
  * @package			PHPCheck
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_SubModule_typescan_scan extends PC_SubModule implements FWS_Progress_Listener
+final class PC_SubModule_stmtscan_scan extends PC_SubModule implements FWS_Progress_Listener
 {
 	/**
 	 * The process manager
@@ -46,12 +46,12 @@ final class PC_SubModule_typescan_scan extends PC_SubModule implements FWS_Progr
 	{
 		$user = FWS_Props::get()->user();
 
-		$storage = new FWS_Progress_Storage_Session('ptypescan_');
+		$storage = new FWS_Progress_Storage_Session('pstmtscan_');
 		$this->_pm = new FWS_Progress_Manager($storage);
-		$this->_pm->set_ops_per_cycle(PC_TYPE_FILES_PER_CYCLE);
+		$this->_pm->set_ops_per_cycle(PC_STMT_FILES_PER_CYCLE);
 		$this->_pm->add_listener($this);
 		
-		$task = new PC_Module_TypeScan_Task_Scan();
+		$task = new PC_Module_StmtScan_Task_Scan();
 		$this->_pm->run_task($task);
 	}
 
@@ -73,7 +73,7 @@ final class PC_SubModule_typescan_scan extends PC_SubModule implements FWS_Progr
 	{
 		$this->_populate_template();
 		$user = FWS_Props::get()->user();
-		$user->delete_session_data('typescan_files');
+		$user->delete_session_data('stmtscan_files');
 	}
 	
 	/**
@@ -84,7 +84,7 @@ final class PC_SubModule_typescan_scan extends PC_SubModule implements FWS_Progr
 		$tpl = FWS_Props::get()->tpl();
 		$user = FWS_Props::get()->user();
 		
-		$total = count($user->get_session_data('typescan_files',array()));
+		$total = count($user->get_session_data('stmtscan_files',array()));
 		$message = sprintf(
 			'Scanned %d of %d files',$this->_pm->is_finished() ? $total : $this->_pm->get_position(),$total
 		);
