@@ -1,0 +1,24 @@
+{include "inc_header.htm"}
+
+{if module_error == false}
+<table width="100%" class="pc_table">
+	<tr>
+		<th>Call</th>
+		<th>File</th>
+		<th>Line</th>
+	</tr>
+	{loop calls as call}
+	<tr>
+		<td>{call:call}</td>
+		<td>{call:file}</td>
+		<td>{call:line}</td>
+	</tr>
+	{endloop}
+</table>
+
+<div class="pc_padtop">
+	{include "inc_pagination.htm"}
+</div>
+{endif}
+
+{include "inc_footer.htm"}
