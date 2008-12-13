@@ -77,8 +77,8 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 
 		$js = FWS_Javascript::get_instance();
 		$js->set_cache_folder('cache');
-		$tpl->add_global_ref('js',$js);
-		$tpl->add_allowed_method('js','get_file');
+		$tpl->add_global_ref('gjs',$js);
+		$tpl->add_allowed_method('gjs','get_file');
 		
 		$url = new PC_URL();
 		$tpl->add_global_ref('gurl',$url);
@@ -104,6 +104,7 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 	{
 		$tpl = FWS_Props::get()->tpl();
 		
+		$this->get_action_performer()->add_action(new PC_Action_chgproject(PC_ACTION_CHG_PROJECT));
 		$this->perform_action();
 		
 		$projects = PC_DAO::get_projects()->get_all();
@@ -118,6 +119,7 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 			'location' => $this->get_breadcrumbs(),
 			'form' => $form,
 			'projects' => $pronames,
+			'chg_project_aid' => PC_ACTION_CHG_PROJECT,
 			'project' => FWS_Props::get()->project()->get_id()
 		));
 		$tpl->restore_template();

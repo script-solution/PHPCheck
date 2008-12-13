@@ -5,15 +5,23 @@
 	<tr>
 		<th>Call</th>
 		<th>File</th>
-		<th>Line</th>
+		<th align="center">Line</th>
 	</tr>
+	{if calls.length == 0}
+	<tr>
+		<td colspan="3" class="pc_main" align="center">No calls found</td>
+	</tr>
+	{else}
 	{loop calls as call}
 	<tr>
-		<td>{call:call}</td>
-		<td>{call:file}</td>
-		<td><a href="{call:url}">{call:line}</a></td>
+		<td class="pc_main">
+		<a href="{call:url}"><img src="images/goto.gif" alt="-&gt;" /></a> {call:call}
+		</td>
+		<td class="pc_main">{call:file}</td>
+		<td class="pc_main" align="center">{call:line}</td>
 	</tr>
 	{endloop}
+	{endif}
 </table>
 
 <div class="pc_padtop">

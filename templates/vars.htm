@@ -7,13 +7,19 @@
 		<th>Name</th>
 		<th>Type</th>
 	</tr>
+	{if vars.length == 0}
+	<tr>
+		<td colspan="3" class="pc_main" align="center">No variables found</td>
+	</tr>
+	{else}
 	{loop vars as var}
 	<tr>
-		<td>{var:scope}</td>
-		<td>{var:name}</td>
-		<td>{var:type}</td>
+		<td class="pc_main">{var:scope}</td>
+		<td class="pc_main">{var:name}</td>
+		<td class="pc_main">{var:type}</td>
 	</tr>
 	{endloop}
+	{endif}
 </table>
 
 <div class="pc_padtop">

@@ -4,6 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>PHP-Check</title>
 	<link rel="stylesheet" href="templates/style.css" type="text/css" />
+	<script type="text/javascript" src="{gjs.get_file('js/basic.js','fws')}"></script>
 </head>
 <body>
 
@@ -12,6 +13,7 @@
 </div>
 <div style="float: right;" class="pc_padbottom">
 	<form method="post" action="index.php">
+	<input type="hidden" name="action_id" value="{chg_project_aid}" />
 	Project: {form.get_combobox('project',projects,project)}
 	<input type="submit" value="Go!" />
 	</form>
@@ -19,6 +21,8 @@
 <br style="clear: both;" />
 
 <div class="pc_padbottom">
+	<a class="pc_button" href="index.php?module=projects">Projects</a>
+	<span style="float: right;">&nbsp;&middot;&nbsp;</span>
 	<a class="pc_button" href="index.php?module=errors">Errors</a>
 	<a class="pc_button" href="index.php?module=vars">Variables</a>
 	<a class="pc_button" href="index.php?module=calls">Calls</a>

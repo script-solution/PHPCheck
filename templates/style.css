@@ -24,6 +24,10 @@ a:hover {
 	margin-top: 0.9em;
 }
 
+.pc_paddouble {
+	margin-top: 2em;
+}
+
 .pc_padbottom {
 	margin-bottom: 0.9em;
 }
@@ -85,12 +89,35 @@ fieldset.pc_form dd {
 	text-decoration: none;
 }
 
+/* ------------ ROW-HOVER ------------ */
+
+td.hlCol {
+	padding: 0.4em;
+	background-color: #ebebeb;
+}
+
+tr.hlRow:hover td.hlCol {
+	background-color: #f5f5f5;
+}
+td.hlCol_sel {
+	padding: 0.4em;
+	background-color: #FFBE5C;
+}
+
 /* ------------ THE DIFFERENT CONTENT-STYLES ------------ */
 
 /* for the main content */
 .pc_main {
 	padding: 0.3em;
-	background-color: #ebebeb;
+	background-color: #f6f6f6;
+}
+
+/* the columns on the left (if 2 column-layout) */
+.pc_left {
+	padding: 0.3em;
+	font-size: 0.9em;
+	background-color: #DBDBDB;
+	font-weight: bold;
 }
 
 .pc_topic {

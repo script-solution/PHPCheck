@@ -7,13 +7,19 @@
 		<th>File</th>
 		<th>Line</th>
 	</tr>
+	{if classes.length == 0}
+	<tr>
+		<td colspan="3" class="pc_main" align="center">No classes found</td>
+	</tr>
+	{else}
 	{loop classes as class}
 	<tr>
-		<td><a href="{class:url}">{class:name}</a></td>
-		<td>{class:file}</td>
-		<td>{class:line}</td>
+		<td class="pc_main"><a href="{class:url}">{class:name}</a></td>
+		<td class="pc_main">{class:file}</td>
+		<td class="pc_main" align="center">{class:line}</td>
 	</tr>
 	{endloop}
+	{endif}
 </table>
 
 <div class="pc_padtop">

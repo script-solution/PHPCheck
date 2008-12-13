@@ -7,13 +7,19 @@
 		<th>File</th>
 		<th>Line</th>
 	</tr>
+	{if funcs.length == 0}
+	<tr>
+		<td colspan="3" class="pc_main" align="center">No functions found</td>
+	</tr>
+	{else}
 	{loop funcs as func}
 	<tr>
-		<td>{func:func}</td>
-		<td>{func:file}</td>
-		<td>{func:line}</td>
+		<td class="pc_main">{func:func}</td>
+		<td class="pc_main">{func:file}</td>
+		<td class="pc_main" align="center">{func:line}</td>
 	</tr>
 	{endloop}
+	{endif}
 </table>
 
 <div class="pc_padtop">

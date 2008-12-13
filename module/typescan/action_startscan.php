@@ -50,8 +50,13 @@ final class PC_Action_typescan_startscan extends FWS_Actions_Base
 		// store in session
 		$user->set_session_data('typescan_files',$files);
 		
-		// clear previous data in the db
+		// store in project
 		$project = FWS_Props::get()->project();
+		$project->set_type_folders($folderstr);
+		$project->set_type_exclude($exclstr);
+		PC_DAO::get_projects()->update($project);
+		
+		// clear previous data in the db
 		PC_DAO::get_classes()->delete_by_project($project->get_id());
 		PC_DAO::get_functions()->delete_by_project($project->get_id());
 		PC_DAO::get_constants()->delete_by_project($project->get_id());

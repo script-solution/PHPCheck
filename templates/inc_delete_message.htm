@@ -1,0 +1,15 @@
+{if delete_message}
+<div class="pc_border pc_padbottom">
+	<h1 class="pc_topic">Information</h1>
+	<div class="pc_main" style="text-align: center;">
+		{delete_message}
+		<div class="pc_paddouble">
+			<input id="del_yes" type="submit" style="width: 50px;" name="option_yes"
+					value="Yes" onclick="document.location.href = '{yes_url}';" />
+			&nbsp;
+			<input id="del_no" type="submit" style="width: 50px;" name="option_no"
+					value="No" onclick="document.location.href = '{no_url}';" />
+		</div>
+	</div>
+</div>
+{endif}

@@ -66,15 +66,17 @@ function toggleSearch(cookie,id)
 	</tr>
 	{if errors.length == 0}
 	<tr>
-		<td colspan="4" align="center">No errors found</td>
+		<td colspan="4" class="pc_main" align="center">No errors found</td>
 	</tr>
 	{else}
 	{loop errors as err}
 	<tr>
-		<td>{err:type}</td>
-		<td>{err:message}</td>
-		<td>{err:file}</td>
-		<td><a href="{err:fileurl}">{err:line}</a></td>
+		<td class="pc_main">{err:type}</td>
+		<td class="pc_main">
+		<a href="{err:fileurl}"><img src="images/goto.gif" alt="-&gt;" /></a> {err:message}
+		</td>
+		<td class="pc_main">{err:file}</td>
+		<td class="pc_main" align="center">{err:line}</td>
 	</tr>
 	{endloop}
 	{endif}

@@ -7,18 +7,16 @@
 	<h1 class="pc_topic">Statement scanner</h1>
 	<fieldset class="pc_form">
 		<dl>
-			<dt>Folders:</dt>
+			<dt>Folders/Files to scan:</dt>
 			<dd>
-				{form.get_textarea('folders','../Boardsolution','90%','120px')}
-				<div class="pc_desc">One line per folder!</div>
+				{form.get_textarea('folders',folders,'90%','120px')}
+				<div class="pc_desc">One line per file/folder!</div>
 			</dd>
 		</dl>
 		<dl>
 			<dt>Exclude files/folders:</dt>
 			<dd>
-				{form.get_textarea('exclude','/.svn/
-/cache/
-/tests/','90%','120px')}
+				{form.get_textarea('exclude',exclude,'90%','120px')}
 				<div class="pc_desc">One line per file/folder!</div>
 			</dd>
 		</dl>
