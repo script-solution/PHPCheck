@@ -1406,7 +1406,7 @@ class PC_StatementScanner extends FWS_Object
 	 */
 	private function _print_slice()
 	{
-		echo $this->pos.': '.FWS_PrintUtils::to_string(
+		echo $this->pos.': '.FWS_Printer::to_string(
 			array_slice($this->tokens,max(0,$this->pos - 20),40,true)
 		);
 	}

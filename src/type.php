@@ -340,13 +340,13 @@ final class PC_Type extends FWS_Object
 		{
 			$str = 'array';
 			if($this->_array_elements !== null)
-				$str .= '='.FWS_PrintUtils::to_string($this->_array_elements,PHP_SAPI != 'cli',false);
+				$str .= '='.FWS_Printer::to_string($this->_array_elements,PHP_SAPI != 'cli',false);
 			return $str;
 		}
 		
 		$str = $this->_get_type_name($this->_type);
 		if($this->_value !== null)
-			$str .= '='.FWS_PrintUtils::to_string($this->_value,PHP_SAPI != 'cli',false);
+			$str .= '='.FWS_Printer::to_string($this->_value,PHP_SAPI != 'cli',false);
 		return $str;
 	}
 }

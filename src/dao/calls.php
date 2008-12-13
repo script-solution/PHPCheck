@@ -164,7 +164,7 @@ class PC_DAO_Calls extends FWS_Singleton
 		$c->set_object_creation($row['objcreation']);
 		$args = unserialize($row['arguments']);
 		if($args === false)
-			echo FWS_PrintUtils::to_string($row);
+			echo FWS_Printer::to_string($row);
 		foreach($args as $arg)
 			$c->add_argument($arg);
 		return $c;
