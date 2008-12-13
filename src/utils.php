@@ -39,7 +39,7 @@ class PC_Utils extends FWS_UtilBase
 		$x = 1;
 		foreach(explode('<br />',$res) as $str)
 		{
-			$l = '<a name="l'.$x.'" href="#l'.$x.'">'.sprintf('%4d',$x).'</a>&nbsp;';
+			$l = '<a name="l'.$x.'" href="#l'.$x.'">'.sprintf('%04d',$x).'</a>&nbsp;';
 			if($x == $line)
 				$l .= '<span style="background-color: #ffff00;">'.$str.'</span>';
 			else
