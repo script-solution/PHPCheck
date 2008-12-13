@@ -1,9 +1,9 @@
 <?php
 /**
- * TODO: describe the file
+ * The entry-point
  *
  * @version			$Id$
- * @package			Boardsolution
+ * @package			PHPCheck
  * @subpackage	main
  * @author			Nils Asmussen <nils@script-solution.de>
  * @copyright		2003-2008 Nils Asmussen

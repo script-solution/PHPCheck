@@ -2,7 +2,7 @@
 /**
  * Contains the action-performer
  *
- * @version			$Id: performer.php 49 2008-07-30 12:35:41Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	src.action
  * @author			Nils Asmussen <nils@script-solution.de>

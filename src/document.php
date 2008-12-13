@@ -1,15 +1,22 @@
 <?php
 /**
- * TODO: describe the file
+ * Contains the document-class
  *
  * @version			$Id$
- * @package			Boardsolution
- * @subpackage	main
+ * @package			PHPCheck
+ * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  * @copyright		2003-2008 Nils Asmussen
  * @link				http://www.script-solution.de
  */
 
+/**
+ * The document for phpcheck
+ *
+ * @package			PHPCheck
+ * @subpackage	src
+ * @author			Nils Asmussen <nils@script-solution.de>
+ */
 final class PC_Document extends FWS_Document
 {
 	/**

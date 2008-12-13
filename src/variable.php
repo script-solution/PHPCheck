@@ -2,7 +2,7 @@
 /**
  * Contains the variable-class
  *
- * @version			$Id: variable.php 4 2008-08-17 19:57:46Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  * @copyright		2003-2008 Nils Asmussen

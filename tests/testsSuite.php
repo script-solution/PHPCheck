@@ -2,7 +2,7 @@
 /**
  * Contains the testsuite
  *
- * @version			$Id: testsSuite.php 53 2008-12-08 10:21:01Z nasmussen $
+ * @version			$Id$
  * @package			FrameWorkSolution
  * @subpackage	tests
  * @author			Nils Asmussen <nils@script-solution.de>

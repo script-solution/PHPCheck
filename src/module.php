@@ -2,7 +2,7 @@
 /**
  * Contains the module-base-class
  * 
- * @version			$Id: submodule.php 39 2008-07-27 18:24:44Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>

@@ -2,7 +2,7 @@
 /**
  * Contains the sub-module-container-class
  * 
- * @version			$Id: submodulecontainer.php 54 2008-12-01 10:26:23Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>

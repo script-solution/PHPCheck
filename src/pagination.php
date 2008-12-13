@@ -2,7 +2,7 @@
 /**
  * Contains the pagination-class
  *
- * @version			$Id: pagination.php 93 2008-12-09 09:20:08Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>

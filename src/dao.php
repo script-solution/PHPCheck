@@ -2,7 +2,7 @@
 /**
  * Contains the dao-factory
  *
- * @version			$Id: dao.php 49 2008-07-30 12:35:41Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>

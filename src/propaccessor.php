@@ -2,7 +2,7 @@
 /**
  * Contains the property-accessor-class
  *
- * @version			$Id: propaccessor.php 52 2008-07-30 19:26:50Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>

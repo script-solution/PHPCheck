@@ -2,7 +2,7 @@
 /**
  * Contains the properties-class
  *
- * @version			$Id: props.php 25 2008-07-30 12:41:15Z nasmussen $
+ * @version			$Id$
  * @package			FrameWorkSolution
  * @author			Nils Asmussen <nils@script-solution.de>
  * @copyright		2003-2008 Nils Asmussen
