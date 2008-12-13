@@ -36,7 +36,7 @@ final class PC_Document extends FWS_Document
 	protected function load_module()
 	{
 		$this->_module_name = FWS_Helper::get_module_name(
-			'PC_Module_','module','start','module'
+			'PC_Module_','module','typescan','module'
 		);
 		$class = 'PC_Module_'.$this->_module_name;
 		return new $class();
