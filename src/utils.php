@@ -77,13 +77,13 @@ class PC_Utils extends FWS_UtilBase
 			$files[] = 'test.php';
 		else
 		{
-			foreach(FWS_FileUtils::get_dir_content('../Boardsolution/install/',true,true) as $item)
+			foreach(FWS_FileUtils::get_list('../Boardsolution/install/',true,true) as $item)
 			{
 				if(preg_match('/\.php$/',$item) && strpos($item,'.svn/') === false &&
 						strpos($item,'/cache/') === false && strpos($item,'/tests/') === false)
 					$files[] = $item;
 			}
-			/*foreach(FWS_FileUtils::get_dir_content('../Boardsolution/',true,true) as $item)
+			/*foreach(FWS_FileUtils::get_list('../Boardsolution/',true,true) as $item)
 			{
 				if(preg_match('/\.php$/',$item) && strpos($item,'.svn/') === false &&
 						strpos($item,'/cache/') === false && strpos($item,'/tests/') === false)
@@ -117,7 +117,7 @@ class PC_Utils extends FWS_UtilBase
 			$changed = false;
 			foreach(array('../PHPLib','../Boardsolution') as $dir)
 			{
-				$dirfiles = FWS_FileUtils::get_dir_content($dir,true,true);
+				$dirfiles = FWS_FileUtils::get_list($dir,true,true);
 				foreach($dirfiles as $filename)
 				{
 					if(!preg_match('/\.php$/',$filename) || FWS_String::strpos($filename,'.svn/') !== false)

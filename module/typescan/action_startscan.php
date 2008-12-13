@@ -39,7 +39,7 @@ final class PC_Action_typescan_startscan extends FWS_Action_Base
 				$files[] = $folder;
 			else
 			{
-				foreach(FWS_FileUtils::get_dir_content($folder,true,true) as $item)
+				foreach(FWS_FileUtils::get_list($folder,true,true) as $item)
 				{
 					if(!$this->_is_excluded($item,$excl))
 						$files[] = $item;
