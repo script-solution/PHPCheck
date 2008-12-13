@@ -70,6 +70,7 @@ class PC_DAO_Calls extends FWS_Singleton
 		$rows = $db->sql_rows(
 			'SELECT * FROM '.PC_TB_CALLS.'
 			 WHERE project_id = '.$pid.'
+			 ORDER BY id ASC
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
@@ -137,6 +138,8 @@ class PC_DAO_Calls extends FWS_Singleton
 		$c->set_static($row['static']);
 		$c->set_object_creation($row['objcreation']);
 		$args = unserialize($row['arguments']);
+		if($args === false)
+			echo FWS_PrintUtils::to_string($row);
 		foreach($args as $arg)
 			$c->add_argument($arg);
 		return $c;

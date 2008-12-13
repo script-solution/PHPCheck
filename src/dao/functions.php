@@ -122,6 +122,58 @@ class PC_DAO_Functions extends FWS_Singleton
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
 		
+		$db->sql_insert(PC_TB_FUNCTIONS,$this->_get_fields($function,$class));
+		return $db->get_last_insert_id();
+	}
+	
+	/**
+	 * Updates the properties of the given function
+	 *
+	 * @param PC_Method $function the function/method
+	 * @param int $class the id of the class the function belongs to
+	 * @return int the number of affected rows
+	 */
+	public function update($function,$class = 0)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(!($function instanceof PC_Method))
+			FWS_Helper::def_error('instance','function','PC_Method',$function);
+		
+		$db->sql_update(
+			PC_TB_FUNCTIONS,' WHERE id = '.$function->get_id(),$this->_get_fields($function,$class)
+		);
+		return $db->get_affected_rows();
+	}
+	
+	/**
+	 * Deletes all functions from the project with given id
+	 *
+	 * @param int $id the project-id
+	 * @return int the number of affected rows
+	 */
+	public function delete_by_project($id)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(!FWS_Helper::is_integer($id) || $id <= 0)
+			FWS_Helper::def_error('intgt0','id',$id);
+		
+		$db->sql_qry(
+			'DELETE FROM '.PC_TB_FUNCTIONS.' WHERE project_id = '.$id
+		);
+		return $db->get_affected_rows();
+	}
+	
+	/**
+	 * Builds the fields to insert / update in the db
+	 *
+	 * @param PC_Method $function the function/method
+	 * @param int $class the id of the class the function belongs to
+	 * @return array all fields
+	 */
+	private function _get_fields($function,$class)
+	{
 		$params = '';
 		foreach($function->get_params() as $param)
 		{
@@ -146,7 +198,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$type = $function->get_return_type()->get_type();
-		$db->sql_insert(PC_TB_FUNCTIONS,array(
+		return array(
 			'project_id' => $project->get_id(),
 			'file' => addslashes($function->get_file()),
 			'line' => $function->get_line(),
@@ -158,27 +210,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			'visibility' => $function->get_visibility(),
 			'return_type' => $type == PC_Type::OBJECT ? $function->get_return_type()->get_class() : $type,
 			'params' => $params
-		));
-		return $db->get_last_insert_id();
-	}
-	
-	/**
-	 * Deletes all functions from the project with given id
-	 *
-	 * @param int $id the project-id
-	 * @return int the number of affected rows
-	 */
-	public function delete_by_project($id)
-	{
-		$db = FWS_Props::get()->db();
-		
-		if(!FWS_Helper::is_integer($id) || $id <= 0)
-			FWS_Helper::def_error('intgt0','id',$id);
-		
-		$db->sql_qry(
-			'DELETE FROM '.PC_TB_FUNCTIONS.' WHERE project_id = '.$id
 		);
-		return $db->get_affected_rows();
 	}
 	
 	/**
@@ -189,7 +221,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	 */
 	private function _build_func($row)
 	{
-		$c = new PC_Method($row['file'],$row['line'],$row['class'] == 0);
+		$c = new PC_Method($row['file'],$row['line'],$row['class'] == 0,$row['id']);
 		$c->set_name($row['name']);
 		$c->set_visibity($row['visibility']);
 		$c->set_abstract($row['abstract']);
@@ -197,6 +229,9 @@ class PC_DAO_Functions extends FWS_Singleton
 		$c->set_final($row['final']);
 		foreach(FWS_Array_Utils::advanced_explode(';',$row['params']) as $param)
 		{
+			$x = explode(':',$param);
+			if(!isset($x[1]))
+				echo FWS_PrintUtils::to_string($row);
 			list($name,$type) = explode(':',$param);
 			$p = new PC_Parameter();
 			$types = array();

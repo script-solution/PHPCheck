@@ -40,6 +40,7 @@ final class PC_Module_StmtScan_Task_Scan extends FWS_Object implements FWS_Progr
 	{
 		$user = FWS_Props::get()->user();
 		
+		// scan for statements
 		$types = new PC_TypeContainer();
 		$ascanner = new PC_StatementScanner();
 		$files = $user->get_session_data('stmtscan_files',array());
@@ -47,6 +48,7 @@ final class PC_Module_StmtScan_Task_Scan extends FWS_Object implements FWS_Progr
 		for($i = $pos;$i < $end;$i++)
 			$ascanner->scan_file($files[$i],$types);
 		
+		// insert vars and calls into db
 		foreach($ascanner->get_vars() as $svars)
 		{
 			foreach($svars as $var)

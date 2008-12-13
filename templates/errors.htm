@@ -1,0 +1,26 @@
+{include "inc_header.htm"}
+
+{if module_error == false}
+<table width="100%" class="pc_table">
+	<tr>
+		<th>Type</th>
+		<th>Message</th>
+		<th>File</th>
+		<th>Line</th>
+	</tr>
+	{loop errors as err}
+	<tr>
+		<td>{err:type}</td>
+		<td>{err:message}</td>
+		<td>{err:file}</td>
+		<td>{err:line}</td>
+	</tr>
+	{endloop}
+</table>
+
+<div class="pc_padtop">
+	{include "inc_pagination.htm"}
+</div>
+{endif}
+
+{include "inc_footer.htm"}

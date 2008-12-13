@@ -97,6 +97,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		$rows = $db->sql_rows(
 			'SELECT * FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = '.$pid.'
+			 ORDER BY id ASC
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
@@ -173,7 +174,7 @@ class PC_DAO_Classes extends FWS_Singleton
 	 */
 	private function _build_class($row)
 	{
-		$c = new PC_Class($row['file'],$row['line']);
+		$c = new PC_Class($row['file'],$row['line'],$row['id']);
 		$c->set_name($row['name']);
 		$c->set_super_class($row['superclass']);
 		$c->set_abstract($row['abstract']);

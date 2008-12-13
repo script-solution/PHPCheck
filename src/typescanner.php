@@ -104,33 +104,6 @@ class PC_TypeScanner extends FWS_Object
 	}
 	
 	/**
-	 * Finishes the given classes or the classes of this object. That means, inheritance will
-	 * be performed and missing constructors will be added.
-	 * TODO here is the wrong place for this method!
-	 *
-	 * @param array $classes optionally you can give the classes to finish
-	 */
-	public function finish($classes = null)
-	{
-		if($classes !== null)
-			$this->classes = $classes;
-		foreach($this->classes as $name => $c)
-		{
-			$this->_add_members($this->classes[$name],$c->get_name());
-			
-			// add missing constructor
-			$c = $this->classes[$name];
-			if(!$c->is_interface() && $c->get_method('__construct') === null)
-			{
-				$method = new PC_Method($this->file,-1,false);
-				$method->set_name('__construct');
-				$method->set_visibity(PC_Visible::V_PUBLIC);
-				$c->add_method($method);
-			}
-		}
-	}
-	
-	/**
 	 * Scans the given file for functions and classes
 	 *
 	 * @param string $file the filename
@@ -576,7 +549,6 @@ class PC_TypeScanner extends FWS_Object
 		// TODO store references
 		if($t == '&')
 		{
-			$this->pos++;
 			$this->_skip_rubbish();
 			list($t,$str,) = $this->tokens[$this->pos++];
 		}
@@ -837,63 +809,6 @@ class PC_TypeScanner extends FWS_Object
 		// look for return-type
 		if(preg_match('/\@return\s+([^\s]+)/',$doc,$matches))
 			$func->set_return_type(PC_Type::get_type_by_name($matches[1]));
-	}
-	
-	/**
-	 * Adds the member from <var>$class</var> to <var>$data</var>. That means, inheritance is
-	 * performed.
-	 *
-	 * @param PC_Class $data the class to which the members should be added
-	 * @param string $class the class-name
-	 * @param boolean $overwrite just internal: wether the members should be overwritten
-	 */
-	private function _add_members($data,$class,$overwrite = true)
-	{
-		if(isset($this->classes[$class]))
-		{
-			if($class != $data->get_name())
-			{
-				// methods
-				foreach($this->classes[$class]->get_methods() as $function)
-				{
-					if($function->get_visibility() != PC_Visible::V_PRIVATE)
-					{
-						// if we don't want to overwrite the methods and the method is already there
-						// we add just the types that are not known yet
-						if(!$overwrite && ($f = $data->get_method($function->get_name())) !== null)
-						{
-							/* @var $f PC_Method */
-							if($f->get_return_type()->is_unknown())
-								$f->set_return_type($function->get_return_type());
-							foreach($function->get_params() as $param)
-							{
-								$fparam = $f->get_param($param->get_name());
-								// just replace the parameter if it exists and the type is unknown yet
-								if($fparam !== null && $fparam->get_mtype()->is_unknown())
-									$f->put_param($param);
-							}
-						}
-						else
-							$data->add_method($function);
-					}
-				}
-				
-				// fields
-				foreach($this->classes[$class]->get_fields() as $field)
-				{
-					if($field->get_visibility() != PC_Visible::V_PRIVATE)
-						$data->add_field($field);
-				}
-				
-				// constants
-				foreach($this->classes[$class]->get_constants() as $const)
-					$data->add_constant($const);
-			}
-			
-			$this->_add_members($data,$this->classes[$class]->get_super_class(),false);
-			foreach($this->classes[$class]->get_interfaces() as $interface)
-				$this->_add_members($data,$interface,false);
-		}
 	}
 	
 	protected function get_dump_vars()

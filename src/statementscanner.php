@@ -1103,15 +1103,13 @@ class PC_StatementScanner extends FWS_Object
 				// unary +/- ?
 				if(($t == '+' || $t == '-') && $val === null)
 				{
-					if($rop === null)
-						$this->_print_slice();
 					eval('$num='.$t.$rop->get_value_as_number().';');
 					if(is_float($num))
 						$arg = new PC_Type(PC_Type::FLOAT,$num);
 					else
 						$arg = new PC_Type(PC_Type::INT,$num);
 				}
-				// address operator
+				// reference operator
 				else if($t == '&' && $val === null)
 					$arg = new PC_Type(PC_Type::UNKNOWN);
 				else

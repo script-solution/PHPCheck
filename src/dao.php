@@ -45,6 +45,14 @@ final class PC_DAO extends FWS_UtilBase
 	}
 	
 	/**
+	 * @return PC_DAO_Errors the DAO for the errors-table
+	 */
+	public static function get_errors()
+	{
+		return PC_DAO_Errors::get_instance();
+	}
+	
+	/**
 	 * @return PC_DAO_Functions the DAO for the functions-table
 	 */
 	public static function get_functions()

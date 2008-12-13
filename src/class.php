@@ -21,6 +21,13 @@ class PC_Class extends PC_Modifiable
 	const UNKNOWN = '#UNKNOWN';
 	
 	/**
+	 * The id of this class
+	 *
+	 * @var int
+	 */
+	private $id;
+	
+	/**
 	 * Is it an interface?
 	 *
 	 * @var boolean
@@ -68,15 +75,25 @@ class PC_Class extends PC_Modifiable
 	 *
 	 * @param string $file the file of the class-def
 	 * @param int $line the line of the class-def
+	 * @param int $id the class-id
 	 */
-	public function __construct($file,$line)
+	public function __construct($file,$line,$id = 0)
 	{
 		parent::__construct($file,$line);
 		
+		$this->id = $id;
 		$this->interfaces = array();
 		$this->fields = array();
 		$this->methods = array();
 		$this->constants = array();
+	}
+	
+	/**
+	 * @return int the id of this class (in the db). May be 0 if not loaded from db
+	 */
+	public function get_id()
+	{
+		return $this->id;
 	}
 	
 	/**

@@ -10,6 +10,9 @@
  * @link				http://www.script-solution.de
  */
 
+define('REPORT_MIXED',false);
+define('REPORT_UNKNOWN',false);
+
 /**
  * Analyzes a given set of classes, functions, calls and so on and stores possible errors.
  *
@@ -38,24 +41,23 @@ final class PC_Analyzer extends FWS_Object
 	 * Analyzes the given function-/method-calls
 	 *
 	 * @param PC_TypeContainer $types the types
-	 * @param array $vars all known variables
 	 * @param array $calls an array with function-/method-calls
 	 */
-	public function analyze_calls($types,$vars,$calls)
+	public function analyze_calls($types,$calls)
 	{
 		foreach($calls as $call)
 		{
 			/* @var $call PC_Call */
 			$name = $call->get_function();
-			$obj = $call->get_class();
-			if($obj !== null)
+			$classname = $call->get_class();
+			if($classname !== null)
 			{
-				if($obj)
+				if($classname)
 				{
-					if($obj[0] == '$' && isset($vars[$obj]))
+					/*if($obj[0] == '$' && isset($vars[$obj]))
 						$classname = $vars[$obj];
 					else
-						$classname = $obj;
+						$classname = $obj;*/
 					
 					$c = $types->get_class($classname);
 					if($c !== null)
@@ -64,17 +66,16 @@ final class PC_Analyzer extends FWS_Object
 						{
 							$this->_report(
 								$call,
-								'The method "'.$name.'" does not exist in the class "'
-									.$this->_get_class_link($classname).'"!',
-								PC_Error::E_METHOD_MISSING
+								'The method "'.$name.'" does not exist in the class "#'.$classname.'#"!',
+								PC_Error::E_S_METHOD_MISSING
 							);
 						}
 						else if($call->is_object_creation() && $c->is_abstract())
 						{
 							$this->_report(
 								$call,
-								'You can\'t instantiate the abstract class "'.$c->get_name().'"!',
-								PC_Error::E_ABSTRACT_CLASS_INSTANTIATION
+								'You can\'t instantiate the abstract class "#'.$c->get_name().'#"!',
+								PC_Error::E_S_ABSTRACT_CLASS_INSTANTIATION
 							);
 						}
 						else
@@ -87,7 +88,7 @@ final class PC_Analyzer extends FWS_Object
 									$call,
 									'Your call "'.$this->_get_call_link($call).'" calls "'.$m->get_name()
 										.'" statically, but the method is not static!',
-									PC_Error::E_STATIC_CALL
+									PC_Error::E_S_STATIC_CALL
 								);
 							}
 							else if(!$call->is_static() && $m->is_static())
@@ -96,7 +97,7 @@ final class PC_Analyzer extends FWS_Object
 									$call,
 									'Your call "'.$this->_get_call_link($call).'" calls "'.$m->get_name()
 										.'" not statically, but the method is static!',
-									PC_Error::E_NONSTATIC_CALL
+									PC_Error::E_S_NONSTATIC_CALL
 								);
 							}
 							
@@ -108,8 +109,8 @@ final class PC_Analyzer extends FWS_Object
 					{
 						$this->_report(
 							$call,
-							'The class "'.$this->_get_class_link($class).'" does not exist!',
-							PC_Error::E_CLASS_MISSING
+							'The class "#'.$classname.'#" does not exist!',
+							PC_Error::E_S_CLASS_MISSING
 						);
 					}
 					else if(REPORT_UNKNOWN && $classname == PC_Class::UNKNOWN)
@@ -117,7 +118,7 @@ final class PC_Analyzer extends FWS_Object
 						$this->_report(
 							$call,
 							'The class of the object in the call "'.$this->_get_call_link($call).'" is unknown!',
-							PC_Error::E_CLASS_UNKNOWN
+							PC_Error::E_S_CLASS_UNKNOWN
 						);
 					}
 				}
@@ -131,7 +132,7 @@ final class PC_Analyzer extends FWS_Object
 					$this->_report(
 						$call,
 						'The function "'.$name.'" does not exist!',
-						PC_Error::E_FUNCTION_MISSING
+						PC_Error::E_S_FUNCTION_MISSING
 					);
 				}
 				else if($func !== null)
@@ -142,10 +143,11 @@ final class PC_Analyzer extends FWS_Object
 	
 	/**
 	 * Analyzes the given classes
-	 *
+	 * 
+	 * @param PC_TypeContainer $types the types
 	 * @param array $classes an array with classes (name as key)
 	 */
-	public function analyze_classes($classes)
+	public function analyze_classes($types,$classes)
 	{
 		// check classes for issues
 		foreach($classes as $class)
@@ -164,18 +166,18 @@ final class PC_Analyzer extends FWS_Object
 			{
 				$this->_report(
 					$class,
-					'The class "'.$this->_get_class_link($class->get_name()).'" is abstract but'
+					'The class "#'.$class->get_name().'#" is abstract but'
 						.' has no abstract method!',
-					PC_Error::E_CLASS_POT_USELESS_ABSTRACT
+					PC_Error::E_T_CLASS_POT_USELESS_ABSTRACT
 				);
 			}
 			else if(!$class->is_abstract() && $abstractcount > 0)
 			{
 				$this->_report(
 					$class,
-					'The class "'.$this->_get_class_link($class->get_name()).'" is NOT abstract but'
+					'The class "#'.$class->get_name().'#" is NOT abstract but'
 						.' contains abstract methods!',
-					PC_Error::E_CLASS_NOT_ABSTRACT
+					PC_Error::E_T_CLASS_NOT_ABSTRACT
 				);
 			}
 			
@@ -183,15 +185,15 @@ final class PC_Analyzer extends FWS_Object
 			if($class->get_super_class() !== null)
 			{
 				// do we know the class?
-				$sclass = isset($classes[$class->get_super_class()]) ? $classes[$class->get_super_class()] : null;
+				$sclass = $types->get_class($class->get_super_class());
 				
 				// check for buildin-php-classes, too
 				if($sclass === null && !class_exists($class->get_super_class(),false))
 				{
 					$this->_report(
 						$class,
-						'The class "'.$this->_get_class_link($class->get_super_class()).'" does not exist!',
-						PC_Error::E_CLASS_MISSING
+						'The class "#'.$class->get_super_class().'#" does not exist!',
+						PC_Error::E_T_CLASS_MISSING
 					);
 				}
 				// super-class final?
@@ -199,9 +201,9 @@ final class PC_Analyzer extends FWS_Object
 				{
 					$this->_report(
 						$class,
-						'The class "'.$this->_get_class_link($class->get_name()).'" inherits from the final '
-							.'class "'.$this->_get_class_link($sclass->get_name()).'"!',
-						PC_Error::E_FINAL_CLASS_INHERITANCE
+						'The class "#'.$class->get_name().'#" inherits from the final '
+							.'class "#'.$sclass->get_name().'#"!',
+						PC_Error::E_T_FINAL_CLASS_INHERITANCE
 					);
 				}
 			}
@@ -226,7 +228,7 @@ final class PC_Analyzer extends FWS_Object
 				$call,
 				'The function/method called by "'.$this->_get_call_link($call).'" requires '.$reqparams
 					.' arguments but you have given '.count($arguments),
-				PC_Error::E_WRONG_ARGUMENT_COUNT
+				PC_Error::E_S_WRONG_ARGUMENT_COUNT
 			);
 		}
 		else
@@ -252,7 +254,7 @@ final class PC_Analyzer extends FWS_Object
 								'The argument '.($i + 1).' in "'.$this->_get_call_link($call).'" requires '
 									.$this->_get_article($trequired).' "'.$trequired.'" but you have given '
 									.$this->_get_article($tactual).' "'.$tactual.'"',
-								PC_Error::E_WRONG_ARGUMENT_TYPE
+								PC_Error::E_S_WRONG_ARGUMENT_TYPE
 							);
 						}
 					}
@@ -312,20 +314,6 @@ final class PC_Analyzer extends FWS_Object
 		}
 		$str .= $call->get_function().'('.implode(', ',$call->get_arguments()).')';
 		return $str;
-	}
-	
-	/**
-	 * Builds a link for the given class-name
-	 *
-	 * @param string $name the class-name
-	 * @return string the link
-	 */
-	private function _get_class_link($name)
-	{
-		$url = new FWS_URL();
-		$url->set('module','class');
-		$url->set('name',$name);
-		return '<a href="'.$url->to_url().'">'.$name.'</a>';
 	}
 	
 	/**

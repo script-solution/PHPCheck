@@ -61,6 +61,17 @@ final class PC_TypeContainer extends FWS_Object
 	}
 	
 	/**
+	 * Adds all given classes to the container
+	 *
+	 * @param array $classes an array of classes
+	 */
+	public function add_classes($classes)
+	{
+		foreach($classes as $class)
+			$this->_classes[$class->get_name()] = $class;
+	}
+	
+	/**
 	 * Returns the class with given name. Will fetch it from db if not already present
 	 *
 	 * @param string $name the class-name
@@ -68,9 +79,22 @@ final class PC_TypeContainer extends FWS_Object
 	 */
 	public function get_class($name)
 	{
+		if(empty($name))
+			return null;
 		if(!isset($this->_classes[$name]))
 			$this->_classes[$name] = PC_DAO::get_classes()->get_by_name($name,$this->_pid);
 		return $this->_classes[$name];
+	}
+	
+	/**
+	 * Adds all given functions to the container
+	 *
+	 * @param array $funcs an array of functions
+	 */
+	public function add_functions($funcs)
+	{
+		foreach($funcs as $func)
+			$this->_functions[$func->get_name()] = $func;
 	}
 	
 	/**
@@ -81,9 +105,22 @@ final class PC_TypeContainer extends FWS_Object
 	 */
 	public function get_function($name)
 	{
+		if(empty($name))
+			return null;
 		if(!isset($this->_functions[$name]))
 			$this->_functions[$name] = PC_DAO::get_functions()->get_by_name($name,$this->_pid);
 		return $this->_functions[$name];
+	}
+	
+	/**
+	 * Adds all given constants to the container
+	 *
+	 * @param array $consts an array of constants
+	 */
+	public function add_constants($consts)
+	{
+		foreach($consts as $const)
+			$this->_constants[$const->get_name()] = $const;
 	}
 	
 	/**
@@ -94,6 +131,8 @@ final class PC_TypeContainer extends FWS_Object
 	 */
 	public function get_constant($name)
 	{
+		if(empty($name))
+			return null;
 		if(!isset($this->_constants[$name]))
 			$this->_constants[$name] = PC_DAO::get_constants()->get_by_name($name,$this->_pid);
 		return $this->_constants[$name];

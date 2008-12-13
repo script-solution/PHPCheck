@@ -20,6 +20,13 @@
 class PC_Method extends PC_Modifiable implements PC_Visible
 {
 	/**
+	 * The id of this function
+	 *
+	 * @var int
+	 */
+	private $id;
+	
+	/**
 	 * The visibility
 	 *
 	 * @var string
@@ -60,14 +67,24 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	 * @param string $file the file of the def
 	 * @param int $line the line of the def
 	 * @param boolean $free wether it is a free function
+	 * @param int $id the function-id
 	 */
-	public function __construct($file,$line,$free)
+	public function __construct($file,$line,$free,$id = 0)
 	{
 		parent::__construct($file,$line);
 		
+		$this->id = $id;
 		$this->params = array();
 		$this->return = new PC_Type(PC_Type::UNKNOWN);
 		$this->free = $free;
+	}
+	
+	/**
+	 * @return int the id of this function (in the db). May be 0 if not loaded from db
+	 */
+	public function get_id()
+	{
+		return $this->id;
 	}
 	
 	/**
