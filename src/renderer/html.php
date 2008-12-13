@@ -26,6 +26,10 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 	{
 		parent::__construct();
 		
+		$ap = $this->get_action_performer();
+		$ap->set_prefix('PC_Action_');
+		$ap->set_mod_folder('module/');
+		
 		$tpl = FWS_Props::get()->tpl();
 		
 		$tpl->set_path('templates/');
@@ -35,16 +39,6 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 		$url = new FWS_URL();
 		$url->set('action','start');
 		$this->add_breadcrumb('PHP-Check',$url->to_url());
-	}
-	
-	/**
-	 * @see FWS_Document_Renderer_HTML_Default::load_action_perf()
-	 *
-	 * @return FWS_Actions_Performer
-	 */
-	protected function load_action_perf()
-	{
-		return new PC_Action_Performer();
 	}
 	
 	/**

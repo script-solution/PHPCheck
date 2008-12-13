@@ -17,7 +17,7 @@
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Action_typescan_startscan extends FWS_Actions_Base
+final class PC_Action_typescan_startscan extends FWS_Action_Base
 {
 	public function perform_action()
 	{
