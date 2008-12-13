@@ -29,8 +29,12 @@ final class PC_Module_file extends PC_Module
 		parent::init($doc);
 		$renderer = $doc->use_default_renderer();
 		$input = FWS_Props::get()->input();
-		$path = $input->get_var('path','get',FWS_Input::STRING);
-		$renderer->add_breadcrumb('View file',PC_URL::get_mod_url()->set('path',$path)->to_url());
+		$line = $input->get_var('line','get',FWS_Input::INTEGER);
+		$url = PC_URL::get_mod_url();
+		if(isset($_GET['path']))
+			$url->set('path',$_GET['path']);
+		$url->set('line',$line);
+		$renderer->add_breadcrumb('View file',$url->to_url());
 	}
 
 	/**
@@ -50,7 +54,7 @@ final class PC_Module_file extends PC_Module
 		
 		$path = urldecode($_GET['path']);
 		if(PC_DAO::get_classes()->get_count_for_file($path) == 0 &&
-				PC_DAO::get_calls()->get_count_for_file($path) == 0)
+				PC_DAO::get_calls()->get_count_for($path) == 0)
 		{
 			$this->report_error();
 			return;

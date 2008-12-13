@@ -230,19 +230,17 @@ class PC_DAO_Functions extends FWS_Singleton
 		foreach(FWS_Array_Utils::advanced_explode(';',$row['params']) as $param)
 		{
 			$x = explode(':',$param);
-			if(!isset($x[1]))
-				echo FWS_PrintUtils::to_string($row);
 			list($name,$type) = explode(':',$param);
 			$p = new PC_Parameter();
 			$types = array();
 			foreach(explode('|',$type) as $t)
 			{
-				if(FWS_Helper::is_integer($t))
+				if(is_numeric($t))
 					$types[] = new PC_Type($t);
 				else
 					$types[] = new PC_Type(PC_Type::OBJECT,null,$t);
 			}
-			$p->set_mtype(PC_MultiType::get_type_by_name(implode('|',$types)));
+			$p->set_mtype(new PC_MultiType($types));
 			if(FWS_String::ends_with($name,'?'))
 			{
 				$p->set_optional(true);

@@ -1,6 +1,38 @@
 {include "inc_header.htm"}
 
 {if module_error == false}
+<script type="text/javascript" src="{gjs.get_file('src/functions.js')}"></script>
+
+<div class="pc_padbottom">
+	<form method="post" action="{search_target}">
+	<div class="pc_border">
+		<h1 class="pc_topic" onmouseover="this.style.cursor='pointer';"
+				onmouseout="this.style.cursor='default';"
+				onclick="toggleSearch('{cookie_name}','searchform');">Search</h1>
+		<div id="searchform" style="display: {display_search};">
+			<fieldset class="pc_form">
+				<dl>
+					<dt>File:</dt>
+					<dd>{form.get_textbox('file',file,40)}</dd>
+				</dl>
+				<dl>
+					<dt>Class:</dt>
+					<dd>{form.get_textbox('class',class,40)}</dd>
+				</dl>
+				<dl>
+					<dt>Function:</dt>
+					<dd>{form.get_textbox('function',function,40)}</dd>
+				</dl>
+			</fieldset>
+			<div class="pc_main" style="margin-top: 1px; text-align: center">
+				<input type="button" value="Reset" onclick="document.location.href = '{gurl.build_mod_url()}';" />
+				<input type="submit" value="Search!" />
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+
 <table width="100%" class="pc_table">
 	<tr>
 		<th>Call</th>

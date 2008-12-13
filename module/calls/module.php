@@ -38,13 +38,30 @@ final class PC_Module_calls extends PC_Module
 	{
 		$tpl = FWS_Props::get()->tpl();
 		$input = FWS_Props::get()->input();
+		$cookies = FWS_Props::get()->cookies();
 		
-		$pagination = new PC_Pagination(PC_ENTRIES_PER_PAGE,PC_DAO::get_calls()->get_count());
-		$pagination->populate_tpl(PC_URL::get_mod_url());
+		$file = $input->get_var('file',-1,FWS_Input::STRING);
+		$class = $input->get_var('class',-1,FWS_Input::STRING);
+		$function = $input->get_var('function',-1,FWS_Input::STRING);
+		
+		$file = $input->unescape_value($file,'get');
+		$class = $input->unescape_value($class,'get');
+		$function = $input->unescape_value($function,'get');
+		
+		$url = PC_URL::get_mod_url();
+		$url->set('file',$file);
+		$url->set('class',$class);
+		$url->set('function',$function);
+		$surl = clone $url;
+		
+		$pagination = new PC_Pagination(
+			PC_ENTRIES_PER_PAGE,PC_DAO::get_calls()->get_count_for($file,$class,$function)
+		);
+		$pagination->populate_tpl($url);
 		$start = $pagination->get_start();
 		
 		$calls = array();
-		foreach(PC_DAO::get_calls()->get_list($start,PC_ENTRIES_PER_PAGE) as $call)
+		foreach(PC_DAO::get_calls()->get_list($start,PC_ENTRIES_PER_PAGE,$file,$class,$function) as $call)
 		{
 			/* @var $call PC_Call */
 			$url = PC_URL::get_mod_url('file');
@@ -59,8 +76,15 @@ final class PC_Module_calls extends PC_Module
 			);
 		}
 		
+		$this->request_formular();
 		$tpl->add_variables(array(
-			'calls' => $calls
+			'calls' => $calls,
+			'file' => $file,
+			'class' => $class,
+			'function' => $function,
+			'search_target' => $surl->to_url(),
+			'display_search' => $cookies->get_cookie('calls_search') ? 'block' : 'none',
+			'cookie_name' => $cookies->get_prefix().'calls_search',
 		));
 	}
 }

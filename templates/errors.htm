@@ -1,17 +1,7 @@
 {include "inc_header.htm"}
 
 {if module_error == false}
-<script type="text/javascript">
-<!--
-function toggleSearch(cookie,id)
-{
-	var obj = document.getElementById(id);
-	var oldStatus = obj.style.display;
-	obj.style.display = oldStatus == 'none' ? 'block' : 'none';
-	setCookie(cookie,oldStatus == 'none' ? "1" : "0",3600 * 24 * 30);
-}
-//-->
-</script>
+<script type="text/javascript" src="{gjs.get_file('src/functions.js')}"></script>
 
 <div class="pc_padbottom">
 	<form method="post" action="{search_target}">

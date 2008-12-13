@@ -118,7 +118,7 @@ final class PC_Module_errors extends PC_Module
 	{
 		$msg = $err->get_msg();
 		return preg_replace(
-			'/#(.+?)#/e',
+			'/#([a-zA-Z0-9_]+?)#/e',
 			'"<a href=\"".PC_URL::get_mod_url(\'class\')->set(\'name\',\'\\1\')->to_url()."\">\\1</a>"',
 			$msg
 		);

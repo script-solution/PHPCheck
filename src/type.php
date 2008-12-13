@@ -64,6 +64,9 @@ final class PC_Type extends FWS_Object
 			case 'res':
 				return new self(self::RESOURCE);
 			
+			case 'object':
+				return new self(self::UNKNOWN);
+			
 			default:
 				// TODO check if we know the class?
 				return new self(self::OBJECT,null,$name);

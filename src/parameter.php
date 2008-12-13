@@ -107,7 +107,7 @@ class PC_Parameter extends FWS_Object
 	
 	protected function get_dump_vars()
 	{
-		return array_merge(parent::get_dump_vars(),get_object_vars($this));
+		return get_object_vars($this);
 	}
 	
 	public function __ToString()

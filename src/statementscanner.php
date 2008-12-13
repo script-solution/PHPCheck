@@ -693,7 +693,10 @@ class PC_StatementScanner extends FWS_Object
 		else if($t != '(')
 		{
 			$this->pos = $oldpos;
-			return $this->types->get_constant($first);
+			$c = $this->types->get_constant($first);
+			if($c !== null)
+				return $c->get_type();
+			return null;
 		}
 		// walk backwards to scan the token again
 		else
@@ -1335,6 +1338,8 @@ class PC_StatementScanner extends FWS_Object
 	
 	/**
 	 * Runs until the current token is $token and stops there
+	 * 
+	 * @param string $token the token which causes a stop
 	 */
 	private function _run_to_token($token = ';')
 	{

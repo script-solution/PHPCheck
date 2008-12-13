@@ -67,6 +67,8 @@ class testsSuite extends PHPUnit_Framework_TestSuite
 	
 	/**
 	 * We overwrite this method to autoload the class
+	 * 
+	 * @param string $name the class-name
 	 */
 	public function addTestSuite($name)
 	{

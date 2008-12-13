@@ -223,6 +223,8 @@ class PC_DAO_Classes extends FWS_Singleton
 		$c->set_abstract($row['abstract']);
 		$c->set_interface($row['interface']);
 		$c->set_final($row['final']);
+		foreach(FWS_Array_Utils::advanced_explode(',',$row['interfaces']) as $if)
+			$c->add_interface($if);
 		foreach(PC_DAO::get_constants()->get_list($row['id']) as $const)
 			$c->add_constant($const);
 		foreach(PC_DAO::get_classfields()->get_all($row['id']) as $field)

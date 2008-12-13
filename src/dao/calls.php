@@ -36,17 +36,19 @@ class PC_DAO_Calls extends FWS_Singleton
 	 */
 	public function get_count($pid = 0)
 	{
-		return $this->get_count_for_file('',$pid);
+		return $this->get_count_for('','','',$pid);
 	}
 	
 	/**
 	 * Returns the number of items for the given file
 	 *
 	 * @param string $file the file
+	 * @param string $class the class-name
+	 * @param string $function the function-name
 	 * @param int $pid the project-id (0 = current)
 	 * @return int the number
 	 */
-	public function get_count_for_file($file = '',$pid = 0)
+	public function get_count_for($file = '',$class = '',$function = '',$pid = 0)
 	{
 		if(!FWS_Helper::is_integer($pid) || $pid < 0)
 			FWS_Helper::def_error('intge0','pid',$pid);
@@ -56,7 +58,9 @@ class PC_DAO_Calls extends FWS_Singleton
 		$pid = $pid === 0 ? $project->get_id() : $pid;
 		return $db->sql_num(
 			PC_TB_CALLS,'*',' WHERE project_id = '.$pid
-				.($file ? ' AND file = "'.addslashes($file).'"' : '')
+				.($file ? ' AND file LIKE "%'.addslashes($file).'%"' : '')
+				.($class ? ' AND class LIKE "%'.addslashes($class).'%"' : '')
+				.($function ? ' AND function LIKE "%'.addslashes($function).'%"' : '')
 		);
 	}
 	
@@ -66,9 +70,12 @@ class PC_DAO_Calls extends FWS_Singleton
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
 	 * @param int $pid the project-id (0 = current)
+	 * @param string $file the file
+	 * @param string $class the class-name
+	 * @param string $function the function-name
 	 * @return array all found calls
 	 */
-	public function get_list($start = 0,$count = 0,$pid = 0)
+	public function get_list($start = 0,$count = 0,$file = '',$class = '',$function = '',$pid = 0)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -84,8 +91,11 @@ class PC_DAO_Calls extends FWS_Singleton
 		$calls = array();
 		$rows = $db->sql_rows(
 			'SELECT * FROM '.PC_TB_CALLS.'
-			 WHERE project_id = '.$pid.'
-			 ORDER BY id ASC
+			 WHERE project_id = '.$pid
+				.($file ? ' AND file LIKE "%'.addslashes($file).'%"' : '')
+				.($class ? ' AND class LIKE "%'.addslashes($class).'%"' : '')
+				.($function ? ' AND function LIKE "%'.addslashes($function).'%"' : '')
+			 .' ORDER BY id ASC
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
