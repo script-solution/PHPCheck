@@ -36,24 +36,46 @@ class PC_DAO_Errors extends FWS_Singleton
 	 */
 	public function get_count($pid = 0)
 	{
+		return $this->get_count_with('','',array(),$pid);
+	}
+	
+	/**
+	 * Returns the number of errors that contain the given file and message
+	 *
+	 * @param string $file the file
+	 * @param string $msg the message
+	 * @param array $types an array of types (numeric!)
+	 * @param int $pid the project-id (0 = current)
+	 * @return int the number
+	 */
+	public function get_count_with($file = '',$msg = '',$types = array(),$pid = 0)
+	{
 		if(!FWS_Helper::is_integer($pid) || $pid < 0)
 			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		return $db->sql_num(PC_TB_ERRORS,'*',' WHERE project_id = '.$pid);
+		return $db->sql_num(
+			PC_TB_ERRORS,'*',' WHERE project_id = '.$pid
+				.($file ? ' AND file LIKE "%'.addslashes($file).'%"' : '')
+				.($msg ? ' AND message LIKE "%'.addslashes($msg).'%"' : '')
+				.(count($types) ? ' AND type IN ('.implode(',',$types).')' : '')
+		);
 	}
 	
 	/**
-	 * Returns all errors
+	 * Returns all errors. Optionally you can filter the search by file and message
 	 *
 	 * @param int $pid the project-id (0 = current)
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
+	 * @param string $file the file
+	 * @param string $msg the message
+	 * @param array $types an array of types (numeric!)
 	 * @return array all found errors
 	 */
-	public function get_list($pid = 0,$start = 0,$count = 0)
+	public function get_list($pid = 0,$start = 0,$count = 0,$file = '',$msg = '',$types = array())
 	{
 		$db = FWS_Props::get()->db();
 
@@ -63,13 +85,19 @@ class PC_DAO_Errors extends FWS_Singleton
 			FWS_Helper::def_error('intge0','start',$start);
 		if(!FWS_Helper::is_integer($count) || $count < 0)
 			FWS_Helper::def_error('intge0','count',$count);
+		if(!FWS_Array_Utils::is_numeric($types))
+			FWS_Helper::def_error('numarray','types',$types);
 		
 		$project = FWS_Props::get()->project();
 		$errs = array();
 		$rows = $db->sql_rows(
 			'SELECT * FROM '.PC_TB_ERRORS.'
-			 WHERE project_id = '.$project->get_id().'
-			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
+			 WHERE project_id = '.$project->get_id()
+				.($file ? ' AND file LIKE "%'.addslashes($file).'%"' : '')
+				.($msg ? ' AND message LIKE "%'.addslashes($msg).'%"' : '')
+				.(count($types) ? ' AND type IN ('.implode(',',$types).')' : '')
+				.' ORDER BY id ASC'
+				.($count > 0 ? ' LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
 			$errs[] = $this->_build_error($row);

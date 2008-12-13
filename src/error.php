@@ -41,38 +41,32 @@ final class PC_Error extends FWS_Object
 	 */
 	public static function get_type_name($type)
 	{
-		switch($type)
-		{
-			case self::E_S_METHOD_MISSING:
-				return 'Method missing';
-			case self::E_S_ABSTRACT_CLASS_INSTANTIATION:
-				return 'Abstract class instantiation';
-			case self::E_S_STATIC_CALL:
-				return 'Static call';
-			case self::E_S_NONSTATIC_CALL:
-				return 'Nonstatic call';
-			case self::E_S_CLASS_MISSING:
-				return 'Class missing';
-			case self::E_S_CLASS_UNKNOWN:
-				return 'Class unknown';
-			case self::E_S_FUNCTION_MISSING:
-				return 'Function missing';
-			case self::E_S_WRONG_ARGUMENT_COUNT:
-				return 'Wrong arg count';
-			case self::E_S_WRONG_ARGUMENT_TYPE:
-				return 'Wrong arg type';
-			case self::E_T_CLASS_POT_USELESS_ABSTRACT:
-				return 'Abstract class';
-			case self::E_T_FINAL_CLASS_INHERITANCE:
-				return 'Final class inheritance';
-			case self::E_T_CLASS_NOT_ABSTRACT:
-				return 'Class not abstract';
-			case self::E_T_CLASS_MISSING:
-				return 'Class missing';
-			
-			default:
-				return 'Unknown';
-		}
+		$types = self::get_types();
+		return isset($types[$type]) ? $types[$type] : 'Unknown';
+	}
+	
+	/**
+	 * An array of all types: <code>array(<type> => <name>,...)</code>
+	 *
+	 * @return array all types
+	 */
+	public static function get_types()
+	{
+		return array(
+			self::E_S_METHOD_MISSING =>									'Method missing',
+			self::E_S_ABSTRACT_CLASS_INSTANTIATION =>		'Abstract class instantiation',
+			self::E_S_STATIC_CALL => 										'Static call',
+			self::E_S_NONSTATIC_CALL =>									'Nonstatic call',
+			self::E_S_CLASS_MISSING =>									'Class missing',
+			self::E_S_CLASS_UNKNOWN =>									'Class unknown',
+			self::E_S_FUNCTION_MISSING =>								'Function missing',
+			self::E_S_WRONG_ARGUMENT_COUNT =>						'Wrong arg count',
+			self::E_S_WRONG_ARGUMENT_TYPE =>						'Wrong arg type',
+			self::E_T_CLASS_POT_USELESS_ABSTRACT =>			'Abstract class',
+			self::E_T_FINAL_CLASS_INHERITANCE =>				'Final class inheritance',
+			self::E_T_CLASS_NOT_ABSTRACT =>							'Class not abstract',
+			self::E_T_CLASS_MISSING =>									'Class missing'
+		);
 	}
 	
 	/**

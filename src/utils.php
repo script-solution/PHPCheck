@@ -18,6 +18,39 @@
 class PC_Utils extends FWS_UtilBase
 {
 	/**
+	 * Highlights the given file
+	 *
+	 * @param string $file the file
+	 * @param int $line optional the line to mark
+	 * @return string the highlighted source
+	 */
+	public static function highlight_file($file,$line = 0)
+	{
+		if(is_file($file))
+			$source = FWS_FileUtils::read($file);
+		else
+			$source = '';
+		
+		$decorator = new FWS_Highlighting_Decorator_HTML();
+		$lang = new FWS_Highlighting_Language_XML('php.xml');
+		$hl = new FWS_Highlighting_Processor($source,$lang,$decorator);
+		$res = $hl->highlight();
+		$lines = array();
+		$x = 1;
+		foreach(explode('<br />',$res) as $str)
+		{
+			$l = '<a name="l'.$x.'" href="#l'.$x.'">'.sprintf('%4d',$x).'</a>&nbsp;';
+			if($x == $line)
+				$l .= '<span style="background-color: #ffff00;">'.$str.'</span>';
+			else
+				$l .= $str;
+			$lines[] = $l;
+			$x++;
+		}
+		return implode('<br />',$lines);
+	}
+	
+	/**
 	 * Retrieves all data from the corresponding files and returns them.
 	 * TODO just temporary ;)
 	 *

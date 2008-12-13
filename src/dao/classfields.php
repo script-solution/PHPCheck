@@ -48,9 +48,8 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		$pid = $pid === 0 ? $project->get_id() : $pid;
 		$fields = array();
 		$rows = $db->sql_rows(
-			'SELECT c.file,f.* FROM '.PC_TB_CLASS_FIELDS.' f
-			 LEFT JOIN '.PC_TB_CLASSES.' c ON f.class = c.id
-			 WHERE f.project_id = '.$pid.' AND f.class = '.$class
+			'SELECT * FROM '.PC_TB_CLASS_FIELDS.'
+			 WHERE project_id = '.$pid.' AND class = '.$class
 		);
 		foreach($rows as $row)
 		{
@@ -86,6 +85,7 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		$db->sql_insert(PC_TB_CLASS_FIELDS,array(
 			'project_id' => $project->get_id(),
 			'class' => $class,
+			'file' => $field->get_file(),
 			'line' => $field->get_line(),
 			'name' => addslashes($field->get_name()),
 			'type' => $type,

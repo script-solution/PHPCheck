@@ -90,6 +90,8 @@ final class PC_Module_Class extends FWS_Module
 			'declaration' => $declaration
 		));
 		
+		$classfile = $this->_class->get_file();
+		
 		// constants
 		$consts = array();
 		foreach($this->_class->get_constants() as $const)
@@ -97,7 +99,8 @@ final class PC_Module_Class extends FWS_Module
 			$consts[] = array(
 				'name' => $const->get_name(),
 				'type' => $const->get_type(),
-				'line' => $const->get_line()
+				'line' => $const->get_line(),
+				'url' => $this->_get_url($classfile,$const->get_file(),$const->get_line())
 			);
 		}
 		$tpl->add_variable_ref('consts',$consts);
@@ -111,7 +114,8 @@ final class PC_Module_Class extends FWS_Module
 			$fields[] = array(
 				'name' => $field->get_name(),
 				'type' => (string)$field,
-				'line' => $field->get_line()
+				'line' => $field->get_line(),
+				'url' => $this->_get_url($classfile,$field->get_file(),$field->get_line())
 			);
 		}
 		$tpl->add_variable_ref('fields',$fields);
@@ -125,26 +129,38 @@ final class PC_Module_Class extends FWS_Module
 			$methods[] = array(
 				'name' => $method->get_name(),
 				'type' => $method->__ToString(),
-				'line' => $method->get_line()
+				'line' => $method->get_line(),
+				'url' => $this->_get_url($classfile,$method->get_file(),$method->get_line())
 			);
 		}
 		$tpl->add_variable_ref('methods',$methods);
 		
-		// source-lines
-		if(is_file($this->_class->get_file()))
-			$source = FWS_FileUtils::read($this->_class->get_file());
+		$source = PC_Utils::highlight_file($this->_class->get_file());
+		$tpl->add_variables(array('source' => $source));
+	}
+	
+	/**
+	 * Builds an URL to the given file and line
+	 *
+	 * @param string $classfile the file of the class
+	 * @param string $file the file of the item
+	 * @param int $line the line of the item
+	 * @return string the URL
+	 */
+	private function _get_url($classfile,$file,$line)
+	{
+		if($file == $classfile)
+			return '#l'.$line;
 		else
-			$source = '';
-		
-		$decorator = new FWS_Highlighting_Decorator_HTML();
-		$lang = new FWS_Highlighting_Language_XML('../Boardsolution/bbceditor/highlighter/php.xml');
-		$hl = new FWS_Highlighting_Processor($source,$lang,$decorator);
-		$res = $hl->highlight();
-		$lines = array();
-		$x = 1;
-		foreach(explode('<br />',$res) as $line)
-			$lines[] = '<span id="l'.$x++.'"></span>'.$line;
-		$tpl->add_variables(array('source' => implode('<br />',$lines)));
+		{
+			$classes = PC_DAO::get_classes()->get_by_file($file);
+			if(count($classes) == 1)
+				$url = PC_URL::get_mod_url('class')->set('name',$classes[0]->get_name());
+			else
+				$url = PC_URL::get_mod_url('file')->set('path',$file);
+			$url->set_anchor('l'.$line);
+			return $url->to_url();
+		}
 	}
 }
 ?>

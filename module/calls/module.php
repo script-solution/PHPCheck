@@ -47,10 +47,15 @@ final class PC_Module_calls extends PC_Module
 		foreach(PC_DAO::get_calls()->get_list($start,PC_ENTRIES_PER_PAGE) as $call)
 		{
 			/* @var $call PC_Call */
+			$url = PC_URL::get_mod_url('file');
+			$url->set('path',$call->get_file());
+			$url->set('line',$call->get_line());
+			$url->set_anchor('l'.$call->get_line());
 			$calls[] = array(
 				'call' => $call->get_call(),
 				'file' => $call->get_file(),
-				'line' => $call->get_line()
+				'line' => $call->get_line(),
+				'url' => $url->to_url()
 			);
 		}
 		

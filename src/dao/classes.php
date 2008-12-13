@@ -36,13 +36,56 @@ class PC_DAO_Classes extends FWS_Singleton
 	 */
 	public function get_count($pid = 0)
 	{
+		return $this->get_count_for_file('',$pid);
+	}
+	
+	/**
+	 * Returns the number of items for the given file
+	 *
+	 * @param string $file the file
+	 * @param int $pid the project-id (0 = current)
+	 * @return int the number
+	 */
+	public function get_count_for_file($file = '',$pid = 0)
+	{
 		if(!FWS_Helper::is_integer($pid) || $pid < 0)
 			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		return $db->sql_num(PC_TB_CLASSES,'*',' WHERE project_id = '.$pid);
+		return $db->sql_num(
+			PC_TB_CLASSES,'*',' WHERE project_id = '.$pid
+				.($file ? ' AND file = "'.addslashes($file).'"' : '')
+		);
+	}
+	
+	/**
+	 * Returns the classes with given file in the given project
+	 *
+	 * @param string $file the file-name
+	 * @param int $pid the project-id (0 = current)
+	 * @return array all found classes
+	 */
+	public function get_by_file($file,$pid = 0)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(empty($file))
+			FWS_Helper::def_error('notempty','file',$file);
+		if(!FWS_Helper::is_integer($pid) || $pid < 0)
+			FWS_Helper::def_error('intge0','pid',$pid);
+		
+		$project = FWS_Props::get()->project();
+		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$rows = $db->sql_rows(
+			'SELECT * FROM '.PC_TB_CLASSES.'
+			 WHERE project_id = '.$pid.' AND file = "'.addslashes($file).'"'
+		);
+		$classes = array();
+		foreach($rows as $row)
+			$classes[] = $this->_build_class($row);
+		return $classes;
 	}
 	
 	/**

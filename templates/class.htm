@@ -19,7 +19,7 @@
 	{endif}
 	{loop consts as const}
 	<tr>
-		<td><a href="#l{const:line}">{const:name}</a></td>
+		<td><a href="{const:url}">{const:name}</a></td>
 		<td>{const:type}</td>
 	</tr>
 	{endloop}
@@ -33,7 +33,7 @@
 	{endif}
 	{loop fields as field}
 	<tr>
-		<td><a href="#l{field:line}">{field:name}</a></td>
+		<td><a href="{field:url}">{field:name}</a></td>
 		<td>{field:type}</td>
 	</tr>
 	{endloop}
@@ -47,7 +47,7 @@
 	{endif}
 	{loop methods as method}
 	<tr>
-		<td><a href="#l{method:line}">{method:name}</a>:</td>
+		<td><a href="{method:url}">{method:name}</a>:</td>
 		<td>{method:type}</td>
 	</tr>
 	{endloop}

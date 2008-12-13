@@ -1,6 +1,62 @@
 {include "inc_header.htm"}
 
 {if module_error == false}
+<script type="text/javascript">
+<!--
+function toggleSearch(cookie,id)
+{
+	var obj = document.getElementById(id);
+	var oldStatus = obj.style.display;
+	obj.style.display = oldStatus == 'none' ? 'block' : 'none';
+	setCookie(cookie,oldStatus == 'none' ? "1" : "0",3600 * 24 * 30);
+}
+//-->
+</script>
+
+<div class="pc_padbottom">
+	<form method="post" action="{search_target}">
+	<div class="pc_border">
+		<h1 class="pc_topic" onmouseover="this.style.cursor='pointer';"
+				onmouseout="this.style.cursor='default';"
+				onclick="toggleSearch('{cookie_name}','searchform');">Search</h1>
+		<div id="searchform" style="display: {display_search};">
+			<fieldset class="pc_form">
+				<dl>
+					<dt>Types:</dt>
+					<dd>
+					<table>
+					{loop typecbs as rows}
+						<tr>
+							{loop rows as cb}
+							<td>
+							{if cb:name != ''}
+							{form.get_checkbox(cb:name,cb:selected,cb:value,cb:text)}
+							{endif}
+							</td>
+							{endloop}
+						</tr>
+					{endloop}
+					</table>
+					</dd>
+				</dl>
+				<dl>
+					<dt>File:</dt>
+					<dd>{form.get_textbox('file',file,40)}</dd>
+				</dl>
+				<dl>
+					<dt>Message:</dt>
+					<dd>{form.get_textbox('msg',msg,40)}</dd>
+				</dl>
+			</fieldset>
+			<div class="pc_main" style="margin-top: 1px; text-align: center">
+				<input type="button" value="Reset" onclick="document.location.href = '{gurl.build_mod_url()}';" />
+				<input type="submit" value="Search!" />
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+
 <table width="100%" class="pc_table">
 	<tr>
 		<th>Type</th>
@@ -8,14 +64,20 @@
 		<th>File</th>
 		<th>Line</th>
 	</tr>
+	{if errors.length == 0}
+	<tr>
+		<td colspan="4" align="center">No errors found</td>
+	</tr>
+	{else}
 	{loop errors as err}
 	<tr>
 		<td>{err:type}</td>
 		<td>{err:message}</td>
 		<td>{err:file}</td>
-		<td>{err:line}</td>
+		<td><a href="{err:fileurl}">{err:line}</a></td>
 	</tr>
 	{endloop}
+	{endif}
 </table>
 
 <div class="pc_padtop">
