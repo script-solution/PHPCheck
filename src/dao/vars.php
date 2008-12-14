@@ -42,7 +42,7 @@ class PC_DAO_Vars extends FWS_Singleton
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		return $db->sql_num(PC_TB_VARS,'*',' WHERE project_id = '.$pid);
+		return $db->get_row_count(PC_TB_VARS,'*',' WHERE project_id = '.$pid);
 	}
 	
 	/**
@@ -67,7 +67,7 @@ class PC_DAO_Vars extends FWS_Singleton
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
 		$vars = array();
-		$rows = $db->sql_rows(
+		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_VARS.'
 			 WHERE project_id = '.$pid.'
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
@@ -91,14 +91,13 @@ class PC_DAO_Vars extends FWS_Singleton
 			FWS_Helper::def_error('instance','var','PC_Variable',$var);
 		
 		$project = FWS_Props::get()->project();
-		$db->sql_insert(PC_TB_VARS,array(
+		return $db->insert(PC_TB_VARS,array(
 			'project_id' => $project->get_id(),
 			'name' => addslashes($var->get_name()),
 			'function' => addslashes($var->get_function()),
 			'class' => addslashes($var->get_class()),
 			'type' => addslashes(serialize($var->get_type()))
 		));
-		return $db->get_last_insert_id();
 	}
 	
 	/**
@@ -114,7 +113,7 @@ class PC_DAO_Vars extends FWS_Singleton
 		if(!FWS_Helper::is_integer($id) || $id <= 0)
 			FWS_Helper::def_error('intgt0','id',$id);
 		
-		$db->sql_qry(
+		$db->execute(
 			'DELETE FROM '.PC_TB_VARS.' WHERE project_id = '.$id
 		);
 		return $db->get_affected_rows();

@@ -47,7 +47,7 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
 		$fields = array();
-		$rows = $db->sql_rows(
+		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_CLASS_FIELDS.'
 			 WHERE project_id = '.$pid.' AND class = '.$class
 		);
@@ -82,7 +82,7 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		$otype = $field->get_type();
 		$type = $otype->get_type();
 		$val = $type == PC_Type::OBJECT ? $otype->get_class() : $otype->get_value();
-		$db->sql_insert(PC_TB_CLASS_FIELDS,array(
+		return $db->insert(PC_TB_CLASS_FIELDS,array(
 			'project_id' => $project->get_id(),
 			'class' => $class,
 			'file' => $field->get_file(),
@@ -93,7 +93,6 @@ class PC_DAO_ClassFields extends FWS_Singleton
 			'visibility' => $field->get_visibility(),
 			'static' => $field->is_static() ? 1 : 0
 		));
-		return $db->get_last_insert_id();
 	}
 	
 	/**
@@ -109,7 +108,7 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		if(!FWS_Helper::is_integer($id) || $id <= 0)
 			FWS_Helper::def_error('intgt0','id',$id);
 		
-		$db->sql_qry(
+		$db->execute(
 			'DELETE FROM '.PC_TB_CLASS_FIELDS.' WHERE project_id = '.$id
 		);
 		return $db->get_affected_rows();

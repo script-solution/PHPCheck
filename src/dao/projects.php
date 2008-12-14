@@ -35,7 +35,7 @@ class PC_DAO_Projects extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		$res = array();
-		$rows = $db->sql_rows('SELECT * FROM '.PC_TB_PROJECTS);
+		$rows = $db->get_rows('SELECT * FROM '.PC_TB_PROJECTS);
 		foreach($rows as $row)
 			$res[] = $this->_build_project($row);
 		return $res;
@@ -54,7 +54,7 @@ class PC_DAO_Projects extends FWS_Singleton
 		
 		$db = FWS_Props::get()->db();
 		$res = array();
-		$rows = $db->sql_rows('SELECT * FROM '.PC_TB_PROJECTS.' WHERE id IN ('.implode(',',$ids).')');
+		$rows = $db->get_rows('SELECT * FROM '.PC_TB_PROJECTS.' WHERE id IN ('.implode(',',$ids).')');
 		foreach($rows as $row)
 			$res[] = $this->_build_project($row);
 		return $res;
@@ -66,7 +66,7 @@ class PC_DAO_Projects extends FWS_Singleton
 	public function get_current()
 	{
 		$db = FWS_Props::get()->db();
-		$row = $db->sql_fetch('SELECT * FROM '.PC_TB_PROJECTS.' WHERE current = 1');
+		$row = $db->get_row('SELECT * FROM '.PC_TB_PROJECTS.' WHERE current = 1');
 		return $this->_build_project($row);
 	}
 	
@@ -81,10 +81,10 @@ class PC_DAO_Projects extends FWS_Singleton
 			FWS_Helper::def_error('intgt0','id',$id);
 		
 		$db = FWS_Props::get()->db();
-		$db->sql_update(PC_TB_PROJECTS,'',array(
+		$db->update(PC_TB_PROJECTS,'',array(
 			'current' => 0
 		));
-		$db->sql_update(PC_TB_PROJECTS,'WHERE id = '.$id,array(
+		$db->update(PC_TB_PROJECTS,'WHERE id = '.$id,array(
 			'current' => 1
 		));
 	}
@@ -102,11 +102,10 @@ class PC_DAO_Projects extends FWS_Singleton
 		if(!($project instanceof PC_Project))
 			FWS_Helper::def_error('instance','project','PC_Project',$project);
 		
-		$db->sql_insert(PC_TB_PROJECTS,array(
+		return $db->insert(PC_TB_PROJECTS,array(
 			'name' => addslashes($project->get_name()),
 			'created' => time()
 		));
-		return $db->get_last_insert_id();
 	}
 	
 	/**
@@ -120,7 +119,7 @@ class PC_DAO_Projects extends FWS_Singleton
 			FWS_Helper::def_error('intgt0','project','PC_Project',$project);
 		
 		$db = FWS_Props::get()->db();
-		$db->sql_update(PC_TB_PROJECTS,'WHERE id = '.$project->get_id(),array(
+		$db->update(PC_TB_PROJECTS,'WHERE id = '.$project->get_id(),array(
 			'name' => $project->get_name(),
 			'type_folders' => addslashes($project->get_type_folders()),
 			'type_exclude' => addslashes($project->get_type_exclude()),
@@ -141,7 +140,7 @@ class PC_DAO_Projects extends FWS_Singleton
 			FWS_Helper::def_error('numarray>0','ids',$ids);
 		
 		$db = FWS_Props::get()->db();
-		$db->sql_qry('DELETE FROM '.PC_TB_PROJECTS.' WHERE id IN ('.implode(',',$ids).')');
+		$db->execute('DELETE FROM '.PC_TB_PROJECTS.' WHERE id IN ('.implode(',',$ids).')');
 		return $db->get_affected_rows();
 	}
 	

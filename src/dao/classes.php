@@ -54,7 +54,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		return $db->sql_num(
+		return $db->get_row_count(
 			PC_TB_CLASSES,'*',' WHERE project_id = '.$pid
 				.($file ? ' AND file = "'.addslashes($file).'"' : '')
 		);
@@ -78,7 +78,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		$rows = $db->sql_rows(
+		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = '.$pid.' AND file = "'.addslashes($file).'"'
 		);
@@ -106,7 +106,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		$row = $db->sql_fetch(
+		$row = $db->get_row(
 			'SELECT * FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = '.$pid.' AND name = "'.addslashes($name).'"'
 		);
@@ -137,7 +137,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
 		$classes = array();
-		$rows = $db->sql_rows(
+		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = '.$pid.'
 			 ORDER BY id ASC
@@ -162,7 +162,7 @@ class PC_DAO_Classes extends FWS_Singleton
 			FWS_Helper::def_error('instance','class','PC_Class',$class);
 		
 		$project = FWS_Props::get()->project();
-		$db->sql_insert(PC_TB_CLASSES,array(
+		$cid = $db->insert(PC_TB_CLASSES,array(
 			'project_id' => $project->get_id(),
 			'file' => addslashes($class->get_file()),
 			'line' => $class->get_line(),
@@ -173,7 +173,6 @@ class PC_DAO_Classes extends FWS_Singleton
 			'superclass' => $class->get_super_class() === null ? '' : $class->get_super_class(),
 			'interfaces' => addslashes(implode(',',$class->get_interfaces()))
 		));
-		$cid = $db->get_last_insert_id();
 		
 		// create constants
 		foreach($class->get_constants() as $const)
@@ -203,7 +202,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		if(!FWS_Helper::is_integer($id) || $id <= 0)
 			FWS_Helper::def_error('intgt0','id',$id);
 		
-		$db->sql_qry(
+		$db->execute(
 			'DELETE FROM '.PC_TB_CLASSES.' WHERE project_id = '.$id
 		);
 		return $db->get_affected_rows();

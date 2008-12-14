@@ -50,16 +50,24 @@ final class PC_PropLoader extends FWS_PropLoader
 	}
 	
 	/**
-	 * @return FWS_MySQL the property
+	 * @return FWS_DB_MySQL_Connection the property
 	 */
 	protected function db()
 	{
 		include_once(FWS_Path::server_app().'config/mysql.php');
-		$c = FWS_MySQL::get_instance();
-		$c->connect(PC_MYSQL_HOST,PC_MYSQL_LOGIN,PC_MYSQL_PASSWORD,PC_MYSQL_DATABASE);
-		$c->set_use_transactions(false);
-		$c->init('utf8');
-		$c->set_debugging_enabled(false);
+		$c = new FWS_DB_MySQL_Connection();
+		$c->connect(PC_MYSQL_HOST,PC_MYSQL_LOGIN,PC_MYSQL_PASSWORD);
+		$c->select_database(PC_MYSQL_DATABASE);
+		$c->set_save_queries(false);
+		$c->set_escape_values(false);
+		
+		$version = $c->get_server_version();
+		if($version >= '4.1')
+		{
+			$c->execute('SET CHARACTER SET utf8;');
+			// we don't want to have any sql-modes
+			$c->execute('SET SESSION sql_mode="";');
+		}
 		return $c;
 	}
 	

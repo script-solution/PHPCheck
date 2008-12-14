@@ -56,7 +56,7 @@ class PC_DAO_Errors extends FWS_Singleton
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		return $db->sql_num(
+		return $db->get_row_count(
 			PC_TB_ERRORS,'*',' WHERE project_id = '.$pid
 				.($file ? ' AND file LIKE "%'.addslashes($file).'%"' : '')
 				.($msg ? ' AND message LIKE "%'.addslashes($msg).'%"' : '')
@@ -90,7 +90,7 @@ class PC_DAO_Errors extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$errs = array();
-		$rows = $db->sql_rows(
+		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_ERRORS.'
 			 WHERE project_id = '.$project->get_id()
 				.($file ? ' AND file LIKE "%'.addslashes($file).'%"' : '')
@@ -118,14 +118,13 @@ class PC_DAO_Errors extends FWS_Singleton
 			FWS_Helper::def_error('instance','error','PC_Error',$error);
 		
 		$project = FWS_Props::get()->project();
-		$db->sql_insert(PC_TB_ERRORS,array(
+		return $db->insert(PC_TB_ERRORS,array(
 			'project_id' => $project->get_id(),
 			'file' => addslashes($error->get_loc()->get_file()),
 			'line' => $error->get_loc()->get_line(),
 			'message' => addslashes($error->get_msg()),
 			'type' => $error->get_type()
 		));
-		return $db->get_last_insert_id();
 	}
 	
 	/**
@@ -141,7 +140,7 @@ class PC_DAO_Errors extends FWS_Singleton
 		if(!FWS_Helper::is_integer($id) || $id <= 0)
 			FWS_Helper::def_error('intgt0','id',$id);
 		
-		$db->sql_qry(
+		$db->execute(
 			'DELETE FROM '.PC_TB_ERRORS.' WHERE project_id = '.$id
 		);
 		return $db->get_affected_rows();

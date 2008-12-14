@@ -45,7 +45,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		return $db->sql_num(PC_TB_FUNCTIONS,'*',' WHERE project_id = '.$pid.' AND class = '.$class);
+		return $db->get_row_count(PC_TB_FUNCTIONS,'*',' WHERE project_id = '.$pid.' AND class = '.$class);
 	}
 	
 	/**
@@ -66,7 +66,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		$row = $db->sql_fetch(
+		$row = $db->get_row(
 			'SELECT * FROM '.PC_TB_FUNCTIONS.'
 			 WHERE project_id = '.$pid.' AND class = 0 AND name = "'.addslashes($name).'"'
 		);
@@ -96,7 +96,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$funcs = array();
-		$rows = $db->sql_rows(
+		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_FUNCTIONS.'
 			 WHERE project_id = '.$project->get_id().' AND class = '.$class.'
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
@@ -122,8 +122,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
 		
-		$db->sql_insert(PC_TB_FUNCTIONS,$this->_get_fields($function,$class));
-		return $db->get_last_insert_id();
+		return $db->insert(PC_TB_FUNCTIONS,$this->_get_fields($function,$class));
 	}
 	
 	/**
@@ -140,10 +139,9 @@ class PC_DAO_Functions extends FWS_Singleton
 		if(!($function instanceof PC_Method))
 			FWS_Helper::def_error('instance','function','PC_Method',$function);
 		
-		$db->sql_update(
+		return $db->update(
 			PC_TB_FUNCTIONS,' WHERE id = '.$function->get_id(),$this->_get_fields($function,$class)
 		);
-		return $db->get_affected_rows();
 	}
 	
 	/**
@@ -159,7 +157,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		if(!FWS_Helper::is_integer($id) || $id <= 0)
 			FWS_Helper::def_error('intgt0','id',$id);
 		
-		$db->sql_qry(
+		$db->execute(
 			'DELETE FROM '.PC_TB_FUNCTIONS.' WHERE project_id = '.$id
 		);
 		return $db->get_affected_rows();
