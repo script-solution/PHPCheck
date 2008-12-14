@@ -103,7 +103,7 @@ class PC_DAO_Projects extends FWS_Singleton
 			FWS_Helper::def_error('instance','project','PC_Project',$project);
 		
 		return $db->insert(PC_TB_PROJECTS,array(
-			'name' => addslashes($project->get_name()),
+			'name' => $project->get_name(),
 			'created' => time()
 		));
 	}
@@ -121,10 +121,10 @@ class PC_DAO_Projects extends FWS_Singleton
 		$db = FWS_Props::get()->db();
 		$db->update(PC_TB_PROJECTS,'WHERE id = '.$project->get_id(),array(
 			'name' => $project->get_name(),
-			'type_folders' => addslashes($project->get_type_folders()),
-			'type_exclude' => addslashes($project->get_type_exclude()),
-			'stmt_folders' => addslashes($project->get_stmt_folders()),
-			'stmt_exclude' => addslashes($project->get_stmt_exclude())
+			'type_folders' => $project->get_type_folders(),
+			'type_exclude' => $project->get_type_exclude(),
+			'stmt_folders' => $project->get_stmt_folders(),
+			'stmt_exclude' => $project->get_stmt_exclude()
 		));
 	}
 	

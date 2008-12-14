@@ -66,10 +66,12 @@ class PC_DAO_Constants extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		$row = $db->get_row(
+		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CONSTANTS.'
-			 WHERE project_id = '.$pid.' AND class = 0 AND name = "'.addslashes($name).'"'
+			 WHERE project_id = '.$pid.' AND class = 0 AND name = ?'
 		);
+		$stmt->bind(0,$name);
+		$row = $db->get_row($stmt->get_statement());
 		if($row)
 			return $this->_build_const($row);
 		return null;
@@ -129,11 +131,11 @@ class PC_DAO_Constants extends FWS_Singleton
 		return $db->insert(PC_TB_CONSTANTS,array(
 			'project_id' => $project->get_id(),
 			'class' => $class,
-			'file' => addslashes($constant->get_file()),
+			'file' => $constant->get_file(),
 			'line' => $constant->get_line(),
-			'name' => addslashes($constant->get_name()),
+			'name' => $constant->get_name(),
 			'type' => $constant->get_type()->get_type(),
-			'value' => addslashes($constant->get_type()->get_value())
+			'value' => $constant->get_type()->get_value()
 		));
 	}
 	

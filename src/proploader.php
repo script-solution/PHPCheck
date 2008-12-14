@@ -30,6 +30,18 @@ final class PC_PropLoader extends FWS_PropLoader
 	}
 
 	/**
+	 * @see FWS_PropLoader::input()
+	 *
+	 * @return FWS_Input
+	 */
+	protected function input()
+	{
+		$c = FWS_Input::get_instance();
+		$c->set_escape_values(false);
+		return $c;
+	}
+
+	/**
 	 * @see FWS_PropLoader::cookies()
 	 *
 	 * @return FWS_Cookies
@@ -59,7 +71,7 @@ final class PC_PropLoader extends FWS_PropLoader
 		$c->connect(PC_MYSQL_HOST,PC_MYSQL_LOGIN,PC_MYSQL_PASSWORD);
 		$c->select_database(PC_MYSQL_DATABASE);
 		$c->set_save_queries(false);
-		$c->set_escape_values(false);
+		$c->set_escape_values(true);
 		
 		$version = $c->get_server_version();
 		if($version >= '4.1')

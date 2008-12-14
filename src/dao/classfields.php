@@ -87,9 +87,9 @@ class PC_DAO_ClassFields extends FWS_Singleton
 			'class' => $class,
 			'file' => $field->get_file(),
 			'line' => $field->get_line(),
-			'name' => addslashes($field->get_name()),
+			'name' => $field->get_name(),
 			'type' => $type,
-			'value' => $val === null ? null : addslashes($val),
+			'value' => $val,
 			'visibility' => $field->get_visibility(),
 			'static' => $field->is_static() ? 1 : 0
 		));

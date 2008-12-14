@@ -44,10 +44,6 @@ final class PC_Module_calls extends PC_Module
 		$class = $input->get_var('class',-1,FWS_Input::STRING);
 		$function = $input->get_var('function',-1,FWS_Input::STRING);
 		
-		$file = $input->unescape_value($file,'get');
-		$class = $input->unescape_value($class,'get');
-		$function = $input->unescape_value($function,'get');
-		
 		$url = PC_URL::get_mod_url();
 		$url->set('file',$file);
 		$url->set('class',$class);

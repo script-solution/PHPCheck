@@ -54,10 +54,16 @@ class PC_DAO_Classes extends FWS_Singleton
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		return $db->get_row_count(
-			PC_TB_CLASSES,'*',' WHERE project_id = '.$pid
-				.($file ? ' AND file = "'.addslashes($file).'"' : '')
+		$stmt = $db->get_prepared_statement(
+			'SELECT COUNT(*) num FROM '.PC_TB_CLASSES.'
+			 WHERE project_id = :pid'
+				.($file ? ' AND file = :file' : '')
 		);
+		$stmt->bind(':pid',$pid);
+		if($file)
+			$stmt->bind(':file',$file);
+		$row = $db->get_row($stmt->get_statement());
+		return $row['num'];
 	}
 	
 	/**
@@ -78,12 +84,14 @@ class PC_DAO_Classes extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		$rows = $db->get_rows(
+		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASSES.'
-			 WHERE project_id = '.$pid.' AND file = "'.addslashes($file).'"'
+			 WHERE project_id = ? AND file = ?'
 		);
+		$stmt->bind(0,$pid);
+		$stmt->bind(1,$file);
 		$classes = array();
-		foreach($rows as $row)
+		foreach($db->get_rows($stmt->get_statement()) as $row)
 			$classes[] = $this->_build_class($row);
 		return $classes;
 	}
@@ -106,10 +114,13 @@ class PC_DAO_Classes extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		$row = $db->get_row(
+		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASSES.'
-			 WHERE project_id = '.$pid.' AND name = "'.addslashes($name).'"'
+			 WHERE project_id = ? AND name = ?'
 		);
+		$stmt->bind(0,$pid);
+		$stmt->bind(1,$name);
+		$row = $db->get_row($stmt->get_statement());
 		if($row)
 			return $this->_build_class($row);
 		return null;
@@ -164,14 +175,14 @@ class PC_DAO_Classes extends FWS_Singleton
 		$project = FWS_Props::get()->project();
 		$cid = $db->insert(PC_TB_CLASSES,array(
 			'project_id' => $project->get_id(),
-			'file' => addslashes($class->get_file()),
+			'file' => $class->get_file(),
 			'line' => $class->get_line(),
-			'name' => addslashes($class->get_name()),
+			'name' => $class->get_name(),
 			'abstract' => $class->is_abstract() ? 1 : 0,
 			'final' => $class->is_final() ? 1 : 0,
 			'interface' => $class->is_interface() ? 1 : 0,
 			'superclass' => $class->get_super_class() === null ? '' : $class->get_super_class(),
-			'interfaces' => addslashes(implode(',',$class->get_interfaces()))
+			'interfaces' => implode(',',$class->get_interfaces())
 		));
 		
 		// create constants

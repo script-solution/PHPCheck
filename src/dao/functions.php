@@ -66,10 +66,12 @@ class PC_DAO_Functions extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		$row = $db->get_row(
+		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_FUNCTIONS.'
-			 WHERE project_id = '.$pid.' AND class = 0 AND name = "'.addslashes($name).'"'
+			 WHERE project_id = '.$pid.' AND class = 0 AND name = ?'
 		);
+		$stmt->bind(0,$name);
+		$row = $db->get_row($stmt->get_statement());
 		if($row)
 			return $this->_build_func($row);
 		return null;
@@ -198,10 +200,10 @@ class PC_DAO_Functions extends FWS_Singleton
 		$type = $function->get_return_type()->get_type();
 		return array(
 			'project_id' => $project->get_id(),
-			'file' => addslashes($function->get_file()),
+			'file' => $function->get_file(),
 			'line' => $function->get_line(),
 			'class' => $class,
-			'name' => addslashes($function->get_name()),
+			'name' => $function->get_name(),
 			'abstract' => $function->is_abstract() ? 1 : 0,
 			'final' => $function->is_final() ? 1 : 0,
 			'static' => $function->is_static() ? 1 : 0,

@@ -56,12 +56,19 @@ class PC_DAO_Errors extends FWS_Singleton
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		return $db->get_row_count(
-			PC_TB_ERRORS,'*',' WHERE project_id = '.$pid
-				.($file ? ' AND file LIKE "%'.addslashes($file).'%"' : '')
-				.($msg ? ' AND message LIKE "%'.addslashes($msg).'%"' : '')
+		$stmt = $db->get_prepared_statement(
+			'SELECT COUNT(*) num FROM '.PC_TB_ERRORS.'
+			 WHERE project_id = '.$pid
+				.($file ? ' AND file LIKE :file' : '')
+				.($msg ? ' AND message LIKE :msg' : '')
 				.(count($types) ? ' AND type IN ('.implode(',',$types).')' : '')
 		);
+		if($file)
+			$stmt->bind(':file','%'.$file.'%');
+		if($msg)
+			$stmt->bind(':msg','%'.$msg.'%');
+		$row = $db->get_row($stmt->get_statement());
+		return $row['num'];
 	}
 	
 	/**
@@ -90,16 +97,20 @@ class PC_DAO_Errors extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$errs = array();
-		$rows = $db->get_rows(
+		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_ERRORS.'
 			 WHERE project_id = '.$project->get_id()
-				.($file ? ' AND file LIKE "%'.addslashes($file).'%"' : '')
-				.($msg ? ' AND message LIKE "%'.addslashes($msg).'%"' : '')
+				.($file ? ' AND file LIKE :file' : '')
+				.($msg ? ' AND message LIKE :msg' : '')
 				.(count($types) ? ' AND type IN ('.implode(',',$types).')' : '')
 				.' ORDER BY id ASC'
 				.($count > 0 ? ' LIMIT '.$start.','.$count : '')
 		);
-		foreach($rows as $row)
+		if($file)
+			$stmt->bind(':file','%'.$file.'%');
+		if($msg)
+			$stmt->bind(':msg','%'.$msg.'%');
+		foreach($db->get_rows($stmt->get_statement()) as $row)
 			$errs[] = $this->_build_error($row);
 		return $errs;
 	}
@@ -120,9 +131,9 @@ class PC_DAO_Errors extends FWS_Singleton
 		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_ERRORS,array(
 			'project_id' => $project->get_id(),
-			'file' => addslashes($error->get_loc()->get_file()),
+			'file' => $error->get_loc()->get_file(),
 			'line' => $error->get_loc()->get_line(),
-			'message' => addslashes($error->get_msg()),
+			'message' => $error->get_msg(),
 			'type' => $error->get_type()
 		));
 	}

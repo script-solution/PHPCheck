@@ -93,10 +93,10 @@ class PC_DAO_Vars extends FWS_Singleton
 		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_VARS,array(
 			'project_id' => $project->get_id(),
-			'name' => addslashes($var->get_name()),
-			'function' => addslashes($var->get_function()),
-			'class' => addslashes($var->get_class()),
-			'type' => addslashes(serialize($var->get_type()))
+			'name' => $var->get_name(),
+			'function' => $var->get_function(),
+			'class' => $var->get_class(),
+			'type' => serialize($var->get_type())
 		));
 	}
 	

@@ -56,12 +56,22 @@ class PC_DAO_Calls extends FWS_Singleton
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
-		return $db->get_row_count(
-			PC_TB_CALLS,'*',' WHERE project_id = '.$pid
-				.($file ? ' AND file LIKE "%'.addslashes($file).'%"' : '')
-				.($class ? ' AND class LIKE "%'.addslashes($class).'%"' : '')
-				.($function ? ' AND function LIKE "%'.addslashes($function).'%"' : '')
+		$stmt = $db->get_prepared_statement(
+			'SELECT COUNT(*) num FROM '.PC_TB_CALLS.' WHERE project_id = :pid'
+				.($file ? ' AND file LIKE :file' : '')
+				.($class ? ' AND class LIKE :class' : '')
+				.($function ? ' AND function LIKE :func' : '')
 		);
+		$stmt->bind(':pid',$pid);
+		if($file)
+			$stmt->bind(':file','%'.$file.'%');
+		if($class)
+			$stmt->bind(':class','%'.$class.'%');
+		if($function)
+			$stmt->bind(':func','%'.$function.'%');
+		$set = $db->execute($stmt->get_statement());
+		$row = $set->next();
+		return $row['num'];
 	}
 	
 	/**
@@ -89,16 +99,23 @@ class PC_DAO_Calls extends FWS_Singleton
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
 		$calls = array();
-		$rows = $db->get_rows(
+		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CALLS.'
-			 WHERE project_id = '.$pid
-				.($file ? ' AND file LIKE "%'.addslashes($file).'%"' : '')
-				.($class ? ' AND class LIKE "%'.addslashes($class).'%"' : '')
-				.($function ? ' AND function LIKE "%'.addslashes($function).'%"' : '')
+			 WHERE project_id = :pid'
+				.($file ? ' AND file LIKE :file' : '')
+				.($class ? ' AND class LIKE :class' : '')
+				.($function ? ' AND function LIKE :func' : '')
 			 .' ORDER BY id ASC
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
-		foreach($rows as $row)
+		$stmt->bind(':pid',$pid);
+		if($file)
+			$stmt->bind(':file','%'.$file.'%');
+		if($class)
+			$stmt->bind(':class','%'.$class.'%');
+		if($function)
+			$stmt->bind(':func','%'.$function.'%');
+		foreach($db->get_rows($stmt->get_statement()) as $row)
 			$calls[] = $this->_build_call($row);
 		return $calls;
 	}
@@ -119,13 +136,13 @@ class PC_DAO_Calls extends FWS_Singleton
 		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_CALLS,array(
 			'project_id' => $project->get_id(),
-			'file' => addslashes($call->get_file()),
+			'file' => $call->get_file(),
 			'line' => $call->get_line(),
-			'function' => addslashes($call->get_function()),
-			'class' => $call->get_class() === null ? null : addslashes($call->get_class()),
+			'function' => $call->get_function(),
+			'class' => $call->get_class() === null ? null : $call->get_class(),
 			'static' => $call->is_static() ? 1 : 0,
 			'objcreation' => $call->is_object_creation() ? 1 : 0,
-			'arguments' => addslashes(serialize($call->get_arguments()))
+			'arguments' => serialize($call->get_arguments())
 		));
 	}
 	
