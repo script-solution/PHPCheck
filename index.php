@@ -24,6 +24,7 @@ $accessor->set_loader(new PC_PropLoader());
 FWS_Props::set_accessor($accessor);
 
 // TODO use abstract, final for methods
+// TODO watch out if abstract methods are called! (parent::abstractMethod())
 // TODO use static for fields
 // TODO handle case-sensitivy correctly
 // TODO handle list() so that it declares the variables as unknown?
