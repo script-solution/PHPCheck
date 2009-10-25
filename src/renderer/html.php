@@ -110,7 +110,7 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 		$tpl->set_template('inc_header.htm');
 		$tpl->add_allowed_method('form','*');
 		$tpl->add_variables(array(
-			'location' => $this->get_breadcrumbs(),
+			'location' => $this->get_breadcrumb_links(),
 			'form' => $form,
 			'projects' => $pronames,
 			'chg_project_aid' => PC_ACTION_CHG_PROJECT,
