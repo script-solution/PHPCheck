@@ -180,7 +180,7 @@ class PC_DAO_Calls extends FWS_Singleton
 		$c->set_object_creation($row['objcreation']);
 		$args = unserialize($row['arguments']);
 		if($args === false)
-			echo FWS_Printer::to_string($row);
+			throw new Exception("Unable to unserialize '".$row['arguments']."'");
 		foreach($args as $arg)
 			$c->add_argument($arg);
 		return $c;

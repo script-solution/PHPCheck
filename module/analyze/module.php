@@ -36,8 +36,6 @@ final class PC_Module_analyze extends PC_Module implements FWS_Progress_Listener
 	 */
 	public function run()
 	{
-		$user = FWS_Props::get()->user();
-
 		$storage = new FWS_Progress_Storage_Session('panalyze_');
 		$this->_pm = new FWS_Progress_Manager($storage);
 		$this->_pm->set_ops_per_cycle(PC_ANALYZE_ITEMS_PER_CYCLE);
@@ -72,7 +70,6 @@ final class PC_Module_analyze extends PC_Module implements FWS_Progress_Listener
 	private function _populate_template()
 	{
 		$tpl = FWS_Props::get()->tpl();
-		$user = FWS_Props::get()->user();
 		
 		$tpl->add_variables(array(
 			'not_finished' => !$this->_pm->is_finished(),

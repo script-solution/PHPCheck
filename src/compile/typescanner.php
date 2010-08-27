@@ -18,7 +18,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_TypeScanner extends FWS_Object
+class PC_Compile_TypeScanner extends FWS_Object
 {
 	/**
 	 * The tokens of the file

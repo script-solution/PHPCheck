@@ -49,18 +49,20 @@ function x($a,MyClass $b) {
 	
 	public function testVars()
 	{
-		global $code;
-		$tscanner = new PC_TypeScanner();
+		$tscanner = new PC_Compile_TypeScanner();
 		$tscanner->scan(self::$code);
-		$tscanner->finish();
-			
-		$functions = $tscanner->get_functions();
-		$classes = $tscanner->get_classes();
-		$constants = $tscanner->get_constants();
+		
+		$typecon = new PC_Compile_TypeContainer(0,false);
+		$typecon->add_classes($tscanner->get_classes());
+		$typecon->add_functions($tscanner->get_functions());
+		$typecon->add_constants($tscanner->get_constants());
+		
+		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
+		$fin->finalize();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_StatementScanner();
-		$ascanner->scan(self::$code,$functions,$classes,$constants);
+		$ascanner = new PC_Compile_StatementScanner();
+		$ascanner->scan(self::$code,$typecon);
 		$vars = $ascanner->get_vars();
 		$calls = $ascanner->get_calls();
 		

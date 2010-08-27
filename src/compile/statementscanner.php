@@ -18,7 +18,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_StatementScanner extends FWS_Object
+class PC_Compile_StatementScanner extends FWS_Object
 {
 	// the states
 	const ST_WAIT_FOR_VAR = 0;
@@ -73,7 +73,7 @@ class PC_StatementScanner extends FWS_Object
 	/**
 	 * The type-container
 	 *
-	 * @var PC_TypeContainer
+	 * @var PC_Compile_TypeContainer
 	 */
 	private $types;
 	
@@ -112,7 +112,7 @@ class PC_StatementScanner extends FWS_Object
 	 * Scans the given file
 	 *
 	 * @param string $file the file to scan
-	 * @param PC_TypeContainer $types the type-container
+	 * @param PC_Compile_TypeContainer $types the type-container
 	 */
 	public function scan_file($file,$types)
 	{
@@ -124,7 +124,7 @@ class PC_StatementScanner extends FWS_Object
 	 * Scannes the given string
 	 *
 	 * @param string $source the string to scan
-	 * @param PC_TypeContainer $types the type-container
+	 * @param PC_Compile_TypeContainer $types the type-container
 	 */
 	public function scan($source,$types)
 	{
@@ -215,8 +215,9 @@ class PC_StatementScanner extends FWS_Object
 						$this->scope = $str;
 						
 						// add function parameters, if known
-						if(isset($this->funcs[$str]))
-							$this->_add_parameters_to_local($this->funcs[$str]->get_params());
+						$func = $this->types->get_function($str);
+						if($func)
+							$this->_add_parameters_to_local($func->get_params());
 						
 						$state = self::ST_WAIT_FOR_METHOD_BODY;
 					}

@@ -33,22 +33,32 @@ private function d($a = 0,$b = "a",$c = false) {
 	$a = $b + $c;
 	return $a;
 }
+/**
+ * @param int $d
+ */
+public function doit(MyClass $c,$d) {
+	$c->test($d);
+}
 ?>';
 	
 	public function testFuncs()
 	{
-		global $code;
-		$tscanner = new PC_TypeScanner();
+		$tscanner = new PC_Compile_TypeScanner();
 		$tscanner->scan(self::$code);
-		$tscanner->finish();
-			
+		
+		$typecon = new PC_Compile_TypeContainer(0,false);
+		$typecon->add_classes($tscanner->get_classes());
+		$typecon->add_functions($tscanner->get_functions());
+		$typecon->add_constants($tscanner->get_constants());
+		
+		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
+		$fin->finalize();
+		
 		$functions = $tscanner->get_functions();
-		$classes = $tscanner->get_classes();
-		$constants = $tscanner->get_constants();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_StatementScanner();
-		$ascanner->scan(self::$code,$functions,$classes,$constants);
+		$ascanner = new PC_Compile_StatementScanner();
+		$ascanner->scan(self::$code,$typecon);
 		
 		$func = $functions['a'];
 		/* @var $func PC_Method */
@@ -80,6 +90,14 @@ private function d($a = 0,$b = "a",$c = false) {
 		self::assertEquals('integer?',(string)$func->get_param('$a'));
 		self::assertEquals('string?',(string)$func->get_param('$b'));
 		self::assertEquals('bool?',(string)$func->get_param('$c'));
+		
+		$func = $functions['doit'];
+		self::assertEquals('doit',$func->get_name());
+		self::assertEquals(2,$func->get_param_count());
+		self::assertEquals(2,$func->get_required_param_count());
+		self::assertEquals(PC_Type::UNKNOWN,$func->get_return_type()->get_type());
+		self::assertEquals('MyClass',(string)$func->get_param('$c'));
+		self::assertEquals('integer',(string)$func->get_param('$d'));
 	}
 }
 ?>

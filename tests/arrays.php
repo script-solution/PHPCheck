@@ -33,46 +33,52 @@ $b[] = 4;
 	
 	public function testArrays()
 	{
-		global $code;
-		$tscanner = new PC_TypeScanner();
+		$tscanner = new PC_Compile_TypeScanner();
 		$tscanner->scan(self::$code);
-		$tscanner->finish();
 		
-		$functions = $tscanner->get_functions();
-		$classes = $tscanner->get_classes();
-		$constants = $tscanner->get_constants();
+		$typecon = new PC_Compile_TypeContainer(0,false);
+		$typecon->add_classes($tscanner->get_classes());
+		$typecon->add_functions($tscanner->get_functions());
+		$typecon->add_constants($tscanner->get_constants());
+		
+		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
+		$fin->finalize();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_StatementScanner();
-		$ascanner->scan(self::$code,$functions,$classes,$constants);
+		$ascanner = new PC_Compile_StatementScanner();
+		$ascanner->scan(self::$code,$typecon);
 		$vars = $ascanner->get_vars();
 		$calls = $ascanner->get_calls();
 		
 		$args = $calls[0]->get_arguments();
-		self::assertEquals('integer=1',(string)$args[0]);
+		self::assertEquals((string)new PC_Type(PC_Type::INT,1),(string)$args[0]);
 		$args = $calls[1]->get_arguments();
-		self::assertEquals('integer=2',(string)$args[0]);
+		self::assertEquals((string)new PC_Type(PC_Type::INT,2),(string)$args[0]);
 		$args = $calls[2]->get_arguments();
-		self::assertEquals('integer=3',(string)$args[0]);
+		self::assertEquals((string)new PC_Type(PC_Type::INT,3),(string)$args[0]);
 		$args = $calls[3]->get_arguments();
-		self::assertEquals('array={0 = string=\'abc\';1 = integer=2;}',(string)$args[0]);
+		$type = new PC_Type(PC_Type::TARRAY);
+		$type->set_array_type(0,new PC_Type(PC_Type::STRING,'\'abc\''));
+		$type->set_array_type(1,new PC_Type(PC_Type::INT,2));
+		self::assertEquals((string)$type,(string)$args[0]);
 		$args = $calls[4]->get_arguments();
-		self::assertEquals('string=\'abc\'',(string)$args[0]);
+		self::assertEquals((string)new PC_Type(PC_Type::STRING,'\'abc\''),(string)$args[0]);
 		$args = $calls[5]->get_arguments();
-		self::assertEquals('integer=2',(string)$args[0]);
+		self::assertEquals((string)new PC_Type(PC_Type::INT,2),(string)$args[0]);
 		$args = $calls[6]->get_arguments();
-		self::assertEquals('unknown',(string)$args[0]);
+		self::assertEquals((string)new PC_Type(PC_Type::UNKNOWN),(string)$args[0]);
 		$args = $calls[7]->get_arguments();
-		self::assertEquals('unknown',(string)$args[0]);
+		self::assertEquals((string)new PC_Type(PC_Type::UNKNOWN),(string)$args[0]);
 		
-		self::assertEquals(
-			'array={0 = a;1 = integer=4;2 = integer=5;"Abc" = string="me";}',
-			(string)$vars[PC_Variable::SCOPE_GLOBAL]['$a']->get_type()
-		);
-		self::assertEquals(
-			'array={0 = integer=4;}',
-			(string)$vars[PC_Variable::SCOPE_GLOBAL]['$b']->get_type()
-		);
+		$type = new PC_Type(PC_Type::TARRAY);
+		$type->set_array_type(0,new PC_Type(PC_Type::OBJECT,null,'a'));
+		$type->set_array_type(1,new PC_Type(PC_Type::INT,4));
+		$type->set_array_type(2,new PC_Type(PC_Type::INT,5));
+		$type->set_array_type('"Abc"',new PC_Type(PC_Type::STRING,'"me"'));
+		self::assertEquals((string)$type,(string)$vars[PC_Variable::SCOPE_GLOBAL]['$a']->get_type());
+		$type = new PC_Type(PC_Type::TARRAY);
+		$type->set_array_type(0,new PC_Type(PC_Type::INT,4));
+		self::assertEquals((string)$type,(string)$vars[PC_Variable::SCOPE_GLOBAL]['$b']->get_type());
 	}
 }
 ?>

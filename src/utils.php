@@ -126,7 +126,7 @@ class PC_Utils extends FWS_UtilBase
 					// do we have to re-parse the file?
 					if(!isset($cache[$filename]) || $cache[$filename][0] < filemtime($filename))
 					{
-						$tscanner = new PC_TypeScanner();
+						$tscanner = new PC_Compile_TypeScanner();
 						$tscanner->scan_file($filename);
 						$functions = array_merge($functions,$tscanner->get_functions());
 						$classes = array_merge($classes,$tscanner->get_classes());
@@ -143,14 +143,14 @@ class PC_Utils extends FWS_UtilBase
 			// write back to cache
 			if($changed)
 			{
-				$tscanner = new PC_TypeScanner();
+				$tscanner = new PC_Compile_TypeScanner();
 				$tscanner->finish($classes);
 				FWS_FileUtils::write('cache.php',serialize($cache));
 			}
 		}
 		else
 		{
-			$tscanner = new PC_TypeScanner();
+			$tscanner = new PC_Compile_TypeScanner();
 			foreach($files as $file)
 				$tscanner->scan_file($file);
 			$tscanner->finish();
@@ -161,8 +161,8 @@ class PC_Utils extends FWS_UtilBase
 		}*/
 		
 		// scan files for function-calls and variables
-		$types = new PC_TypeContainer();
-		$ascanner = new PC_StatementScanner();
+		$types = new PC_Compile_TypeContainer();
+		$ascanner = new PC_Compile_StatementScanner();
 		foreach($files as $file)
 			$ascanner->scan_file($file,$types);
 		

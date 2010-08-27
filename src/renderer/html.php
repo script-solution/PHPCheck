@@ -37,7 +37,7 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 		
 		// add the home-breadcrumb
 		$url = new FWS_URL();
-		$url->set('action','start');
+		$url->set('action','home');
 		$this->add_breadcrumb('PHP-Check',$url->to_url());
 	}
 	
@@ -124,7 +124,25 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 	 */
 	protected function footer()
 	{
-		// nothing to do yet
+		$db = FWS_Props::get()->db();
+		$locale = FWS_Props::get()->locale();
+		$doc = FWS_Props::get()->doc();
+		$tpl = FWS_Props::get()->tpl();
+		$profiler = $doc->get_profiler();
+		
+		$mem = FWS_StringHelper::get_formated_data_size(
+			$profiler->get_memory_usage(),$locale->get_thousands_separator(),
+			$locale->get_dec_separator()
+		);
+		
+		$tpl->set_template('inc_footer.htm');
+		$tpl->add_variables(array(
+			'version' => PC_VERSION,
+			'time' => $profiler->get_time(),
+			'queries' => $db->get_query_count(),
+			'memory' => $mem
+		));
+		$tpl->restore_template();
 	}
 }
 ?>

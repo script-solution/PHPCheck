@@ -49,13 +49,14 @@ class PC_DAO_Functions extends FWS_Singleton
 	}
 	
 	/**
-	 * Returns the (free) function with given name in the given project
+	 * Returns the function/method with given name and optionally in given class and project
 	 *
 	 * @param string $name the function-name
 	 * @param int $pid the project-id (0 = current)
+	 * @param int $class the class in which the method is (default: empty, i.e. a free function)
 	 * @return PC_Method the function or null
 	 */
-	public function get_by_name($name,$pid = 0)
+	public function get_by_name($name,$pid = 0,$class = '')
 	{
 		$db = FWS_Props::get()->db();
 		
@@ -67,10 +68,16 @@ class PC_DAO_Functions extends FWS_Singleton
 		$project = FWS_Props::get()->project();
 		$pid = $pid === 0 ? $project->get_id() : $pid;
 		$stmt = $db->get_prepared_statement(
-			'SELECT * FROM '.PC_TB_FUNCTIONS.'
-			 WHERE project_id = '.$pid.' AND class = 0 AND name = ?'
+			'SELECT f.* FROM '.PC_TB_FUNCTIONS.' f
+			 LEFT JOIN '.PC_TB_CLASSES.' c ON f.class = c.id AND f.project_id = c.project_id
+			 WHERE
+			 	f.project_id = :pid AND
+			 	((:class = "" AND c.id IS NULL) OR (:class != "" AND c.name = :funcname)) AND
+			 	f.name = :funcname'
 		);
-		$stmt->bind(0,$name);
+		$stmt->bind(':pid',$pid);
+		$stmt->bind(':class',$class ? $class : '');
+		$stmt->bind(':funcname',$name);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
 			return $this->_build_func($row);

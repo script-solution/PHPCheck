@@ -159,16 +159,30 @@ class PC_Call extends PC_Location
 	/**
 	 * Builds a string-representation of the call
 	 * 
+	 * @param bool $use_db wether to query the db for more info
 	 * @return string
 	 */
-	public function get_call()
+	public function get_call($use_db = true)
 	{
 		$classname = $this->class && $this->class == PC_Class::UNKNOWN ? '<i>UNKNOWN</i>' : $this->class;
-		$url = new FWS_URL();
-		$url->set('module','class');
+		$url = PC_URL::get_mod_url('class');
 		$url->set('name',$classname);
-		$str = $classname ? '<a href="'.$url->to_url().'">'.$classname.'</a>'.($this->static ? '::' : '->') : '';
-		$str .= $this->function.'(';
+		$str = '';
+		if($classname)
+			$str .= '<a href="'.$url->to_url().'">'.$classname.'</a>'.($this->static ? '::' : '->');
+		if($use_db)
+			$func = PC_DAO::get_functions()->get_by_name($this->function,0,$this->class);
+		else
+			$func = null;
+		if($func)
+		{
+			$url = PC_URL::get_mod_url('class');
+			$url->set('name',$classname);
+			$url->set_anchor('l'.$func->get_line());
+			$str .= '<a href="'.$url->to_url().'">'.$this->function.'</a>(';
+		}
+		else
+			$str .= $this->function.'(';
 		$str .= implode(', ',$this->arguments);
 		$str .= ')';
 		return $str;
@@ -181,7 +195,7 @@ class PC_Call extends PC_Location
 	
 	public function __ToString()
 	{
-		return $this->get_call().' in "'.$this->get_file().'", line '.$this->get_line();
+		return $this->get_call(false).' in "'.$this->get_file().'", line '.$this->get_line();
 	}
 }
 ?>

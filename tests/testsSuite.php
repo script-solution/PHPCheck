@@ -10,8 +10,8 @@
  * @link				http://www.script-solution.de
  */
 
-define('ROOT','../');
-define('FWS_PATH',dirname(__FILE__).'/../../PHPLib/');
+define('ROOT',dirname(__FILE__).'/../');
+define('FWS_PATH',ROOT.'../FrameWorkSolution/');
 
 // init the framework
 include_once(FWS_PATH.'init.php');

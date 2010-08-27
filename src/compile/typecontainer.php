@@ -17,7 +17,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_TypeContainer extends FWS_Object
+final class PC_Compile_TypeContainer extends FWS_Object
 {
 	/**
 	 * The project-id
@@ -48,16 +48,25 @@ final class PC_TypeContainer extends FWS_Object
 	private $_constants = array();
 	
 	/**
+	 * Wether the db should be queried if a type can't be found
+	 *
+	 * @var bool
+	 */
+	private $_use_db;
+	
+	/**
 	 * Constructor
 	 *
 	 * @param int $pid the project-id
+	 * @param bool $use_db wether the db should be queried if a type can't be found
 	 */
-	public function __construct($pid = 0)
+	public function __construct($pid = 0,$use_db = true)
 	{
 		if(!FWS_Helper::is_integer($pid) || $pid < 0)
 			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$this->_pid = $pid === 0 ? $pid : FWS_Props::get()->project()->get_id();
+		$this->_use_db = $use_db;
 	}
 	
 	/**
@@ -72,6 +81,14 @@ final class PC_TypeContainer extends FWS_Object
 	}
 	
 	/**
+	 * @return array an associative array of <code>array(<name> => <class>)</code>
+	 */
+	public function get_classes()
+	{
+		return $this->_classes;
+	}
+	
+	/**
 	 * Returns the class with given name. Will fetch it from db if not already present
 	 *
 	 * @param string $name the class-name
@@ -81,9 +98,11 @@ final class PC_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if(!isset($this->_classes[$name]))
+		if($this->_use_db && !isset($this->_classes[$name]))
 			$this->_classes[$name] = PC_DAO::get_classes()->get_by_name($name,$this->_pid);
-		return $this->_classes[$name];
+		if(isset($this->_classes[$name]))
+			return $this->_classes[$name];
+		return null;
 	}
 	
 	/**
@@ -107,9 +126,11 @@ final class PC_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if(!isset($this->_functions[$name]))
+		if($this->_use_db && !isset($this->_functions[$name]))
 			$this->_functions[$name] = PC_DAO::get_functions()->get_by_name($name,$this->_pid);
-		return $this->_functions[$name];
+		if(isset($this->_functions[$name]))
+			return $this->_functions[$name];
+		return null;
 	}
 	
 	/**
@@ -133,9 +154,11 @@ final class PC_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if(!isset($this->_constants[$name]))
+		if($this->_use_db && !isset($this->_constants[$name]))
 			$this->_constants[$name] = PC_DAO::get_constants()->get_by_name($name,$this->_pid);
-		return $this->_constants[$name];
+		if(isset($this->_constants[$name]))
+			return $this->_constants[$name];
+		return null;
 	}
 
 	/**

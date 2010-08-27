@@ -69,8 +69,8 @@ final class PC_Module_Analyze_Task_Scan extends FWS_Object implements FWS_Progre
 			PC_DAO::get_errors()->delete_by_project($project->get_id());
 		}
 		
-		$an = new PC_Analyzer();
-		$types = new PC_TypeContainer();
+		$an = new PC_Compile_Analyzer();
+		$types = new PC_Compile_TypeContainer();
 		
 		// analyze calls
 		if($pos < $this->_callnum)

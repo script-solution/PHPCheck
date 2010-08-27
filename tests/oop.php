@@ -56,18 +56,24 @@ $e = $d->test2($d);
 	
 	public function testOOP()
 	{
-		global $code;
-		$tscanner = new PC_TypeScanner();
+		$tscanner = new PC_Compile_TypeScanner();
 		$tscanner->scan(self::$code);
-		$tscanner->finish();
+		
+		$typecon = new PC_Compile_TypeContainer(0,false);
+		$typecon->add_classes($tscanner->get_classes());
+		$typecon->add_functions($tscanner->get_functions());
+		$typecon->add_constants($tscanner->get_constants());
+		
+		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
+		$fin->finalize();
 			
 		$functions = $tscanner->get_functions();
 		$classes = $tscanner->get_classes();
 		$constants = $tscanner->get_constants();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_StatementScanner();
-		$ascanner->scan(self::$code,$functions,$classes,$constants);
+		$ascanner = new PC_Compile_StatementScanner();
+		$ascanner->scan(self::$code,$typecon);
 		$vars = $ascanner->get_vars();
 		$calls = $ascanner->get_calls();
 		
@@ -78,7 +84,7 @@ $e = $d->test2($d);
 		self::assertEquals(false,$a->is_final());
 		self::assertEquals(null,$a->get_super_class());
 		self::assertEquals(array(),$a->get_interfaces());
-		self::assertEquals((string)new PC_Type(PC_Type::INT,0),(string)$a->get_constant('c'));
+		self::assertEquals((string)new PC_Type(PC_Type::INT,0),(string)$a->get_constant('c')->get_type());
 		self::assertEquals(
 			(string)new PC_Field('',0,'$f',new PC_Type(PC_Type::STRING,'"abc"'),PC_Field::V_PRIVATE),
 			(string)$a->get_field('$f')
@@ -111,7 +117,7 @@ $e = $d->test2($d);
 		self::assertEquals(false,$b->is_final());
 		self::assertEquals('a',$b->get_super_class());
 		self::assertEquals(array(),$b->get_interfaces());
-		self::assertEquals((string)new PC_Type(PC_Type::INT,0),(string)$b->get_constant('c'));
+		self::assertEquals((string)new PC_Type(PC_Type::INT,0),(string)$b->get_constant('c')->get_type());
 		self::assertEquals(null,$b->get_field('$f'));
 		self::assertEquals(
 			(string)new PC_Field('',0,'$p',$array,PC_Field::V_PROTECTED),
@@ -155,7 +161,7 @@ $e = $d->test2($d);
 		);
 		
 		$global = $vars[PC_Variable::SCOPE_GLOBAL];
-		self::assertEquals('integer=0',(string)$global['$a']->get_type());
+		self::assertEquals((string)new PC_Type(PC_Type::INT,0),(string)$global['$a']->get_type());
 		self::assertEquals('a',(string)$global['$b']->get_type());
 		self::assertEquals('a',(string)$global['$c']->get_type());
 		self::assertEquals('x',(string)$global['$d']->get_type());

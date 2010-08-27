@@ -11,6 +11,14 @@
  */
 
 /**
+ * Path to FrameWorkSolution with trailing slash
+ */
+define('FWS_PATH','../FrameWorkSolution/');
+/**
+ * The version
+ */
+define('PC_VERSION','PHPCheck v1.0');
+/**
  * The number of entries per page for lists
  */
 define('PC_ENTRIES_PER_PAGE',20);

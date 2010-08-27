@@ -51,7 +51,6 @@ final class PC_Module_Class extends FWS_Module
 	public function run()
 	{
 		$tpl = FWS_Props::get()->tpl();
-		$input = FWS_Props::get()->input();
 		
 		if(!$this->_class)
 		{
@@ -100,7 +99,7 @@ final class PC_Module_Class extends FWS_Module
 				'name' => $const->get_name(),
 				'type' => $const->get_type(),
 				'line' => $const->get_line(),
-				'url' => $this->_get_url($classfile,$const->get_file(),$const->get_line())
+				'url' => $this->_get_url($classfile,$const)
 			);
 		}
 		$tpl->add_variable_ref('consts',$consts);
@@ -115,7 +114,7 @@ final class PC_Module_Class extends FWS_Module
 				'name' => $field->get_name(),
 				'type' => (string)$field,
 				'line' => $field->get_line(),
-				'url' => $this->_get_url($classfile,$field->get_file(),$field->get_line())
+				'url' => $this->_get_url($classfile,$field)
 			);
 		}
 		$tpl->add_variable_ref('fields',$fields);
@@ -130,7 +129,7 @@ final class PC_Module_Class extends FWS_Module
 				'name' => $method->get_name(),
 				'type' => $method->__ToString(),
 				'line' => $method->get_line(),
-				'url' => $this->_get_url($classfile,$method->get_file(),$method->get_line())
+				'url' => $this->_get_url($classfile,$method)
 			);
 		}
 		$tpl->add_variable_ref('methods',$methods);
@@ -140,27 +139,18 @@ final class PC_Module_Class extends FWS_Module
 	}
 	
 	/**
-	 * Builds an URL to the given file and line
+	 * Builds an URL to the given location
 	 *
 	 * @param string $classfile the file of the class
-	 * @param string $file the file of the item
-	 * @param int $line the line of the item
+	 * @param PC_Location $loc the location of the item
 	 * @return string the URL
 	 */
-	private function _get_url($classfile,$file,$line)
+	private function _get_url($classfile,$loc)
 	{
-		if($file == $classfile)
-			return '#l'.$line;
+		if($loc->get_file() == $classfile)
+			return '#l'.$loc->get_line();
 		else
-		{
-			$classes = PC_DAO::get_classes()->get_by_file($file);
-			if(count($classes) == 1)
-				$url = PC_URL::get_mod_url('class')->set('name',$classes[0]->get_name());
-			else
-				$url = PC_URL::get_mod_url('file')->set('path',$file);
-			$url->set_anchor('l'.$line);
-			return $url->to_url();
-		}
+			return PC_URL::get_code_url($loc);
 	}
 }
 ?>
