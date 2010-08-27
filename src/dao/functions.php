@@ -236,7 +236,6 @@ class PC_DAO_Functions extends FWS_Singleton
 		$c->set_final($row['final']);
 		foreach(FWS_Array_Utils::advanced_explode(';',$row['params']) as $param)
 		{
-			$x = explode(':',$param);
 			list($name,$type) = explode(':',$param);
 			$p = new PC_Obj_Parameter();
 			$types = array();

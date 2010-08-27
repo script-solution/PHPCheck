@@ -211,7 +211,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 		// skip stuff until ','
 		$this->_skip_rubbish();
 		// skip ','
-		$this->pos++;
+		++$this->pos;
 		// skip rubbish until value
 		$this->_skip_rubbish();
 		
@@ -223,7 +223,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 		// skip rubbish until ')'
 		$this->_skip_rubbish();
 		// skip ')'
-		$this->pos++;
+		++$this->pos;
 		return true;
 	}
 	
@@ -265,7 +265,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 					// fall through
 				
 				case T_CLASS:
-					$this->pos++;
+					++$this->pos;
 					$this->_skip_rubbish();
 					list($t,$str,) = $this->tokens[$this->pos];
 					$class->set_name($str);
@@ -274,7 +274,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 				case T_EXTENDS:
 					if(!$class->is_interface())
 					{
-						$this->pos++;
+						++$this->pos;
 						$this->_skip_rubbish();
 						list($t,$str,) = $this->tokens[$this->pos];
 						$class->set_super_class($str);
@@ -283,7 +283,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 					// interfaces fall through
 					
 				case T_IMPLEMENTS:
-					$this->pos++;
+					++$this->pos;
 					$this->_skip_rubbish();
 					for(;!$finished && $this->pos < $this->end;$this->pos++)
 					{
@@ -358,7 +358,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	private function _handle_class_const($class)
 	{
 		// to const-name
-		$this->pos++;
+		++$this->pos;
 		$this->_skip_rubbish();
 		
 		list(,$str,$line) = $this->tokens[$this->pos++];
@@ -368,7 +368,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 		$this->_skip_rubbish();
 		
 		// go to value
-		$this->pos++;
+		++$this->pos;
 		$this->_skip_rubbish();
 		list($t,$str,) = $this->tokens[$this->pos];
 		
@@ -411,7 +411,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 		}
 		
 		// scan the name
-		$this->pos++;
+		++$this->pos;
 		$this->_skip_rubbish();
 		list($t,$str,) = $this->tokens[$this->pos];
 		
@@ -420,7 +420,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 		{
 			$field->set_static(true);
 			// to next interesting token
-			$this->pos++;
+			++$this->pos;
 			$this->_skip_rubbish();
 			list($t,$str,) = $this->tokens[$this->pos];
 		}
@@ -435,12 +435,12 @@ class PC_Compile_TypeScanner extends FWS_Object
 		$field->set_name($str);
 		
 		// look for default type
-		$this->pos++;
+		++$this->pos;
 		$this->_skip_rubbish();
 		list($t,$str,) = $this->tokens[$this->pos];
 		if($t == '=')
 		{
-			$this->pos++;
+			++$this->pos;
 			$this->_skip_rubbish();
 			
 			list($t,$str,) = $this->tokens[$this->pos];
@@ -579,7 +579,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 		{
 			// wait for the end of the the function-body
 			$curlies = 0;
-			for($this->pos++;$this->pos < $this->end;$this->pos++)
+			for(++$this->pos;$this->pos < $this->end;++$this->pos)
 			{
 				$this->_skip_rubbish();
 				list($t,$str,) = $this->tokens[$this->pos];
@@ -619,7 +619,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	private function _handle_params($method)
 	{
 		// we are at the '('
-		$this->pos++;
+		++$this->pos;
 		
 		// we are at ')' or the first param
 		for(;$this->pos < $this->end;$this->pos++)
@@ -639,7 +639,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 				$param->set_optional(true);
 				
 				$round = 0;
-				for($this->pos++;$this->pos < $this->end;$this->pos++)
+				for(++$this->pos;$this->pos < $this->end;++$this->pos)
 				{
 					list($t,,) = $this->tokens[$this->pos];
 					if($t == '(')
@@ -649,7 +649,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 						$round--;
 						if($round < 0)
 						{
-							$this->pos--;
+							--$this->pos;
 							break;
 						}
 					}
@@ -665,7 +665,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 			// TODO store references!
 			if($t == '&')
 			{
-				$this->pos++;
+				++$this->pos;
 				$this->_skip_rubbish();
 				list($t,$str,) = $this->tokens[$this->pos];
 			}
@@ -674,7 +674,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 			if($t == T_STRING)
 			{
 				$param->set_mtype(PC_Obj_MultiType::get_type_by_name($str));
-				$this->pos++;
+				++$this->pos;
 				$this->_skip_rubbish();
 				list(,$str,) = $this->tokens[$this->pos];
 				$param->set_name($str);

@@ -373,7 +373,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		// store var-name and walk to next 'interesting' token
 		$var = $str;
 		$oldpos = $this->pos;
-		$this->pos++;
+		++$this->pos;
 		$this->_skip_rubbish();
 		
 		list($t,,) = $this->tokens[$this->pos];
@@ -383,13 +383,13 @@ class PC_Compile_StatementScanner extends FWS_Object
 		// $foo->bar() or $foo->bar ?
 		if($t == T_OBJECT_OPERATOR)
 		{
-			$this->pos++;
+			++$this->pos;
 			$this->_skip_rubbish();
 			$res = $this->_handle_object_access($res);
 			$oldpos = $this->pos;
 			// we don't support assignments for class-fields (methods are disallowed anyway)
 			$var = null;
-			$this->pos++;
+			++$this->pos;
 			$this->_skip_rubbish();
 			list($t,,) = $this->tokens[$this->pos];
 		}
@@ -402,7 +402,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 			$isarray = true;
 			$res = $this->_handle_array_access($keys,$res);
 			$oldpos = $this->pos;
-			$this->pos++;
+			++$this->pos;
 			$this->_skip_rubbish();
 		}
 		
@@ -411,7 +411,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		if($var !== null && $t == '=')
 		{
 			// to next interesting token
-			$this->pos++;
+			++$this->pos;
 			$this->_skip_rubbish();
 			
 			$res = $this->_get_expr_value();
@@ -521,7 +521,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		// it is an object
 		if($t == T_OBJECT_OPERATOR)
 		{
-			$this->pos++; // go to next token
+			++$this->pos; // go to next token
 			$res = $this->_handle_object_access($fieldtype);
 		}
 		// array access
@@ -553,7 +553,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 			return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 		
 		// step to name
-		$this->pos++;
+		++$this->pos;
 		$this->_skip_rubbish();
 		
 		list($t,$str,$line) = $this->tokens[$this->pos];
@@ -569,7 +569,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 			$call->set_function('__construct');
 			
 			// go to '('
-			$this->pos++;
+			++$this->pos;
 			$this->_skip_rubbish();
 			
 			$this->_handle_call_args($call);
@@ -618,7 +618,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		$oldp = $this->pos;
 		
 		// step to the next token
-		$this->pos++;
+		++$this->pos;
 		$this->_skip_rubbish();
 		
 		list($t,,) = $this->tokens[$this->pos];
@@ -626,7 +626,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		if($t == T_OBJECT_OPERATOR)
 		{
 			// step to name
-			$this->pos++;
+			++$this->pos;
 			$this->_skip_rubbish();
 			
 			list($t,$str,$line) = $this->tokens[$this->pos++];
@@ -701,7 +701,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		}
 		// walk backwards to scan the token again
 		else
-			$this->pos--;
+			--$this->pos;
 		
 		// walk to '('
 		$this->_skip_rubbish();
@@ -714,7 +714,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 			list($t,,) = $this->tokens[$this->pos];
 			if($t != '(')
 			{
-				$this->pos--;
+				--$this->pos;
 				
 				// determine classname
 				$classname = $first;
@@ -783,7 +783,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 	 */
 	private function _handle_global()
 	{
-		for($this->pos++;$this->pos < $this->end;$this->pos++)
+		for(++$this->pos; $this->pos < $this->end; ++$this->pos)
 		{
 			$this->_skip_rubbish();
 			list($t,$str,) = $this->tokens[$this->pos];
@@ -811,12 +811,12 @@ class PC_Compile_StatementScanner extends FWS_Object
 		if($t != '(')
 			return null;
 		
-		$this->pos++;
+		++$this->pos;
 		$arg = null;
 		$curlies = 1;
 		for(;$this->pos < $this->end;$this->pos++)
 		{
-			list($t,$str,) = $this->tokens[$this->pos];
+			list($t,,) = $this->tokens[$this->pos];
 			
 			// count curlies, so we know when we're done
 			if($t == '(')
@@ -860,19 +860,18 @@ class PC_Compile_StatementScanner extends FWS_Object
 		$type = new PC_Obj_Type(PC_Obj_Type::TARRAY);
 		
 		// go to '('
-		$this->pos++;
+		++$this->pos;
 		$this->_skip_rubbish();
 		
 		$numkey = 0;
 		$key = null;
 		$assoc = false;
 		$curlies = 1;
-		$casttype = null;
 		$arg = null;
 		$valchecked = false;
-		for($this->pos++;$this->pos < $this->end;$this->pos++)
+		for(++$this->pos;$this->pos < $this->end;++$this->pos)
 		{
-			list($t,$str,) = $this->tokens[$this->pos];
+			list($t,,) = $this->tokens[$this->pos];
 			
 			// count curlies, so we know when we're done
 			if($t == '(')
@@ -892,7 +891,6 @@ class PC_Compile_StatementScanner extends FWS_Object
 					// reset
 					$valchecked = false;
 					$arg = null;
-					$casttype = null;
 				}
 				else if($t == ',')
 				{
@@ -911,7 +909,6 @@ class PC_Compile_StatementScanner extends FWS_Object
 					$assoc = false;
 					$key = null;
 					$arg = null;
-					$casttype = null;
 				}
 				else
 				{
@@ -990,7 +987,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		
 		// handle multi-dimensional arrays
 		$oldpos = $this->pos;
-		$this->pos++;
+		++$this->pos;
 		$this->_skip_rubbish();
 		list($t,,) = $this->tokens[$this->pos];
 		if($t == '[')
@@ -999,7 +996,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		// $array[...]->bar() or $array[...]->bar ?
 		if($t == T_OBJECT_OPERATOR)
 		{
-			$this->pos++;
+			++$this->pos;
 			$this->_skip_rubbish();
 			return $this->_handle_object_access($subvar);
 		}
@@ -1063,7 +1060,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 			case T_LNUMBER:
 			case '(':
 			case '?':
-				$this->pos++;
+				++$this->pos;
 				$this->_skip_rubbish();
 				break;
 			
@@ -1077,7 +1074,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 			case ')':
 				if($brcount > 0)
 				{
-					$this->pos++;
+					++$this->pos;
 					$this->_skip_rubbish();
 					break;
 				}
@@ -1107,6 +1104,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 				// unary +/- ?
 				if(($t == '+' || $t == '-') && $val === null)
 				{
+					$num = 0;
 					eval('$num='.$t.$rop->get_value_as_number().';');
 					if(is_float($num))
 						$arg = new PC_Obj_Type(PC_Obj_Type::FLOAT,$num);
@@ -1199,11 +1197,11 @@ class PC_Compile_StatementScanner extends FWS_Object
 			// expr ? expr : expr
 			case '?':
 				$first = $this->_get_expr_value(null,$coldpos,$brcount);
-				$this->pos++;
+				++$this->pos;
 				$this->_skip_rubbish();
 				// skip ':'
 				$coldpos = $this->pos;
-				$this->pos++;
+				++$this->pos;
 				$this->_skip_rubbish();
 				$second = $this->_get_expr_value(null,$coldpos,$brcount);
 				// we can't be sure about the value here
@@ -1234,7 +1232,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 				if($res === null)
 					$res = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 				$coldpos = $this->pos;
-				$this->pos++;
+				++$this->pos;
 				$this->_skip_rubbish();
 				$arg = $this->_get_expr_value($res,$coldpos,$brcount);
 				break;
@@ -1254,7 +1252,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 			case '"':
 				$this->_run_to_token('"');
 				$coldpos = $this->pos;
-				$this->pos++;
+				++$this->pos;
 				$this->_skip_rubbish();
 				$arg = $this->_get_expr_value(new PC_Obj_Type(PC_Obj_Type::STRING),$coldpos,$brcount);
 				break;
@@ -1283,7 +1281,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 				if(strcasecmp($str,'true') == 0 || strcasecmp($str,'false') == 0 ||
 						strcasecmp($str,'null') == 0)
 				{
-					$this->pos++;
+					++$this->pos;
 					$this->_skip_rubbish();
 				}
 				
@@ -1300,7 +1298,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 					if($res === null)
 						$res = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 					$coldpos = $this->pos;
-					$this->pos++;
+					++$this->pos;
 					$this->_skip_rubbish();
 					$arg = $this->_get_expr_value($res,$coldpos,$brcount);
 				}
@@ -1329,12 +1327,8 @@ class PC_Compile_StatementScanner extends FWS_Object
 				return new PC_Obj_Type(PC_Obj_Type::INT);
 			case T_STRING_CAST:
 				return new PC_Obj_Type(PC_Obj_Type::STRING);
-			
-			case T_OBJECT_CAST:
-			case T_UNSET_CAST:
-			default:
-				return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 		}
+		return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 	}
 	
 	/**

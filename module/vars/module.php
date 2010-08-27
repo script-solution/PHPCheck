@@ -37,7 +37,6 @@ final class PC_Module_vars extends PC_Module
 	public function run()
 	{
 		$tpl = FWS_Props::get()->tpl();
-		$input = FWS_Props::get()->input();
 		
 		$pagination = new PC_Pagination(PC_ENTRIES_PER_PAGE,PC_DAO::get_vars()->get_count());
 		$pagination->populate_tpl(PC_URL::get_mod_url());

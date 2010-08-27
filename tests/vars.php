@@ -64,7 +64,6 @@ function x($a,MyClass $b) {
 		$ascanner = new PC_Compile_StatementScanner();
 		$ascanner->scan(self::$code,$typecon);
 		$vars = $ascanner->get_vars();
-		$calls = $ascanner->get_calls();
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::INT,1),(string)$global['$i1']->get_type());

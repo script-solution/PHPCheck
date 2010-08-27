@@ -67,15 +67,12 @@ $e = $d->test2($d);
 		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
 		$fin->finalize();
 			
-		$functions = $tscanner->get_functions();
 		$classes = $tscanner->get_classes();
-		$constants = $tscanner->get_constants();
 		
 		// scan files for function-calls and variables
 		$ascanner = new PC_Compile_StatementScanner();
 		$ascanner->scan(self::$code,$typecon);
 		$vars = $ascanner->get_vars();
-		$calls = $ascanner->get_calls();
 		
 		$a = $classes['a'];
 		/* @var $a PC_Obj_Class */
