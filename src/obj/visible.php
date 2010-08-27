@@ -15,7 +15,7 @@
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-interface PC_Visible
+interface PC_Obj_Visible
 {
 	/**
 	 * Represents a visibility of 'public'

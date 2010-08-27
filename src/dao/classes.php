@@ -101,7 +101,7 @@ class PC_DAO_Classes extends FWS_Singleton
 	 *
 	 * @param string $name the class-name
 	 * @param int $pid the project-id (0 = current)
-	 * @return PC_Class the class or null
+	 * @return PC_Obj_Class the class or null
 	 */
 	public function get_by_name($name,$pid = 0)
 	{
@@ -162,15 +162,15 @@ class PC_DAO_Classes extends FWS_Singleton
 	/**
 	 * Creates a new entry for given class
 	 *
-	 * @param PC_Class $class the class
+	 * @param PC_Obj_Class $class the class
 	 * @return int the used id
 	 */
 	public function create($class)
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!($class instanceof PC_Class))
-			FWS_Helper::def_error('instance','class','PC_Class',$class);
+		if(!($class instanceof PC_Obj_Class))
+			FWS_Helper::def_error('instance','class','PC_Obj_Class',$class);
 		
 		$project = FWS_Props::get()->project();
 		$cid = $db->insert(PC_TB_CLASSES,array(
@@ -220,14 +220,14 @@ class PC_DAO_Classes extends FWS_Singleton
 	}
 	
 	/**
-	 * Builds an instance of PC_Class from the given row
+	 * Builds an instance of PC_Obj_Class from the given row
 	 *
 	 * @param array $row the row from the db
-	 * @return PC_Class the class
+	 * @return PC_Obj_Class the class
 	 */
 	private function _build_class($row)
 	{
-		$c = new PC_Class($row['file'],$row['line'],$row['id']);
+		$c = new PC_Obj_Class($row['file'],$row['line'],$row['id']);
 		$c->set_name($row['name']);
 		$c->set_super_class($row['superclass']);
 		$c->set_abstract($row['abstract']);

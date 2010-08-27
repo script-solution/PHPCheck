@@ -92,7 +92,7 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	 * Returns the class with given name. Will fetch it from db if not already present
 	 *
 	 * @param string $name the class-name
-	 * @return PC_Class the class or null if not found
+	 * @return PC_Obj_Class the class or null if not found
 	 */
 	public function get_class($name)
 	{
@@ -120,7 +120,7 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	 * Returns the (free) function with given name. Will fetch it from db if not already present
 	 *
 	 * @param string $name the function-name
-	 * @return PC_Method the function or null if not found
+	 * @return PC_Obj_Method the function or null if not found
 	 */
 	public function get_function($name)
 	{
@@ -148,7 +148,7 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	 * Returns the (free) constant with given name. Will fetch it from db if not already present
 	 *
 	 * @param string $name the constant-name
-	 * @return PC_Constant the constant or null if not found
+	 * @return PC_Obj_Constant the constant or null if not found
 	 */
 	public function get_constant($name)
 	{

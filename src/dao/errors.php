@@ -165,7 +165,7 @@ class PC_DAO_Errors extends FWS_Singleton
 	 */
 	private function _build_error($row)
 	{
-		return new PC_Error(new PC_Location($row['file'],$row['line']),$row['message'],$row['type']);
+		return new PC_Error(new PC_Obj_Location($row['file'],$row['line']),$row['message'],$row['type']);
 	}
 }
 ?>

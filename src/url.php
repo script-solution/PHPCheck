@@ -22,7 +22,7 @@ final class PC_URL extends FWS_URL
 	/**
 	 * Builds an URL to the code of the given location
 	 *
-	 * @param PC_Location $loc
+	 * @param PC_Obj_Location $loc
 	 * @return string the URL
 	 */
 	public static function get_code_url($loc)

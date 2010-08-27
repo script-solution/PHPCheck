@@ -15,7 +15,7 @@
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Variable extends FWS_Object
+class PC_Obj_Variable extends FWS_Object
 {
 	/**
 	 * Represents the global scope
@@ -46,7 +46,7 @@ class PC_Variable extends FWS_Object
 	/**
 	 * The type of the variable
 	 *
-	 * @var PC_Type
+	 * @var PC_Obj_Type
 	 */
 	private $type;
 	
@@ -54,7 +54,7 @@ class PC_Variable extends FWS_Object
 	 * Constructor
 	 * 
 	 * @param string $name the name
-	 * @param PC_Type $type the type
+	 * @param PC_Obj_Type $type the type
 	 * @param string $function the function-name (scope)
 	 * @param string $class the class-name (scope)
 	 */
@@ -62,8 +62,8 @@ class PC_Variable extends FWS_Object
 	{
 		parent::__construct();
 		
-		if(!($type instanceof PC_Type))
-			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		if(!($type instanceof PC_Obj_Type))
+			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
 		
 		$this->name = $name;
 		$this->type = $type;
@@ -80,7 +80,7 @@ class PC_Variable extends FWS_Object
 	}
 	
 	/**
-	 * @return PC_Type the type
+	 * @return PC_Obj_Type the type
 	 */
 	public function get_type()
 	{

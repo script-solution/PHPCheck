@@ -57,7 +57,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	
 	/**
 	 * The functions:
-	 * <code>array(<name> => PC_Method,...)</code>
+	 * <code>array(<name> => PC_Obj_Method,...)</code>
 	 *
 	 * @var array
 	 */
@@ -65,7 +65,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	
 	/**
 	 * The classes:
-	 * <code>array(<name> => PC_Class,...)</code>
+	 * <code>array(<name> => PC_Obj_Class,...)</code>
 	 *
 	 * @var array
 	 */
@@ -73,7 +73,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	
 	/**
 	 * The constants:
-	 * <code>array(<name> => PC_Constant,...)</code>
+	 * <code>array(<name> => PC_Obj_Constant,...)</code>
 	 *
 	 * @var array
 	 */
@@ -96,7 +96,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	}
 	
 	/**
-	 * @return array the collected contants: <code>array(<name> => PC_Constant,...)</code>
+	 * @return array the collected contants: <code>array(<name> => PC_Obj_Constant,...)</code>
 	 */
 	public function get_constants()
 	{
@@ -152,7 +152,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	 *
 	 * @param int|string $t the token
 	 * @param string $str the token-value
-	 * @return PC_Type the type
+	 * @return PC_Obj_Type the type
 	 */
 	private function _get_type_from_token($t,$str)
 	{
@@ -160,30 +160,30 @@ class PC_Compile_TypeScanner extends FWS_Object
 		switch($t)
 		{
 			case T_CONSTANT_ENCAPSED_STRING:
-				return new PC_Type(PC_Type::STRING,$str);
+				return new PC_Obj_Type(PC_Obj_Type::STRING,$str);
 			
 			case T_STRING:
 				if(strcasecmp($str,'true') == 0)
-					return new PC_Type(PC_Type::BOOL,true);
+					return new PC_Obj_Type(PC_Obj_Type::BOOL,true);
 				else if(strcasecmp($str,'false') == 0)
-					return new PC_Type(PC_Type::BOOL,false);
+					return new PC_Obj_Type(PC_Obj_Type::BOOL,false);
 				// constants
 				else if(isset($this->constants[$str]))
-					return new PC_Type($this->constants[$str]->get_type()->get_type());
+					return new PC_Obj_Type($this->constants[$str]->get_type()->get_type());
 				break;
 				// TODO handle constants / func-calls
 
 			case T_ARRAY:
-				return new PC_Type(PC_Type::TARRAY);
+				return new PC_Obj_Type(PC_Obj_Type::TARRAY);
 			
 			case T_DNUMBER:
-				return new PC_Type(PC_Type::FLOAT,(double)$str);
+				return new PC_Obj_Type(PC_Obj_Type::FLOAT,(double)$str);
 			
 			case T_LNUMBER:
-				return new PC_Type(PC_Type::INT,(int)$str);
+				return new PC_Obj_Type(PC_Obj_Type::INT,(int)$str);
 		}
 		
-		return new PC_Type(PC_Type::UNKNOWN);
+		return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 	}
 	
 	/**
@@ -218,7 +218,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 		list($t,$str,) = $this->tokens[$this->pos++];
 		$type = $this->_get_type_from_token($t,$str);
 		
-		$this->constants[$name] = new PC_Constant($this->file,$line,$name,$type);
+		$this->constants[$name] = new PC_Obj_Constant($this->file,$line,$name,$type);
 		
 		// skip rubbish until ')'
 		$this->_skip_rubbish();
@@ -243,7 +243,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 		if(!isset($vtokens[$t]))
 			return false;
 		
-		$class = new PC_Class($this->file,$line);
+		$class = new PC_Obj_Class($this->file,$line);
 		
 		// save position just in case it is no function
 		$oldpos = $this->pos;
@@ -353,7 +353,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	/**
 	 * Handles a const-definition. The method assumes that the current token is T_CONST.
 	 *
-	 * @param PC_Class $class the class in which we are currently
+	 * @param PC_Obj_Class $class the class in which we are currently
 	 */
 	private function _handle_class_const($class)
 	{
@@ -374,7 +374,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 		
 		$type = $this->_get_type_from_token($t,$str);
 		
-		$class->add_constant(new PC_Constant($this->file,$line,$name,$type));
+		$class->add_constant(new PC_Obj_Constant($this->file,$line,$name,$type));
 		
 		$this->_run_to(';');
 	}
@@ -383,7 +383,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	 * Handles a field-definition. If at the current token is no field the method does nothing.
 	 * Otherwise it reads the complete field
 	 *
-	 * @param PC_Class $class the class in which we are currently
+	 * @param PC_Obj_Class $class the class in which we are currently
 	 */
 	private function _handle_field($class)
 	{
@@ -397,13 +397,13 @@ class PC_Compile_TypeScanner extends FWS_Object
 			case T_VAR:
 			case T_PRIVATE:
 			case T_PROTECTED:
-				$field = new PC_Field($this->file,$line);
+				$field = new PC_Obj_Field($this->file,$line);
 				if($t == T_PROTECTED)
-					$field->set_visibity(PC_Visible::V_PROTECTED);
+					$field->set_visibity(PC_Obj_Visible::V_PROTECTED);
 				else if($t == T_PRIVATE)
-					$field->set_visibity(PC_Visible::V_PRIVATE);
+					$field->set_visibity(PC_Obj_Visible::V_PRIVATE);
 				else
-					$field->set_visibity(PC_Visible::V_PUBLIC);
+					$field->set_visibity(PC_Obj_Visible::V_PUBLIC);
 				break;
 			
 			default:
@@ -454,7 +454,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 		// add field
 		if($this->doc !== null)
 		{
-			$field->set_type(PC_Type::get_type_by_name($this->_get_field_type($this->doc)));
+			$field->set_type(PC_Obj_Type::get_type_by_name($this->_get_field_type($this->doc)));
 			$this->doc = null;
 		}
 		$class->add_field($field);
@@ -464,7 +464,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	 * Handles a function-/method-definition. If at the current token is no function, it returns false.
 	 * Otherwise it reads the complete function.
 	 *
-	 * @param PC_Class $class if you are in a class, please pass the class-object
+	 * @param PC_Obj_Class $class if you are in a class, please pass the class-object
 	 * @return boolean true if a function has been read
 	 */
 	private function _handle_function($class = null)
@@ -481,9 +481,9 @@ class PC_Compile_TypeScanner extends FWS_Object
 		if(!isset($vtokens[$t]))
 			return false;
 		
-		$method = new PC_Method($this->file,$line,$class === null);
+		$method = new PC_Obj_Method($this->file,$line,$class === null);
 		if($class === null)
-			$method->set_visibity(PC_Visible::V_PUBLIC);
+			$method->set_visibity(PC_Obj_Visible::V_PUBLIC);
 		
 		// save position just in case it is no function
 		$oldpos = $this->pos;
@@ -504,15 +504,15 @@ class PC_Compile_TypeScanner extends FWS_Object
 				// visibility
 				case T_PUBLIC:
 					if($class !== null)
-						$method->set_visibity(PC_Visible::V_PUBLIC);
+						$method->set_visibity(PC_Obj_Visible::V_PUBLIC);
 					break;
 				case T_PRIVATE:
 					if($class !== null)
-						$method->set_visibity(PC_Visible::V_PRIVATE);
+						$method->set_visibity(PC_Obj_Visible::V_PRIVATE);
 					break;
 				case T_PROTECTED:
 					if($class !== null)
-						$method->set_visibity(PC_Visible::V_PROTECTED);
+						$method->set_visibity(PC_Obj_Visible::V_PROTECTED);
 					break;
 				
 				// other modifier
@@ -614,7 +614,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	 * Handles the parameter of a function/method. It scans the complete parameters and adds them
 	 * to the given method-object.
 	 *
-	 * @param PC_Method $method the method-object
+	 * @param PC_Obj_Method $method the method-object
 	 */
 	private function _handle_params($method)
 	{
@@ -659,7 +659,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 				continue;
 			}
 			
-			$param = new PC_Parameter();
+			$param = new PC_Obj_Parameter();
 			
 			// handle references
 			// TODO store references!
@@ -673,7 +673,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 			// type hinting?
 			if($t == T_STRING)
 			{
-				$param->set_mtype(PC_MultiType::get_type_by_name($str));
+				$param->set_mtype(PC_Obj_MultiType::get_type_by_name($str));
 				$this->pos++;
 				$this->_skip_rubbish();
 				list(,$str,) = $this->tokens[$this->pos];
@@ -713,16 +713,16 @@ class PC_Compile_TypeScanner extends FWS_Object
 				switch($t)
 				{
 					case T_CONSTANT_ENCAPSED_STRING:
-						$param->set_type(PC_Type::$STRING);
+						$param->set_type(PC_Obj_Type::$STRING);
 						break;
 					case T_DNUMBER:
-						$param->set_type(PC_Type::$FLOAT);
+						$param->set_type(PC_Obj_Type::$FLOAT);
 						break;
 					case T_LNUMBER:
-						$param->set_type(PC_Type::$INT);
+						$param->set_type(PC_Obj_Type::$INT);
 						break;
 					case T_ARRAY:
-						$param->set_type(PC_Type::$TARRAY);
+						$param->set_type(PC_Obj_Type::$TARRAY);
 						// we want to ignore the array-elements
 						return $param;
 				}
@@ -790,7 +790,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 	/**
 	 * Parses the given method-phpdoc
 	 *
-	 * @param PC_Method $func the method to which the phpdoc belongs
+	 * @param PC_Obj_Method $func the method to which the phpdoc belongs
 	 * @param string $doc the phpdoc
 	 */
 	private function _parse_phpdoc($func,$doc)
@@ -803,12 +803,12 @@ class PC_Compile_TypeScanner extends FWS_Object
 			$param = $matches[2][$k];
 			// does the param exist?
 			if(($fp = $func->get_param($param)) !== null)
-				$fp->set_mtype(PC_MultiType::get_type_by_name($match));
+				$fp->set_mtype(PC_Obj_MultiType::get_type_by_name($match));
 		}
 		
 		// look for return-type
 		if(preg_match('/\@return\s+([^\s]+)/',$doc,$matches))
-			$func->set_return_type(PC_Type::get_type_by_name($matches[1]));
+			$func->set_return_type(PC_Obj_Type::get_type_by_name($matches[1]));
 	}
 	
 	protected function get_dump_vars()

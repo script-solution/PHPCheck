@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains the class PC_Class
+ * Contains the class PC_Obj_Class
  *
  * @version			$Id$
  * @package			PHPCheck
@@ -15,7 +15,7 @@
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Class extends PC_Modifiable
+class PC_Obj_Class extends PC_Obj_Modifiable
 {
 	// use an invalid identifier for an unknown class
 	const UNKNOWN = '#UNKNOWN';
@@ -57,14 +57,14 @@ class PC_Class extends PC_Modifiable
 	private $constants;
 	
 	/**
-	 * An array of fields of the class, represented as PC_Field
+	 * An array of fields of the class, represented as PC_Obj_Field
 	 *
 	 * @var array
 	 */
 	private $fields;
 	
 	/**
-	 * An array of methods, represented as PC_Method
+	 * An array of methods, represented as PC_Obj_Method
 	 *
 	 * @var array
 	 */
@@ -162,7 +162,7 @@ class PC_Class extends PC_Modifiable
 	 * Returns the constant with given name
 	 *
 	 * @param string $name the constant-name
-	 * @return PC_Constant the constant or null
+	 * @return PC_Obj_Constant the constant or null
 	 */
 	public function get_constant($name)
 	{
@@ -172,18 +172,18 @@ class PC_Class extends PC_Modifiable
 	/**
 	 * Adds the given constant to the class
 	 *
-	 * @param PC_Constant $const the constant
+	 * @param PC_Obj_Constant $const the constant
 	 */
 	public function add_constant($const)
 	{
-		if(!($const instanceof PC_Constant))
-			FWS_Helper::def_error('instance','const','PC_Constant',$const);
+		if(!($const instanceof PC_Obj_Constant))
+			FWS_Helper::def_error('instance','const','PC_Obj_Constant',$const);
 		
 		$this->constants[$const->get_name()] = $const;
 	}
 	
 	/**
-	 * @return array an array of PC_Field's
+	 * @return array an array of PC_Obj_Field's
 	 */
 	public function get_fields()
 	{
@@ -194,7 +194,7 @@ class PC_Class extends PC_Modifiable
 	 * Returns the class-field with given name
 	 *
 	 * @param string $name the name (including "$"!)
-	 * @return PC_Field the field or null
+	 * @return PC_Obj_Field the field or null
 	 */
 	public function get_field($name)
 	{
@@ -204,18 +204,18 @@ class PC_Class extends PC_Modifiable
 	/**
 	 * Adds the given field to the class
 	 *
-	 * @param PC_Field $field the field
+	 * @param PC_Obj_Field $field the field
 	 */
 	public function add_field($field)
 	{
-		if(!($field instanceof PC_Field))
-			FWS_Helper::def_error('instance','field','PC_Field',$field);
+		if(!($field instanceof PC_Obj_Field))
+			FWS_Helper::def_error('instance','field','PC_Obj_Field',$field);
 		
 		$this->fields[$field->get_name()] = $field;
 	}
 	
 	/**
-	 * @return array an array of PC_Method's
+	 * @return array an array of PC_Obj_Method's
 	 */
 	public function get_methods()
 	{
@@ -237,7 +237,7 @@ class PC_Class extends PC_Modifiable
 	 * Returns with method with given name
 	 *
 	 * @param string $name the method-name
-	 * @return PC_Method the method or null
+	 * @return PC_Obj_Method the method or null
 	 */
 	public function get_method($name)
 	{
@@ -249,12 +249,12 @@ class PC_Class extends PC_Modifiable
 	/**
 	 * Adds the given method to the class
 	 *
-	 * @param PC_Method $method the method
+	 * @param PC_Obj_Method $method the method
 	 */
 	public function add_method($method)
 	{
-		if(!($method instanceof PC_Method))
-			FWS_Helper::def_error('instance','method','PC_Method',$method);
+		if(!($method instanceof PC_Obj_Method))
+			FWS_Helper::def_error('instance','method','PC_Obj_Method',$method);
 		
 		$this->methods[$method->get_name()] = $method;
 	}

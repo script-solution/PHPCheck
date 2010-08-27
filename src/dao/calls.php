@@ -123,15 +123,15 @@ class PC_DAO_Calls extends FWS_Singleton
 	/**
 	 * Creates a new entry for given call
 	 *
-	 * @param PC_Call $call the call
+	 * @param PC_Obj_Call $call the call
 	 * @return int the used id
 	 */
 	public function create($call)
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!($call instanceof PC_Call))
-			FWS_Helper::def_error('instance','call','PC_Call',$call);
+		if(!($call instanceof PC_Obj_Call))
+			FWS_Helper::def_error('instance','call','PC_Obj_Call',$call);
 		
 		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_CALLS,array(
@@ -166,14 +166,14 @@ class PC_DAO_Calls extends FWS_Singleton
 	}
 	
 	/**
-	 * Builds an instance of PC_Call from the given row
+	 * Builds an instance of PC_Obj_Call from the given row
 	 *
 	 * @param array $row the row from the db
-	 * @return PC_Call the call
+	 * @return PC_Obj_Call the call
 	 */
 	private function _build_call($row)
 	{
-		$c = new PC_Call($row['file'],$row['line']);
+		$c = new PC_Obj_Call($row['file'],$row['line']);
 		$c->set_class($row['class']);
 		$c->set_function($row['function']);
 		$c->set_static($row['static']);

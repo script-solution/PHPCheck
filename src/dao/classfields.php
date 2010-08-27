@@ -33,7 +33,7 @@ class PC_DAO_ClassFields extends FWS_Singleton
 	 *
 	 * @param int $class the class-id
 	 * @param int $pid the project-id (0 = current)
-	 * @return array an array of PC_Field objects
+	 * @return array an array of PC_Obj_Field objects
 	 */
 	public function get_all($class,$pid = 0)
 	{
@@ -53,11 +53,11 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		);
 		foreach($rows as $row)
 		{
-			if($row['type'] == PC_Type::OBJECT)
-				$type = new PC_Type($row['type'],null,$row['value']);
+			if($row['type'] == PC_Obj_Type::OBJECT)
+				$type = new PC_Obj_Type($row['type'],null,$row['value']);
 			else
-				$type = new PC_Type($row['type'],$row['value']);
-			$fields[] = new PC_Field($row['file'],$row['line'],$row['name'],$type,$row['visibility']);
+				$type = new PC_Obj_Type($row['type'],$row['value']);
+			$fields[] = new PC_Obj_Field($row['file'],$row['line'],$row['name'],$type,$row['visibility']);
 		}
 		return $fields;
 	}
@@ -65,7 +65,7 @@ class PC_DAO_ClassFields extends FWS_Singleton
 	/**
 	 * Creates a new entry for given field
 	 *
-	 * @param PC_Field $field the field to create
+	 * @param PC_Obj_Field $field the field to create
 	 * @param int $class the class-id
 	 * @return int the used id
 	 */
@@ -73,15 +73,15 @@ class PC_DAO_ClassFields extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!($field instanceof PC_Field))
-			FWS_Helper::def_error('instance','field','PC_Field',$field);
+		if(!($field instanceof PC_Obj_Field))
+			FWS_Helper::def_error('instance','field','PC_Obj_Field',$field);
 		if(!FWS_Helper::is_integer($class) || $class <= 0)
 			FWS_Helper::def_error('intgt0','class',$class);
 		
 		$project = FWS_Props::get()->project();
 		$otype = $field->get_type();
 		$type = $otype->get_type();
-		$val = $type == PC_Type::OBJECT ? $otype->get_class() : $otype->get_value();
+		$val = $type == PC_Obj_Type::OBJECT ? $otype->get_class() : $otype->get_value();
 		return $db->insert(PC_TB_CLASS_FIELDS,array(
 			'project_id' => $project->get_id(),
 			'class' => $class,

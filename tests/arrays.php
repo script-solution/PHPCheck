@@ -51,34 +51,34 @@ $b[] = 4;
 		$calls = $ascanner->get_calls();
 		
 		$args = $calls[0]->get_arguments();
-		self::assertEquals((string)new PC_Type(PC_Type::INT,1),(string)$args[0]);
+		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::INT,1),(string)$args[0]);
 		$args = $calls[1]->get_arguments();
-		self::assertEquals((string)new PC_Type(PC_Type::INT,2),(string)$args[0]);
+		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::INT,2),(string)$args[0]);
 		$args = $calls[2]->get_arguments();
-		self::assertEquals((string)new PC_Type(PC_Type::INT,3),(string)$args[0]);
+		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::INT,3),(string)$args[0]);
 		$args = $calls[3]->get_arguments();
-		$type = new PC_Type(PC_Type::TARRAY);
-		$type->set_array_type(0,new PC_Type(PC_Type::STRING,'\'abc\''));
-		$type->set_array_type(1,new PC_Type(PC_Type::INT,2));
+		$type = new PC_Obj_Type(PC_Obj_Type::TARRAY);
+		$type->set_array_type(0,new PC_Obj_Type(PC_Obj_Type::STRING,'\'abc\''));
+		$type->set_array_type(1,new PC_Obj_Type(PC_Obj_Type::INT,2));
 		self::assertEquals((string)$type,(string)$args[0]);
 		$args = $calls[4]->get_arguments();
-		self::assertEquals((string)new PC_Type(PC_Type::STRING,'\'abc\''),(string)$args[0]);
+		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::STRING,'\'abc\''),(string)$args[0]);
 		$args = $calls[5]->get_arguments();
-		self::assertEquals((string)new PC_Type(PC_Type::INT,2),(string)$args[0]);
+		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::INT,2),(string)$args[0]);
 		$args = $calls[6]->get_arguments();
-		self::assertEquals((string)new PC_Type(PC_Type::UNKNOWN),(string)$args[0]);
+		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::UNKNOWN),(string)$args[0]);
 		$args = $calls[7]->get_arguments();
-		self::assertEquals((string)new PC_Type(PC_Type::UNKNOWN),(string)$args[0]);
+		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::UNKNOWN),(string)$args[0]);
 		
-		$type = new PC_Type(PC_Type::TARRAY);
-		$type->set_array_type(0,new PC_Type(PC_Type::OBJECT,null,'a'));
-		$type->set_array_type(1,new PC_Type(PC_Type::INT,4));
-		$type->set_array_type(2,new PC_Type(PC_Type::INT,5));
-		$type->set_array_type('"Abc"',new PC_Type(PC_Type::STRING,'"me"'));
-		self::assertEquals((string)$type,(string)$vars[PC_Variable::SCOPE_GLOBAL]['$a']->get_type());
-		$type = new PC_Type(PC_Type::TARRAY);
-		$type->set_array_type(0,new PC_Type(PC_Type::INT,4));
-		self::assertEquals((string)$type,(string)$vars[PC_Variable::SCOPE_GLOBAL]['$b']->get_type());
+		$type = new PC_Obj_Type(PC_Obj_Type::TARRAY);
+		$type->set_array_type(0,new PC_Obj_Type(PC_Obj_Type::OBJECT,null,'a'));
+		$type->set_array_type(1,new PC_Obj_Type(PC_Obj_Type::INT,4));
+		$type->set_array_type(2,new PC_Obj_Type(PC_Obj_Type::INT,5));
+		$type->set_array_type('"Abc"',new PC_Obj_Type(PC_Obj_Type::STRING,'"me"'));
+		self::assertEquals((string)$type,(string)$vars[PC_Obj_Variable::SCOPE_GLOBAL]['$a']->get_type());
+		$type = new PC_Obj_Type(PC_Obj_Type::TARRAY);
+		$type->set_array_type(0,new PC_Obj_Type(PC_Obj_Type::INT,4));
+		self::assertEquals((string)$type,(string)$vars[PC_Obj_Variable::SCOPE_GLOBAL]['$b']->get_type());
 	}
 }
 ?>

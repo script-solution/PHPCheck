@@ -15,7 +15,7 @@
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Field extends PC_Location implements PC_Visible
+class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 {
 	/**
 	 * The name of the field
@@ -34,7 +34,7 @@ class PC_Field extends PC_Location implements PC_Visible
 	/**
 	 * The type of the variable
 	 *
-	 * @var PC_Type
+	 * @var PC_Obj_Type
 	 */
 	private $type;
 	
@@ -51,7 +51,7 @@ class PC_Field extends PC_Location implements PC_Visible
 	 * @param string $file the file of the field
 	 * @param int $line the line of the field
 	 * @param string $name the name of the field
-	 * @param PC_Type $type the type of the field
+	 * @param PC_Obj_Type $type the type of the field
 	 * @param string $visibility the visibility
 	 */
 	public function __construct($file,$line,$name = '',$type = null,$visibility = self::V_PUBLIC)
@@ -60,7 +60,7 @@ class PC_Field extends PC_Location implements PC_Visible
 		
 		$this->name = $name;
 		$this->visibility = $visibility;
-		$this->type = $type === null ? new PC_Type(PC_Type::UNKNOWN) : $type;
+		$this->type = $type === null ? new PC_Obj_Type(PC_Obj_Type::UNKNOWN) : $type;
 	}
 	
 	/**
@@ -100,7 +100,7 @@ class PC_Field extends PC_Location implements PC_Visible
 	}
 	
 	/**
-	 * @return PC_Type the type of the variable
+	 * @return PC_Obj_Type the type of the variable
 	 */
 	public function get_type()
 	{
@@ -110,18 +110,18 @@ class PC_Field extends PC_Location implements PC_Visible
 	/**
 	 * Sets the type of the variable
 	 *
-	 * @param PC_Type $type the new value
+	 * @param PC_Obj_Type $type the new value
 	 */
 	public function set_type($type)
 	{
-		if(!($type instanceof PC_Type))
-			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		if(!($type instanceof PC_Obj_Type))
+			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
 		
 		$this->type = $type;
 	}
 	
 	/**
-	 * @see PC_Visible::get_visibility()
+	 * @see PC_Obj_Visible::get_visibility()
 	 * 
 	 * @return string
 	 */
@@ -131,7 +131,7 @@ class PC_Field extends PC_Location implements PC_Visible
 	}
 	
 	/**
-	 * @see PC_Visible::set_visibity()
+	 * @see PC_Obj_Visible::set_visibity()
 	 *
 	 * @param string $visibility
 	 */

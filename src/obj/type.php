@@ -15,7 +15,7 @@
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Type extends FWS_Object
+final class PC_Obj_Type extends FWS_Object
 {
 	// the different types
 	const INT				= 0;
@@ -31,7 +31,7 @@ final class PC_Type extends FWS_Object
 	 * Determines the type-instance by the given type-name
 	 *
 	 * @param string $name the type-name
-	 * @return PC_Type the type-instance
+	 * @return PC_Obj_Type the type-instance
 	 */
 	public static function get_type_by_name($name)
 	{
@@ -95,7 +95,7 @@ final class PC_Type extends FWS_Object
 	private $_class;
 	
 	/**
-	 * The elements for self::TARRAY (instances of PC_Type)
+	 * The elements for self::TARRAY (instances of PC_Obj_Type)
 	 *
 	 * @var array
 	 */
@@ -143,7 +143,7 @@ final class PC_Type extends FWS_Object
 	 */
 	public function equals($o)
 	{
-		if(!($o instanceof PC_Type))
+		if(!($o instanceof PC_Obj_Type))
 			return false;
 		
 		if($o->get_type() != $this->get_type())
@@ -166,31 +166,31 @@ final class PC_Type extends FWS_Object
 	 * Returns the type of the array-element with given key
 	 *
 	 * @param mixed $key the key
-	 * @return PC_Type the type of the element
+	 * @return PC_Obj_Type the type of the element
 	 */
 	public function get_array_type($key)
 	{
 		if($this->_type == self::TARRAY && isset($this->_array_elements[$key]))
 			return $this->_array_elements[$key];
-		return new PC_Type(PC_Type::UNKNOWN);
+		return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 	}
 	
 	/**
 	 * Sets the array-element-type for the given key to given type
 	 *
 	 * @param mixed $key the key
-	 * @param PC_Type $type the element-type
+	 * @param PC_Obj_Type $type the element-type
 	 */
 	public function set_array_type($key,$type)
 	{
-		if($type !== null && !($type instanceof PC_Type))
-			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		if($type !== null && !($type instanceof PC_Obj_Type))
+			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
 		
 		// convert implicitly to an array
 		$this->_type = self::TARRAY;
 		if($this->_array_elements === null)
 			$this->_array_elements = array();
-		$this->_array_elements[$key] = $type === null ? new PC_Type(PC_Type::UNKNOWN) : $type;
+		$this->_array_elements[$key] = $type === null ? new PC_Obj_Type(PC_Obj_Type::UNKNOWN) : $type;
 	}
 	
 	/**

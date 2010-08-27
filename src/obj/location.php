@@ -15,7 +15,7 @@
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Location extends FWS_Object
+class PC_Obj_Location extends FWS_Object
 {
 	/**
 	 * The file

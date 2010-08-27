@@ -68,9 +68,9 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 			$c = $this->_classes[$name];
 			if(!$c->is_interface() && $c->get_method('__construct') === null)
 			{
-				$method = new PC_Method($c->get_file(),-1,false);
+				$method = new PC_Obj_Method($c->get_file(),-1,false);
 				$method->set_name('__construct');
-				$method->set_visibity(PC_Visible::V_PUBLIC);
+				$method->set_visibity(PC_Obj_Visible::V_PUBLIC);
 				$c->add_method($method);
 				$this->_storage->create_function($method,$c->get_id());
 			}
@@ -82,7 +82,7 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 	 * performed.
 	 *
 	 * @param PC_Compile_TypeContainer $types the type-container
-	 * @param PC_Class $data the class to which the members should be added
+	 * @param PC_Obj_Class $data the class to which the members should be added
 	 * @param string $class the class-name
 	 * @param boolean $overwrite just internal: wether the members should be overwritten
 	 */
@@ -96,14 +96,14 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 				// methods
 				foreach($cobj->get_methods() as $function)
 				{
-					if($function->get_visibility() != PC_Visible::V_PRIVATE)
+					if($function->get_visibility() != PC_Obj_Visible::V_PRIVATE)
 					{
 						// if we don't want to overwrite the methods and the method is already there
 						// we add just the types that are not known yet
 						if(!$overwrite && ($f = $data->get_method($function->get_name())) !== null)
 						{
 							$changed = false;
-							/* @var $f PC_Method */
+							/* @var $f PC_Obj_Method */
 							if($f->get_return_type()->is_unknown())
 							{
 								$f->set_return_type($function->get_return_type());
@@ -134,7 +134,7 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 				// fields
 				foreach($cobj->get_fields() as $field)
 				{
-					if($field->get_visibility() != PC_Visible::V_PRIVATE)
+					if($field->get_visibility() != PC_Obj_Visible::V_PRIVATE)
 					{
 						$data->add_field($field);
 						$this->_storage->create_field($field,$data->get_id());

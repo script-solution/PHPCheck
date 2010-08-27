@@ -23,7 +23,7 @@ interface PC_Compile_TypeStorage
 	/**
 	 * Creates the given function for the given class-id
 	 *
-	 * @param PC_Method $method the method
+	 * @param PC_Obj_Method $method the method
 	 * @param int $classid the class-id
 	 */
 	public function create_function($method,$classid);
@@ -31,7 +31,7 @@ interface PC_Compile_TypeStorage
 	/**
 	 * Updates the given function for the given class-id
 	 *
-	 * @param PC_Method $method the method
+	 * @param PC_Obj_Method $method the method
 	 * @param int $classid the class-id
 	 */
 	public function update_function($method,$classid);
@@ -39,7 +39,7 @@ interface PC_Compile_TypeStorage
 	/**
 	 * Creates the given field for the given class-id
 	 *
-	 * @param PC_Field $field the field
+	 * @param PC_Obj_Field $field the field
 	 * @param int $classid the class-id
 	 */
 	public function create_field($field,$classid);
@@ -47,7 +47,7 @@ interface PC_Compile_TypeStorage
 	/**
 	 * Creates the given constant for the given class-id
 	 *
-	 * @param PC_Constant $const the constant
+	 * @param PC_Obj_Constant $const the constant
 	 * @param int $classid the class-id
 	 */
 	public function create_constant($const,$classid);

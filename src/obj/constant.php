@@ -17,7 +17,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Constant extends PC_Location
+final class PC_Obj_Constant extends PC_Obj_Location
 {
 	/**
 	 * The name of the constant
@@ -29,7 +29,7 @@ final class PC_Constant extends PC_Location
 	/**
 	 * The type (and maybe value)
 	 *
-	 * @var PC_Type
+	 * @var PC_Obj_Type
 	 */
 	private $_type;
 	
@@ -39,7 +39,7 @@ final class PC_Constant extends PC_Location
 	 * @param string $file the file of the class-def
 	 * @param int $line the line of the class-def
 	 * @param string $name the constant-name
-	 * @param PC_Type $type the type
+	 * @param PC_Obj_Type $type the type
 	 */
 	public function __construct($file,$line,$name,$type)
 	{
@@ -47,8 +47,8 @@ final class PC_Constant extends PC_Location
 		
 		if(empty($name))
 			FWS_Helper::def_error('notempty','name',$name);
-		if(!($type instanceof PC_Type))
-			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		if(!($type instanceof PC_Obj_Type))
+			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
 		
 		$this->_name = $name;
 		$this->_type = $type;
@@ -63,7 +63,7 @@ final class PC_Constant extends PC_Location
 	}
 	
 	/**
-	 * @return PC_Type the type (and maybe value) of the constant
+	 * @return PC_Obj_Type the type (and maybe value) of the constant
 	 */
 	public function get_type()
 	{

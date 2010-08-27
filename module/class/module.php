@@ -22,7 +22,7 @@ final class PC_Module_Class extends FWS_Module
 	/**
 	 * The class
 	 *
-	 * @var PC_Class
+	 * @var PC_Obj_Class
 	 */
 	private $_class;
 	
@@ -142,7 +142,7 @@ final class PC_Module_Class extends FWS_Module
 	 * Builds an URL to the given location
 	 *
 	 * @param string $classfile the file of the class
-	 * @param PC_Location $loc the location of the item
+	 * @param PC_Obj_Location $loc the location of the item
 	 * @return string the URL
 	 */
 	private function _get_url($classfile,$loc)

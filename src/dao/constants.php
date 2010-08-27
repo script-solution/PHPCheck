@@ -53,7 +53,7 @@ class PC_DAO_Constants extends FWS_Singleton
 	 *
 	 * @param string $name the constant-name
 	 * @param int $pid the project-id (0 = current)
-	 * @return PC_Constant the constant or null
+	 * @return PC_Obj_Constant the constant or null
 	 */
 	public function get_by_name($name,$pid = 0)
 	{
@@ -114,7 +114,7 @@ class PC_DAO_Constants extends FWS_Singleton
 	/**
 	 * Creates a new entry for given function
 	 *
-	 * @param PC_Constant $constant the constant to create
+	 * @param PC_Obj_Constant $constant the constant to create
 	 * @param int $class the class-id (0 = freestanding)
 	 * @return int the used id
 	 */
@@ -122,8 +122,8 @@ class PC_DAO_Constants extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!($constant instanceof PC_Constant))
-			FWS_Helper::def_error('instance','constant','PC_Constant',$constant);
+		if(!($constant instanceof PC_Obj_Constant))
+			FWS_Helper::def_error('instance','constant','PC_Obj_Constant',$constant);
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
 		
@@ -159,15 +159,15 @@ class PC_DAO_Constants extends FWS_Singleton
 	}
 	
 	/**
-	 * Builds a PC_Constant from the given row
+	 * Builds a PC_Obj_Constant from the given row
 	 *
 	 * @param array $row the row from db
-	 * @return PC_Constant the constant
+	 * @return PC_Obj_Constant the constant
 	 */
 	private function _build_const($row)
 	{
-		return new PC_Constant(
-			$row['file'],$row['line'],$row['name'],new PC_Type($row['type'],$row['value'])
+		return new PC_Obj_Constant(
+			$row['file'],$row['line'],$row['name'],new PC_Obj_Type($row['type'],$row['value'])
 		);
 	}
 }

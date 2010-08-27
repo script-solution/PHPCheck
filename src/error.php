@@ -72,7 +72,7 @@ final class PC_Error extends FWS_Object
 	/**
 	 * The error-location
 	 *
-	 * @var PC_Location
+	 * @var PC_Obj_Location
 	 */
 	private $loc;
 	
@@ -93,7 +93,7 @@ final class PC_Error extends FWS_Object
 	/**
 	 * Constructor
 	 *
-	 * @param PC_Location $loc the location of the error
+	 * @param PC_Obj_Location $loc the location of the error
 	 * @param string $msg the message to display
 	 * @param int $type the error-type. See self::E_*
 	 */
@@ -101,8 +101,8 @@ final class PC_Error extends FWS_Object
 	{
 		parent::__construct();
 		
-		if(!($loc instanceof PC_Location))
-			FWS_Helper::def_error('instance','loc','PC_Location',$loc);
+		if(!($loc instanceof PC_Obj_Location))
+			FWS_Helper::def_error('instance','loc','PC_Obj_Location',$loc);
 		if(!FWS_Helper::is_integer($type) || $type < 0)
 			FWS_Helper::def_error('intge0','type',$type);
 		
@@ -112,7 +112,7 @@ final class PC_Error extends FWS_Object
 	}
 	
 	/**
-	 * @return PC_Location the error-location
+	 * @return PC_Obj_Location the error-location
 	 */
 	public function get_loc()
 	{

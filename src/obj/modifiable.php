@@ -15,7 +15,7 @@
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Modifiable extends PC_Location
+class PC_Obj_Modifiable extends PC_Obj_Location
 {
 	/**
 	 * Is it abstract?

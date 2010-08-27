@@ -17,7 +17,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Method extends PC_Modifiable implements PC_Visible
+class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 {
 	/**
 	 * The id of this function
@@ -50,7 +50,7 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	/**
 	 * The return-type
 	 *
-	 * @var PC_Type
+	 * @var PC_Obj_Type
 	 */
 	private $return;
 	
@@ -75,7 +75,7 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 		
 		$this->id = $id;
 		$this->params = array();
-		$this->return = new PC_Type(PC_Type::UNKNOWN);
+		$this->return = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 		$this->free = $free;
 	}
 	
@@ -114,7 +114,7 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	}
 	
 	/**
-	 * @see PC_Visible::get_visibility()
+	 * @see PC_Obj_Visible::get_visibility()
 	 * 
 	 * @return string
 	 */
@@ -124,7 +124,7 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	}
 	
 	/**
-	 * @see PC_Visible::set_visibity()
+	 * @see PC_Obj_Visible::set_visibity()
 	 *
 	 * @param string $visibility
 	 */
@@ -138,7 +138,7 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	}
 	
 	/**
-	 * @return PC_Type the return-type
+	 * @return PC_Obj_Type the return-type
 	 */
 	public function get_return_type()
 	{
@@ -148,12 +148,12 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	/**
 	 * Sets the return-type of this method
 	 *
-	 * @param PC_Type $type the new value
+	 * @param PC_Obj_Type $type the new value
 	 */
 	public function set_return_type($type)
 	{
-		if(!($type instanceof PC_Type))
-			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		if(!($type instanceof PC_Obj_Type))
+			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
 		
 		$this->return = $type;
 	}
@@ -161,12 +161,12 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	/**
 	 * Puts the parameter to the method
 	 *
-	 * @param PC_Parameter $param the param
+	 * @param PC_Obj_Parameter $param the param
 	 */
 	public function put_param($param)
 	{
-		if(!($param instanceof PC_Parameter))
-			FWS_Helper::def_error('instance','param','PC_Parameter',$param);
+		if(!($param instanceof PC_Obj_Parameter))
+			FWS_Helper::def_error('instance','param','PC_Obj_Parameter',$param);
 		
 		$this->params[$param->get_name()] = $param;
 	}
@@ -207,7 +207,7 @@ class PC_Method extends PC_Modifiable implements PC_Visible
 	 * Returns the parameter with given name
 	 *
 	 * @param string $name the param-name
-	 * @return PC_Parameter the param or null
+	 * @return PC_Obj_Parameter the param or null
 	 */
 	public function get_param($name)
 	{

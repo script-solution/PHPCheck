@@ -54,7 +54,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	 * @param string $name the function-name
 	 * @param int $pid the project-id (0 = current)
 	 * @param int $class the class in which the method is (default: empty, i.e. a free function)
-	 * @return PC_Method the function or null
+	 * @return PC_Obj_Method the function or null
 	 */
 	public function get_by_name($name,$pid = 0,$class = '')
 	{
@@ -118,7 +118,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	/**
 	 * Creates a new entry for given function
 	 *
-	 * @param PC_Method $function the function to create
+	 * @param PC_Obj_Method $function the function to create
 	 * @param int $class the id of the class the function belongs to
 	 * @return int the used id
 	 */
@@ -126,8 +126,8 @@ class PC_DAO_Functions extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!($function instanceof PC_Method))
-			FWS_Helper::def_error('instance','function','PC_Method',$function);
+		if(!($function instanceof PC_Obj_Method))
+			FWS_Helper::def_error('instance','function','PC_Obj_Method',$function);
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
 		
@@ -137,7 +137,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	/**
 	 * Updates the properties of the given function
 	 *
-	 * @param PC_Method $function the function/method
+	 * @param PC_Obj_Method $function the function/method
 	 * @param int $class the id of the class the function belongs to
 	 * @return int the number of affected rows
 	 */
@@ -145,8 +145,8 @@ class PC_DAO_Functions extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		
-		if(!($function instanceof PC_Method))
-			FWS_Helper::def_error('instance','function','PC_Method',$function);
+		if(!($function instanceof PC_Obj_Method))
+			FWS_Helper::def_error('instance','function','PC_Obj_Method',$function);
 		
 		return $db->update(
 			PC_TB_FUNCTIONS,' WHERE id = '.$function->get_id(),$this->_get_fields($function,$class)
@@ -175,7 +175,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	/**
 	 * Builds the fields to insert / update in the db
 	 *
-	 * @param PC_Method $function the function/method
+	 * @param PC_Obj_Method $function the function/method
 	 * @param int $class the id of the class the function belongs to
 	 * @return array all fields
 	 */
@@ -191,7 +191,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			$types = array();
 			foreach($param->get_mtype()->get_types() as $type)
 			{
-				if($type->get_type() == PC_Type::OBJECT)
+				if($type->get_type() == PC_Obj_Type::OBJECT)
 					$types[] = $type->get_class();
 				else
 					$types[] = $type->get_type();
@@ -199,7 +199,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			if(count($types) > 0)
 				$params .= implode('|',$types);
 			else
-				$params .= PC_Type::UNKNOWN;
+				$params .= PC_Obj_Type::UNKNOWN;
 			$params .= ';';
 		}
 		
@@ -215,20 +215,20 @@ class PC_DAO_Functions extends FWS_Singleton
 			'final' => $function->is_final() ? 1 : 0,
 			'static' => $function->is_static() ? 1 : 0,
 			'visibility' => $function->get_visibility(),
-			'return_type' => $type == PC_Type::OBJECT ? $function->get_return_type()->get_class() : $type,
+			'return_type' => $type == PC_Obj_Type::OBJECT ? $function->get_return_type()->get_class() : $type,
 			'params' => $params
 		);
 	}
 	
 	/**
-	 * Builds a PC_Method from the given row
+	 * Builds a PC_Obj_Method from the given row
 	 *
 	 * @param array $row the row from db
-	 * @return PC_Method the method
+	 * @return PC_Obj_Method the method
 	 */
 	private function _build_func($row)
 	{
-		$c = new PC_Method($row['file'],$row['line'],$row['class'] == 0,$row['id']);
+		$c = new PC_Obj_Method($row['file'],$row['line'],$row['class'] == 0,$row['id']);
 		$c->set_name($row['name']);
 		$c->set_visibity($row['visibility']);
 		$c->set_abstract($row['abstract']);
@@ -238,16 +238,16 @@ class PC_DAO_Functions extends FWS_Singleton
 		{
 			$x = explode(':',$param);
 			list($name,$type) = explode(':',$param);
-			$p = new PC_Parameter();
+			$p = new PC_Obj_Parameter();
 			$types = array();
 			foreach(explode('|',$type) as $t)
 			{
 				if(is_numeric($t))
-					$types[] = new PC_Type($t);
+					$types[] = new PC_Obj_Type($t);
 				else
-					$types[] = new PC_Type(PC_Type::OBJECT,null,$t);
+					$types[] = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$t);
 			}
-			$p->set_mtype(new PC_MultiType($types));
+			$p->set_mtype(new PC_Obj_MultiType($types));
 			if(FWS_String::ends_with($name,'?'))
 			{
 				$p->set_optional(true);
@@ -257,9 +257,9 @@ class PC_DAO_Functions extends FWS_Singleton
 			$c->put_param($p);
 		}
 		if(is_numeric($row['return_type']))
-			$rettype = new PC_Type($row['return_type']);
+			$rettype = new PC_Obj_Type($row['return_type']);
 		else
-			$rettype = new PC_Type(PC_Type::OBJECT,null,$row['return_type']);
+			$rettype = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$row['return_type']);
 		$c->set_return_type($rettype);
 		return $c;
 	}

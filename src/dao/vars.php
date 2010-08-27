@@ -80,15 +80,15 @@ class PC_DAO_Vars extends FWS_Singleton
 	/**
 	 * Creates a new entry for given var
 	 *
-	 * @param PC_Variable $var the variable
+	 * @param PC_Obj_Variable $var the variable
 	 * @return int the used id
 	 */
 	public function create($var)
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!($var instanceof PC_Variable))
-			FWS_Helper::def_error('instance','var','PC_Variable',$var);
+		if(!($var instanceof PC_Obj_Variable))
+			FWS_Helper::def_error('instance','var','PC_Obj_Variable',$var);
 		
 		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_VARS,array(
@@ -120,14 +120,14 @@ class PC_DAO_Vars extends FWS_Singleton
 	}
 	
 	/**
-	 * Builds an instance of PC_Variable from the given row
+	 * Builds an instance of PC_Obj_Variable from the given row
 	 *
 	 * @param array $row the row from the db
-	 * @return PC_Variable the var
+	 * @return PC_Obj_Variable the var
 	 */
 	private function _build_var($row)
 	{
-		return new PC_Variable($row['name'],unserialize($row['type']),$row['function'],$row['class']);
+		return new PC_Obj_Variable($row['name'],unserialize($row['type']),$row['function'],$row['class']);
 	}
 }
 ?>

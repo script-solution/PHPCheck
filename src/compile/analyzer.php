@@ -47,7 +47,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 	{
 		foreach($calls as $call)
 		{
-			/* @var $call PC_Call */
+			/* @var $call PC_Obj_Call */
 			$name = $call->get_function();
 			$classname = $call->get_class();
 			if($classname !== null)
@@ -105,7 +105,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 						}
 					}
 					// check wether it's a buildin-php-class
-					else if($classname != PC_Class::UNKNOWN && !class_exists($classname,false))
+					else if($classname != PC_Obj_Class::UNKNOWN && !class_exists($classname,false))
 					{
 						$this->_report(
 							$call,
@@ -113,7 +113,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 							PC_Error::E_S_CLASS_MISSING
 						);
 					}
-					else if(REPORT_UNKNOWN && $classname == PC_Class::UNKNOWN)
+					else if(REPORT_UNKNOWN && $classname == PC_Obj_Class::UNKNOWN)
 					{
 						$this->_report(
 							$call,
@@ -152,7 +152,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 		// check classes for issues
 		foreach($classes as $class)
 		{
-			/* @var $class PC_Class */
+			/* @var $class PC_Obj_Class */
 			
 			// test wether abstract is used in a usefull way
 			$abstractcount = 0;
@@ -213,8 +213,8 @@ final class PC_Compile_Analyzer extends FWS_Object
 	/**
 	 * Checks the parameters of the call against the given ones
 	 *
-	 * @param PC_Call $call the call
-	 * @param PC_Method $method the method
+	 * @param PC_Obj_Call $call the call
+	 * @param PC_Obj_Method $method the method
 	 */
 	private function _check_params($call,$method)
 	{
@@ -233,12 +233,12 @@ final class PC_Compile_Analyzer extends FWS_Object
 		}
 		else
 		{
-			$tmixed = new PC_Type(PC_Type::OBJECT,null,'mixed');
-			$tunknown = new PC_Type(PC_Type::UNKNOWN);
+			$tmixed = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,'mixed');
+			$tunknown = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 			$i = 0;
 			foreach($method->get_params() as $param)
 			{
-				/* @var $param PC_Parameter */
+				/* @var $param PC_Obj_Parameter */
 				$arg = isset($arguments[$i]) ? $arguments[$i] : null;
 				if(REPORT_MIXED || (!$param->get_mtype()->contains($tmixed) &&
 					($arg === null || !$arg->equals($tmixed))))
@@ -267,8 +267,8 @@ final class PC_Compile_Analyzer extends FWS_Object
 	/**
 	 * Checks wether $arg is ok for $param
 	 *
-	 * @param PC_Type $arg the argument
-	 * @param PC_Parameter $param the parameter
+	 * @param PC_Obj_Type $arg the argument
+	 * @param PC_Obj_Parameter $param the parameter
 	 * @return boolean true if so
 	 */
 	private function _is_argument_ok($arg,$param)
@@ -286,7 +286,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 			return true;
 		
 		// every int can be converted to float
-		if($arg->get_type() == PC_Type::INT && $param->get_mtype()->contains(new PC_Type(PC_Type::FLOAT)))
+		if($arg->get_type() == PC_Obj_Type::INT && $param->get_mtype()->contains(new PC_Obj_Type(PC_Obj_Type::FLOAT)))
 			return true;
 		
 		return false;
@@ -295,7 +295,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 	/**
 	 * Builds a link for the given call
 	 *
-	 * @param PC_Call $call the call
+	 * @param PC_Obj_Call $call the call
 	 * @return string the link
 	 */
 	private function _get_call_link($call)
@@ -319,7 +319,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 	/**
 	 * Reports the given error
 	 *
-	 * @param PC_Location $loc the location
+	 * @param PC_Obj_Location $loc the location
 	 * @param string $msg the message to display
 	 * @param int $type the error-type
 	 */

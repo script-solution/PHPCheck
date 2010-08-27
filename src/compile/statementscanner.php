@@ -82,7 +82,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 	 *
 	 * @var string
 	 */
-	private $scope = PC_Variable::SCOPE_GLOBAL;
+	private $scope = PC_Obj_Variable::SCOPE_GLOBAL;
 	
 	/**
 	 * The scope-stack
@@ -309,7 +309,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 				$this->_set_local_var($param->get_name(),$ts[0]);
 			}
 			else
-				$this->_set_local_var($param->get_name(),new PC_Type(PC_Type::UNKNOWN));
+				$this->_set_local_var($param->get_name(),new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
 		}
 	}
 	
@@ -317,12 +317,12 @@ class PC_Compile_StatementScanner extends FWS_Object
 	 * Sets the local variable with given name to given type
 	 *
 	 * @param string $name the variable-name
-	 * @param PC_Type $type the type
+	 * @param PC_Obj_Type $type the type
 	 */
 	private function _set_local_var($name,$type)
 	{
-		if(!($type instanceof PC_Type))
-			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		if(!($type instanceof PC_Obj_Type))
+			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
 		
 		$class = '';
 		if(($dp = FWS_String::strpos($this->scope,'::')) !== false)
@@ -333,7 +333,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		else
 			$func = $this->scope;
 		
-		$this->vars[$this->scope][$name] = new PC_Variable($name,clone $type,$func,$class);
+		$this->vars[$this->scope][$name] = new PC_Obj_Variable($name,clone $type,$func,$class);
 	}
 	
 	/**
@@ -341,7 +341,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 	 *
 	 * @param string $name the variable-name
 	 * @param string $scope optional the scope (by default the current one)
-	 * @return PC_Type the type or null if not found
+	 * @return PC_Obj_Type the type or null if not found
 	 */
 	private function _get_var_type($name,$scope = null)
 	{
@@ -353,7 +353,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		
 		// handle $this
 		if($name == '$this' && ($dp = FWS_String::strpos($scope,'::')) !== false)
-			return new PC_Type(PC_Type::OBJECT,null,FWS_String::substr($scope,0,$dp));
+			return new PC_Obj_Type(PC_Obj_Type::OBJECT,null,FWS_String::substr($scope,0,$dp));
 		
 		return null;
 	}
@@ -361,7 +361,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 	/**
 	 * Handles a variable-defintion
 	 *
-	 * @return PC_Type the type of the variable
+	 * @return PC_Obj_Type the type of the variable
 	 */
 	private function _handle_variable()
 	{
@@ -429,8 +429,8 @@ class PC_Compile_StatementScanner extends FWS_Object
 							break;
 						}
 						$stype = $stype->get_array_type($keys[$i]->get_value());
-						if($stype->get_type() != PC_Type::TARRAY)
-							$stype->set_type(PC_Type::TARRAY);
+						if($stype->get_type() != PC_Obj_Type::TARRAY)
+							$stype->set_type(PC_Obj_Type::TARRAY);
 					}
 					// ignore invalid array-accesses
 					if($stype !== null && $valid && $keys[$n - 1] !== null)
@@ -440,7 +440,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 					$this->_set_local_var($var,$res);
 			}
 			else
-				$this->_set_local_var($var,new PC_Type(PC_Type::UNKNOWN));
+				$this->_set_local_var($var,new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
 		}
 		else
 			$this->pos = $oldpos;
@@ -452,8 +452,8 @@ class PC_Compile_StatementScanner extends FWS_Object
 	 * Handles a function-call or field-access on an object with given type. The method assumes
 	 * that we are behind the object-operator.
 	 *
-	 * @param PC_Type $type the type of the object
-	 * @return PC_Type the return-type (of the call or the field)
+	 * @param PC_Obj_Type $type the type of the object
+	 * @return PC_Obj_Type the return-type (of the call or the field)
 	 */
 	private function _handle_object_access($type)
 	{
@@ -470,12 +470,12 @@ class PC_Compile_StatementScanner extends FWS_Object
 		if($t == '(')
 		{
 			// build function-call; use the type of the variable
-			$call = new PC_Call($this->file,$line);
+			$call = new PC_Obj_Call($this->file,$line);
 			// is it an object?
-			if($type !== null && $type->get_type() == PC_Type::OBJECT)
+			if($type !== null && $type->get_type() == PC_Obj_Type::OBJECT)
 				$cname = $type->get_class();
 			else
-				$cname = PC_Class::UNKNOWN;
+				$cname = PC_Obj_Class::UNKNOWN;
 			$call->set_class($cname);
 			$call->set_function($str);
 			
@@ -494,8 +494,8 @@ class PC_Compile_StatementScanner extends FWS_Object
 	/**
 	 * Handles a class-field-access. Assumes that we are on the field-name.
 	 * 
-	 * @param PC_Type $vartype the found variable-type for this class-field-access
-	 * @return PC_Type the return-type
+	 * @param PC_Obj_Type $vartype the found variable-type for this class-field-access
+	 * @return PC_Obj_Type the return-type
 	 */
 	private function _handle_class_field($vartype)
 	{
@@ -503,11 +503,11 @@ class PC_Compile_StatementScanner extends FWS_Object
 		list($t,$str,) = $this->tokens[$this->pos++];
 		// just strings as field-names supported
 		if($t != T_STRING)
-			return new PC_Type(PC_Type::UNKNOWN);
+			return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 
 		// determine type of $var->$fieldName
-		$fieldtype = new PC_Type(PC_Type::UNKNOWN);
-		if($vartype !== null && $vartype->get_type() == PC_Type::OBJECT &&
+		$fieldtype = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
+		if($vartype !== null && $vartype->get_type() == PC_Obj_Type::OBJECT &&
 			($class = $this->types->get_class($vartype->get_class())) !== null)
 		{
 			$field = $class->get_field('$'.$str);
@@ -544,13 +544,13 @@ class PC_Compile_StatementScanner extends FWS_Object
 	/**
 	 * Handles a "new <class>(...)" and returns the the type
 	 *
-	 * @return PC_Type the type
+	 * @return PC_Obj_Type the type
 	 */
 	private function _handle_new()
 	{
 		list($t,,) = $this->tokens[$this->pos];
 		if($t != T_NEW)
-			return new PC_Type(PC_Type::UNKNOWN);
+			return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 		
 		// step to name
 		$this->pos++;
@@ -560,7 +560,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		if($t == T_STRING)
 		{
 			// build constructor-call
-			$call = new PC_Call($this->file,$line);
+			$call = new PC_Obj_Call($this->file,$line);
 			$call->set_object_creation(true);
 			if(strcasecmp($str,'self') == 0)
 				$call->set_class($this->_get_var_type('$this')->get_class());
@@ -573,18 +573,18 @@ class PC_Compile_StatementScanner extends FWS_Object
 			$this->_skip_rubbish();
 			
 			$this->_handle_call_args($call);
-			return new PC_Type(PC_Type::OBJECT,null,$str);
+			return new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$str);
 		}
 		// variables are not supported here yet!
 		
-		return new PC_Type(PC_Type::UNKNOWN);
+		return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 	}
 	
 	/**
 	 * Assumes that the current token is T_STRING and the value the function-name / class-name.
 	 * Returns the return-type of the call.
 	 *
-	 * @return PC_Type the return-type
+	 * @return PC_Obj_Type the return-type
 	 */
 	private function _handle_func_call()
 	{
@@ -592,7 +592,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		if($call !== null)
 		{
 			// no call, but type (class-constant or constant) ?
-			if($call instanceof PC_Type)
+			if($call instanceof PC_Obj_Type)
 				return $call;
 			
 			$rettype = $this->_handle_func_call_rec($call);
@@ -600,15 +600,15 @@ class PC_Compile_StatementScanner extends FWS_Object
 			return $rettype;
 		}
 		
-		//return new PC_Type(PC_Type::UNKNOWN);
+		//return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 		return null;
 	}
 	
 	/**
 	 * The recursive function that handles stuff like foo()->bar()->something()
 	 *
-	 * @param PC_Call $call the call
-	 * @return PC_Type the type that the last function-call returns
+	 * @param PC_Obj_Call $call the call
+	 * @return PC_Obj_Type the type that the last function-call returns
 	 */
 	private function _handle_func_call_rec($call)
 	{
@@ -630,12 +630,12 @@ class PC_Compile_StatementScanner extends FWS_Object
 			$this->_skip_rubbish();
 			
 			list($t,$str,$line) = $this->tokens[$this->pos++];
-			$subcall = new PC_Call($this->file,$line);
+			$subcall = new PC_Obj_Call($this->file,$line);
 			// an object?
-			if($rettype !== null && $rettype->get_type() == PC_Type::OBJECT)
+			if($rettype !== null && $rettype->get_type() == PC_Obj_Type::OBJECT)
 				$cname = $rettype->get_class();
 			else
-				$cname = PC_Class::UNKNOWN;
+				$cname = PC_Obj_Class::UNKNOWN;
 			$subcall->set_class($cname);
 			$subcall->set_function($str);
 			
@@ -655,7 +655,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 	 * that the current position is the first name part. You'll get the scanned call or null if
 	 * no call has been found. The position will be the '(' of the call after this method.
 	 *
-	 * @return PC_Call the call or null
+	 * @return PC_Obj_Call the call or null
 	 */
 	private function _handle_func_name()
 	{
@@ -665,7 +665,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		list($t,$str,$line) = $this->tokens[$this->pos++];
 		if($t != T_STRING)
 			return null;
-		$call = new PC_Call($this->file,$line);
+		$call = new PC_Obj_Call($this->file,$line);
 		$first = $str;
 		$second = '';
 		
@@ -739,9 +739,9 @@ class PC_Compile_StatementScanner extends FWS_Object
 			// handle 'parent::'
 			if(strcasecmp($first,'parent') == 0)
 			{
-				$first = PC_Class::UNKNOWN;
+				$first = PC_Obj_Class::UNKNOWN;
 				$cclass = $this->_get_var_type('$this');
-				if($cclass !== null && $cclass->get_type() == PC_Type::OBJECT)
+				if($cclass !== null && $cclass->get_type() == PC_Obj_Type::OBJECT)
 				{
 					$cclassobj = $this->types->get_class($cclass->get_class());
 					if($cclassobj !== null)
@@ -793,8 +793,8 @@ class PC_Compile_StatementScanner extends FWS_Object
 				continue;
 			if($t == T_VARIABLE)
 			{
-				$type = $this->_get_var_type($str,PC_Variable::SCOPE_GLOBAL);
-				$this->_set_local_var($str,$type === null ? new PC_Type(PC_Type::UNKNOWN) : $type);
+				$type = $this->_get_var_type($str,PC_Obj_Variable::SCOPE_GLOBAL);
+				$this->_set_local_var($str,$type === null ? new PC_Obj_Type(PC_Obj_Type::UNKNOWN) : $type);
 			}
 		}
 	}
@@ -802,8 +802,8 @@ class PC_Compile_StatementScanner extends FWS_Object
 	/**
 	 * Handles the arguments of a call. Will stop on the ')'.
 	 *
-	 * @param PC_Call $call the call
-	 * @return PC_Type the return-type of the function that is called
+	 * @param PC_Obj_Call $call the call
+	 * @return PC_Obj_Type the return-type of the function that is called
 	 */
 	private function _handle_call_args($call)
 	{
@@ -857,7 +857,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 	 */
 	private function _handle_array_def()
 	{
-		$type = new PC_Type(PC_Type::TARRAY);
+		$type = new PC_Obj_Type(PC_Obj_Type::TARRAY);
 		
 		// go to '('
 		$this->pos++;
@@ -947,8 +947,8 @@ class PC_Compile_StatementScanner extends FWS_Object
 	 * Handles an array-access ('$array[...]'). Assumes that we are on the '[' token
 	 * 
 	 * @param array $keys a list of keys that will be collected
-	 * @param PC_Type $var the array to access (has not to be an array)
-	 * @return PC_Type the resulting type of the access
+	 * @param PC_Obj_Type $var the array to access (has not to be an array)
+	 * @return PC_Obj_Type the resulting type of the access
 	 */
 	private function _handle_array_access(&$keys,$var)
 	{
@@ -969,13 +969,13 @@ class PC_Compile_StatementScanner extends FWS_Object
 			}
 			// otherwise the type is unknown
 			else
-				$arg = new PC_Type(PC_Type::UNKNOWN);
+				$arg = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 		}
 		
 		// access
-		$key = $valchecked ? null : new PC_Type(PC_Type::INT,$var === null ? 0 : $var->get_array_count());
+		$key = $valchecked ? null : new PC_Obj_Type(PC_Obj_Type::INT,$var === null ? 0 : $var->get_array_count());
 		$subvar = null;
-		if($var !== null && $var->get_type() == PC_Type::TARRAY && $arg !== null &&
+		if($var !== null && $var->get_type() == PC_Obj_Type::TARRAY && $arg !== null &&
 				$arg->get_value() !== null)
 		{
 			if($arg->is_scalar())
@@ -986,7 +986,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 		}
 		$keys[] = $key;
 		if($subvar === null)
-			$subvar = new PC_Type(PC_Type::UNKNOWN);
+			$subvar = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 		
 		// handle multi-dimensional arrays
 		$oldpos = $this->pos;
@@ -1011,10 +1011,10 @@ class PC_Compile_StatementScanner extends FWS_Object
 	/**
 	 * Evaluates the expression at the current token.
 	 *
-	 * @param PC_Type $val the value (for recursive calls)
+	 * @param PC_Obj_Type $val the value (for recursive calls)
 	 * @param int $oldpos the old position (for recursive calls)
 	 * @param int $brcount the number of open braces (for recursive calls)
-	 * @return PC_Type the type
+	 * @return PC_Obj_Type the type
 	 */
 	private function _get_expr_value($val = null,$oldpos = null,$brcount = 0)
 	{
@@ -1109,21 +1109,21 @@ class PC_Compile_StatementScanner extends FWS_Object
 				{
 					eval('$num='.$t.$rop->get_value_as_number().';');
 					if(is_float($num))
-						$arg = new PC_Type(PC_Type::FLOAT,$num);
+						$arg = new PC_Obj_Type(PC_Obj_Type::FLOAT,$num);
 					else
-						$arg = new PC_Type(PC_Type::INT,$num);
+						$arg = new PC_Obj_Type(PC_Obj_Type::INT,$num);
 				}
 				// reference operator
 				else if($t == '&' && $val === null)
-					$arg = new PC_Type(PC_Type::UNKNOWN);
+					$arg = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 				else
 				{
 					if($rop === null || $val === null)
-						$rop = new PC_Type(PC_Type::UNKNOWN);
+						$rop = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 					else if(is_float($val->get_value_as_number()) || is_float($rop->get_value_as_number()))
-						$arg = new PC_Type(PC_Type::FLOAT);
+						$arg = new PC_Obj_Type(PC_Obj_Type::FLOAT);
 					else
-						$arg = new PC_Type(PC_Type::INT);
+						$arg = new PC_Obj_Type(PC_Obj_Type::INT);
 				}
 				break;
 			
@@ -1171,13 +1171,13 @@ class PC_Compile_StatementScanner extends FWS_Object
 			// concatenation
 			case '.':
 				$this->_get_expr_value(null,$coldpos,$brcount);
-				$arg = new PC_Type(PC_Type::STRING);
+				$arg = new PC_Obj_Type(PC_Obj_Type::STRING);
 				break;
 			
 			// unary
 			case '~':
 				$this->_get_expr_value(null,$coldpos,$brcount);
-				$arg = new PC_Type(PC_Type::INT);
+				$arg = new PC_Obj_Type(PC_Obj_Type::INT);
 				break;
 			
 			// condition
@@ -1193,7 +1193,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 				$arg = $this->_get_expr_value(null,$coldpos,$brcount);
 				// hack to support conditions
 				if($savepos == $this->pos)
-					$arg = new PC_Type(PC_Type::BOOL);
+					$arg = new PC_Obj_Type(PC_Obj_Type::BOOL);
 				break;
 			
 			// expr ? expr : expr
@@ -1207,7 +1207,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 				$this->_skip_rubbish();
 				$second = $this->_get_expr_value(null,$coldpos,$brcount);
 				// we can't be sure about the value here
-				$arg = new PC_Type($first->is_unknown() ? $second->get_type() : $first->get_type());
+				$arg = new PC_Obj_Type($first->is_unknown() ? $second->get_type() : $first->get_type());
 				break;
 			
 			// casts
@@ -1232,7 +1232,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 			case T_VARIABLE:
 				$res = $this->_handle_variable();
 				if($res === null)
-					$res = new PC_Type(PC_Type::UNKNOWN);
+					$res = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 				$coldpos = $this->pos;
 				$this->pos++;
 				$this->_skip_rubbish();
@@ -1244,10 +1244,10 @@ class PC_Compile_StatementScanner extends FWS_Object
 			case T_METHOD_C:
 			case T_FILE:
 				// TODO
-				$arg = $this->_get_expr_value(new PC_Type(PC_Type::STRING),$coldpos,$brcount);
+				$arg = $this->_get_expr_value(new PC_Obj_Type(PC_Obj_Type::STRING),$coldpos,$brcount);
 				break;
 			case T_LINE:
-				$arg = $this->_get_expr_value(new PC_Type(PC_Type::INT),$coldpos,$brcount);
+				$arg = $this->_get_expr_value(new PC_Obj_Type(PC_Obj_Type::INT),$coldpos,$brcount);
 				break;
 			
 			// var-strings
@@ -1256,18 +1256,18 @@ class PC_Compile_StatementScanner extends FWS_Object
 				$coldpos = $this->pos;
 				$this->pos++;
 				$this->_skip_rubbish();
-				$arg = $this->_get_expr_value(new PC_Type(PC_Type::STRING),$coldpos,$brcount);
+				$arg = $this->_get_expr_value(new PC_Obj_Type(PC_Obj_Type::STRING),$coldpos,$brcount);
 				break;
 			
 			// plain types
 			case T_CONSTANT_ENCAPSED_STRING:
-				$arg = $this->_get_expr_value(new PC_Type(PC_Type::STRING,$str),$coldpos,$brcount);
+				$arg = $this->_get_expr_value(new PC_Obj_Type(PC_Obj_Type::STRING,$str),$coldpos,$brcount);
 				break;
 			case T_DNUMBER:
-				$arg = $this->_get_expr_value(new PC_Type(PC_Type::FLOAT,(double)$str),$coldpos,$brcount);
+				$arg = $this->_get_expr_value(new PC_Obj_Type(PC_Obj_Type::FLOAT,(double)$str),$coldpos,$brcount);
 				break;
 			case T_LNUMBER:
-				$arg = $this->_get_expr_value(new PC_Type(PC_Type::INT,(int)$str),$coldpos,$brcount);
+				$arg = $this->_get_expr_value(new PC_Obj_Type(PC_Obj_Type::INT,(int)$str),$coldpos,$brcount);
 				break;
 			
 			case T_ARRAY:
@@ -1288,17 +1288,17 @@ class PC_Compile_StatementScanner extends FWS_Object
 				}
 				
 				if(strcasecmp($str,'true') == 0)
-					$arg = $this->_get_expr_value(new PC_Type(PC_Type::BOOL,true),$coldpos,$brcount);
+					$arg = $this->_get_expr_value(new PC_Obj_Type(PC_Obj_Type::BOOL,true),$coldpos,$brcount);
 				else if(strcasecmp($str,'false') == 0)
-					$arg = $this->_get_expr_value(new PC_Type(PC_Type::BOOL,false),$coldpos,$brcount);
+					$arg = $this->_get_expr_value(new PC_Obj_Type(PC_Obj_Type::BOOL,false),$coldpos,$brcount);
 				else if(strcasecmp($str,'null') == 0)
-					$arg = $this->_get_expr_value(new PC_Type(PC_Type::UNKNOWN),$coldpos,$brcount);
+					$arg = $this->_get_expr_value(new PC_Obj_Type(PC_Obj_Type::UNKNOWN),$coldpos,$brcount);
 				// handle func call
 				else
 				{
 					$res = $this->_handle_func_call();
 					if($res === null)
-						$res = new PC_Type(PC_Type::UNKNOWN);
+						$res = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 					$coldpos = $this->pos;
 					$this->pos++;
 					$this->_skip_rubbish();
@@ -1313,27 +1313,27 @@ class PC_Compile_StatementScanner extends FWS_Object
 	 * Determines the type of the given cast
 	 *
 	 * @param int $cast the cast-type
-	 * @return PC_Type the type-instance
+	 * @return PC_Obj_Type the type-instance
 	 */
 	private function _get_type_from_cast($cast)
 	{
 		switch($cast)
 		{
 			case T_BOOL_CAST:
-				return new PC_Type(PC_Type::BOOL);
+				return new PC_Obj_Type(PC_Obj_Type::BOOL);
 			case T_ARRAY_CAST:
-				return new PC_Type(PC_Type::TARRAY);
+				return new PC_Obj_Type(PC_Obj_Type::TARRAY);
 			case T_DOUBLE_CAST:
-				return new PC_Type(PC_Type::FLOAT);
+				return new PC_Obj_Type(PC_Obj_Type::FLOAT);
 			case T_INT_CAST:
-				return new PC_Type(PC_Type::INT);
+				return new PC_Obj_Type(PC_Obj_Type::INT);
 			case T_STRING_CAST:
-				return new PC_Type(PC_Type::STRING);
+				return new PC_Obj_Type(PC_Obj_Type::STRING);
 			
 			case T_OBJECT_CAST:
 			case T_UNSET_CAST:
 			default:
-				return new PC_Type(PC_Type::UNKNOWN);
+				return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 		}
 	}
 	
@@ -1379,7 +1379,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 	 * @param array $classes an array of all known classes
 	 * @param string $function the function-name
 	 * @param string $classname optional, the class-name
-	 * @return PC_Type the type
+	 * @return PC_Obj_Type the type
 	 */
 	private function _get_return_type($function,$classname = '')
 	{
@@ -1399,7 +1399,7 @@ class PC_Compile_StatementScanner extends FWS_Object
 					return $cfuncs[$function]->get_return_type();
 			}
 		}
-		return new PC_Type(PC_Type::UNKNOWN);
+		return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 	}
 	
 	/**

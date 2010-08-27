@@ -15,7 +15,7 @@
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Parameter extends FWS_Object
+class PC_Obj_Parameter extends FWS_Object
 {
 	/**
 	 * The name of the variable
@@ -34,7 +34,7 @@ class PC_Parameter extends FWS_Object
 	/**
 	 * The possible types of the parameter
 	 *
-	 * @var PC_MultiType
+	 * @var PC_Obj_MultiType
 	 */
 	private $mtype;
 	
@@ -45,7 +45,7 @@ class PC_Parameter extends FWS_Object
 	{
 		parent::__construct();
 		
-		$this->mtype = new PC_MultiType();
+		$this->mtype = new PC_Obj_MultiType();
 	}
 	
 	/**
@@ -67,7 +67,7 @@ class PC_Parameter extends FWS_Object
 	}
 	
 	/**
-	 * @return PC_MultiType all types that may be used for this parameter
+	 * @return PC_Obj_MultiType all types that may be used for this parameter
 	 */
 	public function get_mtype()
 	{
@@ -77,12 +77,12 @@ class PC_Parameter extends FWS_Object
 	/**
 	 * Sets the multi-type-instance for this parameter
 	 *
-	 * @param PC_MultiType $mtype the new value
+	 * @param PC_Obj_MultiType $mtype the new value
 	 */
 	public function set_mtype($mtype)
 	{
-		if(!($mtype instanceof PC_MultiType))
-			FWS_Helper::def_error('instance','mtype','PC_MultiType',$mtype);
+		if(!($mtype instanceof PC_Obj_MultiType))
+			FWS_Helper::def_error('instance','mtype','PC_Obj_MultiType',$mtype);
 		
 		$this->mtype = $mtype;
 	}

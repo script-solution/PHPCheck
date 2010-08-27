@@ -16,14 +16,14 @@
  * @package			PHPCheck
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_MultiType extends FWS_Object
+class PC_Obj_MultiType extends FWS_Object
 {
 	/**
 	 * Builds the MultiType-instance from the given name. '|' will be assumed as separator
 	 * of the types.
 	 *
 	 * @param string $name the name
-	 * @return PC_MultiType the instance
+	 * @return PC_Obj_MultiType the instance
 	 */
 	public static function get_type_by_name($name)
 	{
@@ -32,9 +32,9 @@ class PC_MultiType extends FWS_Object
 		foreach($types as $type)
 		{
 			$type = trim($type);
-			$ts[] = PC_Type::get_type_by_name($type);
+			$ts[] = PC_Obj_Type::get_type_by_name($type);
 		}
-		return new PC_MultiType($ts);
+		return new PC_Obj_MultiType($ts);
 	}
 	
 	/**
@@ -82,7 +82,7 @@ class PC_MultiType extends FWS_Object
 	}
 	
 	/**
-	 * @return array all types (PC_Type)
+	 * @return array all types (PC_Obj_Type)
 	 */
 	public function get_types()
 	{
@@ -92,16 +92,16 @@ class PC_MultiType extends FWS_Object
 	/**
 	 * Checks wether it contains the given type
 	 *
-	 * @param PC_Type $type the type
+	 * @param PC_Obj_Type $type the type
 	 * @return boolean true if so
 	 */
 	public function contains($type)
 	{
-		if(!($type instanceof PC_Type))
-			FWS_Helper::def_error('instance','type','PC_Type',$type);
+		if(!($type instanceof PC_Obj_Type))
+			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
 		
 		// special case
-		if($type->get_type() == PC_Type::UNKNOWN && count($this->types) == 0)
+		if($type->get_type() == PC_Obj_Type::UNKNOWN && count($this->types) == 0)
 			return true;
 		
 		foreach($this->types as $t)

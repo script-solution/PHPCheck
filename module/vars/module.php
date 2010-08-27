@@ -46,7 +46,7 @@ final class PC_Module_vars extends PC_Module
 		$vars = array();
 		foreach(PC_DAO::get_vars()->get_list($start,PC_ENTRIES_PER_PAGE) as $var)
 		{
-			/* @var $var PC_Variable */
+			/* @var $var PC_Obj_Variable */
 			$vars[] = array(
 				'scope' => $var->get_scope(),
 				'name' => $var->get_name(),
