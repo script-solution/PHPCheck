@@ -30,6 +30,7 @@ FWS_Props::set_accessor($accessor);
 // FIXME the parameters of BS_User_Current->login() are wrong
 // FIXME parameters like $foo = array(1 => 'true') are not recognized correctly
 // FIXME octal numbers are not detected correctly?
+// TODO type-hinting for array is not supported
 
 $doc = FWS_Props::get()->doc();
 echo $doc->render();

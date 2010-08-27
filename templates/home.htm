@@ -63,9 +63,8 @@ displayed at <a href="{gurl.build_mod_url('errors')}">Errors</a>.
 
 <h2>Important!</h2>
 
-Because of the attributes of PHP mentioned above, please note the following:
 <ul>
-	<li>The type of a variable relies heavily on information in PHPDoc-Tags and type-hinting. The
+	<li>The type of a variable relies heavily on information from PHPDoc-Tags and type-hinting. The
 	used PHPDoc-Tags are:
 	<div><tt>@var &lt;type&gt; ...</tt></div>
 	<div><tt>@param &lt;type&gt; &lt;paramName&gt; ...</tt></div>
@@ -87,14 +86,15 @@ Because of the attributes of PHP mentioned above, please note the following:
 	<li>Of course, the more specific you are with this type-hinting, the better the analysis-results
 	will get. That means, you should prevent to specify multiple types (or better: prevent writing
 	code that works like that) and to use <tt>mixed</tt>.</li>
-	<li>It treats all files given for analyzing as included at all locations. That means you should
+	<li>It treats all files given for analyzing as included at all locations, i.e. it does not follow
+	includes but simply assumes that everything is present everywhere. That means you should
 	not do things like defining a class twice and include sometimes the first and sometimes the
 	other (well, you shouldn't do that anyway ;)). Or more general: Take care, that all used
 	type-names in your code are unique in your whole project!</li>
 </ul>
 So, most of it is good coding-practice anyway. I.e. if you create &quot;nice&quot; code, the tool
 will probably be helpful for you. At least it works well when I do it with Boardsolution,
-FrameWorkSolution or PHPCheck. Decide for yourself if my claim is true :P<br />
+FrameWorkSolution or PHPCheck.<br />
 And to be honest, it unveiled a lot of problems I hadn't seen before :)
 
 {endif}
