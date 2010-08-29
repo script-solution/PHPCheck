@@ -53,7 +53,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT COUNT(*) num FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = :pid'
@@ -83,7 +83,7 @@ class PC_DAO_Classes extends FWS_Singleton
 			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = ? AND file = ?'
@@ -113,7 +113,7 @@ class PC_DAO_Classes extends FWS_Singleton
 			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = ? AND name = ?'
@@ -146,7 +146,7 @@ class PC_DAO_Classes extends FWS_Singleton
 			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$classes = array();
 		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_CLASSES.'
@@ -174,7 +174,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$cid = $db->insert(PC_TB_CLASSES,array(
-			'project_id' => $project->get_id(),
+			'project_id' => $project !== null ? $project->get_id() : 0,
 			'file' => $class->get_file(),
 			'line' => $class->get_line(),
 			'name' => $class->get_name(),

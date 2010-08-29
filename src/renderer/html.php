@@ -114,7 +114,7 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 			'form' => $form,
 			'projects' => $pronames,
 			'chg_project_aid' => PC_ACTION_CHG_PROJECT,
-			'project' => FWS_Props::get()->project()->get_id()
+			'project' => (FWS_Props::get()->project() !== null) ? FWS_Props::get()->project()->get_id() : 0
 		));
 		$tpl->restore_template();
 	}

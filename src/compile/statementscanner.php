@@ -200,6 +200,9 @@ class PC_Compile_StatementScanner extends FWS_Object
 						$state = self::ST_WAIT_FOR_CLASS;
 					else if($t == T_FUNCTION)
 						$state = self::ST_WAIT_FOR_FUNC_NAME;
+					// handle 'global $v1,$v2,...,$vn;'
+					else if($t == T_GLOBAL)
+						$this->_handle_global();
 					else
 						$this->_get_expr_value();
 					break;

@@ -55,7 +55,7 @@ class PC_DAO_Errors extends FWS_Singleton
 		
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT COUNT(*) num FROM '.PC_TB_ERRORS.'
 			 WHERE project_id = '.$pid
@@ -99,7 +99,7 @@ class PC_DAO_Errors extends FWS_Singleton
 		$errs = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_ERRORS.'
-			 WHERE project_id = '.$project->get_id()
+			 WHERE project_id = '.($project !== null ? $project->get_id() : 0)
 				.($file ? ' AND file LIKE :file' : '')
 				.($msg ? ' AND message LIKE :msg' : '')
 				.(count($types) ? ' AND type IN ('.implode(',',$types).')' : '')
@@ -130,7 +130,7 @@ class PC_DAO_Errors extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_ERRORS,array(
-			'project_id' => $project->get_id(),
+			'project_id' => $project !== null ? $project->get_id() : 0,
 			'file' => $error->get_loc()->get_file(),
 			'line' => $error->get_loc()->get_line(),
 			'message' => $error->get_msg(),
@@ -148,8 +148,8 @@ class PC_DAO_Errors extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		
-		if(!FWS_Helper::is_integer($id) || $id <= 0)
-			FWS_Helper::def_error('intgt0','id',$id);
+		if(!FWS_Helper::is_integer($id) || $id < 0)
+			FWS_Helper::def_error('intge0','id',$id);
 		
 		$db->execute(
 			'DELETE FROM '.PC_TB_ERRORS.' WHERE project_id = '.$id

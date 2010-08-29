@@ -41,6 +41,7 @@ $a7 = (array)1;
  * @return int
  */
 function x($a,MyClass $b) {
+	global $b1;
 	$i1 = $a;
 	$i2 = $i1;
 	return $a;
@@ -117,6 +118,7 @@ function x($a,MyClass $b) {
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::OBJECT,null,'MyClass'),(string)$x['$b']->get_type());
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::TARRAY),(string)$x['$i1']->get_type());
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::TARRAY),(string)$x['$i2']->get_type());
+		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::BOOL,true),(string)$x['$b1']->get_type());
 	}
 }
 ?>

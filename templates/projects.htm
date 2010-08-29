@@ -19,6 +19,11 @@ var rowHL = new FWS_TableRowSelector('row_','check_');
 			<td class="pc_left" align="center">Created</td>
 			<td align="center" class="pc_left">Delete</td>
 		</tr>
+		{if projects.length == 0}
+		<tr>
+			<td class="hlCol" align="center" colspan="3">No projects found</td>
+		</tr>
+		{endif}
 		{loop projects as row => project}
 		<tr id="row_{row}" class="hlRow">
 			<td class="hlCol">{form.get_textbox('name['~project:id~']',project:name,30)}</td>

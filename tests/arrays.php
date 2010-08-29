@@ -29,6 +29,8 @@ $a[] = 5;
 $a["Abc"] = "me";
 $b = 0;
 $b[] = 4;
+$d = array(0,array(1),2,3);
+$d[1][0] = 2;
 ?>';
 	
 	public function testArrays()
@@ -79,6 +81,15 @@ $b[] = 4;
 		$type = new PC_Obj_Type(PC_Obj_Type::TARRAY);
 		$type->set_array_type(0,new PC_Obj_Type(PC_Obj_Type::INT,4));
 		self::assertEquals((string)$type,(string)$vars[PC_Obj_Variable::SCOPE_GLOBAL]['$b']->get_type());
+		
+		$type = new PC_Obj_Type(PC_Obj_Type::TARRAY);
+		$type->set_array_type(0,new PC_Obj_Type(PC_Obj_Type::INT,0));
+		$subtype = new PC_Obj_Type(PC_Obj_Type::TARRAY);
+		$subtype->set_array_type(0,new PC_Obj_Type(PC_Obj_Type::INT,2));
+		$type->set_array_type(1,$subtype);
+		$type->set_array_type(2,new PC_Obj_Type(PC_Obj_Type::INT,2));
+		$type->set_array_type(3,new PC_Obj_Type(PC_Obj_Type::INT,3));
+		self::assertEquals((string)$type,(string)$vars[PC_Obj_Variable::SCOPE_GLOBAL]['$d']->get_type());
 	}
 }
 ?>

@@ -42,8 +42,8 @@ final class PC_SubModule_typescan_default extends PC_SubModule
 		$this->request_formular();
 		$tpl->add_variables(array(
 			'action_id' => PC_ACTION_START_TYPESCAN,
-			'folders' => $project->get_type_folders(),
-			'exclude' => $project->get_type_exclude()
+			'folders' => $project !== null ? $project->get_type_folders() : '',
+			'exclude' => $project !== null ? $project->get_type_exclude() : ''
 		));
 	}
 }

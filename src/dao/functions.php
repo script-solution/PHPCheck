@@ -44,7 +44,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		return $db->get_row_count(PC_TB_FUNCTIONS,'*',' WHERE project_id = '.$pid.' AND class = '.$class);
 	}
 	
@@ -53,7 +53,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	 *
 	 * @param string $name the function-name
 	 * @param int $pid the project-id (0 = current)
-	 * @param int $class the class in which the method is (default: empty, i.e. a free function)
+	 * @param string $class the class in which the method is (default: empty, i.e. a free function)
 	 * @return PC_Obj_Method the function or null
 	 */
 	public function get_by_name($name,$pid = 0,$class = '')
@@ -66,7 +66,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT f.* FROM '.PC_TB_FUNCTIONS.' f
 			 LEFT JOIN '.PC_TB_CLASSES.' c ON f.class = c.id AND f.project_id = c.project_id
@@ -107,7 +107,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		$funcs = array();
 		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_FUNCTIONS.'
-			 WHERE project_id = '.$project->get_id().' AND class = '.$class.'
+			 WHERE project_id = '.($project !== null ? $project->get_id() : 0).' AND class = '.$class.'
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
@@ -206,7 +206,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		$project = FWS_Props::get()->project();
 		$type = $function->get_return_type()->get_type();
 		return array(
-			'project_id' => $project->get_id(),
+			'project_id' => $project !== null ? $project->get_id() : 0,
 			'file' => $function->get_file(),
 			'line' => $function->get_line(),
 			'class' => $class,

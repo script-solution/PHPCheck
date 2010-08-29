@@ -41,7 +41,7 @@ class PC_DAO_Vars extends FWS_Singleton
 		
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		return $db->get_row_count(PC_TB_VARS,'*',' WHERE project_id = '.$pid);
 	}
 	
@@ -65,7 +65,7 @@ class PC_DAO_Vars extends FWS_Singleton
 			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$vars = array();
 		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_VARS.'
@@ -92,7 +92,7 @@ class PC_DAO_Vars extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_VARS,array(
-			'project_id' => $project->get_id(),
+			'project_id' => $project !== null ? $project->get_id() : 0,
 			'name' => $var->get_name(),
 			'function' => $var->get_function(),
 			'class' => $var->get_class(),

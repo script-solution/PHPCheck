@@ -55,7 +55,7 @@ class PC_DAO_Calls extends FWS_Singleton
 		
 		$db = FWS_Props::get()->db();
 		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT COUNT(*) num FROM '.PC_TB_CALLS.' WHERE project_id = :pid'
 				.($file ? ' AND file LIKE :file' : '')
@@ -97,7 +97,7 @@ class PC_DAO_Calls extends FWS_Singleton
 			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
+		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$calls = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CALLS.'
@@ -135,7 +135,7 @@ class PC_DAO_Calls extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_CALLS,array(
-			'project_id' => $project->get_id(),
+			'project_id' => $project !== null ? $project->get_id() : 0,
 			'file' => $call->get_file(),
 			'line' => $call->get_line(),
 			'function' => $call->get_function(),

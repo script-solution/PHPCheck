@@ -42,8 +42,8 @@ final class PC_SubModule_stmtscan_default extends PC_SubModule
 		$this->request_formular();
 		$tpl->add_variables(array(
 			'action_id' => PC_ACTION_START_STMNTSCAN,
-			'folders' => $project->get_stmt_folders(),
-			'exclude' => $project->get_stmt_exclude()
+			'folders' => $project !== null ? $project->get_stmt_folders() : '',
+			'exclude' => $project !== null ? $project->get_stmt_exclude() : ''
 		));
 	}
 }

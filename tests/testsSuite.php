@@ -13,6 +13,9 @@
 define('ROOT',dirname(__FILE__).'/../');
 define('FWS_PATH',ROOT.'../FrameWorkSolution/');
 
+require_once 'PHPUnit/Framework.php';
+require_once 'PHPUnit/TextUI/TestRunner.php';
+
 // init the framework
 include_once(FWS_PATH.'init.php');
 
@@ -85,4 +88,7 @@ class testsSuite extends PHPUnit_Framework_TestSuite
 		return $suite;
 	}
 }
+
+if(!defined('PHPUnit_MAIN_METHOD'))
+	PHPUnit_TextUI_TestRunner::run(new testsSuite());
 ?>

@@ -66,7 +66,7 @@ final class PC_Module_Analyze_Task_Scan extends FWS_Object implements FWS_Progre
 		{
 			// delete all errors
 			$project = FWS_Props::get()->project();
-			PC_DAO::get_errors()->delete_by_project($project->get_id());
+			PC_DAO::get_errors()->delete_by_project($project !== null ? $project->get_id() : 0);
 		}
 		
 		$an = new PC_Compile_Analyzer();

@@ -152,6 +152,8 @@ class PC_DAO_Projects extends FWS_Singleton
 	 */
 	private function _build_project($row)
 	{
+		if(!$row)
+			return null;
 		return new PC_Project(
 			$row['id'],$row['name'],$row['created'],$row['type_folders'],$row['type_exclude'],
 			$row['stmt_folders'],$row['stmt_exclude']
