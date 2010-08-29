@@ -3,17 +3,11 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Aug 30, 2010 at 12:05 AM
+-- Generation Time: Aug 30, 2010 at 01:02 AM
 -- Server version: 5.1.41
 -- PHP Version: 5.3.2-1ubuntu4.2
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
 
 --
 -- Database: `phpcheck`
@@ -36,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `pc_calls` (
   `objcreation` tinyint(1) unsigned NOT NULL,
   `arguments` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9065 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11331 ;
 
 -- --------------------------------------------------------
 
@@ -56,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `pc_classes` (
   `superclass` varchar(255) DEFAULT NULL,
   `interfaces` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=704 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=995 ;
 
 -- --------------------------------------------------------
 
@@ -76,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `pc_class_fields` (
   `visibility` varchar(20) NOT NULL,
   `static` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1588 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2526 ;
 
 -- --------------------------------------------------------
 
@@ -94,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `pc_constants` (
   `type` tinyint(1) NOT NULL,
   `value` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=518 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=711 ;
 
 -- --------------------------------------------------------
 
@@ -110,7 +104,7 @@ CREATE TABLE IF NOT EXISTS `pc_errors` (
   `message` text NOT NULL,
   `type` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=508 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3452 ;
 
 -- --------------------------------------------------------
 
@@ -132,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `pc_functions` (
   `return_type` text NOT NULL,
   `params` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6924 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10929 ;
 
 -- --------------------------------------------------------
 
@@ -148,6 +142,8 @@ CREATE TABLE IF NOT EXISTS `pc_projects` (
   `type_exclude` text NOT NULL,
   `stmt_folders` text NOT NULL,
   `stmt_exclude` text NOT NULL,
+  `report_mixed` tinyint(1) NOT NULL,
+  `report_unknown` tinyint(1) NOT NULL,
   `current` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
@@ -166,4 +162,5 @@ CREATE TABLE IF NOT EXISTS `pc_vars` (
   `class` varchar(255) DEFAULT NULL,
   `type` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3601 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4501 ;
+

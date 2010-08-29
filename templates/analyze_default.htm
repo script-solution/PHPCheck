@@ -1,0 +1,33 @@
+{include "inc_header.htm"}
+
+{if module_error == false}
+<form method="post" action="{gurl.build_submod_url()}">
+<input type="hidden" name="aid" value="{action_id}" />
+<div class="pc_border">
+	<h1 class="pc_topic">Analyzer</h1>
+	<fieldset class="pc_form">
+		<dl>
+			<dt>Report mixed:</dt>
+			<dd>
+				{form.get_checkbox('report_mixed',report_mixed,'1','Treat potential problems in which
+				&quot;mixed&quot; types are involved as errors')}
+				<div class="pc_desc">Note: If disabled, they will be ignored.</div>
+			</dd>
+		</dl>
+		<dl>
+			<dt>Report unknown:</dt>
+			<dd>
+				{form.get_checkbox('report_unknown',report_unknown,'1','Treat potential problems in which
+				&quot;unknown&quot; types are involved as errors')}
+				<div class="pc_desc">Note: If disabled, they will be ignored.</div>
+			</dd>
+		</dl>
+	</fieldset>
+</div>
+<center>
+	<input type="submit" value="Start!" />
+</center>
+</form>
+{endif}
+
+{include "inc_footer.htm"}

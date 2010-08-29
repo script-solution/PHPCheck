@@ -124,7 +124,9 @@ class PC_DAO_Projects extends FWS_Singleton
 			'type_folders' => $project->get_type_folders(),
 			'type_exclude' => $project->get_type_exclude(),
 			'stmt_folders' => $project->get_stmt_folders(),
-			'stmt_exclude' => $project->get_stmt_exclude()
+			'stmt_exclude' => $project->get_stmt_exclude(),
+			'report_mixed' => $project->get_report_mixed(),
+			'report_unknown' => $project->get_report_unknown()
 		));
 	}
 	
@@ -156,7 +158,7 @@ class PC_DAO_Projects extends FWS_Singleton
 			return null;
 		return new PC_Project(
 			$row['id'],$row['name'],$row['created'],$row['type_folders'],$row['type_exclude'],
-			$row['stmt_folders'],$row['stmt_exclude']
+			$row['stmt_folders'],$row['stmt_exclude'],$row['report_mixed'],$row['report_unknown']
 		);
 	}
 }

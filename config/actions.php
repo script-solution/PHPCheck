@@ -21,22 +21,27 @@ define('PC_ACTION_START_TYPESCAN',1);
 define('PC_ACTION_START_STMNTSCAN',2);
 
 /**
+ * The start-analyzing-action
+ */
+define('PC_ACTION_START_ANALYZE',3);
+
+/**
  * Saves all projects
  */
-define('PC_ACTION_SAVE_PROJECTS',3);
+define('PC_ACTION_SAVE_PROJECTS',4);
 
 /**
  * Adds a project
  */
-define('PC_ACTION_ADD_PROJECT',4);
+define('PC_ACTION_ADD_PROJECT',5);
 
 /**
  * Deletes projects
  */
-define('PC_ACTION_DELETE_PROJECTS',5);
+define('PC_ACTION_DELETE_PROJECTS',6);
 
 /**
  * Changes the project
  */
-define('PC_ACTION_CHG_PROJECT',6);
+define('PC_ACTION_CHG_PROJECT',7);
 ?>

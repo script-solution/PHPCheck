@@ -32,6 +32,7 @@ FWS_Props::set_accessor($accessor);
 // FIXME octal numbers are not detected correctly?
 // TODO type-hinting for array is not supported
 // TODO class-fields don't store the value when its an array?
+// TODO is it possible to get the required types of builtin functions etc.?
 
 $doc = FWS_Props::get()->doc();
 echo $doc->render();

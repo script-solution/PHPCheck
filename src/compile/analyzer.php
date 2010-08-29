@@ -10,7 +10,7 @@
  * @link				http://www.script-solution.de
  */
 
-define('REPORT_MIXED',false);
+define('REPORT_MIXED',true);
 define('REPORT_UNKNOWN',false);
 
 /**
@@ -23,11 +23,35 @@ define('REPORT_UNKNOWN',false);
 final class PC_Compile_Analyzer extends FWS_Object
 {
 	/**
+	 * Wether errors with mixed types involved should be reported
+	 * 
+	 * @var boolean
+	 */
+	private $report_mixed;
+	/**
+	 * Wether errors with unknown types involved should be reported
+	 * 
+	 * @var boolean
+	 */
+	private $report_unknown;
+	/**
 	 * The container for all errors / warnings
 	 *
 	 * @var array
 	 */
 	private $errors = array();
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param $report_mixed boolean wether errors with mixed types involved should be reported
+	 * @param $report_unknown boolean wether errors with unknown types involved should be reported
+	 */
+	public function __construct($report_mixed = false,$report_unknown = false)
+	{
+		$this->report_mixed = $report_mixed;
+		$this->report_unknown = $report_unknown;
+	}
 	
 	/**
 	 * @return array all found errors
@@ -54,11 +78,6 @@ final class PC_Compile_Analyzer extends FWS_Object
 			{
 				if($classname)
 				{
-					/*if($obj[0] == '$' && isset($vars[$obj]))
-						$classname = $vars[$obj];
-					else
-						$classname = $obj;*/
-					
 					$c = $types->get_class($classname);
 					if($c !== null)
 					{
@@ -113,7 +132,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 							PC_Error::E_S_CLASS_MISSING
 						);
 					}
-					else if(REPORT_UNKNOWN && $classname == PC_Obj_Class::UNKNOWN)
+					else if($this->report_unknown && $classname == PC_Obj_Class::UNKNOWN)
 					{
 						$this->_report(
 							$call,
@@ -240,10 +259,10 @@ final class PC_Compile_Analyzer extends FWS_Object
 			{
 				/* @var $param PC_Obj_Parameter */
 				$arg = isset($arguments[$i]) ? $arguments[$i] : null;
-				if(REPORT_MIXED || (!$param->get_mtype()->contains($tmixed) &&
+				if($this->report_mixed || (!$param->get_mtype()->contains($tmixed) &&
 					($arg === null || !$arg->equals($tmixed))))
 				{
-					if(REPORT_UNKNOWN || $arg === null || !$arg->equals($tunknown))
+					if($this->report_unknown || $arg === null || !$arg->equals($tunknown))
 					{
 						if(!$this->_is_argument_ok($arg,$param))
 						{
@@ -286,7 +305,8 @@ final class PC_Compile_Analyzer extends FWS_Object
 			return true;
 		
 		// every int can be converted to float
-		if($arg->get_type() == PC_Obj_Type::INT && $param->get_mtype()->contains(new PC_Obj_Type(PC_Obj_Type::FLOAT)))
+		if($arg->get_type() == PC_Obj_Type::INT &&
+				$param->get_mtype()->contains(new PC_Obj_Type(PC_Obj_Type::FLOAT)))
 			return true;
 		
 		return false;
@@ -328,27 +348,11 @@ final class PC_Compile_Analyzer extends FWS_Object
 		$this->errors[] = new PC_Error($loc,$msg,$type);
 	}
 	
-	/*private function _parameter_type_warning($i,$call,$tactual,$trequired)
-	{
-		warning('The argument '.$i.' in "'.$call->get_call().'" requires '.get_article($tactual)
-						.' "'.$tactual.'" but you have given '.get_article($trequired).' "'.$trequired.'"',$call);
-	}*/
-	
 	private function _get_article($type)
 	{
 		$str = $type === null ? 'x' : $type->__ToString();
 		return isset($str[0]) && in_array($str[0],array('i','a','o','u','e')) ? 'an' : 'a';
-	}/*
-	
-	private function _error($msg,$loc)
-	{
-		echo '['.$loc->get_file().', '.$loc->get_line().'] <b>Error:</b> '.$msg.'<br />';
 	}
-	
-	private function _warning($msg,$loc)
-	{
-		echo '['.$loc->get_file().', '.$loc->get_line().'] <b>Warning:</b> '.$msg.'<br />';
-	}*/
 	
 	protected function get_dump_vars()
 	{

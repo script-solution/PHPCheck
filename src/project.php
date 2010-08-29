@@ -69,6 +69,20 @@ final class PC_Project extends FWS_Object
 	private $_stmt_exclude;
 	
 	/**
+	 * Wether potential problems in which mixed types are involved should be treaten as errors
+	 * 
+	 * @var boolean
+	 */
+	private $_report_mixed;
+	
+	/**
+	 * Wether potential problems in which unknown types are involved should be treaten as errors
+	 * 
+	 * @var boolean
+	 */
+	private $_report_unknown;
+	
+	/**
 	 * Constructor
 	 *
 	 * @param int $id the project-id
@@ -78,9 +92,11 @@ final class PC_Project extends FWS_Object
 	 * @param string $type_exclude the excluded items for the type-scanner
 	 * @param string $stmt_folders the folders for the statement-scanner
 	 * @param string $stmt_exclude the excluded items for the statement-scanner
+	 * @param boolean $report_mixed report errors with mixed types?
+	 * @param boolean $report_unknown report errors with unknown types?
 	 */
 	public function __construct($id,$name,$created,$type_folders,$type_exclude,$stmt_folders,
-		$stmt_exclude)
+		$stmt_exclude,$report_mixed,$report_unknown)
 	{
 		parent::__construct();
 		
@@ -96,6 +112,8 @@ final class PC_Project extends FWS_Object
 		$this->_type_exclude = $type_exclude;
 		$this->_stmt_folders = $stmt_folders;
 		$this->_stmt_exclude = $stmt_exclude;
+		$this->_report_mixed = $report_mixed;
+		$this->_report_unknown = $report_unknown;
 	}
 	
 	/**
@@ -202,6 +220,42 @@ final class PC_Project extends FWS_Object
 	public function set_stmt_exclude($str)
 	{
 		$this->_stmt_exclude = $str;
+	}
+	
+	/**
+	 * @return boolean wether errors with mixed types should be treaten as errors (or ignored)
+	 */
+	public function get_report_mixed()
+	{
+		return $this->_report_mixed;
+	}
+	
+	/**
+	 * Sets the report-mixed-value
+	 *
+	 * @param boolean $b the new value
+	 */
+	public function set_report_mixed($b)
+	{
+		$this->_report_mixed = $b;
+	}
+	
+	/**
+	 * @return boolean wether errors with unknown types should be treaten as errors (or ignored)
+	 */
+	public function get_report_unknown()
+	{
+		return $this->_report_unknown;
+	}
+	
+	/**
+	 * Sets the report-unknown-value
+	 *
+	 * @param boolean $b the new value
+	 */
+	public function set_report_unknown($b)
+	{
+		$this->_report_unknown = $b;
 	}
 
 	/**
