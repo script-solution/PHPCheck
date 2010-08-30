@@ -131,11 +131,11 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	}
 	
 	/**
-	 * @see PC_Obj_Visible::set_visibity()
+	 * @see PC_Obj_Visible::set_visibility()
 	 *
 	 * @param string $visibility
 	 */
-	public function set_visibity($visibility)
+	public function set_visibility($visibility)
 	{
 		$valid = array(self::V_PUBLIC,self::V_PROTECTED,self::V_PRIVATE);
 		if(!in_array($visibility,$valid))

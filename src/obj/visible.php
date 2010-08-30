@@ -43,6 +43,6 @@ interface PC_Obj_Visible
 	 *
 	 * @param string $visibility the new value (see self::V_*)
 	 */
-	public function set_visibity($visibility);
+	public function set_visibility($visibility);
 } 
 ?>

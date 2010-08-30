@@ -70,7 +70,7 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 			{
 				$method = new PC_Obj_Method($c->get_file(),-1,false);
 				$method->set_name('__construct');
-				$method->set_visibity(PC_Obj_Visible::V_PUBLIC);
+				$method->set_visibility(PC_Obj_Visible::V_PUBLIC);
 				$c->add_method($method);
 				$this->_storage->create_function($method,$c->get_id());
 			}

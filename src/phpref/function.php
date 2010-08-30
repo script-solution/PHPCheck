@@ -123,11 +123,11 @@ final class PC_PHPRef_Function
 		if($modifier1 == 'final' || $modifier2 == 'final' || $modifier3 == 'final')
 			$method->set_final(true);
 		if(in_array($modifier1,array('private','protected')))
-			$method->set_visibity($modifier1);
+			$method->set_visibility($modifier1);
 		else if(in_array($modifier2,array('private','protected')))
-			$method->set_visibity($modifier2);
+			$method->set_visibility($modifier2);
 		else if(in_array($modifier3,array('private','protected')))
-			$method->set_visibity($modifier3);
+			$method->set_visibility($modifier3);
 		if($return != 'void')
 			$method->set_return_type(PC_Obj_Type::get_type_by_name($return));
 		$method->set_name($name);

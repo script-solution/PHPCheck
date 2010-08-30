@@ -399,11 +399,11 @@ class PC_Compile_TypeScanner extends FWS_Object
 			case T_PROTECTED:
 				$field = new PC_Obj_Field($this->file,$line);
 				if($t == T_PROTECTED)
-					$field->set_visibity(PC_Obj_Visible::V_PROTECTED);
+					$field->set_visibility(PC_Obj_Visible::V_PROTECTED);
 				else if($t == T_PRIVATE)
-					$field->set_visibity(PC_Obj_Visible::V_PRIVATE);
+					$field->set_visibility(PC_Obj_Visible::V_PRIVATE);
 				else
-					$field->set_visibity(PC_Obj_Visible::V_PUBLIC);
+					$field->set_visibility(PC_Obj_Visible::V_PUBLIC);
 				break;
 			
 			default:
@@ -483,7 +483,7 @@ class PC_Compile_TypeScanner extends FWS_Object
 		
 		$method = new PC_Obj_Method($this->file,$line,$class === null);
 		if($class === null)
-			$method->set_visibity(PC_Obj_Visible::V_PUBLIC);
+			$method->set_visibility(PC_Obj_Visible::V_PUBLIC);
 		// interface methods are implicit abstract
 		else if($class->is_interface())
 			$method->set_abstract(true);
@@ -507,15 +507,15 @@ class PC_Compile_TypeScanner extends FWS_Object
 				// visibility
 				case T_PUBLIC:
 					if($class !== null)
-						$method->set_visibity(PC_Obj_Visible::V_PUBLIC);
+						$method->set_visibility(PC_Obj_Visible::V_PUBLIC);
 					break;
 				case T_PRIVATE:
 					if($class !== null)
-						$method->set_visibity(PC_Obj_Visible::V_PRIVATE);
+						$method->set_visibility(PC_Obj_Visible::V_PRIVATE);
 					break;
 				case T_PROTECTED:
 					if($class !== null)
-						$method->set_visibity(PC_Obj_Visible::V_PROTECTED);
+						$method->set_visibility(PC_Obj_Visible::V_PROTECTED);
 					break;
 				
 				// other modifier

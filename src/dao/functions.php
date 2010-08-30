@@ -226,7 +226,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	{
 		$c = new PC_Obj_Method($row['file'],$row['line'],$row['class'] == 0,$row['id']);
 		$c->set_name($row['name']);
-		$c->set_visibity($row['visibility']);
+		$c->set_visibility($row['visibility']);
 		$c->set_abstract($row['abstract']);
 		$c->set_static($row['static']);
 		$c->set_final($row['final']);
