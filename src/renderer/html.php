@@ -68,6 +68,7 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 	{
 		$tpl = FWS_Props::get()->tpl();
 		$doc = FWS_Props::get()->doc();
+		$msgs = FWS_Props::get()->msgs();
 
 		$js = FWS_Javascript::get_instance();
 		$js->set_cache_folder('cache');
@@ -89,6 +90,10 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 		
 		$action_result = $this->get_action_result();
 		$tpl->add_global('action_result',$action_result);
+		
+		// add messages
+		if($msgs->contains_msg())
+			$this->_handle_msgs($msgs);
 	}
 
 	/**
@@ -103,6 +108,7 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 		
 		$projects = PC_DAO::get_projects()->get_all();
 		$pronames = array();
+		$pronames[0] = '- PHP builtin -';
 		foreach($projects as $project)
 			$pronames[$project->get_id()] = $project->get_name();
 		
@@ -141,6 +147,30 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 			'time' => $profiler->get_time(),
 			'queries' => $db->get_query_count(),
 			'memory' => $mem
+		));
+		$tpl->restore_template();
+	}
+	
+	/**
+	 * Handles the collected messages
+	 *
+	 * @param FWS_Document_Messages $msgs the messages
+	 */
+	private function _handle_msgs($msgs)
+	{
+		$tpl = FWS_Props::get()->tpl();
+		$locale = FWS_Props::get()->locale();
+
+		$amsgs = $msgs->get_all_messages();
+		$links = $msgs->get_links();
+		$tpl->set_template('inc_messages.htm');
+		$tpl->add_variable_ref('errors',$amsgs[FWS_Document_Messages::ERROR]);
+		$tpl->add_variable_ref('warnings',$amsgs[FWS_Document_Messages::WARNING]);
+		$tpl->add_variable_ref('notices',$amsgs[FWS_Document_Messages::NOTICE]);
+		$tpl->add_variable_ref('links',$links);
+		$tpl->add_variables(array(
+			'title' => $locale->lang('information'),
+			'messages' => $msgs->contains_msg()
 		));
 		$tpl->restore_template();
 	}

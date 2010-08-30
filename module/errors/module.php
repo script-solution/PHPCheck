@@ -29,6 +29,9 @@ final class PC_Module_errors extends PC_Module
 		parent::init($doc);
 		$renderer = $doc->use_default_renderer();
 		$renderer->add_breadcrumb('Errors',PC_URL::build_mod_url());
+		
+		if(FWS_Props::get()->project() === null)
+			$this->report_error(FWS_Document_Messages::ERROR,'Please create and select a project first!');
 	}
 
 	/**
@@ -60,7 +63,10 @@ final class PC_Module_errors extends PC_Module
 		$start = $pagination->get_start();
 		
 		$errs = array();
-		foreach(PC_DAO::get_errors()->get_list(0,$start,PC_ENTRIES_PER_PAGE,$file,$msg,$types) as $err)
+		$errors = PC_DAO::get_errors()->get_list(
+			PC_Project::CURRENT_ID,$start,PC_ENTRIES_PER_PAGE,$file,$msg,$types
+		);
+		foreach($errors as $err)
 		{
 			/* @var $err PC_Obj_Error */
 			$url = PC_URL::get_mod_url('file');

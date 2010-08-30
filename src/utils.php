@@ -18,6 +18,35 @@
 class PC_Utils extends FWS_UtilBase
 {
 	/**
+	 * @param int $pid the project-id
+	 * @return bool true if the project-id is valid
+	 */
+	public static function is_valid_project_id($pid)
+	{
+		return $pid == PC_Project::PHPREF_ID || $pid > 0;
+	}
+	
+	/**
+	 * Helper to get the project-id to use for the database
+	 * 
+	 * @param int $pid the project-id you have
+	 * @return int the real project-id to use
+	 */
+	public static function get_project_id($pid)
+	{
+		$project = FWS_Props::get()->project();
+		if($pid == PC_Project::PHPREF_ID)
+			return $pid;
+		if($pid == PC_Project::CURRENT_ID)
+		{
+			if($project === null)
+				return PC_Project::PHPREF_ID;
+			return $project->get_id();
+		}
+		return $pid;
+	}
+	
+	/**
 	 * Highlights the given file
 	 *
 	 * @param string $file the file

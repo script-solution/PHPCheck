@@ -62,6 +62,13 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	private $params;
 	
 	/**
+	 * The version since when this method exists
+	 * 
+	 * @var string
+	 */
+	private $since = '';
+	
+	/**
 	 * Constructor
 	 *
 	 * @param string $file the file of the def
@@ -223,6 +230,24 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	public function contains_param($name)
 	{
 		return isset($this->params[$name]);
+	}
+	
+	/**
+	 * @return string the version in which the method exists
+	 */
+	public function get_since()
+	{
+		return $this->since;
+	}
+	
+	/**
+	 * Sets the since-value
+	 * 
+	 * @param string $since the new value
+	 */
+	public function set_since($since)
+	{
+		$this->since = $since;
 	}
 	
 	protected function get_dump_vars()

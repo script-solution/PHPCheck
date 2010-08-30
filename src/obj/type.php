@@ -37,6 +37,7 @@ final class PC_Obj_Type extends FWS_Object
 	{
 		switch(FWS_String::strtolower($name))
 		{
+			case 'number':	// TODO keep that here?
 			case 'integer':
 			case 'int':
 			case 'long':

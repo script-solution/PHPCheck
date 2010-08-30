@@ -44,4 +44,9 @@ define('PC_ACTION_DELETE_PROJECTS',6);
  * Changes the project
  */
 define('PC_ACTION_CHG_PROJECT',7);
+
+/**
+ * The start-phpref-scan-action
+ */
+define('PC_ACTION_START_PHPREFSCAN',8);
 ?>

@@ -24,7 +24,7 @@ final class PC_Action_chgproject extends FWS_Action_Base
 		$input = FWS_Props::get()->input();
 		
 		$pid = $input->get_var('project','post',FWS_Input::INTEGER);
-		if($pid <= 0)
+		if($pid < 0)
 			return 'Invalid project-id';
 		
 		PC_DAO::get_projects()->set_current($pid);

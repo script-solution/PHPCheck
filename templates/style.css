@@ -218,3 +218,18 @@ a.pc_button_big {
 a.pc_button_big:hover {
 	color: #3F5E88;
 }
+
+/* ------------ MESSAGES ------------ */
+
+span.pc_msg_error {
+	color: #f00;
+	font-weight: bold;
+}
+span.pc_msg_warning {
+	color: #f90;
+	font-weight: bold;
+}
+span.pc_msg_notice {
+	color: #008000;
+	font-weight: bold;
+}

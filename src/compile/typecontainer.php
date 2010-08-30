@@ -60,12 +60,12 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	 * @param int $pid the project-id
 	 * @param bool $use_db wether the db should be queried if a type can't be found
 	 */
-	public function __construct($pid = 0,$use_db = true)
+	public function __construct($pid = PC_Project::CURRENT_ID,$use_db = true)
 	{
 		if(!FWS_Helper::is_integer($pid) || $pid < 0)
 			FWS_Helper::def_error('intge0','pid',$pid);
 		
-		$this->_pid = $pid === 0 ? $pid : FWS_Props::get()->project()->get_id();
+		$this->_pid = PC_Utils::get_project_id($pid);
 		$this->_use_db = $use_db;
 	}
 	

@@ -32,24 +32,20 @@ class PC_DAO_ClassFields extends FWS_Singleton
 	 * Returns all fields of the given class
 	 *
 	 * @param int $class the class-id
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return array an array of PC_Obj_Field objects
 	 */
-	public function get_all($class,$pid = 0)
+	public function get_all($class,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
 		if(!FWS_Helper::is_integer($class) || $class <= 0)
 			FWS_Helper::def_error('intgt0','class',$class);
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? $project->get_id() : $pid;
 		$fields = array();
 		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_CLASS_FIELDS.'
-			 WHERE project_id = '.$pid.' AND class = '.$class
+			 WHERE project_id = '.PC_Utils::get_project_id($pid).' AND class = '.$class
 		);
 		foreach($rows as $row)
 		{
@@ -67,9 +63,10 @@ class PC_DAO_ClassFields extends FWS_Singleton
 	 *
 	 * @param PC_Obj_Field $field the field to create
 	 * @param int $class the class-id
+	 * @param int $pid the project-id (default = current)
 	 * @return int the used id
 	 */
-	public function create($field,$class)
+	public function create($field,$class,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -78,12 +75,11 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		if(!FWS_Helper::is_integer($class) || $class <= 0)
 			FWS_Helper::def_error('intgt0','class',$class);
 		
-		$project = FWS_Props::get()->project();
 		$otype = $field->get_type();
 		$type = $otype->get_type();
 		$val = $type == PC_Obj_Type::OBJECT ? $otype->get_class() : $otype->get_value();
 		return $db->insert(PC_TB_CLASS_FIELDS,array(
-			'project_id' => $project->get_id(),
+			'project_id' => PC_Utils::get_project_id($pid),
 			'class' => $class,
 			'file' => $field->get_file(),
 			'line' => $field->get_line(),
@@ -105,8 +101,8 @@ class PC_DAO_ClassFields extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		
-		if(!FWS_Helper::is_integer($id) || $id <= 0)
-			FWS_Helper::def_error('intgt0','id',$id);
+		if(!PC_Utils::is_valid_project_id($id))
+			FWS_Helper::def_error('intge0','id',$id);
 		
 		$db->execute(
 			'DELETE FROM '.PC_TB_CLASS_FIELDS.' WHERE project_id = '.$id

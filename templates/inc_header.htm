@@ -23,15 +23,23 @@
 <div class="pc_padbottom">
 	<a class="pc_button" href="index.php?module=projects">Projects</a>
 	<span style="float: right;">&nbsp;&middot;&nbsp;</span>
+	{if project != 0}
 	<a class="pc_button" href="index.php?module=errors">Errors</a>
 	<a class="pc_button" href="index.php?module=vars">Variables</a>
 	<a class="pc_button" href="index.php?module=calls">Calls</a>
+	{endif}
 	<a class="pc_button" href="index.php?module=types&amp;sub=consts">Constants</a>
 	<a class="pc_button" href="index.php?module=types&amp;sub=funcs">Functions</a>
 	<a class="pc_button" href="index.php?module=types&amp;sub=classes">Classes</a>
 	<span style="float: right;">&nbsp;&middot;&nbsp;</span>
+	{if project != 0}
 	<a class="pc_button_big" href="index.php?module=analyze">Analyzer</a>
 	<a class="pc_button_big" href="index.php?module=stmtscan">Statement scanner</a>
 	<a class="pc_button_big" href="index.php?module=typescan">Type scanner</a>
+	{else}
+	<a class="pc_button_big" href="index.php?module=phpref">PHPRef-scanner</a>
+	{endif}
 	<br style="clear: both;" />
 </div>
+
+{include "inc_messages.htm"}

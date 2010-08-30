@@ -44,12 +44,13 @@ final class PC_SubModule_types_funcs extends PC_SubModule
 		$start = $pagination->get_start();
 		
 		$funcs = array();
-		foreach(PC_DAO::get_functions()->get_list($start,PC_ENTRIES_PER_PAGE) as $func)
+		foreach(PC_DAO::get_functions()->get_list(0,$start,PC_ENTRIES_PER_PAGE) as $func)
 		{
 			$funcs[] = array(
 				'func' => (string)$func,
 				'file' => $func->get_file(),
-				'line' => $func->get_line()
+				'line' => $func->get_line(),
+				'since' => $func->get_since()
 			);
 		}
 		

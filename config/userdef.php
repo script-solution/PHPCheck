@@ -37,4 +37,9 @@ define('PC_STMT_FILES_PER_CYCLE',100);
  * The number of items per cycle in the analyzer
  */
 define('PC_ANALYZE_ITEMS_PER_CYCLE',5000);
+
+/**
+ * The number of pages to parse per cycle
+ */
+define('PC_PHPREF_PAGES_PER_CYCLE',500);
 ?>

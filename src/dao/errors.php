@@ -31,10 +31,10 @@ class PC_DAO_Errors extends FWS_Singleton
 	/**
 	 * Returns the number of errors for the given project
 	 *
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return int the number
 	 */
-	public function get_count($pid = 0)
+	public function get_count($pid = PC_Project::CURRENT_ID)
 	{
 		return $this->get_count_with('','',array(),$pid);
 	}
@@ -45,24 +45,20 @@ class PC_DAO_Errors extends FWS_Singleton
 	 * @param string $file the file
 	 * @param string $msg the message
 	 * @param array $types an array of types (numeric!)
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return int the number
 	 */
-	public function get_count_with($file = '',$msg = '',$types = array(),$pid = 0)
+	public function get_count_with($file = '',$msg = '',$types = array(),$pid = PC_Project::CURRENT_ID)
 	{
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
-		
 		$db = FWS_Props::get()->db();
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT COUNT(*) num FROM '.PC_TB_ERRORS.'
-			 WHERE project_id = '.$pid
+			 WHERE project_id = :pid'
 				.($file ? ' AND file LIKE :file' : '')
 				.($msg ? ' AND message LIKE :msg' : '')
 				.(count($types) ? ' AND type IN ('.implode(',',$types).')' : '')
 		);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($msg)
@@ -74,7 +70,7 @@ class PC_DAO_Errors extends FWS_Singleton
 	/**
 	 * Returns all errors. Optionally you can filter the search by file and message
 	 *
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
 	 * @param string $file the file
@@ -82,12 +78,11 @@ class PC_DAO_Errors extends FWS_Singleton
 	 * @param array $types an array of types (numeric!)
 	 * @return array all found errors
 	 */
-	public function get_list($pid = 0,$start = 0,$count = 0,$file = '',$msg = '',$types = array())
+	public function get_list($pid = PC_Project::CURRENT_ID,$start = 0,$count = 0,$file = '',
+		$msg = '',$types = array())
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		if(!FWS_Helper::is_integer($start) || $start < 0)
 			FWS_Helper::def_error('intge0','start',$start);
 		if(!FWS_Helper::is_integer($count) || $count < 0)
@@ -95,17 +90,17 @@ class PC_DAO_Errors extends FWS_Singleton
 		if(!FWS_Array_Utils::is_numeric($types))
 			FWS_Helper::def_error('numarray','types',$types);
 		
-		$project = FWS_Props::get()->project();
 		$errs = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_ERRORS.'
-			 WHERE project_id = '.($project !== null ? $project->get_id() : 0)
+			 WHERE project_id = :pid'
 				.($file ? ' AND file LIKE :file' : '')
 				.($msg ? ' AND message LIKE :msg' : '')
 				.(count($types) ? ' AND type IN ('.implode(',',$types).')' : '')
 				.' ORDER BY id ASC'
 				.($count > 0 ? ' LIMIT '.$start.','.$count : '')
 		);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($msg)
@@ -119,18 +114,18 @@ class PC_DAO_Errors extends FWS_Singleton
 	 * Creates a new entry for given error
 	 *
 	 * @param PC_Obj_Error $error the error to create
+	 * @param int $pid the project-id (default = current)
 	 * @return int the used id
 	 */
-	public function create($error)
+	public function create($error,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
 		if(!($error instanceof PC_Obj_Error))
 			FWS_Helper::def_error('instance','error','PC_Obj_Error',$error);
 		
-		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_ERRORS,array(
-			'project_id' => $project !== null ? $project->get_id() : 0,
+			'project_id' => PC_Utils::get_project_id($pid),
 			'file' => $error->get_loc()->get_file(),
 			'line' => $error->get_loc()->get_line(),
 			'message' => $error->get_msg(),
@@ -148,7 +143,7 @@ class PC_DAO_Errors extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		
-		if(!FWS_Helper::is_integer($id) || $id < 0)
+		if(!PC_Utils::is_valid_project_id($id))
 			FWS_Helper::def_error('intge0','id',$id);
 		
 		$db->execute(

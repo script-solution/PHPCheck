@@ -31,17 +31,13 @@ class PC_DAO_Vars extends FWS_Singleton
 	/**
 	 * Returns the number of vars for the given project
 	 *
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return int the number
 	 */
-	public function get_count($pid = 0)
+	public function get_count($pid = PC_Project::CURRENT_ID)
 	{
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
-		
 		$db = FWS_Props::get()->db();
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
+		$pid = PC_Utils::get_project_id($pid);
 		return $db->get_row_count(PC_TB_VARS,'*',' WHERE project_id = '.$pid);
 	}
 	
@@ -50,10 +46,10 @@ class PC_DAO_Vars extends FWS_Singleton
 	 *
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return array all found vars
 	 */
-	public function get_list($start = 0,$count = 0,$pid = 0)
+	public function get_list($start = 0,$count = 0,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -61,15 +57,11 @@ class PC_DAO_Vars extends FWS_Singleton
 			FWS_Helper::def_error('intge0','start',$start);
 		if(!FWS_Helper::is_integer($count) || $count < 0)
 			FWS_Helper::def_error('intge0','count',$count);
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$vars = array();
 		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_VARS.'
-			 WHERE project_id = '.$pid.'
+			 WHERE project_id = '.PC_Utils::get_project_id($pid).'
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
@@ -92,7 +84,7 @@ class PC_DAO_Vars extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_VARS,array(
-			'project_id' => $project !== null ? $project->get_id() : 0,
+			'project_id' => PC_Utils::get_project_id(PC_Project::CURRENT_ID),
 			'name' => $var->get_name(),
 			'function' => $var->get_function(),
 			'class' => $var->get_class(),
@@ -110,8 +102,8 @@ class PC_DAO_Vars extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		
-		if(!FWS_Helper::is_integer($id) || $id <= 0)
-			FWS_Helper::def_error('intgt0','id',$id);
+		if(!PC_Utils::is_valid_project_id($id))
+			FWS_Helper::def_error('intge0','id',$id);
 		
 		$db->execute(
 			'DELETE FROM '.PC_TB_VARS.' WHERE project_id = '.$id

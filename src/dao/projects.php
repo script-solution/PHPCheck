@@ -77,8 +77,8 @@ class PC_DAO_Projects extends FWS_Singleton
 	 */
 	public function set_current($id)
 	{
-		if(!FWS_Helper::is_integer($id) || $id <= 0)
-			FWS_Helper::def_error('intgt0','id',$id);
+		if(!PC_Utils::is_valid_project_id($id))
+			FWS_Helper::def_error('intge0','id',$id);
 		
 		$db = FWS_Props::get()->db();
 		$db->update(PC_TB_PROJECTS,'',array(

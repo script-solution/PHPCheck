@@ -1,0 +1,31 @@
+{include "inc_header.htm"}
+
+{if module_error == false}
+{if not_finished}
+<script type="text/javascript" language="javascript">
+function reload()
+{
+	document.location.href='{target_url}';
+}
+
+window.setTimeout('reload()',1000);
+</script>
+{endif}
+
+<div class="pc_border pc_padtop">
+	<h1 class="pc_topic">Scanning PHP-reference</h1>
+	<div class="pc_main">
+		<img alt="{percent}%" src="images/topic.gif" width="{percent}%" height="20" />
+	</div>
+	<div class="pc_main" style="text-align: center;">
+		{message}
+		{if not_finished == false}
+		<div class="pc_body" style="padding-top: 5px;">
+		<a href="{gurl.build_mod_url()}">Back</a>
+		</div>
+		{endif}
+	</div>
+</div>
+{endif}
+
+{include "inc_footer.htm"}

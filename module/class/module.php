@@ -134,7 +134,10 @@ final class PC_Module_Class extends FWS_Module
 		}
 		$tpl->add_variable_ref('methods',$methods);
 		
-		$source = PC_Utils::highlight_file($this->_class->get_file());
+		if($this->_class->get_file())
+			$source = PC_Utils::highlight_file($this->_class->get_file());
+		else
+			$source = '';
 		$tpl->add_variables(array('source' => $source));
 	}
 	

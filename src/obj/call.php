@@ -171,7 +171,7 @@ class PC_Obj_Call extends PC_Obj_Location
 		if($classname)
 			$str .= '<a href="'.$url->to_url().'">'.$classname.'</a>'.($this->static ? '::' : '->');
 		if($use_db)
-			$func = PC_DAO::get_functions()->get_by_name($this->function,0,$this->class);
+			$func = PC_DAO::get_functions()->get_by_name($this->function,PC_Project::CURRENT_ID,$this->class);
 		else
 			$func = null;
 		if($func)

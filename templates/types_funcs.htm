@@ -5,17 +5,19 @@
 	<tr>
 		<th>Function</th>
 		<th>File</th>
+		<th>Since</th>
 		<th>Line</th>
 	</tr>
 	{if funcs.length == 0}
 	<tr>
-		<td colspan="3" class="pc_main" align="center">No functions found</td>
+		<td colspan="4" class="pc_main" align="center">No functions found</td>
 	</tr>
 	{else}
 	{loop funcs as func}
 	<tr>
 		<td class="pc_main">{func:func}</td>
 		<td class="pc_main">{func:file}</td>
+		<td class="pc_main" align="center">{func:since}</td>
 		<td class="pc_main" align="center">{func:line}</td>
 	</tr>
 	{endloop}

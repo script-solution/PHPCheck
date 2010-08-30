@@ -44,7 +44,8 @@ final class PC_SubModule_types_consts extends PC_SubModule
 		$start = $pagination->get_start();
 		
 		$consts = array();
-		foreach(PC_DAO::get_constants()->get_list(0,0,$start,PC_ENTRIES_PER_PAGE) as $const)
+		$constants = PC_DAO::get_constants()->get_list(0,PC_Project::CURRENT_ID,$start,PC_ENTRIES_PER_PAGE);
+		foreach($constants as $const)
 		{
 			$consts[] = array(
 				'name' => $const->get_name(),

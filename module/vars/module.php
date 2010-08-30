@@ -29,6 +29,9 @@ final class PC_Module_vars extends PC_Module
 		parent::init($doc);
 		$renderer = $doc->use_default_renderer();
 		$renderer->add_breadcrumb('Vars',PC_URL::build_mod_url());
+		
+		if(FWS_Props::get()->project() === null)
+			$this->report_error(FWS_Document_Messages::ERROR,'Please create and select a project first!');
 	}
 
 	/**

@@ -32,19 +32,16 @@ class PC_DAO_Constants extends FWS_Singleton
 	 * Returns the number of constants for the given project
 	 *
 	 * @param int $class the class-id (0 = freestanding)
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return int the number
 	 */
-	public function get_count($class = 0,$pid = 0)
+	public function get_count($class = 0,$pid = PC_Project::CURRENT_ID)
 	{
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$db = FWS_Props::get()->db();
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
+		$pid = PC_Utils::get_project_id($pid);
 		return $db->get_row_count(PC_TB_CONSTANTS,'*',' WHERE class = '.$class.' AND project_id = '.$pid);
 	}
 	
@@ -55,20 +52,16 @@ class PC_DAO_Constants extends FWS_Singleton
 	 * @param int $pid the project-id (0 = current)
 	 * @return PC_Obj_Constant the constant or null
 	 */
-	public function get_by_name($name,$pid = 0)
+	public function get_by_name($name,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 		
 		if(empty($name))
 			FWS_Helper::def_error('notempty','name',$name);
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CONSTANTS.'
-			 WHERE project_id = '.$pid.' AND class = 0 AND name = ?'
+			 WHERE project_id = '.PC_Utils::get_project_id($pid).' AND class = 0 AND name = ?'
 		);
 		$stmt->bind(0,$name);
 		$row = $db->get_row($stmt->get_statement());
@@ -86,24 +79,21 @@ class PC_DAO_Constants extends FWS_Singleton
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
 	 * @return array all found constants
 	 */
-	public function get_list($class = 0,$pid = 0,$start = 0,$count = 0)
+	public function get_list($class = 0,$pid = PC_Project::CURRENT_ID,$start = 0,$count = 0)
 	{
 		$db = FWS_Props::get()->db();
 
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		if(!FWS_Helper::is_integer($start) || $start < 0)
 			FWS_Helper::def_error('intge0','start',$start);
 		if(!FWS_Helper::is_integer($count) || $count < 0)
 			FWS_Helper::def_error('intge0','count',$count);
 		
-		$project = FWS_Props::get()->project();
 		$consts = array();
 		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_CONSTANTS.'
-			 WHERE class = '.$class.' AND project_id = '.($project !== null ? $project->get_id() : 0).'
+			 WHERE class = '.$class.' AND project_id = '.PC_Utils::get_project_id($pid).'
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
@@ -116,9 +106,10 @@ class PC_DAO_Constants extends FWS_Singleton
 	 *
 	 * @param PC_Obj_Constant $constant the constant to create
 	 * @param int $class the class-id (0 = freestanding)
+	 * @param int $pid the project-id (-1 = current)
 	 * @return int the used id
 	 */
-	public function create($constant,$class = 0)
+	public function create($constant,$class = 0,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -127,9 +118,8 @@ class PC_DAO_Constants extends FWS_Singleton
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
 		
-		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_CONSTANTS,array(
-			'project_id' => $project !== null ? $project->get_id() : 0,
+			'project_id' => PC_Utils::get_project_id($pid),
 			'class' => $class,
 			'file' => $constant->get_file(),
 			'line' => $constant->get_line(),
@@ -149,8 +139,8 @@ class PC_DAO_Constants extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		
-		if(!FWS_Helper::is_integer($id) || $id <= 0)
-			FWS_Helper::def_error('intgt0','id',$id);
+		if(!PC_Utils::is_valid_project_id($id))
+			FWS_Helper::def_error('intge0','id',$id);
 		
 		$db->execute(
 			'DELETE FROM '.PC_TB_CONSTANTS.' WHERE project_id = '.$id

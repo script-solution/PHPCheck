@@ -31,10 +31,10 @@ class PC_DAO_Calls extends FWS_Singleton
 	/**
 	 * Returns the number of calls for the given project
 	 *
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return int the number
 	 */
-	public function get_count($pid = 0)
+	public function get_count($pid = PC_Project::CURRENT_ID)
 	{
 		return $this->get_count_for('','','',$pid);
 	}
@@ -45,24 +45,19 @@ class PC_DAO_Calls extends FWS_Singleton
 	 * @param string $file the file
 	 * @param string $class the class-name
 	 * @param string $function the function-name
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return int the number
 	 */
-	public function get_count_for($file = '',$class = '',$function = '',$pid = 0)
+	public function get_count_for($file = '',$class = '',$function = '',$pid = PC_Project::CURRENT_ID)
 	{
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
-		
 		$db = FWS_Props::get()->db();
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT COUNT(*) num FROM '.PC_TB_CALLS.' WHERE project_id = :pid'
 				.($file ? ' AND file LIKE :file' : '')
 				.($class ? ' AND class LIKE :class' : '')
 				.($function ? ' AND function LIKE :func' : '')
 		);
-		$stmt->bind(':pid',$pid);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($class)
@@ -79,13 +74,14 @@ class PC_DAO_Calls extends FWS_Singleton
 	 *
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @param string $file the file
 	 * @param string $class the class-name
 	 * @param string $function the function-name
 	 * @return array all found calls
 	 */
-	public function get_list($start = 0,$count = 0,$file = '',$class = '',$function = '',$pid = 0)
+	public function get_list($start = 0,$count = 0,$file = '',$class = '',$function = '',
+		$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -93,11 +89,7 @@ class PC_DAO_Calls extends FWS_Singleton
 			FWS_Helper::def_error('intge0','start',$start);
 		if(!FWS_Helper::is_integer($count) || $count < 0)
 			FWS_Helper::def_error('intge0','count',$count);
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$calls = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CALLS.'
@@ -108,7 +100,7 @@ class PC_DAO_Calls extends FWS_Singleton
 			 .' ORDER BY id ASC
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
-		$stmt->bind(':pid',$pid);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($class)
@@ -156,8 +148,8 @@ class PC_DAO_Calls extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		
-		if(!FWS_Helper::is_integer($id) || $id <= 0)
-			FWS_Helper::def_error('intgt0','id',$id);
+		if(!PC_Utils::is_valid_project_id($id))
+			FWS_Helper::def_error('intge0','id',$id);
 		
 		$db->execute(
 			'DELETE FROM '.PC_TB_CALLS.' WHERE project_id = '.$id

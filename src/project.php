@@ -20,6 +20,19 @@
 final class PC_Project extends FWS_Object
 {
 	/**
+	 * The id of the php-reference-types
+	 * 
+	 * @var int
+	 */
+	const PHPREF_ID			= 0;
+	/**
+	 * The id that tells functions to use the current project-id
+	 * 
+	 * @var int
+	 */
+	const CURRENT_ID		= -1;
+	
+	/**
 	 * The project-id
 	 *
 	 * @var int
@@ -100,7 +113,7 @@ final class PC_Project extends FWS_Object
 	{
 		parent::__construct();
 		
-		if(!FWS_Helper::is_integer($id) || $id <= 0)
+		if(!FWS_Helper::is_integer($id) || $id < 0)
 			FWS_Helper::def_error('intgt0','id',$id);
 		if(!FWS_Helper::is_integer($created) || $created < 0)
 			FWS_Helper::def_error('intge0','created',$created);

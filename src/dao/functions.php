@@ -32,19 +32,16 @@ class PC_DAO_Functions extends FWS_Singleton
 	 * Returns the number of functions for the given project
 	 *
 	 * @param int $class the class-id (0 = free functions)
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return int the number
 	 */
-	public function get_count($class = 0,$pid = 0)
+	public function get_count($class = 0,$pid = PC_Project::CURRENT_ID)
 	{
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		
 		$db = FWS_Props::get()->db();
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
+		$pid = PC_Utils::get_project_id($pid);
 		return $db->get_row_count(PC_TB_FUNCTIONS,'*',' WHERE project_id = '.$pid.' AND class = '.$class);
 	}
 	
@@ -52,21 +49,17 @@ class PC_DAO_Functions extends FWS_Singleton
 	 * Returns the function/method with given name and optionally in given class and project
 	 *
 	 * @param string $name the function-name
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @param string $class the class in which the method is (default: empty, i.e. a free function)
 	 * @return PC_Obj_Method the function or null
 	 */
-	public function get_by_name($name,$pid = 0,$class = '')
+	public function get_by_name($name,$pid = PC_Project::CURRENT_ID,$class = '')
 	{
 		$db = FWS_Props::get()->db();
 		
 		if(empty($name))
 			FWS_Helper::def_error('notempty','name',$name);
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT f.* FROM '.PC_TB_FUNCTIONS.' f
 			 LEFT JOIN '.PC_TB_CLASSES.' c ON f.class = c.id AND f.project_id = c.project_id
@@ -75,7 +68,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			 	((:class = "" AND c.id IS NULL) OR (:class != "" AND c.name = :funcname)) AND
 			 	f.name = :funcname'
 		);
-		$stmt->bind(':pid',$pid);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		$stmt->bind(':class',$class ? $class : '');
 		$stmt->bind(':funcname',$name);
 		$row = $db->get_row($stmt->get_statement());
@@ -107,7 +100,8 @@ class PC_DAO_Functions extends FWS_Singleton
 		$funcs = array();
 		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_FUNCTIONS.'
-			 WHERE project_id = '.($project !== null ? $project->get_id() : 0).' AND class = '.$class.'
+			 WHERE project_id = '.PC_Utils::get_project_id(PC_Project::CURRENT_ID).' AND class = '.$class.'
+			 ORDER BY name
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
@@ -120,9 +114,10 @@ class PC_DAO_Functions extends FWS_Singleton
 	 *
 	 * @param PC_Obj_Method $function the function to create
 	 * @param int $class the id of the class the function belongs to
+	 * @param int $pid the project-id (-1 = current)
 	 * @return int the used id
 	 */
-	public function create($function,$class = 0)
+	public function create($function,$class = 0,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -131,7 +126,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
 		
-		return $db->insert(PC_TB_FUNCTIONS,$this->_get_fields($function,$class));
+		return $db->insert(PC_TB_FUNCTIONS,$this->_get_fields($function,$class,$pid));
 	}
 	
 	/**
@@ -149,7 +144,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			FWS_Helper::def_error('instance','function','PC_Obj_Method',$function);
 		
 		return $db->update(
-			PC_TB_FUNCTIONS,' WHERE id = '.$function->get_id(),$this->_get_fields($function,$class)
+			PC_TB_FUNCTIONS,' WHERE id = '.$function->get_id(),$this->_get_fields($function,$class,-1)
 		);
 	}
 	
@@ -163,8 +158,8 @@ class PC_DAO_Functions extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		
-		if(!FWS_Helper::is_integer($id) || $id <= 0)
-			FWS_Helper::def_error('intgt0','id',$id);
+		if(!PC_Utils::is_valid_project_id($id))
+			FWS_Helper::def_error('intge0','id',$id);
 		
 		$db->execute(
 			'DELETE FROM '.PC_TB_FUNCTIONS.' WHERE project_id = '.$id
@@ -177,9 +172,10 @@ class PC_DAO_Functions extends FWS_Singleton
 	 *
 	 * @param PC_Obj_Method $function the function/method
 	 * @param int $class the id of the class the function belongs to
+	 * @param int $pid the project-id (default = current)
 	 * @return array all fields
 	 */
-	private function _get_fields($function,$class)
+	private function _get_fields($function,$class,$pid = PC_Project::CURRENT_ID)
 	{
 		$params = '';
 		foreach($function->get_params() as $param)
@@ -203,10 +199,9 @@ class PC_DAO_Functions extends FWS_Singleton
 			$params .= ';';
 		}
 		
-		$project = FWS_Props::get()->project();
 		$type = $function->get_return_type()->get_type();
 		return array(
-			'project_id' => $project !== null ? $project->get_id() : 0,
+			'project_id' => PC_UTils::get_project_id($pid),
 			'file' => $function->get_file(),
 			'line' => $function->get_line(),
 			'class' => $class,
@@ -216,7 +211,8 @@ class PC_DAO_Functions extends FWS_Singleton
 			'static' => $function->is_static() ? 1 : 0,
 			'visibility' => $function->get_visibility(),
 			'return_type' => $type == PC_Obj_Type::OBJECT ? $function->get_return_type()->get_class() : $type,
-			'params' => $params
+			'params' => $params,
+			'since' => $function->get_since()
 		);
 	}
 	
@@ -234,6 +230,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		$c->set_abstract($row['abstract']);
 		$c->set_static($row['static']);
 		$c->set_final($row['final']);
+		$c->set_since($row['since']);
 		foreach(FWS_Array_Utils::advanced_explode(';',$row['params']) as $param)
 		{
 			list($name,$type) = explode(':',$param);

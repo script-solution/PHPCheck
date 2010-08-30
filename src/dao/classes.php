@@ -31,10 +31,10 @@ class PC_DAO_Classes extends FWS_Singleton
 	/**
 	 * Returns the number of classes for the given project
 	 *
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return int the number
 	 */
-	public function get_count($pid = 0)
+	public function get_count($pid = PC_Project::CURRENT_ID)
 	{
 		return $this->get_count_for_file('',$pid);
 	}
@@ -43,23 +43,18 @@ class PC_DAO_Classes extends FWS_Singleton
 	 * Returns the number of items for the given file
 	 *
 	 * @param string $file the file
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return int the number
 	 */
-	public function get_count_for_file($file = '',$pid = 0)
+	public function get_count_for_file($file = '',$pid = PC_Project::CURRENT_ID)
 	{
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
-		
 		$db = FWS_Props::get()->db();
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT COUNT(*) num FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = :pid'
 				.($file ? ' AND file = :file' : '')
 		);
-		$stmt->bind(':pid',$pid);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
 			$stmt->bind(':file',$file);
 		$row = $db->get_row($stmt->get_statement());
@@ -70,25 +65,21 @@ class PC_DAO_Classes extends FWS_Singleton
 	 * Returns the classes with given file in the given project
 	 *
 	 * @param string $file the file-name
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return array all found classes
 	 */
-	public function get_by_file($file,$pid = 0)
+	public function get_by_file($file,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 		
 		if(empty($file))
 			FWS_Helper::def_error('notempty','file',$file);
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = ? AND file = ?'
 		);
-		$stmt->bind(0,$pid);
+		$stmt->bind(0,PC_Utils::get_project_id($pid));
 		$stmt->bind(1,$file);
 		$classes = array();
 		foreach($db->get_rows($stmt->get_statement()) as $row)
@@ -103,22 +94,18 @@ class PC_DAO_Classes extends FWS_Singleton
 	 * @param int $pid the project-id (0 = current)
 	 * @return PC_Obj_Class the class or null
 	 */
-	public function get_by_name($name,$pid = 0)
+	public function get_by_name($name,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 		
 		if(empty($name))
 			FWS_Helper::def_error('notempty','name',$name);
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = ? AND name = ?'
 		);
-		$stmt->bind(0,$pid);
+		$stmt->bind(0,PC_Utils::get_project_id($pid));
 		$stmt->bind(1,$name);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
@@ -131,10 +118,10 @@ class PC_DAO_Classes extends FWS_Singleton
 	 *
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
-	 * @param int $pid the project-id (0 = current)
+	 * @param int $pid the project-id (default = current)
 	 * @return array all found classes
 	 */
-	public function get_list($start = 0,$count = 0,$pid = 0)
+	public function get_list($start = 0,$count = 0,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -142,16 +129,12 @@ class PC_DAO_Classes extends FWS_Singleton
 			FWS_Helper::def_error('intge0','start',$start);
 		if(!FWS_Helper::is_integer($count) || $count < 0)
 			FWS_Helper::def_error('intge0','count',$count);
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
 		
-		$project = FWS_Props::get()->project();
-		$pid = $pid === 0 ? ($project !== null ? $project->get_id() : 0) : $pid;
 		$classes = array();
 		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_CLASSES.'
-			 WHERE project_id = '.$pid.'
-			 ORDER BY id ASC
+			 WHERE project_id = '.PC_Utils::get_project_id($pid).'
+			 ORDER BY name ASC
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
 		foreach($rows as $row)
@@ -163,18 +146,19 @@ class PC_DAO_Classes extends FWS_Singleton
 	 * Creates a new entry for given class
 	 *
 	 * @param PC_Obj_Class $class the class
+	 * @param int $pid the project-id (default = current)
 	 * @return int the used id
 	 */
-	public function create($class)
+	public function create($class,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
 		if(!($class instanceof PC_Obj_Class))
 			FWS_Helper::def_error('instance','class','PC_Obj_Class',$class);
 		
-		$project = FWS_Props::get()->project();
+		$pid = PC_Utils::get_project_id($pid);
 		$cid = $db->insert(PC_TB_CLASSES,array(
-			'project_id' => $project !== null ? $project->get_id() : 0,
+			'project_id' => $pid,
 			'file' => $class->get_file(),
 			'line' => $class->get_line(),
 			'name' => $class->get_name(),
@@ -187,15 +171,15 @@ class PC_DAO_Classes extends FWS_Singleton
 		
 		// create constants
 		foreach($class->get_constants() as $const)
-			PC_DAO::get_constants()->create($const,$cid);
+			PC_DAO::get_constants()->create($const,$cid,$pid);
 		
 		// create fields
 		foreach($class->get_fields() as $field)
-			PC_DAO::get_classfields()->create($field,$cid);
+			PC_DAO::get_classfields()->create($field,$cid,$pid);
 		
 		// create methods
 		foreach($class->get_methods() as $method)
-			PC_DAO::get_functions()->create($method,$cid);
+			PC_DAO::get_functions()->create($method,$cid,$pid);
 		
 		return $cid;
 	}
@@ -210,8 +194,8 @@ class PC_DAO_Classes extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		
-		if(!FWS_Helper::is_integer($id) || $id <= 0)
-			FWS_Helper::def_error('intgt0','id',$id);
+		if(!PC_Utils::is_valid_project_id($id))
+			FWS_Helper::def_error('intge0','id',$id);
 		
 		$db->execute(
 			'DELETE FROM '.PC_TB_CLASSES.' WHERE project_id = '.$id

@@ -1,0 +1,25 @@
+{include "inc_header.htm"}
+
+{if module_error == false}
+<form method="post" action="{gurl.build_submod_url()}">
+<input type="hidden" name="aid" value="{action_id}" />
+<div class="pc_border">
+	<h1 class="pc_topic">PHP-reference scanner</h1>
+	<div class="pc_main">
+		Click &quot;Start!&quot; to beginn scanning the PHP-reference-manual. It expects the manual
+		in the folder &quot;phpman/&quot; and in the form &quot;Many HTML files&quot; (see
+		<a href="http://www.php.net/download-docs.php">Documentation downloads</a>).<br />
+		As soon as PHPCheck has scanned the manual, it knows all (okay, nearly all ;)) builtin
+		functions and classes including its return- and parameter-types. Therefore it can also help you
+		when you're using builtin-stuff. Additionally it collects since when a function exists or since
+		when it does no longer exist. With this information it can tell you the minimal and maximal
+		PHP-version that is required for your application.
+	</div>
+</div>
+<center>
+	<input type="submit" value="Start!" />
+</center>
+</form>
+{endif}
+
+{include "inc_footer.htm"}

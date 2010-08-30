@@ -1,8 +1,8 @@
 <?php
 /**
- * Contains the typescan-module
+ * Contains the phpref-module
  *
- * @version			$Id$
+ * @version			$Id: module.php 23 2008-12-13 11:07:36Z nasmussen $
  * @package			PHPCheck
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>
@@ -11,20 +11,20 @@
  */
 
 /**
- * The typescan-module
+ * The php-reference-scanner-module
  *
  * @package			PHPCheck
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Module_TypeScan extends PC_SubModuleContainer
+final class PC_Module_PHPRef extends PC_SubModuleContainer
 {
 	/**
 	 * Constructor
 	 */
 	public function __construct()
 	{
-		parent::__construct('typescan',array('default','scan'),'default');
+		parent::__construct('phpref',array('default','scan'),'default');
 	}
 	
 	/**
@@ -37,13 +37,10 @@ final class PC_Module_TypeScan extends PC_SubModuleContainer
 		parent::init($doc);
 		
 		$renderer = $doc->use_default_renderer();
-		$renderer->add_breadcrumb('Type scanner',PC_URL::build_mod_url('typescan'));
+		$renderer->add_breadcrumb('PHP-reference scanner',PC_URL::build_mod_url('phpref'));
 		
 		// init submodule
 		$this->_sub->init($doc);
-		
-		if(FWS_Props::get()->project() === null)
-			$this->report_error(FWS_Document_Messages::ERROR,'Please create and select a project first!');
 	}
 }
 ?>
