@@ -153,16 +153,35 @@ final class PC_Compile_Analyzer extends FWS_Object
 			else
 			{
 				$func = $types->get_function($name);
-				// check wether it's either a user-defined and known function or a php-buildin-function
-				if($func === null && !function_exists($name))
+				if($func === null)
 				{
-					$this->_report(
-						$call,
-						'The function "'.$name.'" does not exist!',
-						PC_Obj_Error::E_S_FUNCTION_MISSING
-					);
+					if($types->is_db_used())
+					{
+						// check if its a builtin function we know
+						$func = PC_DAO::get_functions()->get_by_name($name,PC_Project::PHPREF_ID);
+						if($func === null)
+						{
+							$this->_report(
+								$call,
+								'The function "'.$name.'" does not exist!',
+								PC_Obj_Error::E_S_FUNCTION_MISSING
+							);
+						}
+						// if so, check params
+						else
+							$this->_check_params($call,$func);
+					}
+					// if we should use no db, check at least if the function exists currently */
+					else if(!function_exists($name))
+					{
+						$this->_report(
+							$call,
+							'The function "'.$name.'" does not exist!',
+							PC_Obj_Error::E_S_FUNCTION_MISSING
+						);
+					}
 				}
-				else if($func !== null)
+				else
 					$this->_check_params($call,$func);
 			}
 		}

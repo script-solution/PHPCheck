@@ -62,11 +62,16 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	 */
 	public function __construct($pid = PC_Project::CURRENT_ID,$use_db = true)
 	{
-		if(!FWS_Helper::is_integer($pid) || $pid < 0)
-			FWS_Helper::def_error('intge0','pid',$pid);
-		
 		$this->_pid = PC_Utils::get_project_id($pid);
 		$this->_use_db = $use_db;
+	}
+	
+	/**
+	 * @return bool wether the db is used
+	 */
+	public function is_db_used()
+	{
+		return $this->_use_db;
 	}
 	
 	/**
