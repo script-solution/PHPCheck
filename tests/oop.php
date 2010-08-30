@@ -159,7 +159,7 @@ $r = $p[1]->test2($b);
 		self::assertEquals(true,$i->is_interface());
 		self::assertEquals(false,$i->is_final());
 		self::assertEquals(
-			'public function <b>doSomething</b>(): string',
+			'public abstract function <b>doSomething</b>(): string',
 			(string)$i->get_method('doSomething')
 		);
 		

@@ -118,15 +118,15 @@ class PC_DAO_Errors extends FWS_Singleton
 	/**
 	 * Creates a new entry for given error
 	 *
-	 * @param PC_Error $error the error to create
+	 * @param PC_Obj_Error $error the error to create
 	 * @return int the used id
 	 */
 	public function create($error)
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!($error instanceof PC_Error))
-			FWS_Helper::def_error('instance','error','PC_Error',$error);
+		if(!($error instanceof PC_Obj_Error))
+			FWS_Helper::def_error('instance','error','PC_Obj_Error',$error);
 		
 		$project = FWS_Props::get()->project();
 		return $db->insert(PC_TB_ERRORS,array(
@@ -158,14 +158,14 @@ class PC_DAO_Errors extends FWS_Singleton
 	}
 	
 	/**
-	 * Builds a PC_Error from the given row
+	 * Builds a PC_Obj_Error from the given row
 	 *
 	 * @param array $row the row from db
-	 * @return PC_Error the error
+	 * @return PC_Obj_Error the error
 	 */
 	private function _build_error($row)
 	{
-		return new PC_Error(new PC_Obj_Location($row['file'],$row['line']),$row['message'],$row['type']);
+		return new PC_Obj_Error(new PC_Obj_Location($row['file'],$row['line']),$row['message'],$row['type']);
 	}
 }
 ?>

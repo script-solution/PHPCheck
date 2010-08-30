@@ -484,6 +484,9 @@ class PC_Compile_TypeScanner extends FWS_Object
 		$method = new PC_Obj_Method($this->file,$line,$class === null);
 		if($class === null)
 			$method->set_visibity(PC_Obj_Visible::V_PUBLIC);
+		// interface methods are implicit abstract
+		else if($class->is_interface())
+			$method->set_abstract(true);
 		
 		// save position just in case it is no function
 		$oldpos = $this->pos;

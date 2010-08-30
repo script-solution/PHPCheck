@@ -39,6 +39,14 @@ private function d($a = 0,$b = "a",$c = false) {
 public function doit(MyClass $c,$d) {
 	$c->test($d);
 }
+abstract class myc {
+	public abstract function doit();
+}
+class myc2 extends myc {
+	public function doit() {
+		parent::doit();
+	}
+}
 ?>';
 	
 	public function testFuncs()
@@ -98,6 +106,12 @@ public function doit(MyClass $c,$d) {
 		self::assertEquals(PC_Obj_Type::UNKNOWN,$func->get_return_type()->get_type());
 		self::assertEquals('MyClass',(string)$func->get_param('$c'));
 		self::assertEquals('integer',(string)$func->get_param('$d'));
+		
+		$calls = $ascanner->get_calls();
+		$an = new PC_Compile_Analyzer();
+		$an->analyze_calls($typecon,$calls);
+		$errors = $an->get_errors();
+		self::assertEquals(PC_Obj_Error::E_T_ABSTRACT_METHOD_CALL,$errors[1]->get_type());
 	}
 }
 ?>

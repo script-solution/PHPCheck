@@ -17,7 +17,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Error extends FWS_Object
+final class PC_Obj_Error extends FWS_Object
 {
 	const E_S_METHOD_MISSING										= 0;
 	const E_S_ABSTRACT_CLASS_INSTANTIATION			= 1;
@@ -32,6 +32,7 @@ final class PC_Error extends FWS_Object
 	const E_T_FINAL_CLASS_INHERITANCE						= 21;
 	const E_T_CLASS_NOT_ABSTRACT								= 22;
 	const E_T_CLASS_MISSING											= 23;
+	const E_T_ABSTRACT_METHOD_CALL							= 24;
 	
 	/**
 	 * Determines the name of the given type

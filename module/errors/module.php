@@ -62,14 +62,14 @@ final class PC_Module_errors extends PC_Module
 		$errs = array();
 		foreach(PC_DAO::get_errors()->get_list(0,$start,PC_ENTRIES_PER_PAGE,$file,$msg,$types) as $err)
 		{
-			/* @var $err PC_Error */
+			/* @var $err PC_Obj_Error */
 			$url = PC_URL::get_mod_url('file');
 			$url->set('path',$err->get_loc()->get_file());
 			$url->set('line',$err->get_loc()->get_line());
 			$url->set_anchor('l'.$err->get_loc()->get_line());
 			
 			$errs[] = array(
-				'type' => PC_Error::get_type_name($err->get_type()),
+				'type' => PC_Obj_Error::get_type_name($err->get_type()),
 				'message' => $this->_get_msg($err),
 				'file' => $err->get_loc()->get_file(),
 				'line' => $err->get_loc()->get_line(),
@@ -82,7 +82,7 @@ final class PC_Module_errors extends PC_Module
 		$typecbs = array();
 		$row = -1;
 		$i = 0;
-		foreach(PC_Error::get_types() as $type => $name)
+		foreach(PC_Obj_Error::get_types() as $type => $name)
 		{
 			if($i % 4 == 0)
 				$typecbs[++$row] = array();
@@ -111,7 +111,7 @@ final class PC_Module_errors extends PC_Module
 	/**
 	 * Builds the message
 	 *
-	 * @param PC_Error $err the error
+	 * @param PC_Obj_Error $err the error
 	 * @return string the message
 	 */
 	private function _get_msg($err)
