@@ -160,17 +160,24 @@ class PC_Obj_Call extends PC_Obj_Location
 	 * Builds a string-representation of the call
 	 * 
 	 * @param bool $use_db wether to query the db for more info
+	 * @param bool $use_links use links?
 	 * @return string
 	 */
-	public function get_call($use_db = true)
+	public function get_call($use_db = true,$use_links = true)
 	{
 		$classname = $this->class && $this->class == PC_Obj_Class::UNKNOWN ? '<i>UNKNOWN</i>' : $this->class;
-		$url = PC_URL::get_mod_url('class');
-		$url->set('name',$classname);
+		if($use_links)
+		{
+			$url = PC_URL::get_mod_url('class');
+			$url->set('name',$classname);
+		}
 		$str = '';
 		if($classname)
-			$str .= '<a href="'.$url->to_url().'">'.$classname.'</a>'.($this->static ? '::' : '->');
-		if($use_db)
+		{
+			$str .= $use_links ? '<a href="'.$url->to_url().'">'.$classname.'</a>' : $classname;
+			$str .= $this->static ? '::' : '->';
+		}
+		if($use_db && $use_links)
 			$func = PC_DAO::get_functions()->get_by_name($this->function,PC_Project::CURRENT_ID,$this->class);
 		else
 			$func = null;

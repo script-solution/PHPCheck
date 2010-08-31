@@ -70,6 +70,16 @@ final class PC_Obj_Constant extends PC_Obj_Location
 		return $this->_type;
 	}
 	
+	/**
+	 * Sets the type
+	 * 
+	 * @param PC_Obj_Type $type the new type
+	 */
+	public function set_type($type)
+	{
+		$this->_type = $type;
+	}
+	
 	protected function get_dump_vars()
 	{
 		return array_merge(parent::get_dump_vars(),get_object_vars($this));

@@ -18,51 +18,52 @@ function a() {}
  * @param string $a
  */
 function b($a) {}
-/**
- * @param array $a
- * @param int $b
- */
-protected function c($a,$b = 0) {}
-/**
- * @param int $a
- * @param string $b
- * @param boolean $c
- * @return int
- */
-private function d($a = 0,$b = "a",$c = false) {
-	$a = $b + $c;
-	return $a;
-}
-/**
- * @param int $d
- */
-public function doit(MyClass $c,$d) {
-	$c->test($d);
-}
-abstract class myc {
-	public abstract function doit();
-}
+
 class myc2 extends myc {
 	public function doit() {
 		parent::doit();
 	}
+	/**
+	 * @param array $a
+	 * @param int $b
+	 */
+	protected function c($a,$b = 0) {}
+	/**
+	 * @param int $a
+	 * @param string $b
+	 * @param boolean $c
+	 * @return int
+	 */
+	private function d($a = 0,$b = "a",$c = false) {
+		$a = $b + $c;
+		return $a;
+	}
+	/**
+	 * @param int $d
+	 */
+	public function doit(MyClass $c,$d) {
+		$c->test($d);
+	}
+}
+abstract class myc {
+	public abstract function doit();
 }
 ?>';
 	
 	public function testFuncs()
 	{
-		$tscanner = new PC_Compile_TypeScanner();
+		$tscanner = new PC_Compile_TypeScannerFrontend();
 		$tscanner->scan(self::$code);
 		
 		$typecon = new PC_Compile_TypeContainer(0,false);
 		$typecon->add_classes($tscanner->get_classes());
 		$typecon->add_functions($tscanner->get_functions());
-		$typecon->add_constants($tscanner->get_constants());
 		
 		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
 		$fin->finalize();
 		
 		$functions = $tscanner->get_functions();
+		$classes = $tscanner->get_classes();
 		
 		// scan files for function-calls and variables
 		$ascanner = new PC_Compile_StatementScanner();
@@ -82,7 +83,9 @@ class myc2 extends myc {
 		self::assertEquals(PC_Obj_Type::UNKNOWN,$func->get_return_type()->get_type());
 		self::assertEquals('string',(string)$func->get_param('$a'));
 		
-		$func = $functions['c'];
+		$class = $classes['myc2'];
+		
+		$func = $class->get_method('c');
 		self::assertEquals('c',$func->get_name());
 		self::assertEquals(2,$func->get_param_count());
 		self::assertEquals(1,$func->get_required_param_count());
@@ -90,7 +93,7 @@ class myc2 extends myc {
 		self::assertEquals('array',(string)$func->get_param('$a'));
 		self::assertEquals('integer?',(string)$func->get_param('$b'));
 		
-		$func = $functions['d'];
+		$func = $class->get_method('d');
 		self::assertEquals('d',$func->get_name());
 		self::assertEquals(3,$func->get_param_count());
 		self::assertEquals(0,$func->get_required_param_count());
@@ -99,7 +102,7 @@ class myc2 extends myc {
 		self::assertEquals('string?',(string)$func->get_param('$b'));
 		self::assertEquals('bool?',(string)$func->get_param('$c'));
 		
-		$func = $functions['doit'];
+		$func = $class->get_method('doit');
 		self::assertEquals('doit',$func->get_name());
 		self::assertEquals(2,$func->get_param_count());
 		self::assertEquals(2,$func->get_required_param_count());
@@ -111,7 +114,7 @@ class myc2 extends myc {
 		$an = new PC_Compile_Analyzer();
 		$an->analyze_calls($typecon,$calls);
 		$errors = $an->get_errors();
-		self::assertEquals(PC_Obj_Error::E_T_ABSTRACT_METHOD_CALL,$errors[1]->get_type());
+		self::assertEquals(PC_Obj_Error::E_T_ABSTRACT_METHOD_CALL,$errors[0]->get_type());
 	}
 }
 ?>

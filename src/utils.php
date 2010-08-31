@@ -47,6 +47,18 @@ class PC_Utils extends FWS_UtilBase
 	}
 	
 	/**
+	 * Generates the parser
+	 */
+	public static function generate()
+	{
+		if(!is_file('src/compile/parser.php') ||
+			filemtime('src/compile/parser.y') > filemtime('src/compile/parser.php'))
+		{
+			exec('php /usr/share/php/PHP/ParserGenerator/cli.php src/compile/parser.y');
+		}
+	}
+	
+	/**
 	 * Highlights the given file
 	 *
 	 * @param string $file the file

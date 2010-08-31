@@ -50,13 +50,13 @@ function x($a,MyClass $b) {
 	
 	public function testVars()
 	{
-		$tscanner = new PC_Compile_TypeScanner();
+		$tscanner = new PC_Compile_TypeScannerFrontend();
 		$tscanner->scan(self::$code);
 		
 		$typecon = new PC_Compile_TypeContainer(0,false);
 		$typecon->add_classes($tscanner->get_classes());
 		$typecon->add_functions($tscanner->get_functions());
-		$typecon->add_constants($tscanner->get_constants());
+		//$typecon->add_constants($tscanner->get_constants());
 		
 		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
 		$fin->finalize();

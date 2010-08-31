@@ -16,10 +16,10 @@ class PC_Tests_OOP extends PHPUnit_Framework_Testcase
 class a {
   const c = 0;
   private $f = "abc";
-  protected $p = array(1,2,3);	// we dont know the array-content yet
+  protected $p = array(1,2,3);
   public $pub;
   public $pubint = 4;
-  public $pubarr = array(1,2,3);	// we dont know the array-content yet
+  public $pubarr = array(1,2,3);
   /** @var a */
   public $pubobj;
   public function __construct() {}
@@ -74,7 +74,7 @@ $h = $b->pubobj->pubint;
 $i = $d->test2($b)->test2(1);
 $j = b::sdf();
 $k = $d->partest();
-$l = ~(1 + 2) * 4; // no value here yet
+$l = (1 + 2) * 4; // no value here yet
 $m = (1 < 2) ? 1 : 2;
 $n = __FILE__;
 $o = __LINE__;
@@ -85,13 +85,12 @@ $r = $p[1]->test2($b);
 	
 	public function testOOP()
 	{
-		$tscanner = new PC_Compile_TypeScanner();
+		$tscanner = new PC_Compile_TypeScannerFrontend();
 		$tscanner->scan(self::$code);
 		
 		$typecon = new PC_Compile_TypeContainer(0,false);
 		$typecon->add_classes($tscanner->get_classes());
 		$typecon->add_functions($tscanner->get_functions());
-		$typecon->add_constants($tscanner->get_constants());
 		
 		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
 		$fin->finalize();
@@ -112,13 +111,13 @@ $r = $p[1]->test2($b);
 		self::assertEquals(array(),$a->get_interfaces());
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::INT,0),(string)$a->get_constant('c')->get_type());
 		self::assertEquals(
-			(string)new PC_Obj_Field('',0,'$f',new PC_Obj_Type(PC_Obj_Type::STRING,'"abc"'),PC_Obj_Field::V_PRIVATE),
+			(string)new PC_Obj_Field('',0,'$f',new PC_Obj_Type(PC_Obj_Type::STRING,'abc'),PC_Obj_Field::V_PRIVATE),
 			(string)$a->get_field('$f')
 		);
 		$array = new PC_Obj_Type(PC_Obj_Type::TARRAY);
-		/*$array->set_array_type(0,1);
-		$array->set_array_type(1,2);
-		$array->set_array_type(2,3);*/
+		$array->set_array_type(0,new PC_Obj_Type(PC_Obj_Type::INT,1));
+		$array->set_array_type(1,new PC_Obj_Type(PC_Obj_Type::INT,2));
+		$array->set_array_type(2,new PC_Obj_Type(PC_Obj_Type::INT,3));
 		self::assertEquals(
 			(string)new PC_Obj_Field('',0,'$p',$array,PC_Obj_Field::V_PROTECTED),
 			(string)$a->get_field('$p')
@@ -155,7 +154,7 @@ $r = $p[1]->test2($b);
 		
 		$i = $classes['i'];
 		/* @var $i PC_Obj_Class */
-		self::assertEquals(false,$i->is_abstract());
+		self::assertEquals(true,$i->is_abstract());
 		self::assertEquals(true,$i->is_interface());
 		self::assertEquals(false,$i->is_final());
 		self::assertEquals(
@@ -200,7 +199,7 @@ $r = $p[1]->test2($b);
 			(string)$global['$f']->get_type()
 		);
 		self::assertEquals(
-			(string)new PC_Obj_Type(PC_Obj_Type::UNKNOWN),
+			(string)new PC_Obj_Type(PC_Obj_Type::INT,1),
 			(string)$global['$g']->get_type()
 		);
 		self::assertEquals(

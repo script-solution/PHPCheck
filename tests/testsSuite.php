@@ -47,6 +47,11 @@ FWS_AutoLoader::register_loader('PC_UnitTest_autoloader');
 include_once('../src/autoloader.php');
 FWS_AutoLoader::register_loader('PC_autoloader');
 
+// set our loader and accessor
+$accessor = new PC_PropAccessor();
+$accessor->set_loader(new PC_PropLoader());
+FWS_Props::set_accessor($accessor);
+
 /**
  * Static test suite.
  * 

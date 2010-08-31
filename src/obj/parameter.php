@@ -40,11 +40,14 @@ class PC_Obj_Parameter extends FWS_Object
 	
 	/**
 	 * Constructor
+	 * 
+	 * @param string $name the name
 	 */
-	public function __construct()
+	public function __construct($name = '')
 	{
 		parent::__construct();
 		
+		$this->name = $name;
 		$this->mtype = new PC_Obj_MultiType();
 	}
 	

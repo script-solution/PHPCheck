@@ -172,30 +172,6 @@ class PC_Compile_StatementScanner extends FWS_Object
 						}
 					}
 					
-					// handle stuff in global scope, function scope or method scope
-					
-					// detect variable-definitions and store their type
-					/*if($t == T_VARIABLE)
-					{
-						$res = $this->_handle_variable();
-						if($res !== null)
-							$this->_set_local_var($str,$res);
-					}
-					// handle 'global $v1,$v2,...,$vn;'
-					else if($t == T_GLOBAL)
-						$this->_handle_global();
-					// handle instantiations (for "return new ..." or simply "new ...")
-					else if($t == T_NEW)
-						$this->_handle_new();
-					// detect function-calls
-					else if($t == T_STRING)
-						$res = $this->_handle_func_call();
-					// detect classes and functions (may be nested)
-					else if($t == T_CLASS)
-						$state = self::ST_WAIT_FOR_CLASS;
-					else if($t == T_FUNCTION)
-						$state = self::ST_WAIT_FOR_FUNC_NAME;*/
-					
 					if($t == T_CLASS)
 						$state = self::ST_WAIT_FOR_CLASS;
 					else if($t == T_FUNCTION)

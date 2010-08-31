@@ -191,6 +191,8 @@ final class PC_Obj_Type extends FWS_Object
 		$this->_type = self::TARRAY;
 		if($this->_array_elements === null)
 			$this->_array_elements = array();
+		if($key instanceof PC_Obj_Type)
+			$key = $key->get_value_for_use();
 		$this->_array_elements[$key] = $type === null ? new PC_Obj_Type(PC_Obj_Type::UNKNOWN) : $type;
 	}
 	
