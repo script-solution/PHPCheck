@@ -1,0 +1,84 @@
+<?php
+/**
+ * Contains the frontend for the statement-scanner
+ *
+ * @version			$Id$
+ * @package			PHPCheck
+ * @subpackage	src
+ * @author			Nils Asmussen <nils@script-solution.de>
+ * @copyright		2003-2008 Nils Asmussen
+ * @link				http://www.script-solution.de
+ */
+
+/**
+ * The frontend for the statement-scanner
+ *
+ * @package			PHPCheck
+ * @subpackage	src
+ * @author			Nils Asmussen <nils@script-solution.de>
+ */
+class PC_Compile_StmtScannerFrontend extends FWS_Object
+{
+	/**
+	 * Our lexer
+	 * 
+	 * @var PC_Compile_StmtLexer
+	 */
+	private $lexer;
+	
+	/**
+	 * @return array the found variables
+	 */
+	public function get_vars()
+	{
+		return $this->lexer->get_vars();
+	}
+	
+	/**
+	 * @return array the found function-calls
+	 */
+	public function get_calls()
+	{
+		return $this->lexer->get_calls();
+	}
+	
+	/**
+	 * Scans the given file
+	 *
+	 * @param string $file the file to scan
+	 */
+	public function scan_file($file)
+	{
+		$this->lexer = PC_Compile_StmtLexer::get_for_file($file);
+		$this->parse();
+	}
+	
+	/**
+	 * Scannes the given string
+	 *
+	 * @param string $source the string to scan
+	 */
+	public function scan($source)
+	{
+		$this->lexer = PC_Compile_StmtLexer::get_for_string($source);
+		$this->parse();
+	}
+	
+	/**
+	 * Does the actual parsing
+	 */
+	private function parse()
+	{
+		$parser = new PC_Compile_StmtParser($this->lexer);
+		PC_Compile_StmtParser::PrintTrace();
+		while($this->lexer->advance($parser))
+			$parser->doParse($this->lexer->get_token(),$this->lexer->get_value());
+		$parser->doParse(0,0);
+	}
+	
+	protected function get_dump_vars()
+	{
+		return get_object_vars($this);
+	}
+}
+?>

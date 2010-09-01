@@ -88,6 +88,16 @@ class PC_Obj_Variable extends FWS_Object
 	}
 	
 	/**
+	 * Sets the type
+	 * 
+	 * @param PC_Obj_Type $type the new value
+	 */
+	public function set_type($type)
+	{
+		$this->type = $type;
+	}
+	
+	/**
 	 * @return string the function-name (scope)
 	 */
 	public function get_function()
@@ -96,11 +106,31 @@ class PC_Obj_Variable extends FWS_Object
 	}
 	
 	/**
+	 * Sets the function
+	 * 
+	 * @param string $function the new value
+	 */
+	public function set_function($function)
+	{
+		$this->function = $function;
+	}
+	
+	/**
 	 * @return string the class-name (scope)
 	 */
 	public function get_class()
 	{
 		return $this->class;
+	}
+	
+	/**
+	 * Sets the class
+	 * 
+	 * @param string $class the new value
+	 */
+	public function set_class($class)
+	{
+		$this->class = $class;
 	}
 	
 	/**

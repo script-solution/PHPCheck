@@ -30,7 +30,7 @@ class a {
   }
 }
 
-abstract class b extends a {
+abstract class b extends a implements i,j {
 	/** @return b */
 	protected function test2(b $arg) {
 		return $arg;
@@ -49,7 +49,7 @@ abstract class b extends a {
 	}
 }
 
-interface i {
+interface i extends i1,i2 {
 	/**
 	 * @return string
 	 */
@@ -141,7 +141,7 @@ $r = $p[1]->test2($b);
 		self::assertEquals(false,$b->is_interface());
 		self::assertEquals(false,$b->is_final());
 		self::assertEquals('a',$b->get_super_class());
-		self::assertEquals(array(),$b->get_interfaces());
+		self::assertEquals(array('i','j'),$b->get_interfaces());
 		self::assertEquals(
 			(string)new PC_Obj_Type(PC_Obj_Type::INT,0),
 			(string)$b->get_constant('c')->get_type()
@@ -157,6 +157,7 @@ $r = $p[1]->test2($b);
 		self::assertEquals(true,$i->is_abstract());
 		self::assertEquals(true,$i->is_interface());
 		self::assertEquals(false,$i->is_final());
+		self::assertEquals(array('i1','i2'),$i->get_interfaces());
 		self::assertEquals(
 			'public abstract function <b>doSomething</b>(): string',
 			(string)$i->get_method('doSomething')

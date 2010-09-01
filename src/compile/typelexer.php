@@ -18,7 +18,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Compile_TypeLexer
+class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 {
 	/**
 	 * @param string $file the filename
@@ -39,57 +39,6 @@ class PC_Compile_TypeLexer
 	}
 	
 	/**
-	 * Turn on/off debugging
-	 * 
-	 * @var bool
-	 */
-	private $debug = false;
-	
-	/**
-	 * The file we're scanning (for the parser)
-	 *
-	 * @var string
-	 */
-	private $file = null;
-	/**
-	 * The current token-line (for the parser)
-	 * 
-	 * @var int
-	 */
-	private $line = 0;
-	/**
-	 * The current token (for the parser)
-	 * 
-	 * @var int
-	 */
-	private $token;
-	/**
-	 * The current token-value (for the parser)
-	 * 
-	 * @var string
-	 */
-	private $value;
-	
-	/**
-	 * The number of tokens
-	 * 
-	 * @var int
-	 */
-	private $N;
-	/**
-	 * The tokens
-	 * 
-	 * @var array
-	 */
-	private $tokens;
-	/**
-	 * The current position in the tokens
-	 * 
-	 * @var int
-	 */
-	private $pos = -1;
-	
-	/**
 	 * The last line in which we saw a function-declaration
 	 * 
 	 * @var int
@@ -101,12 +50,6 @@ class PC_Compile_TypeLexer
 	 * @var int
 	 */
 	private $lastClassLine = 0;
-	/**
-	 * The last comment we've seen
-	 * 
-	 * @var string
-	 */
-	private $lastComment = '';
 	
 	/**
 	 * Comments for functions; because lastComment will get overwritten in certain sitations.
@@ -139,62 +82,6 @@ class PC_Compile_TypeLexer
 	 * @var array
 	 */
 	private $classes = array();
-	
-	/**
-	 * Private constructor because its a bit ugly (without method-overloading)
-	 * 
-	 * @param $str the file or string
-	 * @param $is_file wether $str is a file
-	 */
-	private function __construct($str,$is_file)
-	{
-		if($is_file)
-		{
-			$this->file = $str;
-			$str = FWS_FileUtils::read($str);
-		}
-		$this->tokens = token_get_all($str);
-		$this->N = count($this->tokens);
-		for($i = 0; $i < $this->N; $i++)
-		{
-			if(!is_array($this->tokens[$i]))
-				$this->tokens[$i] = array(ord($this->tokens[$i]),$this->tokens[$i]);
-		}
-		$this->pos = -1;
-		$this->line = 1;
-	}
-	
-	/**
-	 * @return string the file
-	 */
-	public function get_file()
-	{
-		return $this->file;
-	}
-	
-	/**
-	 * @return int the current line
-	 */
-	public function get_line()
-	{
-		return $this->line;
-	}
-	
-	/**
-	 * @return int the current token
-	 */
-	public function get_token()
-	{
-		return $this->token;
-	}
-	
-	/**
-	 * @return string the current token-value
-	 */
-	public function get_value()
-	{
-		return $this->value;
-	}
 	
 	/**
 	 * @return int the line in which the last function was declared
@@ -236,7 +123,7 @@ class PC_Compile_TypeLexer
 	 */
 	public function declare_function($name,$params)
 	{
-		$func = new PC_Obj_Method($this->file,$this->get_last_function_line(),true);
+		$func = new PC_Obj_Method($this->get_file(),$this->get_last_function_line(),true);
 		$func->set_name($name);
 		foreach($params as $param)
 			$func->put_param($param);
@@ -255,7 +142,7 @@ class PC_Compile_TypeLexer
 	 */
 	public function declare_class($name,$modifiers,$extends,$implements,$stmts)
 	{
-		$class = new PC_Obj_Class($this->file,$this->get_last_class_line());
+		$class = new PC_Obj_Class($this->get_file(),$this->get_last_class_line());
 		$class->set_name($name);
 		$class->set_abstract(isset($modifiers['abstract']));
 		$class->set_final(isset($modifiers['final']));
@@ -275,7 +162,7 @@ class PC_Compile_TypeLexer
 	 */
 	public function declare_interface($name,$extends,$stmts)
 	{
-		$class = new PC_Obj_Class($this->file,$this->get_last_class_line());
+		$class = new PC_Obj_Class($this->get_file(),$this->get_last_class_line());
 		$class->set_name($name);
 		$class->set_interface(true);
 		$class->set_abstract(true);
@@ -385,28 +272,19 @@ class PC_Compile_TypeLexer
 		}
 	}
 	
-	/**
-	 * Moves to the next token
-	 * 
-	 * @return bool true if there is one
-	 */
-	public function advance()
+	public function advance($parser)
 	{
-		static $T_DOC_COMMENT = false;
-		if(!$T_DOC_COMMENT)
-			$T_DOC_COMMENT = defined('T_DOC_COMMENT') ? constant('T_DOC_COMMENT') : 10000;
-		
-		// do that here because if e.g. after a class-declaration follows immediatly another one
+		// do it before because if e.g. after a class-declaration follows immediatly another one
 		// we would get this token here BEFORE the class-declaration is handled in our parser
 		// therefore we check it for the previous token
 		if($this->pos >= 0)
 		{
 			$type = $this->tokens[$this->pos][0];
 			if($type == T_CLASS || $type == T_INTERFACE)
-				$this->lastClassLine = $this->line;
+				$this->lastClassLine = $this->get_line();
 			else if($type == T_FUNCTION)
 			{
-				$this->lastFunctionLine = $this->line;
+				$this->lastFunctionLine = $this->get_line();
 				// save the last comment for this function so that we don't loose it
 				$this->funcComments[$this->get_name_for_comment()] = $this->lastComment;
 				$this->lastComment = '';
@@ -434,60 +312,11 @@ class PC_Compile_TypeLexer
 			}
 		}
 		
-		$this->pos++;
-		while($this->pos < $this->N)
-		{
-			if($this->debug)
-			{
-				if(token_name($this->tokens[$this->pos][0]) == 'UNKNOWN')
-					echo $this->tokens[$this->pos][1];
-				else
-					echo token_name($this->tokens[$this->pos][0]).'(' .$this->tokens[$this->pos][1].')';
-				echo "<br>";
-			}
-			
-			switch($this->tokens[$this->pos][0])
-			{
-				// simple ignore tags.
-				case T_CLOSE_TAG:
-				case T_OPEN_TAG_WITH_ECHO:
-					$this->pos++;
-					continue;
-
-					// comments - store for phpdoc
-				case $T_DOC_COMMENT;
-				case T_COMMENT:
-					if(substr($this->tokens[$this->pos][1],0,2) == '/*')
-						$this->lastComment = $this->tokens[$this->pos][1];
-					$this->line += substr_count($this->tokens[$this->pos][1],"\n");
-					$this->pos++;
-					continue;
-
-					// large
-				case T_OPEN_TAG:
-				case T_INLINE_HTML:
-				case T_ENCAPSED_AND_WHITESPACE:
-				case T_WHITESPACE:
-					$this->line += substr_count($this->tokens[$this->pos][1],"\n");
-					$this->pos++;
-					continue;
-
-				// everything else!
-				default:
-					$this->line += substr_count($this->tokens[$this->pos][1],"\n");
-
-					$this->token = $this->tokens[$this->pos][0];
-					$this->value = $this->tokens[$this->pos][1];
-					$this->token = PC_Compile_TypeParser::$transTable[$this->token];
-					return true;
-			}
-		}
-		return false;
+		return parent::advance($parser);
 	}
 	
 	private function get_name_for_comment()
 	{
-		// save the last comment for this constant so that we don't loose it
 		for($i = $this->pos + 1; $i < $this->N; $i++)
 		{
 			if($this->tokens[$i][0] == T_STRING)
