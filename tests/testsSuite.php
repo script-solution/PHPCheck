@@ -71,6 +71,8 @@ class testsSuite extends PHPUnit_Framework_TestSuite
 		$this->addTestSuite('PC_Tests_Funcs');
 		$this->addTestSuite('PC_Tests_OOP');
 		$this->addTestSuite('PC_Tests_Arrays');
+		$this->addTestSuite('PC_Tests_Exprs');
+		$this->addTestSuite('PC_Tests_Exprs2');
 	}
 	
 	/**

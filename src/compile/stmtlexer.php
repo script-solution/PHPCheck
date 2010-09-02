@@ -21,28 +21,23 @@
 class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 {
 	/**
-	 * The global-scope identifier
-	 * 
-	 * @var string
-	 */
-	const SC_GLOBAL = '#global';
-	
-	/**
 	 * @param string $file the filename
+	 * @param PC_Compile_TypeContainer $types the type-container
 	 * @return PC_Compile_StmtLexer the instance for lexing a file
 	 */
-	public static function get_for_file($file)
+	public static function get_for_file($file,$types)
 	{
-		return new self($file,true);
+		return new self($file,true,$types);
 	}
 	
 	/**
 	 * @param string $string the string
+	 * @param PC_Compile_TypeContainer $types the type-container
 	 * @return PC_Compile_StmtLexer the instance for lexing a string
 	 */
-	public static function get_for_string($string)
+	public static function get_for_string($string,$types)
 	{
-		return new self($string,false);
+		return new self($string,false,$types);
 	}
 	
 	/**
@@ -67,6 +62,27 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	private $calls = array();
 	
 	/**
+	 * The known types
+	 * 
+	 * @var PC_Compile_TypeContainer
+	 */
+	private $types;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param string $str the file or string
+	 * @param bool $is_file wether $str is a file
+	 * @param PC_Compile_TypeContainer $types the type-container
+	 */
+	protected function __construct($str,$is_file,$types)
+	{
+		parent::__construct($str,$is_file);
+		
+		$this->types = $types;
+	}
+	
+	/**
 	 * @return array the found variables
 	 */
 	public function get_vars()
@@ -83,6 +99,141 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	}
 	
 	/**
+	 * Adds a function-call
+	 * 
+	 * @param PC_Obj_Variable $class the class-name
+	 * @param PC_Obj_Variable $func the function-name
+	 * @param array $args the function-arguments
+	 * @param bool $static wether its a static call
+	 * @return PC_Obj_Variable the result
+	 */
+	public function add_call($class,$func,$args,$static = false)
+	{
+		// if we don't know the function- or class-name, we can't do anything here
+		if($func->get_type()->is_unknown() || $func->get_type()->get_value() === null)
+			return $this->get_unknown();
+		if($class !== null && ($class->get_type()->is_unknown() || $class->get_type()->get_value() === null))
+			return $this->get_unknown();
+		
+		// create call
+		$call = new PC_Obj_Call($this->get_file(),$this->get_line());
+		
+		// determine class- and function-name
+		$fname = $func->get_type()->get_value();
+		$call->set_function($fname);
+		$call->set_object_creation($fname == '__construct');
+		if($class !== null)
+		{
+			$cname = $class->get_type()->get_value();
+			if($cname == 'parent')
+			{
+				$cname = $this->get_scope_part(T_CLASS_C)->get_type()->get_value();
+				$classobj = $this->types->get_class($cname);
+				if($classobj === null || $classobj->get_super_class() == '')
+					return $this->get_unknown();
+				$cname = $classobj->get_super_class();
+				// parent-calls are never static
+				$static = false;
+			}
+			else if($cname == 'self')
+			{
+				$cname = $this->get_scope_part(T_CLASS_C)->get_type()->get_value();
+				// self is always static
+				$static = true;
+			}
+			$call->set_class($cname);
+		}
+		
+		// clone because it might be a variable
+		foreach($args as $arg)
+			$call->add_argument(clone $arg->get_type());
+		$call->set_static($static);
+		$this->calls[] = $call;
+		
+		// if its a constructor we know the type directly
+		if($fname == '__construct')
+			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$cname));
+		// get function-object and determine return-type
+		$funcobj = null;
+		if($class !== null)
+		{
+			$classobj = $this->types->get_class($cname);
+			if($classobj === null)
+				return $this->get_unknown();
+			$funcobj = $classobj->get_method($fname);
+		}
+		else
+			$funcobj = $this->types->get_function($fname);
+		
+		if($funcobj === null)
+			return $this->get_unknown();
+		return new PC_Obj_Variable('',$funcobj->get_return_type());
+	}
+	
+	/**
+	 * Handles access to an object-property through the given chain and for given object
+	 * 
+	 * @param PC_Obj_Variable $obj the object
+	 * @param array $chain the chain
+	 * @return PC_Obj_Variable the result
+	 */
+	public function handle_object_prop_chain($obj,$chain)
+	{
+		$objt = $obj->get_type();
+		foreach($chain as $access)
+		{
+			// if we don't know the class-name or its no object, stop here
+			if($objt === null || $objt->get_type() != PC_Obj_Type::OBJECT || !$objt->get_class())
+				return $this->get_unknown();
+			// if we don't know the class, give up, as well
+			$class = $this->types->get_class($objt->get_class());
+			if($class === null)
+				return $this->get_unknown();
+			
+			$prop = $access['prop'];
+			$args = $access['args'];
+			assert(count($prop) > 0 && $prop[0]['type'] == 'name');
+			if(count($prop) > 1 || $args === null)
+			{
+				$fieldname = $prop[0]['data'];
+				if($fieldname->get_type()->is_unknown() || $fieldname->get_type()->get_value() === null)
+					return $this->get_unknown();
+				// TODO remove the '$' in the type-parser!
+				$field = $class->get_field('$'.$fieldname->get_type()->get_value());
+				if($field === null)
+					return $this->get_unknown();
+				$res = $field->get_type();
+				for($i = 1; $i < count($prop); $i++)
+				{
+					assert($prop[$i]['type'] == 'array');
+					$offset = $prop[$i]['data'];
+					if($res->get_type() != PC_Obj_Type::TARRAY)
+						return $this->get_unknown();
+					if($offset->get_type()->is_unknown() || $offset->get_type()->get_value() === null)
+						return $this->get_unknown();
+					$res = $res->get_array_type($offset->get_type()->get_value());
+				}
+			}
+			else
+			{
+				$mname = $prop[0]['data'];
+				if($mname->get_type()->is_unknown() || $mname->get_type()->get_value() === null)
+					return $this->get_unknown();
+				$method = $class->get_method($mname->get_type()->get_value());
+				if($method === null)
+					return $this->get_unknown();
+				$this->add_call(
+					new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,$class->get_name())),
+					$mname,$args,false
+				);
+				$res = $method->get_return_type();
+			}
+			$objt = $res;
+		}
+		return new PC_Obj_Variable('',$res);
+	}
+	
+	/**
 	 * Returns the value of the variable with given name in current scope. If it does not exist,
 	 * a new one is created (but not stored in scope).
 	 * 
@@ -92,7 +243,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	public function get_var($var)
 	{
 		if(!isset($this->vars[$this->scope][$var]))
-			return new PC_Obj_Variable($var,PC_Obj_Type::get_type_by_name('unknown'));
+			return $this->get_unknown($var);
 		return $this->vars[$this->scope][$var];
 	}
 	
@@ -100,15 +251,33 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 * Sets the given variable in the current scope to given value
 	 * 
 	 * @param PC_Obj_Variable $var the variable to set
-	 * @param PC_Obj_Type $value the value
+	 * @param PC_Obj_Variable $value the value
+	 * @return PC_Obj_Variable the variable
 	 */
 	public function set_var($var,$value)
 	{
-		$var->set_type($value);
-		$var->set_function($this->get_func());
-		$var->set_class($this->get_class());
-		$this->vars[$this->scope][$var->get_name()] = $var;
+		$var->set_type($value->get_type());
+		if($var->get_name())
+		{
+			$var->set_function($this->get_func());
+			$var->set_class($this->get_class());
+			$this->vars[$this->scope][$var->get_name()] = $var;
+		}
 		return $value;
+	}
+	
+	/**
+	 * Puts the variable with given name from global scope into the current one
+	 * 
+	 * @param string $name the variable-name
+	 */
+	public function do_global($name)
+	{
+		if(isset($this->vars[PC_Obj_Variable::SCOPE_GLOBAL][$name]))
+			$val = clone $this->vars[PC_Obj_Variable::SCOPE_GLOBAL][$name];
+		else
+			$val = $this->get_unknown();
+		$this->set_var($this->get_unknown($name),$val);
 	}
 	
 	/**
@@ -150,16 +319,84 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	}
 	
 	/**
+	 * Extracts the given part of the scope
+	 * 
+	 * @param int $part the part: T_METHOD_C, T_FUNCTION_C or T_CLASS_C
+	 * @return
+	 */
+	public function get_scope_part($part)
+	{
+		$str = '';
+		switch($part)
+		{
+			case T_METHOD_C:
+			case T_FUNC_C:
+				if($this->scope != PC_Obj_Variable::SCOPE_GLOBAL)
+				{
+					if(($pos = strpos($this->scope,'::')) !== false)
+						$str = substr($this->scope,$pos + 2);
+					else
+						$str = $this->scope;
+				}
+				break;
+			case T_CLASS_C:
+				if(($pos = strpos($this->scope,'::')) !== false)
+					$str = substr($this->scope,0,$pos);
+				break;
+		}
+		return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,$str));
+	}
+	
+	/**
+	 * Fetches the element from $var at given offset
+	 * 
+	 * @param PC_Obj_Variable $var the variable
+	 * @param PC_Obj_Variable $offset the offset
+	 * @return PC_Obj_Variable the result
+	 */
+	public function handle_array_access($var,$offset)
+	{
+		// if we don't know the variable-type, we can't do anything; additionally, better do nothing
+		// if its no array.
+		// note that null as value is okay because it might be an empty array
+		$t = $var->get_type();
+		if($t->is_unknown() || $t->get_type() != PC_Obj_Type::TARRAY)
+			return $this->get_unknown();
+		// if we don't know the offset, we can't do anything, either
+		if($offset !== null && ($offset->get_type()->is_unknown() || $offset->get_type()->get_value() === null))
+			return $this->get_unknown();
+		
+		// PC_Obj_Variable will do the rest for us; simply access the offset
+		return $var->array_offset($offset !== null ? $offset->get_type()->get_value() : null);
+	}
+	
+	/**
+	 * Handles the given unary-operator
+	 * 
+	 * @param string $op the operator (+,-,...)
+	 * @param PC_Obj_Variable $e the expression
+	 * @return PC_Obj_Variable the result
+	 */
+	public function handle_unary_op($op,$e)
+	{
+		$type = $e->get_type();
+		if($type->is_unknown() || $type->get_value() === null)
+			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
+		eval('$res = '.$op.$type->get_value_for_eval().';');
+		return $this->get_type_from_php($res);
+	}
+	
+	/**
 	 * Handles the given binary-assignment-operator
 	 * 
 	 * @param string $op the operator (+,-,...)
 	 * @param PC_Obj_Variable $var the variable
-	 * @param PC_Obj_type $e the expression
-	 * @return PC_Obj_Type the result
+	 * @param PC_Obj_Variable $e the expression
+	 * @return PC_Obj_Variable the result
 	 */
 	public function handle_bin_assign_op($op,$var,$e)
 	{
-		$res = $this->handle_bin_op($op,$var->get_type(),$e);
+		$res = $this->handle_bin_op($op,$var,$e);
 		$this->set_var($var,$res);
 		return $res;
 	}
@@ -168,26 +405,116 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 * Handles the given binary-operator
 	 * 
 	 * @param string $op the operator (+,-,...)
-	 * @param PC_Obj_Type $e1 the left expression
-	 * @param PC_Obj_type $e2 the right expression
-	 * @return PC_Obj_Type the result
+	 * @param PC_Obj_Variable $e1 the left expression
+	 * @param PC_Obj_Variable $e2 the right expression
+	 * @return PC_Obj_Variable the result
 	 */
 	public function handle_bin_op($op,$e1,$e2)
 	{
-		// if we don't know one of the types, there is no chance the calculate the result
-		if($e1->is_unknown() || $e2->is_unknown())
-			return $e1;
-		if($e1->get_value() === null || $e2->get_value() === null)
+		$t1 = $e1->get_type();
+		$t2 = $e2->get_type();
+		// if we don't know one of the types or values, try to determine the type by the operator
+		if($t1->is_unknown() || $t2->is_unknown() || $t1->get_value() === null || $t2->get_value() === null)
+			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$t1,$t2)));
+		// if we have an array-operation, check if we know all elements
+		if($t1->get_type() == PC_Obj_Type::TARRAY && $t2->get_type() == PC_Obj_Type::TARRAY)
 		{
-			// if we have a float, the result gets a float
-			if($e1->get_type() == PC_Obj_Type::FLOAT || $e2->get_type() == PC_Obj_Type::FLOAT)
-				return new PC_Obj_Type(PC_Obj_Type::FLOAT);
-			// otherwise its always an integer since it are integer-operations
-			return new PC_Obj_Type(PC_Obj_Type::INT);
+			// if not, we know at least, that its an array
+			if($t1->is_array_unknown() || $t2->is_array_unknown())
+				return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
 		}
+		// type and value is known, therefore calculate the result
 		$res = 0;
-		eval('$res = '.$e1->get_value().' '.$op.' '.$e2->get_value().';');
+		eval('$res = '.$t1->get_value_for_eval().' '.$op.' '.$t2->get_value_for_eval().';');
 		return $this->get_type_from_php($res);
+	}
+	
+	/**
+	 * Handles the ternary operator ?:
+	 * 
+	 * @param PC_Obj_Variable $e1 the first expression
+	 * @param PC_Obj_Variable $e2 the second expression
+	 * @param PC_Obj_Variable $e3 the third expression
+	 * @return PC_Obj_Variable the result
+	 */
+	public function handle_tri_op($e1,$e2,$e3)
+	{
+		$t1 = $e1->get_type();
+		$t2 = $e2->get_type();
+		$t3 = $e3->get_type();
+		if($t1->is_unknown() || $t1->get_value() === null)
+		{
+			// if the type is the same, we know the result-type
+			if($t2->get_type() == $t3->get_type())
+				return new PC_Obj_Variable('',new PC_Obj_Type($t2->get_type()));
+			return $this->get_unknown();
+		}
+		// type and value is known, so we can evalulate the result
+		$res = false;
+		eval('$res = '.$t1->get_value_for_eval().';');
+		if($res)
+			return new PC_Obj_Variable('',clone $t2);
+		return new PC_Obj_Variable('',clone $t3);
+	}
+	
+	/**
+	 * Handles the given compare-operator
+	 * 
+	 * @param string $op the operator (==, !=, ===, ...)
+	 * @param PC_Obj_Variable $e1 the first operand
+	 * @param PC_Obj_Variable $e2 the second operand
+	 * @return PC_Obj_Variable the result
+	 */
+	public function handle_cmp($op,$e1,$e2)
+	{
+		$t1 = $e1->get_type();
+		$t2 = $e2->get_type();
+		// if we don't know one of the types or values, try to determine the type by the operator
+		if($t1->is_unknown() || $t2->is_unknown() || $t1->get_value() === null || $t2->get_value() === null)
+			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$t1,$t2)));
+		// if we have an array-operation, just return bool, because we would have to do it ourself
+		// and I think its not worth the effort.
+		if($t1->get_type() == PC_Obj_Type::TARRAY && $t2->get_type() == PC_Obj_Type::TARRAY)
+			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
+		
+		$val = false;
+		switch($op)
+		{
+			// its not a good idea to use eval in this case because it might change the type
+			case '===':
+				$val = $t1->get_value_for_use() === $t2->get_value_for_use();
+				break;
+			case '!==':
+				$val = $t1->get_value_for_use() !== $t2->get_value_for_use();
+				break;
+			
+			case '==':
+			case '!=':
+			case '<':
+			case '>':
+			case '<=':
+			case '>=':
+				eval('$val = '.$t1->get_value_for_eval().' '.$op.' '.$t2->get_value_for_eval().';');
+				break;
+		}
+		return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,$val));
+	}
+	
+	/**
+	 * Handles pre-increments and -decrements
+	 * 
+	 * @param string $op the operator (+,-)expression
+	 * @param PC_Obj_Variable $var the variable
+	 * @return PC_Obj_Variable the variable
+	 */
+	public function handle_pre_op($op,$var)
+	{
+		$type = $var->get_type();
+		if($type->is_unknown() || $type->get_value() === null)
+			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
+		$res = 0;
+		eval('$res = '.$type->get_value_for_eval().$op.'1;');
+		return $this->set_var($var,$this->get_type_from_php($res));
 	}
 	
 	/**
@@ -195,25 +522,186 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 * 
 	 * @param string $op the operator (+,-)expression
 	 * @param PC_Obj_Variable $var the variable
+	 * @return PC_Obj_Variable the variable
 	 */
 	public function handle_post_op($op,$var)
 	{
+		$clone = clone $var;
 		$type = $var->get_type();
-		if($type->is_unknown())
-			return PC_Obj_Type(PC_Obj_Type::UNKNOWN);
+		if($type->is_unknown() || $type->get_value() === null)
+			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
 		$res = 0;
-		eval('$res = '.$type.$op.$op.';');
+		eval('$res = '.$type->get_value_for_eval().$op.'1;');
+		$this->set_var($var,$this->get_type_from_php($res));
+		return $clone;
+	}
+	
+	/**
+	 * Determines the type from the operation (assumes that the type or the value is unknown)
+	 * 
+	 * @param string $op the operator
+	 * @param PC_Obj_Type $t1 the type of the first operand
+	 * @param PC_Obj_Type $t2 the type of the second operand (may be null for unary ops)
+	 * @return int the type
+	 */
+	private function get_type_from_op($op,$t1,$t2 = null)
+	{
+		switch($op)
+		{
+			// bitwise operators have always int as result
+			case '|':
+			case '&':
+			case '^':
+			case '>>':
+			case '<<':
+			case '~':
+				return PC_Obj_Type::INT;
+			
+			// concatenation leads always to string
+			case '.':
+				return PC_Obj_Type::STRING;
+			
+			case '+':
+			case '-':
+			case '*':
+			case '/':
+			case '%':
+				// if one of them is unknown we don't know wether we would get a float or int
+				if($t1->is_unknown() || ($t2 !== null && $t2->is_unknown()))
+					return PC_Obj_Type::UNKNOWN;
+				// if both are arrays, the result is an array
+				if($t1->get_type() == PC_Obj_Type::TARRAY && $t2->get_type() == PC_Obj_Type::TARRAY)
+					return PC_Obj_Type::TARRAY;
+				// if one of them is float, the result is float
+				if($t1->get_type() == PC_Obj_Type::FLOAT || ($t2 !== null && $t2->get_type() == PC_Obj_Type::FLOAT))
+					return PC_Obj_Type::FLOAT;
+				// otherwise its always int
+				return PC_Obj_Type::INT;
+			
+			case '==':
+			case '!=':
+			case '===':
+			case '!==':
+			case '<':
+			case '>':
+			case '<=':
+			case '>=':
+			case '&&':
+			case '||':
+			case 'xor':
+			case '!':
+				// always bool
+				return PC_Obj_Type::BOOL;
+			
+			default:
+				FWS_Helper::error('Unknown operator "'.$op.'"');
+		}
+	}
+	
+	/**
+	 * Handles a cast
+	 * 
+	 * @param string $cast the cast-type: 'int','float','string','array','object','bool' or 'unset'
+	 * @param PC_Obj_Variable $e the expression
+	 * @return PC_Obj_Variable the result
+	 */
+	public function handle_cast($cast,$e)
+	{
+		// unset casts to null. in this case we don't really know the value
+		// object-cast make no sense here, I think
+		if($cast == 'unset' || $cast == 'object')
+			return $this->get_unknown();
+		
+		$t = $e->get_type();
+		// if we don't know the type or value, just provide the type
+		if($t->is_unknown() || $t->get_value() === null)
+			return new PC_Obj_Variable('',PC_Obj_Type::get_type_by_name($cast));
+		
+		// we know the value, so perform a cast
+		$res = 0;
+		eval('$res = ('.$cast.')'.$t->get_value_for_eval().';');
 		return $this->get_type_from_php($res);
 	}
 	
 	/**
+	 * Handles the instanceof-operator
+	 * 
+	 * @param PC_Obj_Variable $e the expression
+	 * @param PC_Obj_Variable $name the name of the class
+	 */
+	public function handle_instanceof($e,$name)
+	{
+		// if the name is not a string, give up; actually this should never happen
+		if($name->get_type()->get_type() != PC_Obj_Type::STRING)
+			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
+		
+		// if we don't know the type or its class we can't say wether its a superclass
+		$name = $name->get_type()->get_value();
+		$type = $e->get_type();
+		if($type->is_unknown() || $type->get_type() != PC_Obj_Type::OBJECT || $type->get_class() == '')
+			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
+		
+		// class-name equal?
+		if(strcasecmp($type->get_class(),$name) == 0)
+				return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,true));
+		
+		// if the class is unknown we can't say more
+		$class = $this->types->get_class($type->get_class());
+		if($class === null)
+			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
+		
+		// check super-classes
+		$super = $class->get_super_class();
+		while($super != '')
+		{
+			if(strcasecmp($super,$name) == 0)
+				return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,true));
+			$superobj = $this->types->get_class($super);
+			if($superobj === null)
+				break;
+			$super = $superobj->get_super_class();
+		}
+		
+		// check interfaces
+		if($this->is_instof_interface($class->get_interfaces(),$name))
+			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,true));
+		return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,false));
+	}
+	
+	/**
+	 * Checks wether $name is an interface in the interface-hierarchie given by $ifs
+	 * 
+	 * @param array $ifs the intefaces to check
+	 * @param string $name the interface-name
+	 * @return bool true if so
+	 */
+	private function is_instof_interface($ifs,$name)
+	{
+		foreach($ifs as $if)
+		{
+			if(strcasecmp($if,$name) == 0)
+				return true;
+			// check super-interfaces
+			$ifobj = $this->types->get_class($if);
+			if($ifobj !== null && $this->is_instof_interface($ifobj->get_interfaces(),$name))
+				return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * @param mixed $val the value
-	 * @return PC_Obj_Type the type
+	 * @return PC_Obj_Variable the type
 	 */
 	private function get_type_from_php($val)
 	{
-		$type = PC_Obj_Type::get_type_by_name(gettype($val));
-		return new PC_Obj_Type($type->get_type(),$val);
+		if(is_array($val))
+			return new PC_Obj_Variable('',PC_Obj_Type::get_type_by_value($val));
+		else
+		{
+			$type = PC_Obj_Type::get_type_by_name(gettype($val));
+			return new PC_Obj_Variable('',new PC_Obj_Type($type->get_type(),$val));
+		}
 	}
 	
 	public function advance($parser)
@@ -248,6 +736,15 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		if(($pos = strpos($this->scope,'::')) !== false)
 			return substr($this->scope,$pos + 2);
 		return $this->scope;
+	}
+	
+	/**
+	 * @param string $name the var-name
+	 * @return PC_Obj_Variable a variable with given name and unknown type
+	 */
+	private function get_unknown($name = '')
+	{
+		return new PC_Obj_Variable($name,new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
 	}
 	
 	private function get_type_name()

@@ -20,8 +20,11 @@ function a() {}
 function b($a) {}
 
 class myc2 extends myc {
+	public static function mystatic() {}
 	public function doit() {
 		parent::doit();
+		self::mystatic();
+		$this->c(1,2);
 	}
 	/**
 	 * @param array $a
@@ -66,7 +69,7 @@ abstract class myc {
 		$classes = $tscanner->get_classes();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_Compile_StatementScanner();
+		$ascanner = new PC_Compile_StmtScannerFrontend();
 		$ascanner->scan(self::$code,$typecon);
 		
 		$func = $functions['a'];
@@ -111,6 +114,9 @@ abstract class myc {
 		self::assertEquals('integer',(string)$func->get_param('$d'));
 		
 		$calls = $ascanner->get_calls();
+		self::assertEquals('myc->doit()',(string)$calls[0]->get_call(false,false));
+		self::assertEquals('myc2::mystatic()',(string)$calls[1]->get_call(false,false));
+		
 		$an = new PC_Compile_Analyzer();
 		$an->analyze_calls($typecon,$calls);
 		$errors = $an->get_errors();

@@ -23,6 +23,21 @@ class PC_Obj_Variable extends FWS_Object
 	const SCOPE_GLOBAL = '#global';
 	
 	/**
+	 * For assigning values to array-elements: Store the reference to the array so that we can
+	 * put the value into the array as soon as we assign it to it. Before the array doesn't know
+	 * about this value (if it didn't exist before)
+	 * 
+	 * @var PC_Obj_Type
+	 */
+	private $arrayref = null;
+	/**
+	 * For assigning values to array-elements: Store the offset for the reference-array
+	 * 
+	 * @var mixed
+	 */
+	private $arrayoff = null;
+	
+	/**
 	 * The name of the variable
 	 *
 	 * @var string
@@ -71,6 +86,14 @@ class PC_Obj_Variable extends FWS_Object
 		$this->class = $class;
 	}
 	
+	public function __clone()
+	{
+		parent::__clone();
+		$this->type = clone $this->type;
+		$this->arrayref = null;
+		$this->arrayoff = null;
+	}
+	
 	/**
 	 * @return string the name
 	 */
@@ -94,7 +117,32 @@ class PC_Obj_Variable extends FWS_Object
 	 */
 	public function set_type($type)
 	{
+		if($this->arrayref !== null)
+			$this->arrayref->set_array_type($this->arrayoff,$type);
 		$this->type = $type;
+	}
+	
+	/**
+	 * Returns a variable pointing to the array-element with given key. If it does not exist, it
+	 * will be created as soon as the type is assigned.
+	 *
+	 * @param mixed $key the key (null = append)
+	 * @return PC_Obj_Type the type of the element
+	 */
+	public function array_offset($key)
+	{
+		if($key === null)
+			$key = $this->type->get_array_count();
+		
+		// fetch element or create it
+		$el = $this->type->get_array_type($key);
+		if($el === null)
+			$el = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
+		$var = new self('',$el);
+		// connect the var to us
+		$var->arrayref = $this->type;
+		$var->arrayoff = $key;
+		return $var;
 	}
 	
 	/**

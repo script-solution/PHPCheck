@@ -8,19 +8,19 @@
  *
  * meta-data should be stored as an array
  */
-class PC_yyToken implements ArrayAccess
+class PC_Type_yyToken implements ArrayAccess
 {
     public $string = '';
     public $metadata = array();
 
     function __construct($s, $m = array())
     {
-        if ($s instanceof PC_yyToken) {
+        if ($s instanceof PC_Type_yyToken) {
             $this->string = $s->string;
             $this->metadata = $s->metadata;
         } else {
             $this->string = (string) $s;
-            if ($m instanceof PC_yyToken) {
+            if ($m instanceof PC_Type_yyToken) {
                 $this->metadata = $m->metadata;
             } elseif (is_array($m)) {
                 $this->metadata = $m;
@@ -47,7 +47,7 @@ class PC_yyToken implements ArrayAccess
     {
         if ($offset === null) {
             if (isset($value[0])) {
-                $x = ($value instanceof PC_yyToken) ?
+                $x = ($value instanceof PC_Type_yyToken) ?
                     $value->metadata : $value;
                 $this->metadata = array_merge($this->metadata, $x);
                 return;
@@ -57,7 +57,7 @@ class PC_yyToken implements ArrayAccess
         if ($value === null) {
             return;
         }
-        if ($value instanceof PC_yyToken) {
+        if ($value instanceof PC_Type_yyToken) {
             if ($value->metadata) {
                 $this->metadata[$offset] = $value->metadata;
             }
@@ -84,7 +84,7 @@ class PC_yyToken implements ArrayAccess
  *      the information used by the action routines in the grammar.
  *      It is sometimes called the "minor" token.
  */
-class PC_yyStackEntry
+class PC_Type_yyStackEntry
 {
     public $stateno;       /* The state-number */
     public $major;         /* The major token value.  This is the code
@@ -4188,7 +4188,7 @@ static public $yy_action = array(
                     if ($nextstate < self::YYNSTATE) {
                         // we need to shift a non-terminal
                         $this->yyidx++;
-                        $x = new PC_yyStackEntry;
+                        $x = new PC_Type_yyStackEntry;
                         $x->stateno = $nextstate;
                         $x->major = self::$yyRuleInfo[$yyruleno]['lhs'];
                         $this->yystack[$this->yyidx] = $x;
@@ -4262,7 +4262,7 @@ static public $yy_action = array(
                     if ($nextstate < self::YYNSTATE) {
                         // we need to shift a non-terminal
                         $this->yyidx++;
-                        $x = new PC_yyStackEntry;
+                        $x = new PC_Type_yyStackEntry;
                         $x->stateno = $nextstate;
                         $x->major = self::$yyRuleInfo[$yyruleno]['lhs'];
                         $this->yystack[$this->yyidx] = $x;
@@ -4392,7 +4392,7 @@ static public $yy_action = array(
             ** stack ever overflows */
             return;
         }
-        $yytos = new PC_yyStackEntry;
+        $yytos = new PC_Type_yyStackEntry;
         $yytos->stateno = $yyNewState;
         $yytos->major = $yyMajor;
         $yytos->minor = $yypMinor;
@@ -4866,13 +4866,13 @@ static public $yy_action = array(
     }
 #line 4872 "src/compile/typeparser.php"
 #line 208 "src/compile/typeparser.y"
-    function yy_r51(){ $this->_retvalue = new PC_yyToken('');     }
+    function yy_r51(){ $this->_retvalue = new PC_Type_yyToken('');     }
 #line 4875 "src/compile/typeparser.php"
 #line 209 "src/compile/typeparser.y"
-    function yy_r52(){ $this->_retvalue = new PC_yyToken('',array('abstract' => true));     }
+    function yy_r52(){ $this->_retvalue = new PC_Type_yyToken('',array('abstract' => true));     }
 #line 4878 "src/compile/typeparser.php"
 #line 210 "src/compile/typeparser.y"
-    function yy_r53(){ $this->_retvalue = new PC_yyToken('',array('final' => true));     }
+    function yy_r53(){ $this->_retvalue = new PC_Type_yyToken('',array('final' => true));     }
 #line 4881 "src/compile/typeparser.php"
 #line 212 "src/compile/typeparser.y"
     function yy_r54(){ $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor->string;     }
@@ -4881,20 +4881,20 @@ static public $yy_action = array(
     function yy_r55(){ $this->_retvalue = null;     }
 #line 4887 "src/compile/typeparser.php"
 #line 217 "src/compile/typeparser.y"
-    function yy_r57(){ $this->_retvalue = new PC_yyToken($this->yystack[$this->yyidx + 0]->minor);     }
+    function yy_r57(){ $this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + 0]->minor);     }
 #line 4890 "src/compile/typeparser.php"
 #line 218 "src/compile/typeparser.y"
-    function yy_r58(){ $this->_retvalue = new PC_yyToken('',array());     }
+    function yy_r58(){ $this->_retvalue = new PC_Type_yyToken('',array());     }
 #line 4893 "src/compile/typeparser.php"
 #line 223 "src/compile/typeparser.y"
     function yy_r61(){
-	$this->_retvalue = new PC_yyToken('');
+	$this->_retvalue = new PC_Type_yyToken('');
 	$this->_retvalue[] = array($this->yystack[$this->yyidx + 0]->minor->string);
     }
 #line 4899 "src/compile/typeparser.php"
 #line 227 "src/compile/typeparser.y"
     function yy_r62(){
-	$this->_retvalue = new PC_yyToken($this->yystack[$this->yyidx + -2]->minor);
+	$this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + -2]->minor);
 	$this->_retvalue[] = array($this->yystack[$this->yyidx + 0]->minor->string);
     }
 #line 4905 "src/compile/typeparser.php"
@@ -4906,7 +4906,7 @@ static public $yy_action = array(
 #line 4911 "src/compile/typeparser.php"
 #line 310 "src/compile/typeparser.y"
     function yy_r136(){
-	$this->_retvalue = new PC_Obj_Type(PC_Obj_Type::STRING,substr($this->yystack[$this->yyidx + 0]->minor,1,-1));
+	$this->_retvalue = new PC_Obj_Type(PC_Obj_Type::STRING,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4916 "src/compile/typeparser.php"
 #line 313 "src/compile/typeparser.y"
@@ -5099,39 +5099,39 @@ static public $yy_action = array(
     }
 #line 5105 "src/compile/typeparser.php"
 #line 548 "src/compile/typeparser.y"
-    function yy_r220(){ $this->_retvalue = new PC_yyToken('',array('public'));     }
+    function yy_r220(){ $this->_retvalue = new PC_Type_yyToken('',array('public'));     }
 #line 5108 "src/compile/typeparser.php"
 #line 554 "src/compile/typeparser.y"
     function yy_r224(){
-	$this->_retvalue = new PC_yyToken($this->yystack[$this->yyidx + -1]->minor);
+	$this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + -1]->minor);
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
 #line 5114 "src/compile/typeparser.php"
 #line 559 "src/compile/typeparser.y"
     function yy_r225(){
-	$this->_retvalue = new PC_yyToken('',array($this->yystack[$this->yyidx + 0]->minor));
+	$this->_retvalue = new PC_Type_yyToken('',array($this->yystack[$this->yyidx + 0]->minor));
     }
 #line 5119 "src/compile/typeparser.php"
 #line 563 "src/compile/typeparser.y"
     function yy_r226(){
-	$this->_retvalue = new PC_yyToken($this->yystack[$this->yyidx + -2]->minor);
+	$this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + -2]->minor);
 	$this->_retvalue[] = array('name' => $this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5125 "src/compile/typeparser.php"
 #line 568 "src/compile/typeparser.y"
     function yy_r227(){
-	$this->_retvalue = new PC_yyToken($this->yystack[$this->yyidx + -4]->minor);
+	$this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + -4]->minor);
 	$this->_retvalue[] = array('name' => $this->yystack[$this->yyidx + -2]->minor,'val' => $this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5131 "src/compile/typeparser.php"
 #line 572 "src/compile/typeparser.y"
     function yy_r228(){
-	$this->_retvalue = new PC_yyToken('',array('name' => $this->yystack[$this->yyidx + 0]->minor));
+	$this->_retvalue = new PC_Type_yyToken('',array('name' => $this->yystack[$this->yyidx + 0]->minor));
     }
 #line 5136 "src/compile/typeparser.php"
 #line 575 "src/compile/typeparser.y"
     function yy_r229(){
-	$this->_retvalue = new PC_yyToken('',array('name' => $this->yystack[$this->yyidx + -2]->minor,'val' => $this->yystack[$this->yyidx + 0]->minor));
+	$this->_retvalue = new PC_Type_yyToken('',array('name' => $this->yystack[$this->yyidx + -2]->minor,'val' => $this->yystack[$this->yyidx + 0]->minor));
     }
 #line 5141 "src/compile/typeparser.php"
 
@@ -5174,7 +5174,7 @@ static public $yy_action = array(
         //int $yygoto;                     /* The next state */
         //int $yyact;                      /* The next action */
         //mixed $yygotominor;        /* The LHS of the rule reduced */
-        //PC_yyStackEntry $yymsp;            /* The top of the parser's stack */
+        //PC_Type_yyStackEntry $yymsp;            /* The top of the parser's stack */
         //int $yysize;                     /* Amount to pop the stack */
         $yymsp = $this->yystack[$this->yyidx];
         if (self::$yyTraceFILE && $yyruleno >= 0 
@@ -5206,7 +5206,7 @@ static public $yy_action = array(
             ** That gives a significant speed improvement. */
             if (!self::$yyTraceFILE && $yysize) {
                 $this->yyidx++;
-                $x = new PC_yyStackEntry;
+                $x = new PC_Type_yyStackEntry;
                 $x->stateno = $yyact;
                 $x->major = $yygoto;
                 $x->minor = $yy_lefthand_side;
@@ -5299,7 +5299,7 @@ static public $yy_action = array(
             /* if ($yymajor == 0) return; // not sure why this was here... */
             $this->yyidx = 0;
             $this->yyerrcnt = -1;
-            $x = new PC_yyStackEntry;
+            $x = new PC_Type_yyStackEntry;
             $x->stateno = 0;
             $x->major = 0;
             $this->yystack = array();

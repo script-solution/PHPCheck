@@ -103,10 +103,10 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if($this->_use_db && !isset($this->_classes[$name]))
-			$this->_classes[$name] = PC_DAO::get_classes()->get_by_name($name,$this->_pid);
 		if(isset($this->_classes[$name]))
 			return $this->_classes[$name];
+		if($this->_use_db)
+			$this->_classes[$name] = PC_DAO::get_classes()->get_by_name($name,$this->_pid);
 		return null;
 	}
 	
@@ -131,10 +131,10 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if($this->_use_db && !isset($this->_functions[$name]))
-			$this->_functions[$name] = PC_DAO::get_functions()->get_by_name($name,$this->_pid);
 		if(isset($this->_functions[$name]))
 			return $this->_functions[$name];
+		if($this->_use_db)
+			$this->_functions[$name] = PC_DAO::get_functions()->get_by_name($name,$this->_pid);
 		return null;
 	}
 	
@@ -159,10 +159,10 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if($this->_use_db && !isset($this->_constants[$name]))
-			$this->_constants[$name] = PC_DAO::get_constants()->get_by_name($name,$this->_pid);
 		if(isset($this->_constants[$name]))
 			return $this->_constants[$name];
+		if($this->_use_db)
+			$this->_constants[$name] = PC_DAO::get_constants()->get_by_name($name,$this->_pid);
 		return null;
 	}
 

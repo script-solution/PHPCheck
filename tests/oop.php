@@ -111,7 +111,7 @@ $r = $p[1]->test2($b);
 		self::assertEquals(array(),$a->get_interfaces());
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::INT,0),(string)$a->get_constant('c')->get_type());
 		self::assertEquals(
-			(string)new PC_Obj_Field('',0,'$f',new PC_Obj_Type(PC_Obj_Type::STRING,'abc'),PC_Obj_Field::V_PRIVATE),
+			(string)new PC_Obj_Field('',0,'$f',new PC_Obj_Type(PC_Obj_Type::STRING,'"abc"'),PC_Obj_Field::V_PRIVATE),
 			(string)$a->get_field('$f')
 		);
 		$array = new PC_Obj_Type(PC_Obj_Type::TARRAY);

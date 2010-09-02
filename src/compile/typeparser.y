@@ -1,4 +1,4 @@
-%name PC_
+%name PC_Type_
 %declare_class {class PC_Compile_TypeParser}
 
 %syntax_error {
@@ -206,27 +206,27 @@ unticked_class_declaration_statement ::=
 		$this->state->declare_interface(name,extends->metadata,stmts);
 }
 
-class_entry_type(A) ::= T_CLASS. { A = new PC_yyToken(''); }
-class_entry_type(A) ::= T_ABSTRACT T_CLASS. { A = new PC_yyToken('',array('abstract' => true)); }
-class_entry_type(A) ::= T_FINAL T_CLASS. { A = new PC_yyToken('',array('final' => true)); }
+class_entry_type(A) ::= T_CLASS. { A = new PC_Type_yyToken(''); }
+class_entry_type(A) ::= T_ABSTRACT T_CLASS. { A = new PC_Type_yyToken('',array('abstract' => true)); }
+class_entry_type(A) ::= T_FINAL T_CLASS. { A = new PC_Type_yyToken('',array('final' => true)); }
 
 extends_from(A) ::= T_EXTENDS fully_qualified_class_name(name). { A = name->string; }
 extends_from(A) ::= . { A = null; }
 
 interface_entry ::= T_INTERFACE.
 
-interface_extends_list(A) ::= T_EXTENDS interface_list(list). { A = new PC_yyToken(list); }
-interface_extends_list(A) ::= . { A = new PC_yyToken('',array()); }
+interface_extends_list(A) ::= T_EXTENDS interface_list(list). { A = new PC_Type_yyToken(list); }
+interface_extends_list(A) ::= . { A = new PC_Type_yyToken('',array()); }
 
-implements_list(A) ::= . { A = new PC_yyToken('',array()); }
-implements_list(A) ::= T_IMPLEMENTS interface_list(list). { A = new PC_yyToken(list); }
+implements_list(A) ::= . { A = new PC_Type_yyToken('',array()); }
+implements_list(A) ::= T_IMPLEMENTS interface_list(list). { A = new PC_Type_yyToken(list); }
 
 interface_list(A) ::= fully_qualified_class_name(name). {
-	A = new PC_yyToken('');
+	A = new PC_Type_yyToken('');
 	A[] = array(name->string);
 }
 interface_list(A) ::= interface_list(list) COMMA fully_qualified_class_name(name). {
-	A = new PC_yyToken(list);
+	A = new PC_Type_yyToken(list);
 	A[] = array(name->string);
 }
 
@@ -309,7 +309,7 @@ exit_expr ::= .
 common_scalar(A) ::= T_LNUMBER(sval). { A = new PC_Obj_Type(PC_Obj_Type::INT,sval); }
 common_scalar(A) ::= T_DNUMBER(sval). { A = new PC_Obj_Type(PC_Obj_Type::FLOAT,sval); }
 common_scalar(A) ::= T_CONSTANT_ENCAPSED_STRING(sval). {
-	A = new PC_Obj_Type(PC_Obj_Type::STRING,substr(sval,1,-1));
+	A = new PC_Obj_Type(PC_Obj_Type::STRING,sval);
 }
 common_scalar(A) ::= T_LINE. { A = new PC_Obj_Type(PC_Obj_Type::INT,$this->state->get_line()); }
 common_scalar(A) ::= T_FILE. { A = new PC_Obj_Type(PC_Obj_Type::STRING,$this->state->get_file()); }
@@ -545,45 +545,45 @@ class_statement(A) ::= method_modifiers(mmodifiers) T_FUNCTION is_reference T_ST
 method_body ::= SEMI. /* abstract method */
 method_body ::= LCURLY inner_statement_list RCURLY.
 
-variable_modifiers(A) ::= non_empty_member_modifiers(mods). { A = new PC_yyToken(mods); }
-variable_modifiers(A) ::= T_VAR. { A = new PC_yyToken('',array('public')); }
+variable_modifiers(A) ::= non_empty_member_modifiers(mods). { A = new PC_Type_yyToken(mods); }
+variable_modifiers(A) ::= T_VAR. { A = new PC_Type_yyToken('',array('public')); }
 
-method_modifiers(A) ::= non_empty_member_modifiers(mods). { A = new PC_yyToken(mods); }
-method_modifiers(A) ::= . { A = new PC_yyToken(''); }
+method_modifiers(A) ::= non_empty_member_modifiers(mods). { A = new PC_Type_yyToken(mods); }
+method_modifiers(A) ::= . { A = new PC_Type_yyToken(''); }
 
-non_empty_member_modifiers(A) ::= member_modifier(mod). { A = new PC_yyToken(mod); }
+non_empty_member_modifiers(A) ::= member_modifier(mod). { A = new PC_Type_yyToken(mod); }
 non_empty_member_modifiers(A) ::= non_empty_member_modifiers(mods) member_modifier(mod). {
-	A = new PC_yyToken(mods);
+	A = new PC_Type_yyToken(mods);
 	A[] = mod;
 }
 
 member_modifier(A) ::= T_PUBLIC|T_PROTECTED|T_PRIVATE|T_STATIC|T_ABSTRACT|T_FINAL(mod). {
-	A = new PC_yyToken('',array(mod));
+	A = new PC_Type_yyToken('',array(mod));
 }
 
 class_variable_declaration(A) ::= class_variable_declaration(decl) COMMA T_VARIABLE(varname). {
-	A = new PC_yyToken(decl);
+	A = new PC_Type_yyToken(decl);
 	A[] = array('name' => varname);
 }
 class_variable_declaration(A) ::= class_variable_declaration(decl) COMMA T_VARIABLE(varname)
 																	EQUALS static_scalar(varval). {
-	A = new PC_yyToken(decl);
+	A = new PC_Type_yyToken(decl);
 	A[] = array('name' => varname,'val' => varval);
 }
 class_variable_declaration(A) ::= T_VARIABLE(varname). {
-	A = new PC_yyToken('',array('name' => varname));
+	A = new PC_Type_yyToken('',array('name' => varname));
 }
 class_variable_declaration(A) ::= T_VARIABLE(varname) EQUALS static_scalar(varval). {
-	A = new PC_yyToken('',array('name' => varname,'val' => varval));
+	A = new PC_Type_yyToken('',array('name' => varname,'val' => varval));
 }
 
 class_constant_declaration(A) ::= class_constant_declaration(decl) COMMA T_STRING(varname)
 																	EQUALS static_scalar(varval). {
-	A = new PC_yyToken(decl);
+	A = new PC_Type_yyToken(decl);
 	A[] = array('name' => varname,'val' => varval);
 }
 class_constant_declaration(A) ::= T_CONST T_STRING(varname) EQUALS static_scalar(varval). {
-	A = new PC_yyToken('',array('name' => varname,'val' => varval));
+	A = new PC_Type_yyToken('',array('name' => varname,'val' => varval));
 }
 
 echo_expr_list ::= echo_expr_list COMMA expr.
@@ -705,7 +705,7 @@ isset_variables ::= isset_variables COMMA variable.
 
 class_constant ::= fully_qualified_class_name T_PAAMAYIM_NEKUDOTAYIM T_STRING.
 
-fully_qualified_class_name(A) ::= T_STRING(name). { A = new PC_yyToken(name); }
+fully_qualified_class_name(A) ::= T_STRING(name). { A = new PC_Type_yyToken(name); }
 
 function_call ::= T_STRING LPAREN function_call_parameter_list RPAREN.
 function_call ::= fully_qualified_class_name T_PAAMAYIM_NEKUDOTAYIM T_STRING LPAREN function_call_parameter_list RPAREN.

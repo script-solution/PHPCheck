@@ -33,6 +33,14 @@ FWS_Props::set_accessor($accessor);
 // TODO we should recognize /* @var $<var> <type> */ as type-hints
 // TODO if a method does not exist, we could look for subclasses of the class and check if the
 // method exists there. this is a bit guessing of course, but the user could enable/disable this.
+// TODO we could detect if conditions are always true/false
+// TODO perhaps we could detect unused variables?
+// TODO we could detect unknown variables
+// TODO we could check return-values. i.e. if the specified types are returned. or if there is no
+// value-return at all, etc.
+// TODO we could check thrown exceptions. i.e. check if @thrown is present and if it specifies
+// the thrown exceptions, etc.
+// FIXME we can't parse for-loops ??
 
 $doc = FWS_Props::get()->doc();
 echo $doc->render();

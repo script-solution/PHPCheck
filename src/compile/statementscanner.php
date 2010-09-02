@@ -1199,9 +1199,10 @@ class PC_Compile_StatementScanner extends FWS_Object
 				$arg = $this->_get_type_from_cast($t);
 				if(!$rop->is_unknown() && $rop->get_value() !== null)
 				{
-					eval('$arg->set_value('
+					/* TODO doesn't work anymore */
+					/*eval('$arg->set_value('
 						.($t == T_STRING_CAST ? '"\'".(' : '').$str.$rop->get_value_for_use()
-						.($t == T_STRING_CAST ? ')."\'"' : '').');');
+						.($t == T_STRING_CAST ? ')."\'"' : '').');');*/
 				}
 				break;
 			

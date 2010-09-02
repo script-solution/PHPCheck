@@ -46,10 +46,11 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	 * Scans the given file
 	 *
 	 * @param string $file the file to scan
+	 * @param PC_Compile_TypeContainer $types the type-container
 	 */
-	public function scan_file($file)
+	public function scan_file($file,$types)
 	{
-		$this->lexer = PC_Compile_StmtLexer::get_for_file($file);
+		$this->lexer = PC_Compile_StmtLexer::get_for_file($file,$types);
 		$this->parse();
 	}
 	
@@ -57,10 +58,11 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	 * Scannes the given string
 	 *
 	 * @param string $source the string to scan
+	 * @param PC_Compile_TypeContainer $types the type-container
 	 */
-	public function scan($source)
+	public function scan($source,$types)
 	{
-		$this->lexer = PC_Compile_StmtLexer::get_for_string($source);
+		$this->lexer = PC_Compile_StmtLexer::get_for_string($source,$types);
 		$this->parse();
 	}
 	
@@ -70,7 +72,6 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	private function parse()
 	{
 		$parser = new PC_Compile_StmtParser($this->lexer);
-		PC_Compile_StmtParser::PrintTrace();
 		while($this->lexer->advance($parser))
 			$parser->doParse($this->lexer->get_token(),$this->lexer->get_value());
 		$parser->doParse(0,0);

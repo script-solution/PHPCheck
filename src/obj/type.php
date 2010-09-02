@@ -75,6 +75,27 @@ final class PC_Obj_Type extends FWS_Object
 	}
 	
 	/**
+	 * Builds the corresponding type from the given value. This way, it can also handle
+	 * arrays-elements.
+	 * 
+	 * @param mixed $value the value
+	 * @return PC_Obj_Type the type
+	 */
+	public static function get_type_by_value($value)
+	{
+		if(is_array($value))
+		{
+			$array = new self(self::TARRAY);
+			foreach($value as $k => $v)
+				$array->set_array_type($k,self::get_type_by_value($v));
+			return $array;
+		}
+		$type = self::get_type_by_name(gettype($value));
+		$type->set_value($value);
+		return $type;
+	}
+	
+	/**
 	 * The type
 	 *
 	 * @var int
@@ -94,13 +115,6 @@ final class PC_Obj_Type extends FWS_Object
 	 * @var string
 	 */
 	private $_class;
-	
-	/**
-	 * The elements for self::TARRAY (instances of PC_Obj_Type)
-	 *
-	 * @var array
-	 */
-	private $_array_elements = null;
 	
 	/**
 	 * Constructor
@@ -129,10 +143,11 @@ final class PC_Obj_Type extends FWS_Object
 		parent::__clone();
 		
 		// clone array-types
-		if(is_array($this->_array_elements))
+		if(is_array($this->_value))
 		{
-			foreach($this->_array_elements as $k => $v)
-				$this->_array_elements[$k] = clone $v;
+			// note that this does handle multi-dimensional arrays!
+			foreach($this->_value as $k => $v)
+				$this->_value[$k] = clone $v;
 		}
 	}
 	
@@ -158,8 +173,8 @@ final class PC_Obj_Type extends FWS_Object
 	 */
 	public function get_array_count()
 	{
-		if($this->_type == self::TARRAY && $this->_array_elements !== null)
-			return count($this->_array_elements);
+		if($this->_type == self::TARRAY && $this->_value !== null)
+			return count($this->_value);
 		return 0;
 	}
 	
@@ -167,13 +182,13 @@ final class PC_Obj_Type extends FWS_Object
 	 * Returns the type of the array-element with given key
 	 *
 	 * @param mixed $key the key
-	 * @return PC_Obj_Type the type of the element
+	 * @return PC_Obj_Type the type of the element or null if it does not exist
 	 */
 	public function get_array_type($key)
 	{
-		if($this->_type == self::TARRAY && isset($this->_array_elements[$key]))
-			return $this->_array_elements[$key];
-		return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
+		if($this->_type == self::TARRAY && isset($this->_value[$key]))
+			return $this->_value[$key];
+		return null;
 	}
 	
 	/**
@@ -189,11 +204,11 @@ final class PC_Obj_Type extends FWS_Object
 		
 		// convert implicitly to an array
 		$this->_type = self::TARRAY;
-		if($this->_array_elements === null)
-			$this->_array_elements = array();
+		if(!is_array($this->_value))
+			$this->_value = array();
 		if($key instanceof PC_Obj_Type)
 			$key = $key->get_value_for_use();
-		$this->_array_elements[$key] = $type === null ? new PC_Obj_Type(PC_Obj_Type::UNKNOWN) : $type;
+		$this->_value[$key] = $type === null ? new PC_Obj_Type(PC_Obj_Type::UNKNOWN) : $type;
 	}
 	
 	/**
@@ -210,6 +225,24 @@ final class PC_Obj_Type extends FWS_Object
 	public function is_unknown()
 	{
 		return $this->_type == self::UNKNOWN;
+	}
+	
+	/**
+	 * For arrays: Check if any element is unknown
+	 * 
+	 * @return boolean true if any element is unknown
+	 */
+	public function is_array_unknown()
+	{
+		if(is_array($this->_value))
+		{
+			foreach($this->_value as $v)
+			{
+				if($v->is_unknown() || $v->is_array_unknown())
+					return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -270,9 +303,59 @@ final class PC_Obj_Type extends FWS_Object
 	{
 		if($this->_value === null || $this->_type == self::UNKNOWN)
 			return 0;
+		switch($this->_type)
+		{
+			case self::STRING:
+				return (string)$this->_value;
+			case self::INT:
+				return (int)$this->_value;
+			case self::FLOAT:
+				return (float)$this->_value;
+			case self::BOOL:
+				return (bool)$this->_value;
+			default:
+				return $this->_value;
+		}
+	}
+	
+	/**
+	 * @return string a value that can be used for eval
+	 */
+	public function get_value_for_eval()
+	{
+		if($this->_value === null || $this->_type == self::UNKNOWN)
+			return '0';
+		if($this->_type == self::BOOL)
+			return $this->_value ? 'true' : 'false';
 		if($this->_type == self::STRING)
-			return (string)$this->_value;
+			return '\''.(string)$this->_value.'\'';
+		if($this->_type == self::TARRAY)
+			return $this->array_to_str($this);
 		return $this->_value;
+	}
+	
+	/**
+	 * Converts the given array to string so that PHP can eval it
+	 * 
+	 * @param PC_Obj_Type $val the value
+	 * @return string the string
+	 */
+	private function array_to_str($val)
+	{
+		if(is_array($val->_value))
+		{
+			$str = 'array(';
+			foreach($val->_value as $k => $v)
+			{
+				if(is_string($k))
+					$str .= '\''.$k.'\'';
+				else
+					$str .= (string)$k;
+				$str .= ' => '.$this->array_to_str($v).',';
+			}
+			return substr($str,0,-1).')';
+		}
+		return $val->get_value_for_eval();
 	}
 	
 	/**
@@ -342,8 +425,8 @@ final class PC_Obj_Type extends FWS_Object
 		if($this->_type == self::TARRAY)
 		{
 			$str = 'array';
-			if($this->_array_elements !== null)
-				$str .= '='.FWS_Printer::to_string($this->_array_elements,PHP_SAPI != 'cli',false);
+			if($this->_value !== null)
+				$str .= '='.FWS_Printer::to_string($this->_value,PHP_SAPI != 'cli',false);
 			return $str;
 		}
 		

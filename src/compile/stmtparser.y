@@ -1,4 +1,4 @@
-%name PC_
+%name PC_Stmt_
 %declare_class {class PC_Compile_StmtParser}
 
 %syntax_error {
@@ -188,7 +188,7 @@ unticked_function_declaration_statement ::=
 }
 
 unticked_class_declaration_statement ::=
-		class_entry_type T_STRING(C) extends_from
+		class_entry_type T_STRING extends_from
 			implements_list
 			LCURLY
 				class_statement_list
@@ -222,7 +222,7 @@ implements_list ::= T_IMPLEMENTS interface_list.
 interface_list ::= fully_qualified_class_name.
 interface_list ::= interface_list COMMA fully_qualified_class_name.
 
-expr(A) ::= r_variable(var). { A = var->get_type(); }
+expr(A) ::= r_variable(var). { A = var; }
 expr(A) ::= expr_without_variable(e). { A = e; }
 
 expr_without_variable ::= T_LIST LPAREN assignment_list RPAREN EQUALS expr.
@@ -232,12 +232,15 @@ expr_without_variable(A) ::= variable(var) EQUALS expr(e). {
 expr_without_variable(A) ::= variable(var) EQUALS AMPERSAND variable(e). {
 	A = $this->state->set_var(var,e);
 }
-expr_without_variable(A) ::= variable(var) EQUALS AMPERSAND T_NEW class_name_reference(name) ctor_arguments. {
-	A = $this->state->set_var(var,new PC_Obj_Type(PC_Obj_Type::OBJECT,null,name));
+expr_without_variable(A) ::= variable(var) EQUALS AMPERSAND T_NEW
+														 class_name_reference(name) ctor_arguments(args). {
+	$func = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,'__construct'));
+	$obj = $this->state->add_call(name,$func,args);
+	A = $this->state->set_var(var,$obj);
 }
-expr_without_variable ::= T_NEW class_name_reference(name) ctor_arguments(args). {
-	// TODO
-	$this->state->add_call(name.'::__construct',args);
+expr_without_variable(A) ::= T_NEW class_name_reference(name) ctor_arguments(args). {
+	$func = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,'__construct'));
+	A = $this->state->add_call(name,$func,args);
 }
 expr_without_variable(A) ::= T_CLONE expr(e). {
 	A = clone e;
@@ -288,10 +291,10 @@ expr_without_variable(A) ::= T_DEC rw_variable(var). {
 	A = $this->state->handle_pre_op('-',var);
 }
 expr_without_variable(A) ::= expr(e1) T_BOOLEAN_OR expr(e2). {
-	A = $this->state->handle_bin_op('|',e1,e2);
+	A = $this->state->handle_bin_op('||',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_BOOLEAN_AND expr(e2). {
-	A = $this->state->handle_bin_op('&',e1,e2);
+	A = $this->state->handle_bin_op('&&',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_LOGICAL_OR expr(e2). {
 	A = $this->state->handle_bin_op('||',e1,e2);
@@ -300,7 +303,7 @@ expr_without_variable(A) ::= expr(e1) T_LOGICAL_AND expr(e2). {
 	A = $this->state->handle_bin_op('&&',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_LOGICAL_XOR expr(e2). {
-	A = $this->state->handle_bin_op('^^',e1,e2);
+	A = $this->state->handle_bin_op('xor',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) BAR expr(e2). {
 	A = $this->state->handle_bin_op('|',e1,e2);
@@ -383,77 +386,90 @@ expr_without_variable(A) ::= expr(e1) QUESTION expr(e2) COLON expr(e3). {
 expr_without_variable(A) ::= internal_functions_in_yacc(e). {
 	A = e;
 }
-expr_without_variable(A) ::= T_INT_CAST(cast) expr(e). {
-	A = $this->state->handle_cast(cast,e);
+expr_without_variable(A) ::= T_INT_CAST expr(e). {
+	A = $this->state->handle_cast('int',e);
 }
-expr_without_variable(A) ::= T_DOUBLE_CAST(cast) expr(e). {
-	A = $this->state->handle_cast(cast,e);
+expr_without_variable(A) ::= T_DOUBLE_CAST expr(e). {
+	A = $this->state->handle_cast('float',e);
 }
-expr_without_variable(A) ::= T_STRING_CAST(cast) expr(e). {
-	A = $this->state->handle_cast(cast,e);
+expr_without_variable(A) ::= T_STRING_CAST expr(e). {
+	A = $this->state->handle_cast('string',e);
 }
-expr_without_variable(A) ::= T_ARRAY_CAST(cast) expr(e). {
-	A = $this->state->handle_cast(cast,e);
+expr_without_variable(A) ::= T_ARRAY_CAST expr(e). {
+	A = $this->state->handle_cast('array',e);
 }
-expr_without_variable(A) ::= T_OBJECT_CAST(cast) expr(e). {
-	A = $this->state->handle_cast(cast,e);
+expr_without_variable(A) ::= T_OBJECT_CAST expr(e). {
+	A = $this->state->handle_cast('object',e);
 }
-expr_without_variable(A) ::= T_BOOL_CAST(cast) expr(e). {
-	A = $this->state->handle_cast(cast,e);
+expr_without_variable(A) ::= T_BOOL_CAST expr(e). {
+	A = $this->state->handle_cast('bool',e);
 }
-expr_without_variable(A) ::= T_UNSET_CAST(cast) expr(e). {
-	A = $this->state->handle_cast(cast,e);
+expr_without_variable(A) ::= T_UNSET_CAST expr(e). {
+	A = $this->state->handle_cast('unset',e);
 }
 expr_without_variable(A) ::= T_EXIT exit_expr. { A = null; }
 expr_without_variable(A) ::= AT expr(e). { A = e; }
 expr_without_variable(A) ::= scalar(sc). { A = sc; }
 expr_without_variable(A) ::= T_ARRAY LPAREN array_pair_list(list) RPAREN. { A = list; }
-expr_without_variable(A) ::= BACKQUOTE encaps_list BACKQUOTE. { A = new PC_Obj_Type(PC_Obj_Type::STRING); }
+expr_without_variable(A) ::= BACKQUOTE encaps_list BACKQUOTE. {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING));
+}
 expr_without_variable(A) ::= T_PRINT expr. { A = null; }
 
 exit_expr ::= LPAREN RPAREN.
 exit_expr ::= LPAREN expr RPAREN.
 exit_expr ::= .
 
-common_scalar(A) ::= T_LNUMBER(sval). { A = new PC_Obj_Type(PC_Obj_Type::INT,sval); }
-common_scalar(A) ::= T_DNUMBER(sval). { A = new PC_Obj_Type(PC_Obj_Type::FLOAT,sval); }
-common_scalar(A) ::= T_CONSTANT_ENCAPSED_STRING(sval). {
-	A = new PC_Obj_Type(PC_Obj_Type::STRING,substr(sval,1,-1));
+common_scalar(A) ::= T_LNUMBER(sval). {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::INT,sval));
 }
-common_scalar(A) ::= T_LINE. { A = new PC_Obj_Type(PC_Obj_Type::INT,$this->state->get_line()); }
-common_scalar(A) ::= T_FILE. { A = new PC_Obj_Type(PC_Obj_Type::STRING,$this->state->get_file()); }
-common_scalar(A) ::= T_CLASS_C|T_METHOD_C|T_FUNC_C. {
-	// TODO value
-	A = new PC_Obj_Type(PC_Obj_Type::STRING);
+common_scalar(A) ::= T_DNUMBER(sval). {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::FLOAT,sval));
+}
+common_scalar(A) ::= T_CONSTANT_ENCAPSED_STRING(sval). {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,substr(sval,1,-1)));
+}
+common_scalar(A) ::= T_LINE. {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::INT,$this->state->get_line()));
+}
+common_scalar(A) ::= T_FILE. {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,$this->state->get_file()));
+}
+common_scalar(A) ::= T_CLASS_C|T_METHOD_C|T_FUNC_C(part). {
+	A = $this->state->get_scope_part(part);
 }
 
 /* compile-time evaluated scalars */
 static_scalar(A) ::= common_scalar(sval). { A = sval; }
-static_scalar(A) ::= T_STRING(sval). { A = new PC_Obj_Type(PC_Obj_Type::STRING,sval); }
+static_scalar(A) ::= T_STRING(sval). {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,sval));
+}
 static_scalar(A) ::= T_ARRAY LPAREN static_array_pair_list(list) RPAREN. { A = list; }
 static_scalar(A) ::= static_class_constant. { /* TODO */ A = null; }
 
 static_array_pair_list(A) ::= non_empty_static_array_pair_list(list). { A = list; }
 static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA. { A = list; }
-static_array_pair_list(A) ::= . { A = new PC_Obj_Type(PC_Obj_Type::TARRAY); }
+static_array_pair_list(A) ::= . {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
+}
 
 non_empty_static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA
 																				static_scalar(skey) T_DOUBLE_ARROW static_scalar(sval). {
 	A = list;
-	A->set_array_type(skey,sval);
+	A->get_type()->set_array_type(skey->get_type()->get_value(),sval->get_type());
 }
 non_empty_static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA
 																				static_scalar(sval). {
 	A = list;
-	A->set_array_type(A->get_array_count(),sval);
+	A->get_type()->set_array_type(A->get_type()->get_array_count(),sval->get_type());
 }
 non_empty_static_array_pair_list(A) ::= static_scalar(skey) T_DOUBLE_ARROW static_scalar(sval). {
-	A = new PC_Obj_Type(PC_Obj_Type::TARRAY);
-	A->set_array_type(skey,sval);
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
+	A->get_type()->set_array_type(skey->get_type()->get_value(),sval->get_type());
 }
 non_empty_static_array_pair_list(A) ::= static_scalar(sval). {
-	A = new PC_Obj_Type(PC_Obj_Type::TARRAY);
-	A->set_array_type(0,sval);
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
+	A->get_type()->set_array_type(0,sval->get_type());
 }
 
 static_class_constant ::= T_STRING T_PAAMAYIM_NEKUDOTAYIM T_STRING.
@@ -519,28 +535,52 @@ non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type 
 optional_class_type ::= T_STRING|T_ARRAY.
 optional_class_type ::= .
 
-function_call_parameter_list ::= non_empty_function_call_parameter_list.
-function_call_parameter_list ::= .
+function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list). { A = list; }
+function_call_parameter_list(A) ::= . { A = array(); }
 
-non_empty_function_call_parameter_list ::= expr_without_variable.
-non_empty_function_call_parameter_list ::= variable.
-non_empty_function_call_parameter_list ::= AMPERSAND w_variable.
-non_empty_function_call_parameter_list ::= non_empty_function_call_parameter_list COMMA expr_without_variable.
-non_empty_function_call_parameter_list ::= non_empty_function_call_parameter_list COMMA variable.
-non_empty_function_call_parameter_list ::= non_empty_function_call_parameter_list COMMA AMPERSAND w_variable.
+non_empty_function_call_parameter_list(A) ::= expr_without_variable(var). { A = array(var); }
+non_empty_function_call_parameter_list(A) ::= variable(var). { A = array(var); }
+non_empty_function_call_parameter_list(A) ::= AMPERSAND w_variable(var). { A = array(var); }
+non_empty_function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list)
+																							COMMA expr_without_variable(var). {
+	A = list;
+	A[] = var;
+}
+non_empty_function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list)
+																							COMMA variable(var). {
+	A = list;
+	A[] = var;
+}
+non_empty_function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list)
+																							COMMA AMPERSAND w_variable(var). {
+	A = list;
+	A[] = var;
+}
 
 global_var_list ::= global_var_list COMMA global_var.
 global_var_list ::= global_var.
 
-global_var ::= T_VARIABLE.
+global_var ::= T_VARIABLE(name). { $this->state->do_global(substr(name,1)); }
 global_var ::= DOLLAR r_variable.
 global_var ::= DOLLAR LCURLY expr RCURLY.
 
 
-static_var_list ::= static_var_list COMMA T_VARIABLE.
-static_var_list ::= static_var_list COMMA T_VARIABLE EQUALS static_scalar.
-static_var_list ::= T_VARIABLE.
-static_var_list ::= T_VARIABLE EQUALS static_scalar.
+static_var_list ::= static_var_list COMMA T_VARIABLE(name). {
+	$var = new PC_Obj_Variable(substr(name,1),new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+	$this->state->set_var($var,new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::UNKNOWN)));
+}
+static_var_list ::= static_var_list COMMA T_VARIABLE(name) EQUALS static_scalar(val). {
+	$var = new PC_Obj_Variable(substr(name,1),new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+	$this->state->set_var($var,val);
+}
+static_var_list ::= T_VARIABLE(name). {
+	$var = new PC_Obj_Variable(substr(name,1),new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+	$this->state->set_var($var,new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::UNKNOWN)));
+}
+static_var_list ::= T_VARIABLE(name) EQUALS static_scalar(val). {
+	$var = new PC_Obj_Variable(substr(name,1),new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+	$this->state->set_var($var,val);
+}
 
 class_statement_list ::= class_statement_list class_statement.
 class_statement_list ::= .
@@ -592,22 +632,34 @@ w_variable(A) ::= variable(v). { A = v; }
 
 rw_variable(A) ::= variable(v). { A = v; }
 
-variable(A) ::= base_variable_with_function_calls T_OBJECT_OPERATOR object_property
-								method_or_not variable_properties. {
-	// TODO
-	A = null;
+variable(A) ::= base_variable_with_function_calls(obj) T_OBJECT_OPERATOR object_property(vprop)
+								method_or_not(margs) variable_properties(vprops). {
+	$chain = array();
+	$chain[] = array(
+		'prop' => vprop,
+		'args' => margs
+	);
+	A = $this->state->handle_object_prop_chain(obj,array_merge($chain,vprops));
 }
 variable(A) ::= base_variable_with_function_calls(v). {
 	A = v;
 }
 
-variable_properties ::= variable_properties variable_property.
-variable_properties ::= .
+variable_properties(A) ::= variable_properties(list) variable_property(prop). {
+	A = list;
+	A[] = prop;
+}
+variable_properties(A) ::= . { A = array(); }
 
-variable_property ::= T_OBJECT_OPERATOR object_property method_or_not.
+variable_property(A) ::= T_OBJECT_OPERATOR object_property(vprop) method_or_not(margs). {
+	A = array(
+		'prop' => vprop,
+		'args' => margs
+	);
+}
 
-method_or_not ::= LPAREN function_call_parameter_list RPAREN.
-method_or_not ::= .
+method_or_not(A) ::= LPAREN function_call_parameter_list(list) RPAREN. { A = list; }
+method_or_not(A) ::= . { A = null; }
 
 variable_without_objects ::= reference_variable.
 variable_without_objects ::= simple_indirect_reference reference_variable.
@@ -615,9 +667,7 @@ variable_without_objects ::= simple_indirect_reference reference_variable.
 static_member ::= fully_qualified_class_name T_PAAMAYIM_NEKUDOTAYIM variable_without_objects.
 
 base_variable_with_function_calls(A) ::= base_variable(v). { A = v; }
-base_variable_with_function_calls(A) ::= function_call(call). {
-	A = $this->state->get_func_retval(call);
-}
+base_variable_with_function_calls(A) ::= function_call(call). { A = call; }
 
 base_variable(A) ::= reference_variable(v). { A = v; }
 base_variable(A) ::= simple_indirect_reference reference_variable. { /* TODO */ A = null; }
@@ -638,8 +688,8 @@ compound_variable(A) ::= T_VARIABLE(name). {
 	A = $this->state->get_var(substr(name,1));
 }
 compound_variable(A) ::= DOLLAR LCURLY expr(e) RCURLY. {
-	if(e->get_value() !== null)
-		A = $this->state->get_var(e->get_value_as_str());
+	if(e->get_type()->get_value() !== null)
+		A = $this->state->get_var(e->get_type()->get_value_as_str());
 	else
 		A = null;
 }
@@ -647,15 +697,27 @@ compound_variable(A) ::= DOLLAR LCURLY expr(e) RCURLY. {
 dim_offset(A) ::= expr(e). { A = e; }
 dim_offset(A) ::= . { A = null; }
 
-object_property ::= object_dim_list.
-object_property ::= variable_without_objects.
+object_property(A) ::= object_dim_list(list). { A = list; }
+object_property(A) ::= variable_without_objects(var). {
+	A = array(array('type' => 'name','data' => var));
+}
 
-object_dim_list ::= object_dim_list LBRACKET dim_offset RBRACKET.
-object_dim_list ::= object_dim_list LCURLY expr RCURLY.
-object_dim_list ::= variable_name .
+object_dim_list(A) ::= object_dim_list(list) LBRACKET dim_offset(off) RBRACKET. {
+	A = list;
+	A[] = array('type' => 'array','data' => off);
+}
+object_dim_list(A) ::= object_dim_list(list) LCURLY expr(e) RCURLY. {
+	A = list;
+	A[] = array('type' => 'array','data' => e);
+}
+object_dim_list(A) ::= variable_name(v) . {
+	A = array(array('type' => 'name','data' => v));
+}
 
-variable_name ::= T_STRING.
-variable_name ::= LCURLY expr RCURLY.
+variable_name(A) ::= T_STRING(str). {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,str));
+}
+variable_name(A) ::= LCURLY expr(e) RCURLY. { A = e; }
 
 simple_indirect_reference ::= DOLLAR.
 simple_indirect_reference ::= simple_indirect_reference DOLLAR.
@@ -667,17 +729,42 @@ assignment_list_element ::= variable.
 assignment_list_element ::= T_LIST LPAREN assignment_list RPAREN.
 assignment_list_element ::= .
 
-array_pair_list ::= non_empty_array_pair_list possible_comma.
-array_pair_list ::= .
+array_pair_list(A) ::= non_empty_array_pair_list(list) possible_comma. { A = list; }
+array_pair_list(A) ::= . { A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY)); }
 
-non_empty_array_pair_list ::= non_empty_array_pair_list COMMA expr T_DOUBLE_ARROW expr.
-non_empty_array_pair_list ::= non_empty_array_pair_list COMMA expr.
-non_empty_array_pair_list ::= expr T_DOUBLE_ARROW expr.
-non_empty_array_pair_list ::= expr.
-non_empty_array_pair_list ::= non_empty_array_pair_list COMMA expr T_DOUBLE_ARROW AMPERSAND w_variable.
-non_empty_array_pair_list ::= non_empty_array_pair_list COMMA AMPERSAND w_variable.
-non_empty_array_pair_list ::= expr T_DOUBLE_ARROW AMPERSAND w_variable.
-non_empty_array_pair_list ::= AMPERSAND w_variable.
+non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA expr(key) T_DOUBLE_ARROW expr(val). {
+	A = list;
+	A->get_type()->set_array_type(key->get_type()->get_value(),val->get_type());
+}
+non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA expr(val). {
+	A = list;
+	A->get_type()->set_array_type(A->get_type()->get_array_count(),val->get_type());
+}
+non_empty_array_pair_list(A) ::= expr(key) T_DOUBLE_ARROW expr(val). {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
+	A->get_type()->set_array_type(key->get_type()->get_value(),val->get_type());
+}
+non_empty_array_pair_list(A) ::= expr(val). {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
+	A->get_type()->set_array_type(0,val->get_type());
+}
+non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA
+								expr(key) T_DOUBLE_ARROW AMPERSAND w_variable(val). {
+	A = list;
+	A->get_type()->set_array_type(key->get_type()->get_value(),val->get_type());
+}
+non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA AMPERSAND w_variable(val). {
+	A = list;
+	A->get_type()->set_array_type(A->get_type()->get_array_count(),val->get_type());
+}
+non_empty_array_pair_list(A) ::= expr(key) T_DOUBLE_ARROW AMPERSAND w_variable(val). {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
+	A->get_type()->set_array_type(key->get_type()->get_value(),val->get_type());
+}
+non_empty_array_pair_list(A) ::= AMPERSAND w_variable(val). {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
+	A->get_type()->set_array_type(0,val->get_type());
+}
 
 encaps_list ::= encaps_list encaps_var.
 encaps_list ::= encaps_list T_STRING.
@@ -716,34 +803,73 @@ isset_variables ::= isset_variables COMMA variable.
 
 class_constant ::= fully_qualified_class_name T_PAAMAYIM_NEKUDOTAYIM T_STRING.
 
-fully_qualified_class_name ::= T_STRING.
+fully_qualified_class_name(A) ::= T_STRING(str). {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,str));
+}
 
-function_call ::= T_STRING LPAREN function_call_parameter_list RPAREN.
-function_call ::= fully_qualified_class_name T_PAAMAYIM_NEKUDOTAYIM T_STRING LPAREN function_call_parameter_list RPAREN.
-function_call ::= fully_qualified_class_name T_PAAMAYIM_NEKUDOTAYIM variable_without_objects LPAREN function_call_parameter_list RPAREN.
-function_call ::= variable_without_objects LPAREN function_call_parameter_list RPAREN.
+function_call(A) ::= T_STRING(name) LPAREN function_call_parameter_list(args) RPAREN. {
+	$fname = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,name));
+	A = $this->state->add_call(null,$fname,args);
+}
+function_call(A) ::= fully_qualified_class_name(classname) T_PAAMAYIM_NEKUDOTAYIM T_STRING(funcname)
+										 LPAREN function_call_parameter_list(args) RPAREN. {
+	$fname = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,funcname));
+	A = $this->state->add_call(classname,$fname,args,true);
+}
+function_call(A) ::= fully_qualified_class_name(classname) T_PAAMAYIM_NEKUDOTAYIM
+										 variable_without_objects(funcname) LPAREN function_call_parameter_list(args) RPAREN. {
+	A = $this->state->add_call(classname,funcname,args,true);
+}
+function_call(A) ::= variable_without_objects(funcname) LPAREN function_call_parameter_list(args) RPAREN. {
+	A = $this->state->add_call(null,funcname,args);
+}
 
-scalar(A) ::= T_STRING(str). { A = new PC_Obj_Type(PC_Obj_Type::STRING,str); }
-scalar(A) ::= T_STRING_VARNAME. { A = new PC_Obj_Type(PC_Obj_Type::STRING); }
+scalar(A) ::= T_STRING(str). {
+	if(strcasecmp(str,"true") == 0)
+		A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,true));
+	else if(strcasecmp(str,"false") == 0)
+		A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,false));
+	else
+		A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,str));
+}
+scalar(A) ::= T_STRING_VARNAME. {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING));
+}
 scalar(A) ::= class_constant. { /* TODO */ A = null; }
 scalar(A) ::= common_scalar(sc). { A = sc; }
-scalar(A) ::= DOUBLEQUOTE encaps_list DOUBLEQUOTE. { A = new PC_Obj_Type(PC_Obj_Type::STRING); }
-scalar(A) ::= SINGLEQUOTE encaps_list SINGLEQUOTE. { A = new PC_Obj_Type(PC_Obj_Type::STRING); }
-scalar(A) ::= T_START_HEREDOC encaps_list T_END_HEREDOC. { A = new PC_Obj_Type(PC_Obj_Type::STRING); }
+scalar(A) ::= DOUBLEQUOTE encaps_list DOUBLEQUOTE. {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING));
+}
+scalar(A) ::= SINGLEQUOTE encaps_list SINGLEQUOTE. {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING));
+}
+scalar(A) ::= T_START_HEREDOC encaps_list T_END_HEREDOC. {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING));
+}
 
-class_name_reference ::= T_STRING.
-class_name_reference ::= dynamic_class_name_reference.
+class_name_reference(A) ::= T_STRING(str). {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,str));
+}
+class_name_reference(A) ::= dynamic_class_name_reference(name). {
+	A = name;
+}
 
-dynamic_class_name_reference ::= base_variable T_OBJECT_OPERATOR object_property dynamic_class_name_variable_properties.
-dynamic_class_name_reference ::= base_variable.
+dynamic_class_name_reference(A) ::= base_variable T_OBJECT_OPERATOR object_property
+																		dynamic_class_name_variable_properties. {
+	// TODO
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+}
+dynamic_class_name_reference(A) ::= base_variable(var). {
+	A = var;
+}
 
 dynamic_class_name_variable_properties ::= dynamic_class_name_variable_properties dynamic_class_name_variable_property.
 dynamic_class_name_variable_properties ::= .
 
 dynamic_class_name_variable_property ::= T_OBJECT_OPERATOR object_property.
 
-ctor_arguments ::= LPAREN function_call_parameter_list RPAREN.
-ctor_arguments ::= .
+ctor_arguments(A) ::= LPAREN function_call_parameter_list(list) RPAREN. { A = list; }
+ctor_arguments(A) ::= . { A = array(); }
 
 possible_comma ::= COMMA.
 possible_comma ::= .
