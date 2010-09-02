@@ -146,7 +146,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 			$cname = $class->get_type()->get_value();
 			if($cname == 'parent')
 			{
-				$cname = $this->get_scope_part(T_CLASS_C)->get_type()->get_value();
+				$cname = $this->get_scope_part_name(T_CLASS_C);
 				$classobj = $this->types->get_class($cname);
 				if($classobj === null || $classobj->get_super_class() == '')
 					return $this->get_unknown();
@@ -156,7 +156,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 			}
 			else if($cname == 'self')
 			{
-				$cname = $this->get_scope_part(T_CLASS_C)->get_type()->get_value();
+				$cname = $this->get_scope_part_name(T_CLASS_C);
 				// self is always static
 				$static = true;
 			}
@@ -198,7 +198,15 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	public function handle_object_prop_chain($obj,$chain)
 	{
-		$objt = $obj->get_type();
+		$objt = null;
+		if($obj->get_name() == 'this')
+		{
+			$classname = $this->get_scope_part_name(T_CLASS_C);
+			if($classname)
+				$objt = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$classname);
+		}
+		else
+			$objt = $obj->get_type();
 		foreach($chain as $access)
 		{
 			// if we don't know the class-name or its no object, stop here
@@ -217,8 +225,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 				$fieldname = $prop[0]['data'];
 				if($fieldname->get_type()->is_unknown() || $fieldname->get_type()->get_value() === null)
 					return $this->get_unknown();
-				// TODO remove the '$' in the type-parser!
-				$field = $class->get_field('$'.$fieldname->get_type()->get_value());
+				$field = $class->get_field($fieldname->get_type()->get_value());
 				if($field === null)
 					return $this->get_unknown();
 				$res = $field->get_type();
@@ -414,6 +421,19 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	public function get_scope_part($part)
 	{
+		return new PC_Obj_Variable(
+			'',new PC_Obj_Type(PC_Obj_Type::STRING,$this->get_scope_part_name($part))
+		);
+	}
+	
+	/**
+	 * Extracts the given part of the scope
+	 * 
+	 * @param int $part the part: T_METHOD_C, T_FUNCTION_C or T_CLASS_C
+	 * @return
+	 */
+	private function get_scope_part_name($part)
+	{
 		$str = '';
 		switch($part)
 		{
@@ -432,7 +452,30 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 					$str = substr($this->scope,0,$pos);
 				break;
 		}
-		return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,$str));
+		return $str;
+	}
+	
+	/**
+	 * Handles a class-constant
+	 * 
+	 * @param PC_Obj_Variable $classname the variable with the class-name
+	 * @param string $constname the const-name
+	 * @return PC_Obj_Variable the type
+	 */
+	public function get_class_constant($classname,$constname)
+	{
+		$ctype = $classname->get_type();
+		if($ctype->get_type() != PC_Obj_Type::STRING || $ctype->get_value() === null)
+			return $this->get_unknown();
+		
+		$cname = $ctype->get_value();
+		$class = $this->types->get_class($cname);
+		if($class === null)
+			return $this->get_unknown();
+		$const = $class->get_constant($constname);
+		if($const === null)
+			return $this->get_unknown();
+		return new PC_Obj_Variable('',$const->get_type());
 	}
 	
 	/**

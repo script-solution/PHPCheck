@@ -464,7 +464,7 @@ static_scalar(A) ::= T_STRING(sval). {
 	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,sval));
 }
 static_scalar(A) ::= T_ARRAY LPAREN static_array_pair_list(list) RPAREN. { A = list; }
-static_scalar(A) ::= static_class_constant. { /* TODO */ A = null; }
+static_scalar(A) ::= static_class_constant(const). { A = const; }
 
 static_array_pair_list(A) ::= non_empty_static_array_pair_list(list). { A = list; }
 static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA. { A = list; }
@@ -491,7 +491,10 @@ non_empty_static_array_pair_list(A) ::= static_scalar(sval). {
 	A->get_type()->set_array_type(0,sval->get_type());
 }
 
-static_class_constant ::= T_STRING T_PAAMAYIM_NEKUDOTAYIM T_STRING.
+static_class_constant(A) ::= T_STRING(class) T_PAAMAYIM_NEKUDOTAYIM T_STRING(const). {
+	$cname = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,class));
+	A = $this->state->get_class_constant($cname,const);
+}
 
 foreach_optional_arg ::= T_DOUBLE_ARROW foreach_variable.
 foreach_optional_arg ::= .
@@ -820,7 +823,9 @@ internal_functions_in_yacc ::= T_REQUIRE_ONCE expr.
 isset_variables ::= variable.
 isset_variables ::= isset_variables COMMA variable.
 
-class_constant ::= fully_qualified_class_name T_PAAMAYIM_NEKUDOTAYIM T_STRING.
+class_constant(A) ::= fully_qualified_class_name(class) T_PAAMAYIM_NEKUDOTAYIM T_STRING(const). {
+	A = $this->state->get_class_constant(class,const);
+}
 
 fully_qualified_class_name(A) ::= T_STRING(str). {
 	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,str));
@@ -854,7 +859,7 @@ scalar(A) ::= T_STRING(str). {
 scalar(A) ::= T_STRING_VARNAME. {
 	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING));
 }
-scalar(A) ::= class_constant. { /* TODO */ A = null; }
+scalar(A) ::= class_constant(const). { A = const; }
 scalar(A) ::= common_scalar(sc). { A = sc; }
 scalar(A) ::= DOUBLEQUOTE encaps_list DOUBLEQUOTE. {
 	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING));

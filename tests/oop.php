@@ -74,7 +74,7 @@ $h = $b->pubobj->pubint;
 $i = $d->test2($b)->test2(1);
 $j = b::sdf();
 $k = $d->partest();
-$l = (1 + 2) * 4; // no value here yet
+$l = (1 + 2) * 4;
 $m = (1 < 2) ? 1 : 2;
 $n = __FILE__;
 $o = __LINE__;
@@ -98,7 +98,7 @@ $r = $p[1]->test2($b);
 		$classes = $tscanner->get_classes();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_Compile_StatementScanner();
+		$ascanner = new PC_Compile_StmtScannerFrontend();
 		$ascanner->scan(self::$code,$typecon);
 		$vars = $ascanner->get_vars();
 		
@@ -111,16 +111,16 @@ $r = $p[1]->test2($b);
 		self::assertEquals(array(),$a->get_interfaces());
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::INT,0),(string)$a->get_constant('c')->get_type());
 		self::assertEquals(
-			(string)new PC_Obj_Field('',0,'$f',new PC_Obj_Type(PC_Obj_Type::STRING,'"abc"'),PC_Obj_Field::V_PRIVATE),
-			(string)$a->get_field('$f')
+			(string)new PC_Obj_Field('',0,'f',new PC_Obj_Type(PC_Obj_Type::STRING,'abc'),PC_Obj_Field::V_PRIVATE),
+			(string)$a->get_field('f')
 		);
 		$array = new PC_Obj_Type(PC_Obj_Type::TARRAY);
 		$array->set_array_type(0,new PC_Obj_Type(PC_Obj_Type::INT,1));
 		$array->set_array_type(1,new PC_Obj_Type(PC_Obj_Type::INT,2));
 		$array->set_array_type(2,new PC_Obj_Type(PC_Obj_Type::INT,3));
 		self::assertEquals(
-			(string)new PC_Obj_Field('',0,'$p',$array,PC_Obj_Field::V_PROTECTED),
-			(string)$a->get_field('$p')
+			(string)new PC_Obj_Field('',0,'p',$array,PC_Obj_Field::V_PROTECTED),
+			(string)$a->get_field('p')
 		);
 		self::assertEquals(
 			'public function <b>__construct</b>(): unknown',
@@ -146,10 +146,10 @@ $r = $p[1]->test2($b);
 			(string)new PC_Obj_Type(PC_Obj_Type::INT,0),
 			(string)$b->get_constant('c')->get_type()
 		);
-		self::assertEquals(null,$b->get_field('$f'));
+		self::assertEquals(null,$b->get_field('f'));
 		self::assertEquals(
-			(string)new PC_Obj_Field('',0,'$p',$array,PC_Obj_Field::V_PROTECTED),
-			(string)$b->get_field('$p')
+			(string)new PC_Obj_Field('',0,'p',$array,PC_Obj_Field::V_PROTECTED),
+			(string)$b->get_field('p')
 		);
 		
 		$i = $classes['i'];
@@ -182,62 +182,62 @@ $r = $p[1]->test2($b);
 			'public static function <b>mystatic</b>(): unknown',
 			(string)$x->get_method('mystatic')
 		);
-		$field = new PC_Obj_Field('',0,'$var',new PC_Obj_Type(PC_Obj_Type::INT,4),PC_Obj_Field::V_PRIVATE);
+		$field = new PC_Obj_Field('',0,'var',new PC_Obj_Type(PC_Obj_Type::INT,4),PC_Obj_Field::V_PRIVATE);
 		$field->set_static(true);
 		self::assertEquals(
 			(string)$field,
-			(string)$x->get_field('$var')
+			(string)$x->get_field('var')
 		);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
-		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::INT,0),(string)$global['$a']->get_type());
-		self::assertEquals('a',(string)$global['$b']->get_type());
-		self::assertEquals('a',(string)$global['$c']->get_type());
-		self::assertEquals('x',(string)$global['$d']->get_type());
-		self::assertEquals('b',(string)$global['$e']->get_type());
+		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::INT,0),(string)$global['a']->get_type());
+		self::assertEquals('a',(string)$global['b']->get_type());
+		self::assertEquals('a',(string)$global['c']->get_type());
+		self::assertEquals('x',(string)$global['d']->get_type());
+		self::assertEquals('b',(string)$global['e']->get_type());
 		self::assertEquals(
 			(string)new PC_Obj_Type(PC_Obj_Type::INT,4),
-			(string)$global['$f']->get_type()
+			(string)$global['f']->get_type()
 		);
 		self::assertEquals(
 			(string)new PC_Obj_Type(PC_Obj_Type::INT,1),
-			(string)$global['$g']->get_type()
+			(string)$global['g']->get_type()
 		);
 		self::assertEquals(
 			(string)new PC_Obj_Type(PC_Obj_Type::INT,4),
-			(string)$global['$h']->get_type()
+			(string)$global['h']->get_type()
 		);
 		self::assertEquals(
 			(string)new PC_Obj_Type(PC_Obj_Type::OBJECT,null,'b'),
-			(string)$global['$i']->get_type()
+			(string)$global['i']->get_type()
 		);
 		self::assertEquals(
 			(string)new PC_Obj_Type(PC_Obj_Type::INT),
-			(string)$global['$j']->get_type()
+			(string)$global['j']->get_type()
 		);
 		self::assertEquals(
-			(string)new PC_Obj_Type(PC_Obj_Type::INT),
-			(string)$global['$l']->get_type()
+			(string)new PC_Obj_Type(PC_Obj_Type::INT,12),
+			(string)$global['l']->get_type()
 		);
 		self::assertEquals(
-			(string)new PC_Obj_Type(PC_Obj_Type::INT),
-			(string)$global['$m']->get_type()
+			(string)new PC_Obj_Type(PC_Obj_Type::INT,1),
+			(string)$global['m']->get_type()
 		);
 		self::assertEquals(
 			(string)new PC_Obj_Type(PC_Obj_Type::STRING),
-			(string)$global['$n']->get_type()
+			(string)$global['n']->get_type()
 		);
 		self::assertEquals(
-			(string)new PC_Obj_Type(PC_Obj_Type::INT),
-			(string)$global['$o']->get_type()
+			(string)new PC_Obj_Type(PC_Obj_Type::INT,66),
+			(string)$global['o']->get_type()
 		);
 		self::assertEquals(
 			(string)new PC_Obj_Type(PC_Obj_Type::OBJECT,null,'a'),
-			(string)$global['$q']->get_type()
+			(string)$global['q']->get_type()
 		);
 		self::assertEquals(
 			(string)new PC_Obj_Type(PC_Obj_Type::OBJECT,null,'b'),
-			(string)$global['$r']->get_type()
+			(string)$global['r']->get_type()
 		);
 		
 		// check calls

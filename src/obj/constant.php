@@ -80,6 +80,11 @@ final class PC_Obj_Constant extends PC_Obj_Location
 		$this->_type = $type;
 	}
 	
+	public function __toString()
+	{
+		return 'const '.$this->_name.'['.$this->_type.']';
+	}
+	
 	protected function get_dump_vars()
 	{
 		return array_merge(parent::get_dump_vars(),get_object_vars($this));

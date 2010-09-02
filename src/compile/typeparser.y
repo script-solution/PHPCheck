@@ -309,7 +309,7 @@ exit_expr ::= .
 common_scalar(A) ::= T_LNUMBER(sval). { A = new PC_Obj_Type(PC_Obj_Type::INT,sval); }
 common_scalar(A) ::= T_DNUMBER(sval). { A = new PC_Obj_Type(PC_Obj_Type::FLOAT,sval); }
 common_scalar(A) ::= T_CONSTANT_ENCAPSED_STRING(sval). {
-	A = new PC_Obj_Type(PC_Obj_Type::STRING,sval);
+	A = new PC_Obj_Type(PC_Obj_Type::STRING,substr(sval,1,-1));
 }
 common_scalar(A) ::= T_LINE. { A = new PC_Obj_Type(PC_Obj_Type::INT,$this->state->get_line()); }
 common_scalar(A) ::= T_FILE. { A = new PC_Obj_Type(PC_Obj_Type::STRING,$this->state->get_file()); }
@@ -563,18 +563,18 @@ member_modifier(A) ::= T_PUBLIC|T_PROTECTED|T_PRIVATE|T_STATIC|T_ABSTRACT|T_FINA
 
 class_variable_declaration(A) ::= class_variable_declaration(decl) COMMA T_VARIABLE(varname). {
 	A = new PC_Type_yyToken(decl);
-	A[] = array('name' => varname);
+	A[] = array('name' => substr(varname,1));
 }
 class_variable_declaration(A) ::= class_variable_declaration(decl) COMMA T_VARIABLE(varname)
 																	EQUALS static_scalar(varval). {
 	A = new PC_Type_yyToken(decl);
-	A[] = array('name' => varname,'val' => varval);
+	A[] = array('name' => substr(varname,1),'val' => varval);
 }
 class_variable_declaration(A) ::= T_VARIABLE(varname). {
-	A = new PC_Type_yyToken('',array('name' => varname));
+	A = new PC_Type_yyToken('',array('name' => substr(varname,1)));
 }
 class_variable_declaration(A) ::= T_VARIABLE(varname) EQUALS static_scalar(varval). {
-	A = new PC_Type_yyToken('',array('name' => varname,'val' => varval));
+	A = new PC_Type_yyToken('',array('name' => substr(varname,1),'val' => varval));
 }
 
 class_constant_declaration(A) ::= class_constant_declaration(decl) COMMA T_STRING(varname)

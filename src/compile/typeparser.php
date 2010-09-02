@@ -4838,10 +4838,10 @@ static public $yy_action = array(
         225 => 225,
         226 => 226,
         227 => 227,
-        230 => 227,
         228 => 228,
         229 => 229,
-        231 => 229,
+        230 => 230,
+        231 => 231,
     );
     /* Beginning here are the reduction cases.  A typical example
     ** follows:
@@ -4907,7 +4907,7 @@ static public $yy_action = array(
 #line 4912 "src/compile/typeparser.php"
 #line 311 "src/compile/typeparser.y"
     function yy_r136(){
-	$this->_retvalue = new PC_Obj_Type(PC_Obj_Type::STRING,$this->yystack[$this->yyidx + 0]->minor);
+	$this->_retvalue = new PC_Obj_Type(PC_Obj_Type::STRING,substr($this->yystack[$this->yyidx + 0]->minor,1,-1));
     }
 #line 4917 "src/compile/typeparser.php"
 #line 314 "src/compile/typeparser.y"
@@ -5116,25 +5116,36 @@ static public $yy_action = array(
 #line 564 "src/compile/typeparser.y"
     function yy_r226(){
 	$this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + -2]->minor);
-	$this->_retvalue[] = array('name' => $this->yystack[$this->yyidx + 0]->minor);
+	$this->_retvalue[] = array('name' => substr($this->yystack[$this->yyidx + 0]->minor,1));
     }
 #line 5126 "src/compile/typeparser.php"
 #line 569 "src/compile/typeparser.y"
     function yy_r227(){
 	$this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + -4]->minor);
-	$this->_retvalue[] = array('name' => $this->yystack[$this->yyidx + -2]->minor,'val' => $this->yystack[$this->yyidx + 0]->minor);
+	$this->_retvalue[] = array('name' => substr($this->yystack[$this->yyidx + -2]->minor,1),'val' => $this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5132 "src/compile/typeparser.php"
 #line 573 "src/compile/typeparser.y"
     function yy_r228(){
-	$this->_retvalue = new PC_Type_yyToken('',array('name' => $this->yystack[$this->yyidx + 0]->minor));
+	$this->_retvalue = new PC_Type_yyToken('',array('name' => substr($this->yystack[$this->yyidx + 0]->minor,1)));
     }
 #line 5137 "src/compile/typeparser.php"
 #line 576 "src/compile/typeparser.y"
     function yy_r229(){
-	$this->_retvalue = new PC_Type_yyToken('',array('name' => $this->yystack[$this->yyidx + -2]->minor,'val' => $this->yystack[$this->yyidx + 0]->minor));
+	$this->_retvalue = new PC_Type_yyToken('',array('name' => substr($this->yystack[$this->yyidx + -2]->minor,1),'val' => $this->yystack[$this->yyidx + 0]->minor));
     }
 #line 5142 "src/compile/typeparser.php"
+#line 581 "src/compile/typeparser.y"
+    function yy_r230(){
+	$this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + -4]->minor);
+	$this->_retvalue[] = array('name' => $this->yystack[$this->yyidx + -2]->minor,'val' => $this->yystack[$this->yyidx + 0]->minor);
+    }
+#line 5148 "src/compile/typeparser.php"
+#line 585 "src/compile/typeparser.y"
+    function yy_r231(){
+	$this->_retvalue = new PC_Type_yyToken('',array('name' => $this->yystack[$this->yyidx + -2]->minor,'val' => $this->yystack[$this->yyidx + 0]->minor));
+    }
+#line 5153 "src/compile/typeparser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -5259,7 +5270,7 @@ static public $yy_action = array(
     }
 	echo "\n";	
     throw new Exception('Unexpected ' . $this->tokenName($yymajor) . '(' . $TOKEN. '), expected one of: ' . implode(',', $expect));
-#line 5268 "src/compile/typeparser.php"
+#line 5279 "src/compile/typeparser.php"
     }
 
     /**

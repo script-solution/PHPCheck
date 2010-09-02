@@ -304,7 +304,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 						break;
 					if($this->tokens[$i][0] == T_VARIABLE)
 					{
-						$this->fieldComments[$this->tokens[$i][1]] = $this->lastComment;
+						$this->fieldComments[substr($this->tokens[$i][1],1)] = $this->lastComment;
 						$this->lastComment = '';
 						break;
 					}

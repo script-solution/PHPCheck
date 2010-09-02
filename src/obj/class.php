@@ -259,6 +259,41 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 		$this->methods[$method->get_name()] = $method;
 	}
 	
+	public function __toString()
+	{
+		$str = '';
+		if($this->interface)
+		{
+			$str .= 'interface '.$this->get_name().' ';
+			if(count($this->interfaces) > 0)
+				$str .= 'extends '.implode(', ',$this->interfaces).' ';
+		}
+		else {
+			if($this->is_abstract())
+				$str .= 'abstract ';
+			else if($this->is_final())
+				$str .= 'final ';
+			$str .= 'class '.$this->get_name().' ';
+			if($this->superclass)
+				$str .= 'extends '.$this->superclass.' ';
+			if(count($this->interfaces) > 0)
+				$str .= 'implements '.implode(', ',$this->interfaces).' ';
+		}
+		$str .= '{'."\n";
+		foreach($this->constants as $const)
+			$str .= "\t".$const.";\n";
+		if(count($this->constants))
+			$str .= "\n";
+		foreach($this->fields as $field)
+			$str .= "\t".$field.";\n";
+		if(count($this->fields))
+			$str .= "\n";
+		foreach($this->methods as $method)
+			$str .= "\t".$method.";\n";
+		$str .= '}';
+		return $str;
+	}
+	
 	protected function get_dump_vars()
 	{
 		return array_merge(parent::get_dump_vars(),get_object_vars($this));
