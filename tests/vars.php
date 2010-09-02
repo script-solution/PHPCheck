@@ -26,6 +26,7 @@ $s1="my\'str";
 $s2
 = \'str2\';
 $s3 = "ab $b c\'a\\\\\""."bla";
+$s4 = "ab c\'a\\\\\""."bla";
 $b1 = true;
 $b2 = false;
 $a1 = array();
@@ -78,6 +79,7 @@ function x($a,MyClass $b) {
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::STRING,'my\'str'),(string)$global['s1']->get_type());
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::STRING,'str2'),(string)$global['s2']->get_type());
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::STRING),(string)$global['s3']->get_type());
+		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::STRING,"ab c'a\\\\\"bla"),(string)$global['s4']->get_type());
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::BOOL,true),(string)$global['b1']->get_type());
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::BOOL,false),(string)$global['b2']->get_type());
 		self::assertEquals((string)new PC_Obj_Type(PC_Obj_Type::TARRAY),(string)$global['a1']->get_type());

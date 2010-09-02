@@ -328,7 +328,7 @@ final class PC_Obj_Type extends FWS_Object
 		if($this->_type == self::BOOL)
 			return $this->_value ? 'true' : 'false';
 		if($this->_type == self::STRING)
-			return '\''.(string)$this->_value.'\'';
+			return '\''.str_replace(array('\\','\''),array('\\\\','\\\''),$this->_value).'\'';
 		if($this->_type == self::TARRAY)
 			return $this->array_to_str($this);
 		return $this->_value;
