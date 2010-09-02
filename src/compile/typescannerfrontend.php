@@ -27,11 +27,24 @@ class PC_Compile_TypeScannerFrontend extends FWS_Object
 	private $lexer;
 	
 	/**
+	 * The found functions
+	 * 
+	 * @var array
+	 */
+	private $functions = array();
+	/**
+	 * The found classes
+	 * 
+	 * @var array
+	 */
+	private $classes = array();
+	
+	/**
 	 * @return array the found functions
 	 */
 	public function get_functions()
 	{
-		return $this->lexer->get_functions();
+		return $this->functions;
 	}
 	
 	/**
@@ -39,7 +52,7 @@ class PC_Compile_TypeScannerFrontend extends FWS_Object
 	 */
 	public function get_classes()
 	{
-		return $this->lexer->get_classes();
+		return $this->classes;
 	}
 	
 	/**
@@ -73,6 +86,9 @@ class PC_Compile_TypeScannerFrontend extends FWS_Object
 		while($this->lexer->advance($parser))
 			$parser->doParse($this->lexer->get_token(),$this->lexer->get_value());
 		$parser->doParse(0,0);
+		
+		$this->functions = array_merge($this->functions,$this->lexer->get_functions());
+		$this->classes = array_merge($this->classes,$this->lexer->get_classes());
 	}
 	
 	protected function get_dump_vars()

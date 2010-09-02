@@ -141,6 +141,119 @@ class PC_Compile_BaseLexer
 	}
 	
 	/**
+	 * Prints the given value and various other information
+	 * 
+	 * @param mixed $val the value to print
+	 */
+	protected function debug($val)
+	{
+		$token = token_name($this->tokens[$this->pos][0]);
+		if($token == 'UNKNOWN')
+			$token = $this->tokens[$this->pos][1];
+		echo FWS_Printer::to_string(array(
+			'file' => $this->file,
+			'line' => $this->line,
+			'token' => $token,
+			'value' => $this->value,
+			'debugval' => $val
+		));
+	}
+	
+	/**
+	 * Handles the given unary-operator. Note that its needed for static-scalars in the type-scanner,
+	 * which is the reason why its here.
+	 * 
+	 * @param string $op the operator (+,-,...)
+	 * @param PC_Obj_Variable $e the expression
+	 * @return PC_Obj_Variable the result
+	 */
+	public function handle_unary_op($op,$e)
+	{
+		$type = $e->get_type();
+		if($type->is_unknown() || $type->get_value() === null)
+			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
+		eval('$res = '.$op.$type->get_value_for_eval().';');
+		return $this->get_type_from_php($res);
+	}
+	
+	/**
+	 * @param mixed $val the value
+	 * @return PC_Obj_Variable the type
+	 */
+	protected function get_type_from_php($val)
+	{
+		if(is_array($val))
+			return new PC_Obj_Variable('',PC_Obj_Type::get_type_by_value($val));
+		else
+		{
+			$type = PC_Obj_Type::get_type_by_name(gettype($val));
+			return new PC_Obj_Variable('',new PC_Obj_Type($type->get_type(),$val));
+		}
+	}
+	
+	/**
+	 * Determines the type from the operation (assumes that the type or the value is unknown)
+	 * 
+	 * @param string $op the operator
+	 * @param PC_Obj_Type $t1 the type of the first operand
+	 * @param PC_Obj_Type $t2 the type of the second operand (may be null for unary ops)
+	 * @return int the type
+	 */
+	protected function get_type_from_op($op,$t1,$t2 = null)
+	{
+		switch($op)
+		{
+			// bitwise operators have always int as result
+			case '|':
+			case '&':
+			case '^':
+			case '>>':
+			case '<<':
+			case '~':
+				return PC_Obj_Type::INT;
+			
+			// concatenation leads always to string
+			case '.':
+				return PC_Obj_Type::STRING;
+			
+			case '+':
+			case '-':
+			case '*':
+			case '/':
+			case '%':
+				// if one of them is unknown we don't know wether we would get a float or int
+				if($t1->is_unknown() || ($t2 !== null && $t2->is_unknown()))
+					return PC_Obj_Type::UNKNOWN;
+				// if both are arrays, the result is an array
+				if($t1->get_type() == PC_Obj_Type::TARRAY && $t2->get_type() == PC_Obj_Type::TARRAY)
+					return PC_Obj_Type::TARRAY;
+				// if one of them is float, the result is float
+				if($t1->get_type() == PC_Obj_Type::FLOAT || ($t2 !== null && $t2->get_type() == PC_Obj_Type::FLOAT))
+					return PC_Obj_Type::FLOAT;
+				// otherwise its always int
+				return PC_Obj_Type::INT;
+			
+			case '==':
+			case '!=':
+			case '===':
+			case '!==':
+			case '<':
+			case '>':
+			case '<=':
+			case '>=':
+			case '&&':
+			case '||':
+			case 'xor':
+			case '!':
+				// always bool
+				return PC_Obj_Type::BOOL;
+			
+			default:
+				FWS_Helper::error('Unknown operator "'.$op.'"');
+		}
+	}
+	
+	/**
 	 * Moves to the next token
 	 * 
 	 * @param object $parser the parser

@@ -1,6 +1,34 @@
 {include "inc_header.htm"}
 
 {if module_error == false}
+<script type="text/javascript" src="{gjs.get_file('src/functions.js')}"></script>
+
+<div class="pc_padbottom">
+	<form method="post" action="{search_target}">
+	<div class="pc_border">
+		<h1 class="pc_topic" onmouseover="this.style.cursor='pointer';"
+				onmouseout="this.style.cursor='default';"
+				onclick="toggleSearch('{cookie_name}','searchform');">Search</h1>
+		<div id="searchform" style="display: {display_search};">
+			<fieldset class="pc_form">
+				<dl>
+					<dt>File:</dt>
+					<dd>{form.get_textbox('file',file,40)}</dd>
+				</dl>
+				<dl>
+					<dt>Class:</dt>
+					<dd>{form.get_textbox('class',class,40)}</dd>
+				</dl>
+			</fieldset>
+			<div class="pc_main" style="margin-top: 1px; text-align: center">
+				<input type="button" value="Reset" onclick="document.location.href = '{gurl.build_submod_url()}';" />
+				<input type="submit" value="Search!" />
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+
 <table width="100%" class="pc_table">
 	<tr>
 		<th>Name</th>
@@ -12,11 +40,11 @@
 		<td colspan="3" class="pc_main" align="center">No classes found</td>
 	</tr>
 	{else}
-	{loop classes as class}
+	{loop classes as c}
 	<tr>
-		<td class="pc_main"><a href="{class:url}">{class:name}</a></td>
-		<td class="pc_main">{class:file}</td>
-		<td class="pc_main" align="center">{class:line}</td>
+		<td class="pc_main"><a href="{c:url}">{c:name}</a></td>
+		<td class="pc_main">{c:file}</td>
+		<td class="pc_main" align="center">{c:line}</td>
 	</tr>
 	{endloop}
 	{endif}

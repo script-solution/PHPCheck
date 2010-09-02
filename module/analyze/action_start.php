@@ -31,6 +31,10 @@ final class PC_Action_analyze_start extends FWS_Action_Base
 		$project->set_report_unknown($report_unknown);
 		PC_DAO::get_projects()->update($project);
 		
+		// clear position, just to be sure
+		$storage = new FWS_Progress_Storage_Session('panalyze_');
+		$storage->clear();
+		
 		// clear previous data in the db
 		$project = FWS_Props::get()->project();
 		PC_DAO::get_errors()->delete_by_project($project->get_id());

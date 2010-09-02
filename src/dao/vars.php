@@ -20,6 +20,8 @@
  */
 class PC_DAO_Vars extends FWS_Singleton
 {
+	const MAX_VALUE_LEN			= 2048;
+	
 	/**
 	 * @return PC_DAO_Vars the instance of this class
 	 */
@@ -83,12 +85,15 @@ class PC_DAO_Vars extends FWS_Singleton
 			FWS_Helper::def_error('instance','var','PC_Obj_Variable',$var);
 		
 		$project = FWS_Props::get()->project();
+		$type = serialize($var->get_type());
+		if(strlen($type) > self::MAX_VALUE_LEN)
+			$type = serialize(new PC_Obj_Type($var->get_type()->get_type()));
 		return $db->insert(PC_TB_VARS,array(
 			'project_id' => PC_Utils::get_project_id(PC_Project::CURRENT_ID),
 			'name' => $var->get_name(),
 			'function' => $var->get_function(),
 			'class' => $var->get_class(),
-			'type' => serialize($var->get_type())
+			'type' => $type
 		));
 	}
 	

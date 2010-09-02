@@ -20,6 +20,8 @@
  */
 class PC_DAO_ClassFields extends FWS_Singleton
 {
+	const MAX_VALUE_LEN			= 2048;
+	
 	/**
 	 * @return PC_DAO_ClassFields the instance of this class
 	 */
@@ -52,7 +54,7 @@ class PC_DAO_ClassFields extends FWS_Singleton
 			if($row['type'] == PC_Obj_Type::OBJECT)
 				$type = new PC_Obj_Type($row['type'],null,$row['value']);
 			else
-				$type = new PC_Obj_Type($row['type'],$row['value']);
+				$type = new PC_Obj_Type($row['type'],unserialize($row['value']));
 			$fields[] = new PC_Obj_Field($row['file'],$row['line'],$row['name'],$type,$row['visibility']);
 		}
 		return $fields;
@@ -77,7 +79,9 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		
 		$otype = $field->get_type();
 		$type = $otype->get_type();
-		$val = $type == PC_Obj_Type::OBJECT ? $otype->get_class() : $otype->get_value();
+		$val = $type == PC_Obj_Type::OBJECT ? $otype->get_class() : serialize($otype->get_value());
+		if(strlen($val) > self::MAX_VALUE_LEN)
+			$val = serialize(null);
 		return $db->insert(PC_TB_CLASS_FIELDS,array(
 			'project_id' => PC_Utils::get_project_id($pid),
 			'class' => $class,

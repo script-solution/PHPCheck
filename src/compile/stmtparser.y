@@ -2,7 +2,7 @@
 %declare_class {class PC_Compile_StmtParser}
 
 %syntax_error {
-    echo "Syntax Error " . ($this->state->get_file() ? "in file " . $this->state->get_file() : '');
+    echo "Syntax Error " . ($this->state->get_file() ? "in file " . $this->state->get_file()." " : '');
 		echo "on line " . $this->state->get_line() . ": token '" . htmlspecialchars($this->state->get_value()) . "'";
 		echo " (".token_name($this->state->get_token()).") while parsing rule: ";
     foreach ($this->yystack as $entry) {
@@ -157,7 +157,7 @@ unticked_statement ::= T_ECHO echo_expr_list SEMI.
 unticked_statement ::= T_INLINE_HTML.
 unticked_statement ::= expr SEMI.
 unticked_statement ::= T_USE use_filename SEMI.
-unticked_statement ::= T_UNSET LPAREN unset_variables LPAREN SEMI.
+unticked_statement ::= T_UNSET LPAREN unset_variables RPAREN SEMI.
 unticked_statement ::= T_FOREACH LPAREN variable T_AS 
 		foreach_variable foreach_optional_arg RPAREN
 		foreach_statement. {
@@ -461,8 +461,15 @@ common_scalar(A) ::= T_CLASS_C|T_METHOD_C|T_FUNC_C(part). {
 /* compile-time evaluated scalars */
 static_scalar(A) ::= common_scalar(sval). { A = sval; }
 static_scalar(A) ::= T_STRING(sval). {
-	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,sval));
+	if(strcasecmp(sval,"true") == 0)
+		A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,true));
+	else if(strcasecmp(sval,"false") == 0)
+		A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,false));
+	else
+		A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,sval));
 }
+static_scalar(A) ::= PLUS static_scalar(sval). { A = $this->state->handle_unary_op('+',sval); }
+static_scalar(A) ::= MINUS static_scalar(sval). { A = $this->state->handle_unary_op('-',sval); }
 static_scalar(A) ::= T_ARRAY LPAREN static_array_pair_list(list) RPAREN. { A = list; }
 static_scalar(A) ::= static_class_constant(const). { A = const; }
 
@@ -493,7 +500,7 @@ non_empty_static_array_pair_list(A) ::= static_scalar(sval). {
 
 static_class_constant(A) ::= T_STRING(class) T_PAAMAYIM_NEKUDOTAYIM T_STRING(const). {
 	$cname = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,class));
-	A = $this->state->get_class_constant($cname,const);
+	A = $this->state->handle_classconst_access($cname,const);
 }
 
 foreach_optional_arg ::= T_DOUBLE_ARROW foreach_variable.
@@ -520,7 +527,7 @@ switch_case_list ::= LCURLY SEMI case_list RCURLY.
 switch_case_list ::= COLON case_list T_ENDSWITCH SEMI.
 switch_case_list ::= COLON SEMI case_list T_ENDSWITCH SEMI.
 
-case_list ::= case_list T_CASE expr case_separator.
+case_list ::= case_list T_CASE expr case_separator inner_statement_list.
 case_list ::= case_list T_DEFAULT case_separator inner_statement_list.
 case_list ::= .
 
@@ -683,24 +690,28 @@ variable_property(A) ::= T_OBJECT_OPERATOR object_property(vprop) method_or_not(
 method_or_not(A) ::= LPAREN function_call_parameter_list(list) RPAREN. { A = list; }
 method_or_not(A) ::= . { A = null; }
 
-variable_without_objects ::= reference_variable.
-variable_without_objects ::= simple_indirect_reference reference_variable.
+variable_without_objects(A) ::= reference_variable(var). { A = var; }
+variable_without_objects(A) ::= simple_indirect_reference reference_variable. {
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+}
 
-static_member ::= fully_qualified_class_name T_PAAMAYIM_NEKUDOTAYIM variable_without_objects.
+static_member(A) ::= fully_qualified_class_name(name) T_PAAMAYIM_NEKUDOTAYIM variable_without_objects(var). {
+	A = $this->state->handle_field_access(name,var);
+}
 
 base_variable_with_function_calls(A) ::= base_variable(v). { A = v; }
 base_variable_with_function_calls(A) ::= function_call(call). { A = call; }
 
 base_variable(A) ::= reference_variable(v). { A = v; }
 base_variable(A) ::= simple_indirect_reference reference_variable. { /* TODO */ A = null; }
-base_variable(A) ::= static_member. { /* TODO */ A = null; }
+base_variable(A) ::= static_member(mem). { A = mem; }
 	
 reference_variable(A) ::= reference_variable(v) LBRACKET dim_offset(off) RBRACKET. {
 	A = $this->state->handle_array_access(v,off);
 }
 reference_variable(A) ::= reference_variable LCURLY expr RCURLY. {
 	// TODO
-	A = null;
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
 }
 reference_variable(A) ::= compound_variable(v). {
 	A = v;
@@ -713,7 +724,7 @@ compound_variable(A) ::= DOLLAR LCURLY expr(e) RCURLY. {
 	if(e->get_type()->get_value() !== null)
 		A = $this->state->get_var(e->get_type()->get_value_as_str());
 	else
-		A = null;
+		A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
 }
 
 dim_offset(A) ::= expr(e). { A = e; }
@@ -812,8 +823,14 @@ encaps_var ::= T_CURLY_OPEN variable RCURLY.
 
 encaps_var_offset ::= T_STRING|T_NUM_STRING|T_VARIABLE.
 
-internal_functions_in_yacc ::= T_ISSET LPAREN isset_variables RPAREN.
-internal_functions_in_yacc ::= T_EMPTY LPAREN variable RPAREN.
+internal_functions_in_yacc(A) ::= T_ISSET LPAREN isset_variables RPAREN. {
+	// TODO evaluate?
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
+}
+internal_functions_in_yacc(A) ::= T_EMPTY LPAREN variable RPAREN. {
+	// TODO evaluate?
+	A = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
+}
 internal_functions_in_yacc ::= T_INCLUDE expr.
 internal_functions_in_yacc ::= T_INCLUDE_ONCE expr.
 internal_functions_in_yacc ::= T_EVAL LPAREN expr RPAREN.
@@ -824,7 +841,7 @@ isset_variables ::= variable.
 isset_variables ::= isset_variables COMMA variable.
 
 class_constant(A) ::= fully_qualified_class_name(class) T_PAAMAYIM_NEKUDOTAYIM T_STRING(const). {
-	A = $this->state->get_class_constant(class,const);
+	A = $this->state->handle_classconst_access(class,const);
 }
 
 fully_qualified_class_name(A) ::= T_STRING(str). {

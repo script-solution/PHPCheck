@@ -233,7 +233,9 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 				{
 					assert($prop[$i]['type'] == 'array');
 					$offset = $prop[$i]['data'];
-					if($res->get_type() != PC_Obj_Type::TARRAY)
+					// if the offset is null it means that we should append to the array. this is not supported
+					// for class-fields. therefore stop here and return unknown
+					if($offset === null || $res === null || $res->get_type() != PC_Obj_Type::TARRAY)
 						return $this->get_unknown();
 					if($offset->get_type()->is_unknown() || $offset->get_type()->get_value() === null)
 						return $this->get_unknown();
@@ -256,6 +258,8 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 			}
 			$objt = $res;
 		}
+		if($res === null)
+			return $this->get_unknown();
 		return new PC_Obj_Variable('',$res);
 	}
 	
@@ -268,6 +272,12 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	public function get_var($var)
 	{
+		if($var == 'this')
+		{
+			return new PC_Obj_Variable(
+				'',new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$this->get_scope_part_name(T_CLASS_C))
+			);
+		}
 		if(!isset($this->vars[$this->scope][$var]))
 			return $this->get_unknown($var);
 		return $this->vars[$this->scope][$var];
@@ -462,7 +472,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 * @param string $constname the const-name
 	 * @return PC_Obj_Variable the type
 	 */
-	public function get_class_constant($classname,$constname)
+	public function handle_classconst_access($classname,$constname)
 	{
 		$ctype = $classname->get_type();
 		if($ctype->get_type() != PC_Obj_Type::STRING || $ctype->get_value() === null)
@@ -476,6 +486,28 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		if($const === null)
 			return $this->get_unknown();
 		return new PC_Obj_Variable('',$const->get_type());
+	}
+	
+	/**
+	 * Access the given field of given class
+	 * 
+	 * @param PC_Obj_Variable $class the class-name
+	 * @param PC_Obj_Variable $field the field (as variable)
+	 * @return PC_Obj_Variable the result
+	 */
+	public function handle_field_access($class,$field)
+	{
+		$ctype = $class->get_type();
+		$fname = $field->get_name();
+		if($ctype->get_type() != PC_Obj_Type::STRING || $ctype->get_value() === null)
+			return $this->get_unknown();
+		$classobj = $this->types->get_class($ctype->get_value());
+		if($classobj === null)
+			return $this->get_unknown();
+		$fieldobj = $classobj->get_field($fname);
+		if($fieldobj === null)
+			return $this->get_unknown();
+		return new PC_Obj_Variable('',$fieldobj->get_type());
 	}
 	
 	/**
@@ -510,11 +542,9 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	public function handle_unary_op($op,$e)
 	{
-		$type = $e->get_type();
-		if($this->loopdepth > 0 || $type->is_unknown() || $type->get_value() === null)
-			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
-		eval('$res = '.$op.$type->get_value_for_eval().';');
-		return $this->get_type_from_php($res);
+		if($this->loopdepth > 0)
+			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$e->get_type())));
+		return parent::handle_unary_op($op,$e);
 	}
 	
 	/**
@@ -559,7 +589,11 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		}
 		// type and value is known, therefore calculate the result
 		$res = 0;
-		eval('$res = '.$t1->get_value_for_eval().' '.$op.' '.$t2->get_value_for_eval().';');
+		$rval = $t2->get_value_for_eval();
+		// prevent division-by-zero error
+		if($op == '/' && $rval == 0)
+			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::INT));
+		eval('$res = '.$t1->get_value_for_eval().' '.$op.' '.$rval.';');
 		return $this->get_type_from_php($res);
 	}
 	
@@ -684,68 +718,6 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	}
 	
 	/**
-	 * Determines the type from the operation (assumes that the type or the value is unknown)
-	 * 
-	 * @param string $op the operator
-	 * @param PC_Obj_Type $t1 the type of the first operand
-	 * @param PC_Obj_Type $t2 the type of the second operand (may be null for unary ops)
-	 * @return int the type
-	 */
-	private function get_type_from_op($op,$t1,$t2 = null)
-	{
-		switch($op)
-		{
-			// bitwise operators have always int as result
-			case '|':
-			case '&':
-			case '^':
-			case '>>':
-			case '<<':
-			case '~':
-				return PC_Obj_Type::INT;
-			
-			// concatenation leads always to string
-			case '.':
-				return PC_Obj_Type::STRING;
-			
-			case '+':
-			case '-':
-			case '*':
-			case '/':
-			case '%':
-				// if one of them is unknown we don't know wether we would get a float or int
-				if($t1->is_unknown() || ($t2 !== null && $t2->is_unknown()))
-					return PC_Obj_Type::UNKNOWN;
-				// if both are arrays, the result is an array
-				if($t1->get_type() == PC_Obj_Type::TARRAY && $t2->get_type() == PC_Obj_Type::TARRAY)
-					return PC_Obj_Type::TARRAY;
-				// if one of them is float, the result is float
-				if($t1->get_type() == PC_Obj_Type::FLOAT || ($t2 !== null && $t2->get_type() == PC_Obj_Type::FLOAT))
-					return PC_Obj_Type::FLOAT;
-				// otherwise its always int
-				return PC_Obj_Type::INT;
-			
-			case '==':
-			case '!=':
-			case '===':
-			case '!==':
-			case '<':
-			case '>':
-			case '<=':
-			case '>=':
-			case '&&':
-			case '||':
-			case 'xor':
-			case '!':
-				// always bool
-				return PC_Obj_Type::BOOL;
-			
-			default:
-				FWS_Helper::error('Unknown operator "'.$op.'"');
-		}
-	}
-	
-	/**
 	 * Handles a cast
 	 * 
 	 * @param string $cast the cast-type: 'int','float','string','array','object','bool' or 'unset'
@@ -834,21 +806,6 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 				return true;
 		}
 		return false;
-	}
-	
-	/**
-	 * @param mixed $val the value
-	 * @return PC_Obj_Variable the type
-	 */
-	private function get_type_from_php($val)
-	{
-		if(is_array($val))
-			return new PC_Obj_Variable('',PC_Obj_Type::get_type_by_value($val));
-		else
-		{
-			$type = PC_Obj_Type::get_type_by_name(gettype($val));
-			return new PC_Obj_Variable('',new PC_Obj_Type($type->get_type(),$val));
-		}
 	}
 	
 	public function advance($parser)

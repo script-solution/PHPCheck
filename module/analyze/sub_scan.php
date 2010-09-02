@@ -36,7 +36,7 @@ final class PC_SubModule_analyze_scan extends PC_SubModule implements FWS_Progre
 		parent::init($doc);
 		
 		$renderer = $doc->use_default_renderer();
-		$renderer->add_breadcrumb('Analyzing...',PC_URL::build_mod_url());
+		$renderer->add_breadcrumb('Analyzing...',PC_URL::build_submod_url());
 	}
 
 	/**
@@ -83,7 +83,7 @@ final class PC_SubModule_analyze_scan extends PC_SubModule implements FWS_Progre
 			'not_finished' => !$this->_pm->is_finished(),
 			'percent' => round($this->_pm->get_percentage(),1),
 			'message' => '',
-			'target_url' => PC_URL::build_mod_url(0,'&')
+			'target_url' => PC_URL::build_submod_url(0,0,'&')
 		));
 	}
 }

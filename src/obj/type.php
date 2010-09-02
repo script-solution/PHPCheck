@@ -342,18 +342,22 @@ final class PC_Obj_Type extends FWS_Object
 	 */
 	private function array_to_str($val)
 	{
-		if(is_array($val->_value))
+		if($val->_type == self::TARRAY)
 		{
-			$str = 'array(';
-			foreach($val->_value as $k => $v)
+			if(is_array($val->_value))
 			{
-				if(is_string($k))
-					$str .= '\''.$k.'\'';
-				else
-					$str .= (string)$k;
-				$str .= ' => '.$this->array_to_str($v).',';
+				$str = 'array(';
+				foreach($val->_value as $k => $v)
+				{
+					if(is_string($k))
+						$str .= '\''.$k.'\'';
+					else
+						$str .= (string)$k;
+					$str .= ' => '.$this->array_to_str($v).',';
+				}
+				return substr($str,0,-1).')';
 			}
-			return substr($str,0,-1).')';
+			return '';
 		}
 		return $val->get_value_for_eval();
 	}

@@ -26,12 +26,12 @@ define('PC_ENTRIES_PER_PAGE',20);
 /**
  * The number of files per cycle in the type-scanner
  */
-define('PC_TYPE_FILES_PER_CYCLE',300);
+define('PC_TYPE_FILES_PER_CYCLE',30);
 
 /**
  * The number of files per cycle in the statement-scanner
  */
-define('PC_STMT_FILES_PER_CYCLE',100);
+define('PC_STMT_FILES_PER_CYCLE',30);
 
 /**
  * The number of items per cycle in the analyzer

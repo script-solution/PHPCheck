@@ -20,6 +20,8 @@
  */
 class PC_DAO_Constants extends FWS_Singleton
 {
+	const MAX_VALUE_LEN			= 2048;
+	
 	/**
 	 * @return PC_DAO_Constants the instance of this class
 	 */
@@ -118,14 +120,19 @@ class PC_DAO_Constants extends FWS_Singleton
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
 		
+		$otype = $constant->get_type();
+		$type = $otype->get_type();
+		$val = $type == PC_Obj_Type::OBJECT ? $otype->get_class() : serialize($otype->get_value());
+		if(strlen($val) > self::MAX_VALUE_LEN)
+			$val = serialize(null);
 		return $db->insert(PC_TB_CONSTANTS,array(
 			'project_id' => PC_Utils::get_project_id($pid),
 			'class' => $class,
 			'file' => $constant->get_file(),
 			'line' => $constant->get_line(),
 			'name' => $constant->get_name(),
-			'type' => $constant->get_type()->get_type(),
-			'value' => $constant->get_type()->get_value()
+			'type' => $type,
+			'value' => $val
 		));
 	}
 	
@@ -156,9 +163,11 @@ class PC_DAO_Constants extends FWS_Singleton
 	 */
 	private function _build_const($row)
 	{
-		return new PC_Obj_Constant(
-			$row['file'],$row['line'],$row['name'],new PC_Obj_Type($row['type'],$row['value'])
-		);
+		if($row['type'] == PC_Obj_Type::OBJECT)
+			$type = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$row['value']);
+		else
+			$type = new PC_Obj_Type($row['type'],unserialize($row['value']));
+		return new PC_Obj_Constant($row['file'],$row['line'],$row['name'],$type);
 	}
 }
 ?>

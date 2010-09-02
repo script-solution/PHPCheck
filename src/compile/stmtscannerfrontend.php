@@ -25,13 +25,25 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	 * @var PC_Compile_StmtLexer
 	 */
 	private $lexer;
+	/**
+	 * The variables
+	 * 
+	 * @var array
+	 */
+	private $vars = array();
+	/**
+	 * The found function-calls
+	 * 
+	 * @var array
+	 */
+	private $calls = array();
 	
 	/**
 	 * @return array the found variables
 	 */
 	public function get_vars()
 	{
-		return $this->lexer->get_vars();
+		return $this->vars;
 	}
 	
 	/**
@@ -39,7 +51,7 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	 */
 	public function get_calls()
 	{
-		return $this->lexer->get_calls();
+		return $this->calls;
 	}
 	
 	/**
@@ -75,6 +87,9 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 		while($this->lexer->advance($parser))
 			$parser->doParse($this->lexer->get_token(),$this->lexer->get_value());
 		$parser->doParse(0,0);
+		
+		$this->vars = array_merge($this->vars,$this->lexer->get_vars());
+		$this->calls = array_merge($this->calls,$this->lexer->get_calls());
 	}
 	
 	protected function get_dump_vars()

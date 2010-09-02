@@ -38,24 +38,41 @@ final class PC_SubModule_types_classes extends PC_SubModule
 	{
 		$tpl = FWS_Props::get()->tpl();
 		$input = FWS_Props::get()->input();
+		$cookies = FWS_Props::get()->cookies();
 		
-		$pagination = new PC_Pagination(PC_ENTRIES_PER_PAGE,PC_DAO::get_classes()->get_count());
-		$pagination->populate_tpl(PC_URL::get_submod_url());
+		$file = $input->get_var('file',-1,FWS_Input::STRING);
+		$class = $input->get_var('class',-1,FWS_Input::STRING);
+		
+		$url = PC_URL::get_submod_url();
+		$url->set('file',$file);
+		$url->set('class',$class);
+		$surl = clone $url;
+		
+		$pagination = new PC_Pagination(
+			PC_ENTRIES_PER_PAGE,PC_DAO::get_classes()->get_count_for($class,$file)
+		);
+		$pagination->populate_tpl($url);
 		$start = $pagination->get_start();
 		
 		$classes = array();
-		foreach(PC_DAO::get_classes()->get_list($start,PC_ENTRIES_PER_PAGE) as $class)
+		foreach(PC_DAO::get_classes()->get_list($start,PC_ENTRIES_PER_PAGE,$class,$file) as $c)
 		{
 			$classes[] = array(
-				'name' => $class->get_name(),
-				'file' => $class->get_file(),
-				'line' => $class->get_line(),
-				'url' => PC_URL::get_mod_url('class')->set('name',$class->get_name())->to_url()
+				'name' => $c->get_name(),
+				'file' => $c->get_file(),
+				'line' => $c->get_line(),
+				'url' => PC_URL::get_mod_url('class')->set('name',$c->get_name())->to_url()
 			);
 		}
 		
+		$this->request_formular();
 		$tpl->add_variables(array(
-			'classes' => $classes
+			'classes' => $classes,
+			'file' => $file,
+			'class' => $class,
+			'search_target' => $surl->to_url(),
+			'display_search' => $cookies->get_cookie('classes_search') ? 'block' : 'none',
+			'cookie_name' => $cookies->get_prefix().'classes_search',
 		));
 	}
 }

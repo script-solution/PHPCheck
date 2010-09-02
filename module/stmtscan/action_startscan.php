@@ -47,6 +47,10 @@ final class PC_Action_stmtscan_startscan extends FWS_Action_Base
 			}
 		}
 		
+		// clear position, just to be sure
+		$storage = new FWS_Progress_Storage_Session('pstmtscan_');
+		$storage->clear();
+		
 		// store in session
 		$user->set_session_data('stmtscan_files',$files);
 		

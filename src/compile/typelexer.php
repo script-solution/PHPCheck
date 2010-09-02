@@ -207,9 +207,14 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	{
 		if(isset($this->constComments[$const->get_name()]))
 		{
-			$type = $this->parse_var_from($this->constComments[$const->get_name()]);
-			if($type !== null)
-				$const->set_type($type);
+			// if we already know the value, we don't have to use the phpdoc
+			// TODO we could issue a warning here if the type differs
+			if($const->get_type()->get_value() === null)
+			{
+				$type = $this->parse_var_from($this->constComments[$const->get_name()]);
+				if($type !== null)
+					$const->set_type($type);
+			}
 			unset($this->constComments[$const->get_name()]);
 		}
 	}
@@ -223,9 +228,14 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	{
 		if(isset($this->fieldComments[$field->get_name()]))
 		{
-			$type = $this->parse_var_from($this->fieldComments[$field->get_name()]);
-			if($type !== null)
-				$field->set_type($type);
+			// if we already know the value, we don't have to use the phpdoc
+			// TODO we could issue a warning here if the type differs
+			if($field->get_type()->get_value() === null)
+			{
+				$type = $this->parse_var_from($this->fieldComments[$field->get_name()]);
+				if($type !== null)
+					$field->set_type($type);
+			}
 			unset($this->fieldComments[$field->get_name()]);
 		}
 	}

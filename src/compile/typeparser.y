@@ -2,7 +2,7 @@
 %declare_class {class PC_Compile_TypeParser}
 
 %syntax_error {
-    echo "Syntax Error " . ($this->state->get_file() ? "in file " . $this->state->get_file() : '');
+    echo "Syntax Error " . ($this->state->get_file() ? "in file " . $this->state->get_file()." " : '');
 		echo "on line " . $this->state->get_line() . ": token '" . htmlspecialchars($this->state->get_value()) . "'";
 		echo " (".token_name($this->state->get_token()).") while parsing rule: ";
     foreach ($this->yystack as $entry) {
@@ -144,7 +144,7 @@ unticked_statement ::= T_ECHO echo_expr_list SEMI.
 unticked_statement ::= T_INLINE_HTML.
 unticked_statement ::= expr SEMI.
 unticked_statement ::= T_USE use_filename SEMI.
-unticked_statement ::= T_UNSET LPAREN unset_variables LPAREN SEMI.
+unticked_statement ::= T_UNSET LPAREN unset_variables RPAREN SEMI.
 unticked_statement ::= T_FOREACH LPAREN variable T_AS 
 		foreach_variable foreach_optional_arg RPAREN
 		foreach_statement.
@@ -320,7 +320,20 @@ common_scalar(A) ::= T_CLASS_C|T_METHOD_C|T_FUNC_C. {
 
 /* compile-time evaluated scalars */
 static_scalar(A) ::= common_scalar(sval). { A = sval; }
-static_scalar(A) ::= T_STRING(sval). { A = new PC_Obj_Type(PC_Obj_Type::STRING,sval); }
+static_scalar(A) ::= T_STRING(sval). {
+	if(strcasecmp(sval,"true") == 0)
+		A = new PC_Obj_Type(PC_Obj_Type::BOOL,true);
+	else if(strcasecmp(sval,"false") == 0)
+		A = new PC_Obj_Type(PC_Obj_Type::BOOL,false);
+	else
+		A = new PC_Obj_Type(PC_Obj_Type::STRING,sval);
+} 
+static_scalar(A) ::= PLUS static_scalar(sval). {
+	A = $this->state->handle_unary_op('+',new PC_Obj_Variable('',sval))->get_type();
+}
+static_scalar(A) ::= MINUS static_scalar(sval). {
+	A = $this->state->handle_unary_op('-',new PC_Obj_Variable('',sval))->get_type();
+}
 static_scalar(A) ::= T_ARRAY LPAREN static_array_pair_list(list) RPAREN. { A = list; }
 static_scalar(A) ::= static_class_constant. { /* TODO */ A = null; }
 
@@ -373,7 +386,7 @@ switch_case_list ::= LCURLY SEMI case_list RCURLY.
 switch_case_list ::= COLON case_list T_ENDSWITCH SEMI.
 switch_case_list ::= COLON SEMI case_list T_ENDSWITCH SEMI.
 
-case_list ::= case_list T_CASE expr case_separator.
+case_list ::= case_list T_CASE expr case_separator inner_statement_list.
 case_list ::= case_list T_DEFAULT case_separator inner_statement_list.
 case_list ::= .
 

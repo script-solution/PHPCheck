@@ -51,7 +51,7 @@ final class PC_Module_vars extends PC_Module
 			/* @var $var PC_Obj_Variable */
 			$vars[] = array(
 				'scope' => $var->get_scope(),
-				'name' => $var->get_name(),
+				'name' => '$'.$var->get_name(),
 				'type' => $var->get_type()
 			);
 		}

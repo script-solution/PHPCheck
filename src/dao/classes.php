@@ -62,6 +62,32 @@ class PC_DAO_Classes extends FWS_Singleton
 	}
 	
 	/**
+	 * Returns the number of items for the given file and class
+	 *
+	 * @param string $class the class-name
+	 * @param string $file the file
+	 * @param int $pid the project-id (default = current)
+	 * @return int the number
+	 */
+	public function get_count_for($class = '',$file = '',$pid = PC_Project::CURRENT_ID)
+	{
+		$db = FWS_Props::get()->db();
+		$stmt = $db->get_prepared_statement(
+			'SELECT COUNT(*) num FROM '.PC_TB_CLASSES.'
+			 WHERE project_id = :pid'
+				.($file ? ' AND file LIKE :file' : '')
+				.($class ? ' AND name LIKE :class' : '')
+		);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		if($file)
+			$stmt->bind(':file','%'.$file.'%');
+		if($class)
+			$stmt->bind(':class','%'.$class.'%');
+		$row = $db->get_row($stmt->get_statement());
+		return $row['num'];
+	}
+	
+	/**
 	 * Returns the classes with given file in the given project
 	 *
 	 * @param string $file the file-name
@@ -118,10 +144,12 @@ class PC_DAO_Classes extends FWS_Singleton
 	 *
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
+	 * @param string $class the class-name
+	 * @param string $file the file
 	 * @param int $pid the project-id (default = current)
 	 * @return array all found classes
 	 */
-	public function get_list($start = 0,$count = 0,$pid = PC_Project::CURRENT_ID)
+	public function get_list($start = 0,$count = 0,$class = '',$file = '',$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -131,13 +159,19 @@ class PC_DAO_Classes extends FWS_Singleton
 			FWS_Helper::def_error('intge0','count',$count);
 		
 		$classes = array();
-		$rows = $db->get_rows(
+		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASSES.'
-			 WHERE project_id = '.PC_Utils::get_project_id($pid).'
-			 ORDER BY name ASC
+			 WHERE project_id = '.PC_Utils::get_project_id($pid)
+				.($file ? ' AND file LIKE :file' : '')
+				.($class ? ' AND name LIKE :class' : '')
+			.' ORDER BY name ASC
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
-		foreach($rows as $row)
+		if($file)
+			$stmt->bind(':file','%'.$file.'%');
+		if($class)
+			$stmt->bind(':class','%'.$class.'%');
+		foreach($db->get_rows($stmt->get_statement()) as $row)
 			$classes[] = $this->_build_class($row);
 		return $classes;
 	}
