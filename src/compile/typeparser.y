@@ -124,7 +124,7 @@ unticked_statement ::= T_DO statement T_WHILE LPAREN expr RPAREN SEMI.
 unticked_statement ::= T_FOR 
 			LPAREN
 				for_expr
-			COLON 
+			SEMI 
 				for_expr
 			SEMI
 				for_expr

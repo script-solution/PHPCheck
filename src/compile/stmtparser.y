@@ -117,10 +117,19 @@ top_statement ::= T_HALT_COMPILER LPAREN RPAREN SEMI.
 statement ::= unticked_statement.
 
 unticked_statement ::= LCURLY inner_statement_list RCURLY.
-unticked_statement ::= T_IF LPAREN expr RPAREN statement elseif_list else_single.
-unticked_statement ::= T_IF LPAREN expr RPAREN COLON inner_statement_list new_elseif_list new_else_single T_ENDIF COLON.
-unticked_statement ::= T_WHILE LPAREN expr RPAREN while_statement.
-unticked_statement ::= T_DO statement T_WHILE LPAREN expr RPAREN SEMI.
+unticked_statement ::= T_IF LPAREN expr RPAREN statement elseif_list else_single. {
+	$this->state->end_cond();
+}
+unticked_statement ::= T_IF LPAREN expr RPAREN COLON inner_statement_list
+											 new_elseif_list new_else_single T_ENDIF COLON. {
+	$this->state->end_cond();
+}
+unticked_statement ::= T_WHILE LPAREN expr RPAREN while_statement. {
+	$this->state->end_loop();
+}
+unticked_statement ::= T_DO statement T_WHILE LPAREN expr RPAREN SEMI. {
+	$this->state->end_loop();
+}
 unticked_statement ::= T_FOR 
 			LPAREN
 				for_expr
@@ -129,8 +138,12 @@ unticked_statement ::= T_FOR
 			SEMI
 				for_expr
 			RPAREN
-			for_statement.
-unticked_statement ::= T_SWITCH LPAREN expr RPAREN switch_case_list.
+			for_statement. {
+	$this->state->end_loop();
+}
+unticked_statement ::= T_SWITCH LPAREN expr RPAREN switch_case_list. {
+	$this->state->end_cond();
+}
 unticked_statement ::= T_BREAK SEMI.
 unticked_statement ::= T_BREAK expr SEMI.
 unticked_statement ::= T_CONTINUE SEMI.
@@ -147,10 +160,14 @@ unticked_statement ::= T_USE use_filename SEMI.
 unticked_statement ::= T_UNSET LPAREN unset_variables LPAREN SEMI.
 unticked_statement ::= T_FOREACH LPAREN variable T_AS 
 		foreach_variable foreach_optional_arg RPAREN
-		foreach_statement.
+		foreach_statement. {
+	$this->state->end_loop();
+}
 unticked_statement ::= T_FOREACH LPAREN expr_without_variable T_AS 
 		w_variable foreach_optional_arg RPAREN
-		foreach_statement.
+		foreach_statement. {
+	$this->state->end_loop();
+}
 unticked_statement ::= T_DECLARE LPAREN declare_list RPAREN declare_statement.
 unticked_statement ::= SEMI.
 unticked_statement ::= T_TRY LCURLY inner_statement_list RCURLY
@@ -158,7 +175,9 @@ unticked_statement ::= T_TRY LCURLY inner_statement_list RCURLY
 		fully_qualified_class_name
 		T_VARIABLE RPAREN
 		LCURLY inner_statement_list RCURLY
-		additional_catches.
+		additional_catches. {
+	$this->state->end_cond();
+}
 unticked_statement ::= T_THROW expr SEMI.
 
 additional_catches ::= non_empty_additional_catches.

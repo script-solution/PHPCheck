@@ -47,6 +47,25 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	private $scope = PC_Obj_Variable::SCOPE_GLOBAL;
 	/**
+	 * Will be > 0 if we're in a loop
+	 * 
+	 * @var int
+	 */
+	private $loopdepth = 0;
+	/**
+	 * Will be > 0 if we're in a condition
+	 * 
+	 * @var int
+	 */
+	private $conddepth = 0;
+	/**
+	 * For each condition and loop a list of variables we should mark as unknown as soon
+	 * as we leave the condition.
+	 * 
+	 * @var array
+	 */
+	private $layers = array();
+	/**
 	 * The variables
 	 * 
 	 * @var array
@@ -256,12 +275,23 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	public function set_var($var,$value)
 	{
+		$varname = $var->get_name();
+		// if we're in a condition save a backup of the current var for later comparisons
+		if($varname && count($this->layers) > 0)
+		{
+			$layer = &$this->layers[count($this->layers) - 1];
+			if(!isset($layer[$varname]))
+			{
+				$clone = isset($this->vars[$this->scope][$varname]) ? clone $var : null;
+				$layer[$varname] = $clone;
+			}
+		}
 		$var->set_type($value->get_type());
-		if($var->get_name())
+		if($varname)
 		{
 			$var->set_function($this->get_func());
 			$var->set_class($this->get_class());
-			$this->vars[$this->scope][$var->get_name()] = $var;
+			$this->vars[$this->scope][$varname] = $var;
 		}
 		return $value;
 	}
@@ -316,6 +346,64 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 			$this->scope = substr($this->scope,0,$pos);
 		else
 			$this->scope = PC_Obj_Variable::SCOPE_GLOBAL;
+	}
+	
+	/**
+	 * Starts a loop
+	 */
+	private function start_loop()
+	{
+		array_push($this->layers,array());
+		$this->loopdepth++;
+	}
+	
+	/**
+	 * Ends a loop
+	 */
+	public function end_loop()
+	{
+		assert($this->loopdepth > 0);
+		$this->loopdepth--;
+		$this->perform_pending_changes();
+	}
+	
+	/**
+	 * Starts a condition
+	 */
+	private function start_cond()
+	{
+		array_push($this->layers,array());
+		$this->conddepth++;
+	}
+	
+	/**
+	 * Ends a condition
+	 */
+	public function end_cond()
+	{
+		assert($this->conddepth > 0);
+		$this->conddepth--;
+		$this->perform_pending_changes();
+	}
+	
+	/**
+	 * Performs the required actions when leaving a loop/condition
+	 */
+	private function perform_pending_changes()
+	{
+		$changes = array_pop($this->layers);
+		foreach($changes as $name => $var)
+		{
+			$curvar = $this->vars[$this->scope][$name];
+			/* @var $var PC_Obj_Variable */
+			// if the variable was created in the condition/loop or the type has changed in it, we don't
+			// know the type behind the condition/loop. since we don't know wether the cond/loop is executed
+			if($var === null || !$curvar->get_type()->equals($var->get_type()))
+				$curvar->set_type(new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+			// if the variable was known before and the value changed, clear the value
+			else if($var !== null && $curvar->get_type()->get_value() !== $var->get_type()->get_value())
+				$curvar->get_type()->set_value(null);
+		}
 	}
 	
 	/**
@@ -380,7 +468,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	public function handle_unary_op($op,$e)
 	{
 		$type = $e->get_type();
-		if($type->is_unknown() || $type->get_value() === null)
+		if($this->loopdepth > 0 || $type->is_unknown() || $type->get_value() === null)
 			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
 		eval('$res = '.$op.$type->get_value_for_eval().';');
 		return $this->get_type_from_php($res);
@@ -413,6 +501,9 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	{
 		$t1 = $e1->get_type();
 		$t2 = $e2->get_type();
+		// if we're in a loop, don't try to provide the value since we don't know how often it is done
+		if($this->loopdepth > 0)
+			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$t1,$t2)));
 		// if we don't know one of the types or values, try to determine the type by the operator
 		if($t1->is_unknown() || $t2->is_unknown() || $t1->get_value() === null || $t2->get_value() === null)
 			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$t1,$t2)));
@@ -442,7 +533,8 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		$t1 = $e1->get_type();
 		$t2 = $e2->get_type();
 		$t3 = $e3->get_type();
-		if($t1->is_unknown() || $t1->get_value() === null)
+		// don't try to evalulate $e1 in loops or if its unknown
+		if($this->loopdepth > 0 || $t1->is_unknown() || $t1->get_value() === null)
 		{
 			// if the type is the same, we know the result-type
 			if($t2->get_type() == $t3->get_type())
@@ -470,7 +562,9 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		$t1 = $e1->get_type();
 		$t2 = $e2->get_type();
 		// if we don't know one of the types or values, try to determine the type by the operator
-		if($t1->is_unknown() || $t2->is_unknown() || $t1->get_value() === null || $t2->get_value() === null)
+		// if we're in a loop, do that, too.
+		if($this->loopdepth > 0 || $t1->is_unknown() || $t2->is_unknown() || $t1->get_value() === null
+				|| $t2->get_value() === null)
 			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$t1,$t2)));
 		// if we have an array-operation, just return bool, because we would have to do it ourself
 		// and I think its not worth the effort.
@@ -510,11 +604,16 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	public function handle_pre_op($op,$var)
 	{
 		$type = $var->get_type();
-		if($type->is_unknown() || $type->get_value() === null)
-			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
-		$res = 0;
-		eval('$res = '.$type->get_value_for_eval().$op.'1;');
-		return $this->set_var($var,$this->get_type_from_php($res));
+		// in loops always by op
+		if($this->loopdepth > 0 || $type->is_unknown() || $type->get_value() === null)
+			$res = new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
+		else
+		{
+			$res = 0;
+			eval('$res = '.$type->get_value_for_eval().$op.'1;');
+			$res = $this->get_type_from_php($res);
+		}
+		return $this->set_var($var,$res);
 	}
 	
 	/**
@@ -528,11 +627,16 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	{
 		$clone = clone $var;
 		$type = $var->get_type();
-		if($type->is_unknown() || $type->get_value() === null)
-			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
-		$res = 0;
-		eval('$res = '.$type->get_value_for_eval().$op.'1;');
-		$this->set_var($var,$this->get_type_from_php($res));
+		// in loops always by op
+		if($this->loopdepth > 0 || $type->is_unknown() || $type->get_value() === null)
+			$res = new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
+		else
+		{
+			$res = 0;
+			eval('$res = '.$type->get_value_for_eval().$op.'1;');
+			$res = $this->get_type_from_php($res);
+		}
+		$this->set_var($var,$res);
 		return $clone;
 	}
 	
@@ -613,8 +717,8 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 			return $this->get_unknown();
 		
 		$t = $e->get_type();
-		// if we don't know the type or value, just provide the type
-		if($t->is_unknown() || $t->get_value() === null)
+		// if we don't know the type or value, just provide the type; in loops as well
+		if($this->loopdepth > 0 || $t->is_unknown() || $t->get_value() === null)
 			return new PC_Obj_Variable('',PC_Obj_Type::get_type_by_name($cast));
 		
 		// we know the value, so perform a cast
@@ -631,8 +735,8 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	public function handle_instanceof($e,$name)
 	{
-		// if the name is not a string, give up; actually this should never happen
-		if($name->get_type()->get_type() != PC_Obj_Type::STRING)
+		// if we're in a loop or the name is not a string, give up
+		if($this->loopdepth > 0 || $name->get_type()->get_type() != PC_Obj_Type::STRING)
 			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
 		
 		// if we don't know the type or its class we can't say wether its a superclass
@@ -709,10 +813,26 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		if($this->pos >= 0)
 		{
 			$type = $this->tokens[$this->pos][0];
-			if($type == T_FUNCTION)
-				$this->start_function($this->get_type_name());
-			else if($type == T_CLASS)
-				$this->start_class($this->get_type_name());
+			switch($type)
+			{
+				case T_FUNCTION:
+					$this->start_function($this->get_type_name());
+					break;
+				case T_CLASS:
+					$this->start_class($this->get_type_name());
+					break;
+				case T_FOR:
+				case T_FOREACH:
+				case T_WHILE:
+				case T_DO:
+					$this->start_loop();
+					break;
+				case T_IF:
+				case T_SWITCH:
+				case T_TRY:
+					$this->start_cond();
+					break;
+			}
 		}
 		
 		return parent::advance($parser);
