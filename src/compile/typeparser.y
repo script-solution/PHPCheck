@@ -297,7 +297,7 @@ expr_without_variable ::= T_BOOL_CAST expr.
 expr_without_variable ::= T_UNSET_CAST expr.
 expr_without_variable ::= T_EXIT exit_expr.
 expr_without_variable ::= AT expr.
-expr_without_variable ::= scalar.
+expr_without_variable(A) ::= scalar(sc). { A = sc; }
 expr_without_variable ::= T_ARRAY LPAREN array_pair_list RPAREN.
 expr_without_variable ::= BACKQUOTE encaps_list BACKQUOTE.
 expr_without_variable ::= T_PRINT expr.
@@ -325,8 +325,8 @@ static_scalar(A) ::= T_STRING(sval). {
 		A = new PC_Obj_Type(PC_Obj_Type::BOOL,true);
 	else if(strcasecmp(sval,"false") == 0)
 		A = new PC_Obj_Type(PC_Obj_Type::BOOL,false);
-	else
-		A = new PC_Obj_Type(PC_Obj_Type::STRING,sval);
+	else 
+		A = $this->state->get_constant_type(sval);
 } 
 static_scalar(A) ::= PLUS static_scalar(sval). {
 	A = $this->state->handle_unary_op('+',new PC_Obj_Variable('',sval))->get_type();
@@ -349,7 +349,7 @@ non_empty_static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) C
 non_empty_static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA
 																				static_scalar(sval). {
 	A = list;
-	A->set_array_type(A->get_array_count(),sval);
+	A->set_array_type(A->get_next_array_key(),sval);
 }
 non_empty_static_array_pair_list(A) ::= static_scalar(skey) T_DOUBLE_ARROW static_scalar(sval). {
 	A = new PC_Obj_Type(PC_Obj_Type::TARRAY);
@@ -486,15 +486,27 @@ optional_class_type(A) ::= T_STRING(vtype). { A = new PC_Obj_Type(PC_Obj_Type::O
 optional_class_type(A) ::= T_ARRAY. { A = new PC_Obj_Type(PC_Obj_Type::TARRAY); }
 optional_class_type(A) ::= . { A = new PC_Obj_Type(PC_Obj_Type::UNKNOWN); }
 
-function_call_parameter_list ::= non_empty_function_call_parameter_list.
-function_call_parameter_list ::= .
+function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list). { A = list; }
+function_call_parameter_list(A) ::= . { A = array(); }
 
-non_empty_function_call_parameter_list ::= expr_without_variable.
-non_empty_function_call_parameter_list ::= variable.
-non_empty_function_call_parameter_list ::= AMPERSAND w_variable.
-non_empty_function_call_parameter_list ::= non_empty_function_call_parameter_list COMMA expr_without_variable.
-non_empty_function_call_parameter_list ::= non_empty_function_call_parameter_list COMMA variable.
-non_empty_function_call_parameter_list ::= non_empty_function_call_parameter_list COMMA AMPERSAND w_variable.
+non_empty_function_call_parameter_list(A) ::= expr_without_variable(e). { A = array(e); }
+non_empty_function_call_parameter_list(A) ::= variable(var). { A = array(var); }
+non_empty_function_call_parameter_list(A) ::= AMPERSAND w_variable(var). { A = array(var); }
+non_empty_function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list)
+																							COMMA expr_without_variable(e). {
+	A = list;
+	A[] = e;
+}
+non_empty_function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list)
+																							COMMA variable(var). {
+	A = list;
+	A[] = var;
+}
+non_empty_function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list)
+																							COMMA AMPERSAND w_variable(var). {
+	A = list;
+	A[] = var;
+}
 
 global_var_list ::= global_var_list COMMA global_var.
 global_var_list ::= global_var.
@@ -720,18 +732,36 @@ class_constant ::= fully_qualified_class_name T_PAAMAYIM_NEKUDOTAYIM T_STRING.
 
 fully_qualified_class_name(A) ::= T_STRING(name). { A = new PC_Type_yyToken(name); }
 
-function_call ::= T_STRING LPAREN function_call_parameter_list RPAREN.
+function_call ::= T_STRING(name) LPAREN function_call_parameter_list(args) RPAREN. {
+	if(strcasecmp(name,'define') == 0)
+		$this->state->handle_define(args);
+}
 function_call ::= fully_qualified_class_name T_PAAMAYIM_NEKUDOTAYIM T_STRING LPAREN function_call_parameter_list RPAREN.
 function_call ::= fully_qualified_class_name T_PAAMAYIM_NEKUDOTAYIM variable_without_objects LPAREN function_call_parameter_list RPAREN.
 function_call ::= variable_without_objects LPAREN function_call_parameter_list RPAREN.
 
-scalar ::= T_STRING.
-scalar ::= T_STRING_VARNAME.
-scalar ::= class_constant.
-scalar ::= common_scalar.
-scalar ::= DOUBLEQUOTE encaps_list DOUBLEQUOTE.
-scalar ::= SINGLEQUOTE encaps_list SINGLEQUOTE.
-scalar ::= T_START_HEREDOC encaps_list T_END_HEREDOC.
+scalar(A) ::= T_STRING(str). {
+	if(strcasecmp(str,"true") == 0)
+		A = new PC_Obj_Type(PC_Obj_Type::BOOL,true);
+	else if(strcasecmp(str,"false") == 0)
+		A = new PC_Obj_Type(PC_Obj_Type::BOOL,false);
+	else 
+		A = $this->state->get_constant_type(str);
+}
+scalar(A) ::= T_STRING_VARNAME. {
+	A = new PC_Obj_Type(PC_Obj_Type::STRING);
+}
+scalar(A) ::= class_constant.
+scalar(A) ::= common_scalar(sc). { A = sc; }
+scalar(A) ::= DOUBLEQUOTE encaps_list DOUBLEQUOTE. {
+	A = new PC_Obj_Type(PC_Obj_Type::STRING);
+}
+scalar(A) ::= SINGLEQUOTE encaps_list SINGLEQUOTE. {
+	A = new PC_Obj_Type(PC_Obj_Type::STRING);
+}
+scalar(A) ::= T_START_HEREDOC encaps_list T_END_HEREDOC. {
+	A = new PC_Obj_Type(PC_Obj_Type::STRING);
+}
 
 class_name_reference ::= T_STRING.
 class_name_reference ::= dynamic_class_name_reference.

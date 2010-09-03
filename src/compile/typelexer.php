@@ -82,6 +82,12 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	 * @var array
 	 */
 	private $classes = array();
+	/**
+	 * The found constants
+	 * 
+	 * @var array
+	 */
+	private $consts = array();
 	
 	/**
 	 * @return int the line in which the last function was declared
@@ -113,6 +119,14 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	public function get_classes()
 	{
 		return $this->classes;
+	}
+	
+	/**
+	 * @return array the found constants
+	 */
+	public function get_constants()
+	{
+		return $this->consts;
 	}
 	
 	/**
@@ -170,6 +184,39 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 			$class->add_interface($if);
 		$this->handle_class_stmts($class,$stmts);
 		$this->classes[$class->get_name()] = $class;
+	}
+	
+	/**
+	 * Handles a define
+	 * 
+	 * @param array $args an array of arguments (PC_Obj_Type)
+	 */
+	public function handle_define($args)
+	{
+		// define has 2 or 3 args
+		if(count($args) != 2 && count($args) != 3)
+			return;
+		// if the type of the name is unknown, do nothing
+		if($args[0] === null || $args[0]->is_unknown())
+			return;
+		if($args[0]->get_type() != PC_Obj_Type::STRING)
+			return;
+		$name = $args[0]->get_value();
+		$type = $args[1] !== null ? $args[1] : new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
+		$this->consts[$name] = new PC_Obj_Constant($this->get_file(),$this->get_line(),$name,$type);
+	}
+	
+	/**
+	 * Returns the value of the given constant
+	 * 
+	 * @param string $name the constant-name
+	 * @return PC_Obj_Type the type
+	 */
+	public function get_constant_type($name)
+	{
+		if(isset($this->consts[$name]))
+			return $this->consts[$name]->get_type();
+		return new PC_Obj_Type(PC_Obj_Type::STRING,$name);
 	}
 	
 	/**

@@ -38,6 +38,12 @@ class PC_Compile_TypeScannerFrontend extends FWS_Object
 	 * @var array
 	 */
 	private $classes = array();
+	/**
+	 * The found constants
+	 * 
+	 * @var array
+	 */
+	private $consts = array();
 	
 	/**
 	 * @return array the found functions
@@ -53,6 +59,14 @@ class PC_Compile_TypeScannerFrontend extends FWS_Object
 	public function get_classes()
 	{
 		return $this->classes;
+	}
+	
+	/**
+	 * @return array the found constants
+	 */
+	public function get_constants()
+	{
+		return $this->consts;
 	}
 	
 	/**
@@ -89,6 +103,7 @@ class PC_Compile_TypeScannerFrontend extends FWS_Object
 		
 		$this->functions = array_merge($this->functions,$this->lexer->get_functions());
 		$this->classes = array_merge($this->classes,$this->lexer->get_classes());
+		$this->consts = array_merge($this->consts,$this->lexer->get_constants());
 	}
 	
 	protected function get_dump_vars()

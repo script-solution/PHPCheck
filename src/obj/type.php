@@ -131,7 +131,7 @@ final class PC_Obj_Type extends FWS_Object
 			FWS_Helper::def_error('int','type',$type);
 		
 		$this->_type = $type;
-		$this->_value = $value;
+		$this->set_value($value);
 		$this->_class = $class;
 	}
 	
@@ -176,6 +176,24 @@ final class PC_Obj_Type extends FWS_Object
 		if($this->_type == self::TARRAY && $this->_value !== null)
 			return count($this->_value);
 		return 0;
+	}
+	
+	/**
+	 * Determines the next array-key to use
+	 * 
+	 * @return int the key
+	 */
+	public function get_next_array_key()
+	{
+		if($this->_type != self::TARRAY || $this->_value === null)
+			return 0;
+		$max = -1;
+		foreach($this->_value as $k => $v)
+		{
+			if(FWS_Helper::is_integer($k) && $k > $max)
+				$max = $k;
+		}
+		return $max + 1;
 	}
 	
 	/**
@@ -370,6 +388,37 @@ final class PC_Obj_Type extends FWS_Object
 	public function set_value($value)
 	{
 		$this->_value = $value;
+		if($this->_value !== null)
+		{
+			switch($this->_type)
+			{
+				case self::BOOL:
+					$this->_value = (bool)$this->_value;
+					break;
+				case self::INT:
+					if(is_string($this->_value))
+					{
+						if(strcasecmp(substr($this->_value,0,2),'0x') == 0)
+							$this->_value = hexdec(substr($this->_value,2));
+						else if(substr($this->_value,0,1) == '0')
+							$this->_value = octdec(substr($this->_value,1));
+						else
+							$this->_value = (int)$this->_value;
+					}
+					else
+						$this->_value = (int)$this->_value;
+					break;
+				case self::FLOAT:
+					$this->_value = (float)$this->_value;
+					break;
+				case self::STRING:
+					$this->_value = (string)$this->_value;
+					break;
+				case self::TARRAY:
+					$this->_value = (array)$this->_value;
+					break;
+			}
+		}
 	}
 	
 	/**

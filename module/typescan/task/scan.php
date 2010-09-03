@@ -49,8 +49,8 @@ final class PC_Module_TypeScan_Task_Scan extends FWS_Object implements FWS_Progr
 			$tscanner->scan_file($files[$i]);
 			foreach($tscanner->get_classes() as $class)
 				PC_DAO::get_classes()->create($class);
-			//foreach($tscanner->get_constants() as $const)
-			//	PC_DAO::get_constants()->create($const);
+			foreach($tscanner->get_constants() as $const)
+				PC_DAO::get_constants()->create($const);
 			foreach($tscanner->get_functions() as $func)
 				PC_DAO::get_functions()->create($func);
 		}

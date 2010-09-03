@@ -132,7 +132,7 @@ class PC_Obj_Variable extends FWS_Object
 	public function array_offset($key)
 	{
 		if($key === null)
-			$key = $this->type->get_array_count();
+			$key = $this->type->get_next_array_key();
 		
 		// fetch element or create it
 		$el = $this->type->get_array_type($key);

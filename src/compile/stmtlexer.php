@@ -264,6 +264,20 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	}
 	
 	/**
+	 * Returns the value of the given constant
+	 * 
+	 * @param string $name the constant-name
+	 * @return PC_Obj_Variable the type
+	 */
+	public function get_constant_type($name)
+	{
+		$const = $this->types->get_constant($name);
+		if($const === null)
+			return $this->get_unknown();
+		return new PC_Obj_Variable('',$const->get_type());
+	}
+	
+	/**
 	 * Returns the value of the variable with given name in current scope. If it does not exist,
 	 * a new one is created (but not stored in scope).
 	 * 
@@ -303,6 +317,29 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 				$layer[$varname] = $clone;
 			}
 		}
+		if($value === null)
+		{
+			// if a variable-type is unknown and we're in a function/class, check if we know the type
+			// from the type-scanner
+			if(($pos = strpos($this->scope,'::')) !== false)
+			{
+				$class = $this->types->get_class(substr($this->scope,0,$pos));
+				if($class === null)
+					$value = $this->get_unknown();
+				else
+				{
+					$func = $class->get_method(substr($this->scope,$pos + 2));
+					$value = $this->get_funcparam_type($func,$varname);
+				}
+			}
+			else if($this->scope != PC_Obj_Variable::SCOPE_GLOBAL)
+			{
+				$func = $this->types->get_function($this->scope);
+				$value = $this->get_funcparam_type($func,$varname);
+			}
+			else
+				$value = $this->get_unknown();
+		}
 		$var->set_type($value->get_type());
 		if($varname)
 		{
@@ -311,6 +348,28 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 			$this->vars[$this->scope][$varname] = $var;
 		}
 		return $value;
+	}
+	
+	/**
+	 * Determines the type of the given function-parameter
+	 * 
+	 * @param PC_Obj_Method $func the function/method
+	 * @param string $varname the variable-name
+	 * @return PC_Obj_Variable the type
+	 */
+	private function get_funcparam_type($func,$varname)
+	{
+		if($func === null)
+			return $this->get_unknown();
+		// TODO remove the '$' in the type-scanner
+		$param = $func->get_param('$'.$varname);
+		if($param === null)
+			return $this->get_unknown();
+		$mtype = $param->get_mtype();
+		if($mtype->is_unknown() || $mtype->is_multiple())
+			return $this->get_unknown();
+		$types = $mtype->get_types();
+		return new PC_Obj_Variable('',$types[0]);
 	}
 	
 	/**
