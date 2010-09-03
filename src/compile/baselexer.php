@@ -86,8 +86,8 @@ class PC_Compile_BaseLexer
 	/**
 	 * Protected constructor because its a bit ugly (without method-overloading)
 	 * 
-	 * @param $str the file or string
-	 * @param $is_file wether $str is a file
+	 * @param string $str the file or string
+	 * @param bool $is_file wether $str is a file
 	 */
 	protected function __construct($str,$is_file)
 	{
