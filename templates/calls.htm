@@ -36,21 +36,25 @@
 <table width="100%" class="pc_table">
 	<tr>
 		<th>Call</th>
-		<th>File</th>
-		<th align="center">Line</th>
+		<th>Location</th>
 	</tr>
 	{if calls.length == 0}
 	<tr>
-		<td colspan="3" class="pc_main" align="center">No calls found</td>
+		<td colspan="2" class="pc_main" align="center">No calls found</td>
 	</tr>
 	{else}
 	{loop calls as call}
 	<tr>
 		<td class="pc_main">
 		<a href="{call:url}"><img src="images/goto.gif" alt="-&gt;" /></a> {call:call}
+		<div style="float: right;">
+			<a href="#" onclick="javascript:toggleCode('{get_code_url}','call','{call:id}');">
+			<img id="call_img_{call:id}" src="images/crossclosed.gif" alt="+" />
+			</a>
+		</div>
+		<div id="call_area_{call:id}" class="pc_code" style="display: none;"></div>
 		</td>
-		<td class="pc_main">{call:file}</td>
-		<td class="pc_main" align="center">{call:line}</td>
+		<td class="pc_main">{call:file}, line {call:line}</td>
 	</tr>
 	{endloop}
 	{endif}

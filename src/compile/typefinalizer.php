@@ -125,8 +125,9 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 						}
 						else
 						{
-							$this->_storage->create_function($function,$data->get_id());
-							$data->add_method($function);
+							$clone = clone $function;
+							$clone->set_id($this->_storage->create_function($clone,$data->get_id()));
+							$data->add_method($clone);
 						}
 					}
 				}
@@ -136,16 +137,18 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 				{
 					if($field->get_visibility() != PC_Obj_Visible::V_PRIVATE)
 					{
-						$data->add_field($field);
-						$this->_storage->create_field($field,$data->get_id());
+						$clone = clone $field;
+						$data->add_field($clone);
+						$this->_storage->create_field($clone,$data->get_id());
 					}
 				}
 				
 				// constants
 				foreach($cobj->get_constants() as $const)
 				{
-					$data->add_constant($const);
-					$this->_storage->create_constant($const,$data->get_id());
+					$clone = clone $const;
+					$data->add_constant($clone);
+					$this->_storage->create_constant($clone,$data->get_id());
 				}
 			}
 			

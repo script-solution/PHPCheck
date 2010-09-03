@@ -38,13 +38,26 @@ final class PC_SubModule_types_consts extends PC_SubModule
 	{
 		$tpl = FWS_Props::get()->tpl();
 		$input = FWS_Props::get()->input();
+		$cookies = FWS_Props::get()->cookies();
 		
-		$pagination = new PC_Pagination(PC_ENTRIES_PER_PAGE,PC_DAO::get_constants()->get_count());
-		$pagination->populate_tpl(PC_URL::get_submod_url());
+		$file = $input->get_var('file',-1,FWS_Input::STRING);
+		$name = $input->get_var('name',-1,FWS_Input::STRING);
+		
+		$url = PC_URL::get_submod_url();
+		$url->set('file',$file);
+		$url->set('name',$name);
+		$surl = clone $url;
+		
+		$pagination = new PC_Pagination(
+			PC_ENTRIES_PER_PAGE,PC_DAO::get_constants()->get_count_for(0,$file,$name)
+		);
+		$pagination->populate_tpl($url);
 		$start = $pagination->get_start();
 		
 		$consts = array();
-		$constants = PC_DAO::get_constants()->get_list(0,PC_Project::CURRENT_ID,$start,PC_ENTRIES_PER_PAGE);
+		$constants = PC_DAO::get_constants()->get_list(
+			0,$file,$name,PC_Project::CURRENT_ID,$start,PC_ENTRIES_PER_PAGE
+		);
 		foreach($constants as $const)
 		{
 			$consts[] = array(
@@ -55,8 +68,14 @@ final class PC_SubModule_types_consts extends PC_SubModule
 			);
 		}
 		
+		$this->request_formular();
 		$tpl->add_variables(array(
-			'consts' => $consts
+			'consts' => $consts,
+			'file' => $file,
+			'name' => $name,
+			'search_target' => $surl->to_url(),
+			'display_search' => $cookies->get_cookie('consts_search') ? 'block' : 'none',
+			'cookie_name' => $cookies->get_prefix().'consts_search',
 		));
 	}
 }

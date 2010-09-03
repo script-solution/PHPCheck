@@ -32,6 +32,13 @@ class PC_Obj_Parameter extends FWS_Object
 	private $optional = false;
 	
 	/**
+	 * Wether its the first variable argument of the function
+	 * 
+	 * @var boolean
+	 */
+	private $first_var_arg = false;
+	
+	/**
 	 * The possible types of the parameter
 	 *
 	 * @var PC_Obj_MultiType
@@ -106,6 +113,28 @@ class PC_Obj_Parameter extends FWS_Object
 	public function set_optional($opt)
 	{
 		$this->optional = (bool)$opt;
+		if($this->optional)
+			$this->first_var_arg = false;
+	}
+	
+	/**
+	 * @return boolean wether the parameter is the first variable argument
+	 */
+	public function is_first_vararg()
+	{
+		return $this->first_var_arg;
+	}
+	
+	/**
+	 * Sets wether the parameter is the first variable argument
+	 *
+	 * @param boolean $first the new value
+	 */
+	public function set_first_vararg($first)
+	{
+		$this->first_var_arg = (bool)$first;
+		if($this->first_var_arg)
+			$this->optional = false;
 	}
 	
 	protected function get_dump_vars()
@@ -115,7 +144,7 @@ class PC_Obj_Parameter extends FWS_Object
 	
 	public function __ToString()
 	{
-		return $this->mtype.($this->optional ? '?' : '');
+		return $this->mtype.($this->optional ? '?' : ($this->first_var_arg ? '*' : ''));
 	}
 }
 ?>

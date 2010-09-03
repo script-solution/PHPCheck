@@ -151,14 +151,25 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 				if($classobj === null || $classobj->get_super_class() == '')
 					return $this->get_unknown();
 				$cname = $classobj->get_super_class();
-				// parent-calls are never static
-				$static = false;
+				// if we're in a static method, the call is always static
+				$curfname = $this->get_scope_part_name(T_FUNC_C);
+				$curfunc = $classobj->get_method($curfname);
+				if($curfunc === null || $curfunc->is_static())
+					$static = true;
+				else
+				{
+					// if we're in a non-static method, its a static-call if the method we're calling is
+					// static, and not if its not. i.e. we basically don't detect errors here
+					$super = $this->types->get_class($cname);
+					$func = $super->get_method($fname);
+					$static = $func !== null && $func->is_static();
+				}
 			}
 			else if($cname == 'self')
 			{
 				$cname = $this->get_scope_part_name(T_CLASS_C);
-				// self is always static
-				$static = true;
+				// self is static if its not a constructor-call
+				$static = $fname != '__construct';
 			}
 			$call->set_class($cname);
 		}

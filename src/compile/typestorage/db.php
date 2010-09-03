@@ -22,7 +22,7 @@ final class PC_Compile_TypeStorage_DB implements PC_Compile_TypeStorage
 {
 	public function create_function($method,$classid)
 	{
-		PC_DAO::get_functions()->create($method,$classid);
+		return PC_DAO::get_functions()->create($method,$classid);
 	}
 	
 	public function update_function($method,$classid)
@@ -32,12 +32,12 @@ final class PC_Compile_TypeStorage_DB implements PC_Compile_TypeStorage
 	
 	public function create_field($field,$classid)
 	{
-		PC_DAO::get_classfields()->create($field,$classid);
+		return PC_DAO::get_classfields()->create($field,$classid);
 	}
 	
 	public function create_constant($const,$classid)
 	{
-		PC_DAO::get_constants()->create($const,$classid);
+		return PC_DAO::get_constants()->create($const,$classid);
 	}
 }
 ?>

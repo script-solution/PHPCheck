@@ -154,7 +154,7 @@ class PC_Compile_BaseLexer
 			'file' => $this->file,
 			'line' => $this->line,
 			'token' => $token,
-			'value' => $this->value,
+			'value' => $this->tokens[$this->pos][1],
 			'debugval' => $val
 		));
 	}

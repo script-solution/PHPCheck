@@ -5,6 +5,17 @@ body {
 	font-size: 12px;
 }
 
+div#ajax_wait_bar {
+	left: 0px;
+	text-align: center;
+	background-color: #008000;
+	color: white;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 4px;
+	border: 1px dotted #fff;
+}
+
 img {
 	border: 0;
 }
@@ -167,6 +178,14 @@ td.pc_coldesc {
 	-webkit-border-radius: 2px;
 	padding: 1px;
 	border: 1px solid #7F90AE;
+}
+
+.pc_code {
+	margin: 0.3em;
+	padding: 0.3em;
+	border: 1px dotted #999;
+	background-color: #fff;
+	font-family: monospace;
 }
 
 /* ------------ LISTS ------------ */

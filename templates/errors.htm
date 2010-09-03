@@ -51,12 +51,11 @@
 	<tr>
 		<th>Type</th>
 		<th>Message</th>
-		<th>File</th>
-		<th>Line</th>
+		<th>Location</th>
 	</tr>
 	{if errors.length == 0}
 	<tr>
-		<td colspan="4" class="pc_main" align="center">No errors found</td>
+		<td colspan="3" class="pc_main" align="center">No errors found</td>
 	</tr>
 	{else}
 	{loop errors as err}
@@ -64,9 +63,14 @@
 		<td class="pc_main">{err:type}</td>
 		<td class="pc_main">
 		<a href="{err:fileurl}"><img src="images/goto.gif" alt="-&gt;" /></a> {err:message}
+		<div style="float: right;">
+			<a href="#" onclick="javascript:toggleCode('{get_code_url}','error','{err:id}');">
+			<img id="error_img_{err:id}" src="images/crossclosed.gif" alt="+" />
+			</a>
+		</div>
+		<div id="error_area_{err:id}" class="pc_code" style="display: none;"></div>
 		</td>
-		<td class="pc_main">{err:file}</td>
-		<td class="pc_main" align="center">{err:line}</td>
+		<td class="pc_main">{err:file}, line {err:line}</td>
 	</tr>
 	{endloop}
 	{endif}

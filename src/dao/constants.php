@@ -48,6 +48,40 @@ class PC_DAO_Constants extends FWS_Singleton
 	}
 	
 	/**
+	 * Returns the number of constants for the given search
+	 *
+	 * @param int $class the class-id (0 = freestanding)
+	 * @param string $file the file to search for
+	 * @param string $name the name to search for
+	 * @param int $pid the project-id (default = current)
+	 * @return int the number
+	 */
+	public function get_count_for($class = 0,$file = '',$name = '',$pid = PC_Project::CURRENT_ID)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(!FWS_Helper::is_integer($class) || $class < 0)
+			FWS_Helper::def_error('intge0','class',$class);
+		
+		$stmt = $db->get_prepared_statement(
+			'SELECT COUNT(*) num FROM '.PC_TB_CONSTANTS.'
+			 WHERE project_id = :pid AND class = :class'
+			 .($file ? ' AND file LIKE :file' : '')
+			 .($name ? ' AND name LIKE :name' : '')
+		);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		$stmt->bind(':class',$class);
+		if($file)
+			$stmt->bind(':file','%'.$file.'%');
+		if($name)
+			$stmt->bind(':name','%'.$name.'%');
+		$row = $db->get_row($stmt->get_statement());
+		if($row)
+			return $row['num'];
+		return 0;
+	}
+	
+	/**
 	 * Returns the (free) constant with given name in the given project
 	 *
 	 * @param string $name the constant-name
@@ -76,12 +110,15 @@ class PC_DAO_Constants extends FWS_Singleton
 	 * Returns all constants
 	 *
 	 * @param int $class the class-id (0 = freestanding)
+	 * @param string $file the file to search for
+	 * @param string $name the name to search for
 	 * @param int $pid the project-id (0 = current)
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
 	 * @return array all found constants
 	 */
-	public function get_list($class = 0,$pid = PC_Project::CURRENT_ID,$start = 0,$count = 0)
+	public function get_list($class = 0,$file = '',$name = '',$pid = PC_Project::CURRENT_ID,
+		$start = 0,$count = 0)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -93,12 +130,20 @@ class PC_DAO_Constants extends FWS_Singleton
 			FWS_Helper::def_error('intge0','count',$count);
 		
 		$consts = array();
-		$rows = $db->get_rows(
+		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CONSTANTS.'
-			 WHERE class = '.$class.' AND project_id = '.PC_Utils::get_project_id($pid).'
-			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
+			 WHERE project_id = :pid AND class = :class'
+			 .($file ? ' AND file LIKE :file' : '')
+			 .($name ? ' AND name LIKE :name' : '')
+			.($count > 0 ? ' LIMIT '.$start.','.$count : '')
 		);
-		foreach($rows as $row)
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		$stmt->bind(':class',$class);
+		if($file)
+			$stmt->bind(':file','%'.$file.'%');
+		if($name)
+			$stmt->bind(':name','%'.$name.'%');
+		foreach($db->get_rows($stmt->get_statement()) as $row)
 			$consts[] = $this->_build_const($row);
 		return $consts;
 	}

@@ -259,26 +259,50 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 		$this->methods[$method->get_name()] = $method;
 	}
 	
-	public function __toString()
+	/**
+	 * Builds the class-signature
+	 * 
+	 * @param bool $hlnames if enabled, class-names are enclosed in #
+	 * @return string the signature
+	 */
+	public function get_signature($hlnames = false)
 	{
+		$name = ($hlnames ? '#'.$this->get_name().'#' : $this->get_name());
 		$str = '';
 		if($this->interface)
 		{
-			$str .= 'interface '.$this->get_name().' ';
+			$str .= 'interface '.$name.' ';
 			if(count($this->interfaces) > 0)
-				$str .= 'extends '.implode(', ',$this->interfaces).' ';
+			{
+				if($hlnames)
+					$str .= 'extends #'.implode('#, #',$this->interfaces).'# ';
+				else
+					$str .= 'extends '.implode(', ',$this->interfaces).' ';
+			}
 		}
-		else {
+		else
+		{
 			if($this->is_abstract())
 				$str .= 'abstract ';
 			else if($this->is_final())
 				$str .= 'final ';
-			$str .= 'class '.$this->get_name().' ';
+			$str .= 'class '.$name.' ';
 			if($this->superclass)
-				$str .= 'extends '.$this->superclass.' ';
+				$str .= 'extends '.($hlnames ? '#'.$this->superclass.'#' : $this->superclass).' ';
 			if(count($this->interfaces) > 0)
-				$str .= 'implements '.implode(', ',$this->interfaces).' ';
+			{
+				if($hlnames)
+					$str .= 'implements #'.implode('#, #',$this->interfaces).'# ';
+				else
+					$str .= 'implements '.implode(', ',$this->interfaces).' ';
+			}
 		}
+		return $str;
+	}
+	
+	public function __toString()
+	{
+		$str = $this->get_signature();
 		$str .= '{'."\n";
 		foreach($this->constants as $const)
 			$str .= "\t".$const.";\n";

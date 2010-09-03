@@ -1,24 +1,50 @@
 {include "inc_header.htm"}
 
 {if module_error == false}
+<script type="text/javascript" src="{gjs.get_file('src/functions.js')}"></script>
+
+<div class="pc_padbottom">
+	<form method="post" action="{search_target}">
+	<div class="pc_border">
+		<h1 class="pc_topic" onmouseover="this.style.cursor='pointer';"
+				onmouseout="this.style.cursor='default';"
+				onclick="toggleSearch('{cookie_name}','searchform');">Search</h1>
+		<div id="searchform" style="display: {display_search};">
+			<fieldset class="pc_form">
+				<dl>
+					<dt>File:</dt>
+					<dd>{form.get_textbox('file',file,40)}</dd>
+				</dl>
+				<dl>
+					<dt>Function:</dt>
+					<dd>{form.get_textbox('func',func,40)}</dd>
+				</dl>
+			</fieldset>
+			<div class="pc_main" style="margin-top: 1px; text-align: center">
+				<input type="button" value="Reset" onclick="document.location.href = '{gurl.build_submod_url()}';" />
+				<input type="submit" value="Search!" />
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+
 <table width="100%" class="pc_table">
 	<tr>
 		<th>Function</th>
-		<th>File</th>
+		<th>Location</th>
 		<th>Since</th>
-		<th>Line</th>
 	</tr>
 	{if funcs.length == 0}
 	<tr>
-		<td colspan="4" class="pc_main" align="center">No functions found</td>
+		<td colspan="3" class="pc_main" align="center">No functions found</td>
 	</tr>
 	{else}
-	{loop funcs as func}
+	{loop funcs as f}
 	<tr>
-		<td class="pc_main">{func:func}</td>
-		<td class="pc_main">{func:file}</td>
-		<td class="pc_main" align="center">{func:since}</td>
-		<td class="pc_main" align="center">{func:line}</td>
+		<td class="pc_main">{f:func}</td>
+		<td class="pc_main">{f:file}, line {f:line}</td>
+		<td class="pc_main" align="center">{f:since}</td>
 	</tr>
 	{endloop}
 	{endif}

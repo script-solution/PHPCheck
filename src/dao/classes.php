@@ -161,12 +161,13 @@ class PC_DAO_Classes extends FWS_Singleton
 		$classes = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASSES.'
-			 WHERE project_id = '.PC_Utils::get_project_id($pid)
+			 WHERE project_id = :pid'
 				.($file ? ' AND file LIKE :file' : '')
 				.($class ? ' AND name LIKE :class' : '')
 			.' ORDER BY name ASC
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($class)

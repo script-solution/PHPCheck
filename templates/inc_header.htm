@@ -5,6 +5,20 @@
 	<title>PHP-Check</title>
 	<link rel="stylesheet" href="templates/style.css" type="text/css" />
 	<script type="text/javascript" src="{gjs.get_file('js/basic.js','fws')}"></script>
+	<script type="text/javascript" src="{gjs.get_file('js/ajax.js','fws')}"></script>
+	
+	<script type="text/javascript">
+	<!--
+	var myAjax = new FWS_Ajax();
+	myAjax.setMimeType('text/plain; utf-8');
+	myAjax.setEventHandler('onstart',function() {
+		FWS_displayWaitBar('ajax_wait_bar');
+	});
+	myAjax.setEventHandler('onfinish',function() {
+		FWS_hideElement('ajax_wait_bar');
+	});
+	//-->
+	</script>
 </head>
 <body>
 

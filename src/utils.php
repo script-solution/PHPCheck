@@ -47,18 +47,6 @@ class PC_Utils extends FWS_UtilBase
 	}
 	
 	/**
-	 * Generates the parser
-	 */
-	public static function generate()
-	{
-		if(!is_file('src/compile/parser.php') ||
-			filemtime('src/compile/parser.y') > filemtime('src/compile/parser.php'))
-		{
-			exec('php /usr/share/php/PHP/ParserGenerator/cli.php src/compile/parser.y');
-		}
-	}
-	
-	/**
 	 * Highlights the given file
 	 *
 	 * @param string $file the file
@@ -71,20 +59,43 @@ class PC_Utils extends FWS_UtilBase
 			$source = FWS_FileUtils::read($file);
 		else
 			$source = '';
-		
+		return self::highlight_string($source,1,$line);
+	}
+	
+	/**
+	 * Highlights the given string
+	 *
+	 * @param string $source the string
+	 * @param int $start_line the first line (0 = display no lines)
+	 * @param int $line optional the line to mark
+	 * @param bool $links wether to use links for the line-numbers
+	 * @return string the highlighted source
+	 */
+	public static function highlight_string($source,$start_line = 0,$line = 0,$links = true)
+	{
 		$decorator = new FWS_Highlighting_Decorator_HTML();
 		$lang = new FWS_Highlighting_Language_XML('php.xml');
 		$hl = new FWS_Highlighting_Processor($source,$lang,$decorator);
 		$res = $hl->highlight();
 		$lines = array();
-		$x = 1;
+		$x = $start_line;
 		foreach(explode('<br />',$res) as $str)
 		{
-			$l = '<a name="l'.$x.'" href="#l'.$x.'">'.sprintf('%04d',$x).'</a>&nbsp;';
+			$l = '';
 			if($x == $line)
-				$l .= '<span style="background-color: #ffff00;">'.$str.'</span>';
-			else
-				$l .= $str;
+				$l = '<div style="display: inline; background-color: #ffff00;">';
+			if($start_line > 0)
+			{
+				if($links)
+					$l .= '<a name="l'.$x.'" href="#l'.$x.'">';
+				$l .= sprintf('%04d',$x);
+				if($links)
+					$l .= '</a>';
+				$l .= '&nbsp;';
+			}
+			$l .= $str;
+			if($x == $line)
+				$l .= '</div>';
 			$lines[] = $l;
 			$x++;
 		}

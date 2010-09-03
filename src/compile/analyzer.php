@@ -97,14 +97,6 @@ final class PC_Compile_Analyzer extends FWS_Object
 								PC_Obj_Error::E_S_ABSTRACT_CLASS_INSTANTIATION
 							);
 						}
-						else if(($m = $c->get_method($name)) && $m->is_abstract())
-						{
-							$this->_report(
-								$call,
-								'The method "#'.$c->get_name().'#::'.$m->get_name().'" is abstract!',
-								PC_Obj_Error::E_T_ABSTRACT_METHOD_CALL
-							);
-						}
 						else
 						{
 							// check for static / not static
@@ -267,9 +259,12 @@ final class PC_Compile_Analyzer extends FWS_Object
 		$arguments = $call->get_arguments();
 		$nparams = $method->get_required_param_count();
 		$nmaxparams = $method->get_param_count();
-		if(count($arguments) < $nparams || count($arguments) > $nmaxparams)
+		if(count($arguments) < $nparams || ($nmaxparams >= 0 && count($arguments) > $nmaxparams))
 		{
-			$reqparams = $nparams != $nmaxparams ? $nparams.' to '.$nmaxparams : $nparams;
+			if($nparams != $nmaxparams)
+				$reqparams = $nparams.' to '.($nmaxparams == -1 ? '*' : $nmaxparams);
+			else
+				$reqparams = $nparams;
 			$this->_report(
 				$call,
 				'The function/method called by "'.$this->_get_call_link($call).'" requires '.$reqparams
@@ -299,7 +294,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 								$call,
 								'The argument '.($i + 1).' in "'.$this->_get_call_link($call).'" requires '
 									.$this->_get_article($trequired).' "'.$trequired.'" but you have given '
-									.$this->_get_article($tactual).' "'.$tactual.'"',
+									.$this->_get_article($tactual).' "'.($tactual === null ? "<i>NULL</i>" : $tactual).'"',
 								PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE
 							);
 						}
@@ -320,7 +315,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 	private function _is_argument_ok($arg,$param)
 	{
 		// not present but required?
-		if($arg === null && !$param->is_optional())
+		if($arg === null && !$param->is_optional() && !$param->is_first_vararg())
 			return false;
 		
 		// unknown / not present

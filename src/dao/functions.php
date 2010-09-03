@@ -33,16 +33,29 @@ class PC_DAO_Functions extends FWS_Singleton
 	 *
 	 * @param int $class the class-id (0 = free functions)
 	 * @param int $pid the project-id (default = current)
+	 * @param string $file the file-name to search for
+	 * @param string $name the function-name to search for
 	 * @return int the number
 	 */
-	public function get_count($class = 0,$pid = PC_Project::CURRENT_ID)
+	public function get_count($class = 0,$pid = PC_Project::CURRENT_ID,$file = '',$name = '')
 	{
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
 		
 		$db = FWS_Props::get()->db();
 		$pid = PC_Utils::get_project_id($pid);
-		return $db->get_row_count(PC_TB_FUNCTIONS,'*',' WHERE project_id = '.$pid.' AND class = '.$class);
+		$stmt = $db->get_prepared_statement(
+			'SELECT COUNT(*) num FROM '.PC_TB_FUNCTIONS.'
+			 WHERE project_id = '.$pid.' AND class = '.$class
+			 .($file ? ' AND file LIKE :file' : '')
+			 .($name ? ' AND name LIKE :name' : '')
+		);
+		if($file)
+			$stmt->bind(':file','%'.$file.'%');
+		if($name)
+			$stmt->bind(':name','%'.$name.'%');
+		$row = $db->get_row($stmt->get_statement());
+		return $row['num'];
 	}
 	
 	/**
@@ -83,9 +96,11 @@ class PC_DAO_Functions extends FWS_Singleton
 	 * @param int $class the class-id (0 = free functions)
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
+	 * @param string $file the file-name to search for
+	 * @param string $name the function-name to search for
 	 * @return array all found functions
 	 */
-	public function get_list($class = 0,$start = 0,$count = 0)
+	public function get_list($class = 0,$start = 0,$count = 0,$file = '',$name = '')
 	{
 		$db = FWS_Props::get()->db();
 
@@ -98,12 +113,19 @@ class PC_DAO_Functions extends FWS_Singleton
 		
 		$project = FWS_Props::get()->project();
 		$funcs = array();
-		$rows = $db->get_rows(
+		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_FUNCTIONS.'
 			 WHERE project_id = '.PC_Utils::get_project_id(PC_Project::CURRENT_ID).' AND class = '.$class.'
+			 '.($file ? ' AND file LIKE :file' : '').'
+			 '.($name ? ' AND name LIKE :name' : '').'
 			 ORDER BY name
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
+		if($file)
+			$stmt->bind(':file','%'.$file.'%');
+		if($name)
+			$stmt->bind(':name','%'.$name.'%');
+		$rows = $db->get_rows($stmt->get_statement());
 		foreach($rows as $row)
 			$funcs[] = $this->_build_func($row);
 		return $funcs;
@@ -144,7 +166,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			FWS_Helper::def_error('instance','function','PC_Obj_Method',$function);
 		
 		return $db->update(
-			PC_TB_FUNCTIONS,' WHERE id = '.$function->get_id(),$this->_get_fields($function,$class,-1)
+			PC_TB_FUNCTIONS,' WHERE id = '.$function->get_id(),$this->_get_fields($function,$class)
 		);
 	}
 	
@@ -183,6 +205,8 @@ class PC_DAO_Functions extends FWS_Singleton
 			$params .= $param->get_name();
 			if($param->is_optional())
 				$params .= '?';
+			else if($param->is_first_vararg())
+				$params .= '*';
 			$params .= ':';
 			$types = array();
 			foreach($param->get_mtype()->get_types() as $type)
@@ -247,6 +271,11 @@ class PC_DAO_Functions extends FWS_Singleton
 			if(FWS_String::ends_with($name,'?'))
 			{
 				$p->set_optional(true);
+				$name = FWS_String::substr($name,0,-1);
+			}
+			else if(FWS_String::ends_with($name,'*'))
+			{
+				$p->set_first_vararg(true);
 				$name = FWS_String::substr($name,0,-1);
 			}
 			$p->set_name($name);

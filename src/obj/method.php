@@ -95,6 +95,16 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	}
 	
 	/**
+	 * Sets the id of the method
+	 * 
+	 * @param int $id the id
+	 */
+	public function set_id($id)
+	{
+		$this->id = $id;
+	}
+	
+	/**
 	 * @return boolean wether this is a free function (belongs to no class)
 	 */
 	public function is_free()
@@ -183,6 +193,11 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	 */
 	public function get_param_count()
 	{
+		foreach($this->params as $param)
+		{
+			if($param->is_first_vararg())
+				return -1;
+		}
 		return count($this->params);
 	}
 	
@@ -196,6 +211,8 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 		$n = 0;
 		foreach($this->params as $param)
 		{
+			if($param->is_first_vararg())
+				break;
 			if(!$param->is_optional())
 				$n++;
 		}

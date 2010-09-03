@@ -21,14 +21,9 @@ $accessor = new PC_PropAccessor();
 $accessor->set_loader(new PC_PropLoader());
 FWS_Props::set_accessor($accessor);
 
-// TODO handle case-sensitivy correctly
 // TODO handle list() so that it declares the variables as unknown?
 // TODO type-hinting in catch-blocks is not supported yet
 // FIXME the parameters of BS_User_Current->login() are wrong
-// FIXME parameters like $foo = array(1 => 'true') are not recognized correctly
-// FIXME octal numbers are not detected correctly?
-// TODO type-hinting for array is not supported
-// TODO class-fields don't store the value when its an array?
 // TODO is it possible to get the required types of builtin functions etc.?
 // TODO we should recognize /* @var $<var> <type> */ as type-hints
 // TODO if a method does not exist, we could look for subclasses of the class and check if the
@@ -40,7 +35,6 @@ FWS_Props::set_accessor($accessor);
 // value-return at all, etc.
 // TODO we could check thrown exceptions. i.e. check if @thrown is present and if it specifies
 // the thrown exceptions, etc.
-// FIXME we can't parse for-loops ??
 // TODO handle builtin functions with var-args
 // TODO some builtin functions are declared as:
 // string number_format ( float $number [, int $decimals ] )
@@ -49,7 +43,6 @@ FWS_Props::set_accessor($accessor);
 // to problems when the parent-class is abstract. atm we treat this as an error
 // TODO parent:: may be a static or not-static call. so maybe we need 3 values for static?
 // TODO we can't handle "null" (we detect it as string)
-// TODO string | string leads to garbage??
 
 $doc = FWS_Props::get()->doc();
 echo $doc->render();

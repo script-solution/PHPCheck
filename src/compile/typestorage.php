@@ -25,6 +25,7 @@ interface PC_Compile_TypeStorage
 	 *
 	 * @param PC_Obj_Method $method the method
 	 * @param int $classid the class-id
+	 * @return int the used id
 	 */
 	public function create_function($method,$classid);
 	
@@ -41,6 +42,7 @@ interface PC_Compile_TypeStorage
 	 *
 	 * @param PC_Obj_Field $field the field
 	 * @param int $classid the class-id
+	 * @return int the used id
 	 */
 	public function create_field($field,$classid);
 	
@@ -49,6 +51,7 @@ interface PC_Compile_TypeStorage
 	 *
 	 * @param PC_Obj_Constant $const the constant
 	 * @param int $classid the class-id
+	 * @return int the used id
 	 */
 	public function create_constant($const,$classid);
 }

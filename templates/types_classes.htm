@@ -32,19 +32,17 @@
 <table width="100%" class="pc_table">
 	<tr>
 		<th>Name</th>
-		<th>File</th>
-		<th>Line</th>
+		<th>Location</th>
 	</tr>
 	{if classes.length == 0}
 	<tr>
-		<td colspan="3" class="pc_main" align="center">No classes found</td>
+		<td colspan="2" class="pc_main" align="center">No classes found</td>
 	</tr>
 	{else}
 	{loop classes as c}
 	<tr>
-		<td class="pc_main"><a href="{c:url}">{c:name}</a></td>
-		<td class="pc_main">{c:file}</td>
-		<td class="pc_main" align="center">{c:line}</td>
+		<td class="pc_main">{c:name}</td>
+		<td class="pc_main">{c:file}, line {c:line}</td>
 	</tr>
 	{endloop}
 	{endif}

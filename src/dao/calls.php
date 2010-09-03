@@ -70,6 +70,29 @@ class PC_DAO_Calls extends FWS_Singleton
 	}
 	
 	/**
+	 * Fetches the call with given id from db
+	 * 
+	 * @param int $id the call-id
+	 * @return PC_Obj_Call the call or null
+	 */
+	public function get_by_id($id)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(!FWS_Helper::is_integer($id) || $id <= 0)
+			FWS_Helper::def_error('intgt0','id',$id);
+		
+		$stmt = $db->get_prepared_statement(
+			'SELECT * FROM '.PC_TB_CALLS.' WHERE id = :id'
+		);
+		$stmt->bind(':id',$id);
+		$row = $db->get_row($stmt->get_statement());
+		if($row)
+			return $this->_build_call($row);
+		return null;
+	}
+	
+	/**
 	 * Returns all calls
 	 *
 	 * @param int $start the start-position (for the LIMIT-statement)
@@ -166,6 +189,7 @@ class PC_DAO_Calls extends FWS_Singleton
 	private function _build_call($row)
 	{
 		$c = new PC_Obj_Call($row['file'],$row['line']);
+		$c->set_id($row['id']);
 		$c->set_class($row['class']);
 		$c->set_function($row['function']);
 		$c->set_static($row['static']);

@@ -68,6 +68,29 @@ class PC_DAO_Errors extends FWS_Singleton
 	}
 	
 	/**
+	 * Fetches the error with given id from db
+	 * 
+	 * @param int $id the error-id
+	 * @return PC_Obj_Error the error or null
+	 */
+	public function get_by_id($id)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(!FWS_Helper::is_integer($id) || $id <= 0)
+			FWS_Helper::def_error('intgt0','id',$id);
+		
+		$stmt = $db->get_prepared_statement(
+			'SELECT * FROM '.PC_TB_ERRORS.' WHERE id = :id'
+		);
+		$stmt->bind(':id',$id);
+		$row = $db->get_row($stmt->get_statement());
+		if($row)
+			return $this->_build_error($row);
+		return null;
+	}
+	
+	/**
 	 * Returns all errors. Optionally you can filter the search by file and message
 	 *
 	 * @param int $pid the project-id (default = current)
@@ -160,7 +183,9 @@ class PC_DAO_Errors extends FWS_Singleton
 	 */
 	private function _build_error($row)
 	{
-		return new PC_Obj_Error(new PC_Obj_Location($row['file'],$row['line']),$row['message'],$row['type']);
+		$err = new PC_Obj_Error(new PC_Obj_Location($row['file'],$row['line']),$row['message'],$row['type']);
+		$err->set_id($row['id']);
+		return $err;
 	}
 }
 ?>

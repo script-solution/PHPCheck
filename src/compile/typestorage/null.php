@@ -23,6 +23,7 @@ final class PC_Compile_TypeStorage_Null implements PC_Compile_TypeStorage
 	public function create_function($method,$classid)
 	{
 		// do nothing
+		return 0;
 	}
 	
 	public function update_function($method,$classid)
@@ -33,11 +34,13 @@ final class PC_Compile_TypeStorage_Null implements PC_Compile_TypeStorage
 	public function create_field($field,$classid)
 	{
 		// do nothing
+		return 0;
 	}
 	
 	public function create_constant($const,$classid)
 	{
 		// do nothing
+		return 0;
 	}
 }
 ?>

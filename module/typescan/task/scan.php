@@ -58,7 +58,7 @@ final class PC_Module_TypeScan_Task_Scan extends FWS_Object implements FWS_Progr
 		// finish all classes if the typescan is finished
 		if($pos + $ops >= $this->get_total_operations())
 		{
-			$typecon = new PC_Compile_TypeContainer(0,true);
+			$typecon = new PC_Compile_TypeContainer(PC_Project::CURRENT_ID,true);
 			$typecon->add_classes(PC_DAO::get_classes()->get_list());
 			$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_DB());
 			$fin->finalize();

@@ -68,6 +68,7 @@ final class PC_Module_calls extends PC_Module
 			$url->set('line',$call->get_line());
 			$url->set_anchor('l'.$call->get_line());
 			$calls[] = array(
+				'id' => $call->get_id(),
 				'call' => $call->get_call(),
 				'file' => $call->get_file(),
 				'line' => $call->get_line(),
@@ -75,9 +76,14 @@ final class PC_Module_calls extends PC_Module
 			);
 		}
 		
+		$callurl = PC_URL::get_mod_url('filepart');
+		$callurl->set('id','__ID__');
+		$callurl->set('type','call');
+		
 		$this->request_formular();
 		$tpl->add_variables(array(
 			'calls' => $calls,
+			'get_code_url' => $callurl->to_url(),
 			'file' => $file,
 			'class' => $class,
 			'function' => $function,

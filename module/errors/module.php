@@ -75,6 +75,7 @@ final class PC_Module_errors extends PC_Module
 			$url->set_anchor('l'.$err->get_loc()->get_line());
 			
 			$errs[] = array(
+				'id' => $err->get_id(),
 				'type' => PC_Obj_Error::get_type_name($err->get_type()),
 				'message' => $this->_get_msg($err),
 				'file' => $err->get_loc()->get_file(),
@@ -103,6 +104,10 @@ final class PC_Module_errors extends PC_Module
 		for($i = $i % 4;$i < 4;$i++)
 			$typecbs[$row][] = array('name' => '');
 		
+		$callurl = PC_URL::get_mod_url('filepart');
+		$callurl->set('id','__ID__');
+		$callurl->set('type','error');
+		
 		$tpl->add_variables(array(
 			'errors' => $errs,
 			'search_target' => $surl->to_url(),
@@ -110,7 +115,8 @@ final class PC_Module_errors extends PC_Module
 			'cookie_name' => $cookies->get_prefix().'error_search',
 			'file' => $file,
 			'msg' => $msg,
-			'typecbs' => $typecbs
+			'typecbs' => $typecbs,
+			'get_code_url' => $callurl->to_url()
 		));
 	}
 	

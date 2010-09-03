@@ -18,6 +18,12 @@
 class PC_Obj_Call extends PC_Obj_Location
 {
 	/**
+	 * The call-id
+	 * 
+	 * @var int
+	 */
+	private $id = 0;
+	/**
 	 * The function-name
 	 *
 	 * @var string
@@ -61,6 +67,24 @@ class PC_Obj_Call extends PC_Obj_Location
 	public function __construct($file,$line)
 	{
 		parent::__construct($file,$line);
+	}
+	
+	/**
+	 * @return int the id
+	 */
+	public function get_id()
+	{
+		return $this->id;
+	}
+	
+	/**
+	 * Sets the id
+	 * 
+	 * @param int $id the new value
+	 */
+	public function set_id($id)
+	{
+		$this->id = $id;
 	}
 	
 	/**

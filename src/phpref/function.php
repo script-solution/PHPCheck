@@ -64,9 +64,9 @@ final class PC_PHPRef_Function
 		}
 		
 		// find method-description
-		$res = preg_match(
+		$res = preg_match_all(
 			'/<div class="(?:methodsynopsis|constructorsynopsis) dc-description">(.*?)<\/div>/s',
-			$content,$match
+			$content,$matches
 		);
 		if(!$res)
 			throw new PC_PHPRef_Exception('Unable to find method-description in "'.$this->file.'"!');
@@ -75,18 +75,122 @@ final class PC_PHPRef_Function
 		$version = '';
 		if(preg_match('/<p class="verinfo">\s*\((.*?)\)\s*<\/p>/',$content,$vmatch))
 			$version = trim($vmatch[1]);
-		return $this->parse_method_desc($match[1],$version);
+		
+		$methods = array();
+		foreach($matches[0] as $k => $v)
+			$methods[] = $this->parse_method_desc($matches[1][$k]);
+		$version = $this->parse_version($version);
+		
+		// if we've found more than one synopsis, we have to merge them into one. this is, of course,
+		// not perfect, but adding multiple methods with the same name would break the current concept
+		if(count($methods) > 1)
+		{
+			list(,,$first) = $methods[0];
+			$method = new PC_Obj_Method('',0,true);
+			$method->set_name($first->get_name());
+			$method->set_visibility($first->get_visibility());
+			$method->set_static($first->is_static());
+			$method->set_final($first->is_final());
+			$method->set_abstract($first->is_abstract());
+			$mparams = array();
+			foreach($methods as $m)
+				$mparams[] = array_values($m[2]->get_params());
+			for($i = 0; ; $i++)
+			{
+				$name = '';
+				$optional = false;
+				$firstvar = false;
+				$mtypes = array();
+				for($j = 0; $j < count($methods); $j++)
+				{
+					if($i < count($mparams[$j]))
+					{
+						$mtypes[] = $mparams[$j][$i]->get_mtype();
+						$name = $mparams[$j][$i]->get_name();
+						if($mparams[$j][$i]->is_optional())
+							$optional = true;
+						if($mparams[$j][$i]->is_first_vararg())
+							$firstvar = true;
+					}
+				}
+				if(count($mtypes) == 0)
+					break;
+				$mtype = $this->merge_types($mtypes);
+				$param = new PC_Obj_Parameter();
+				// the name doesn't really matter. to be safe, use a unique name for each param
+				$param->set_name('param'.$i);
+				$param->set_mtype($mtype);
+				// implicit optional if its not required for all methods
+				$param->set_optional(count($mtypes) < count($methods) || $optional);
+				$param->set_first_vararg($firstvar);
+				$method->put_param($param);
+			}
+			$method->set_since($version);
+			return array($methods[0][0],$methods[0][1],$method);
+		}
+		$methods[0][2]->set_since($version);
+		return $methods[0];
+	}
+	
+	/**
+	 * Merges the given multi-types into one
+	 * 
+	 * @param array $mtypes an array of PC_Obj_MultiType
+	 * @return PC_Obj_MultiType the merged type
+	 */
+	private function merge_types($mtypes)
+	{
+		$types = array();
+		foreach($mtypes as $mt)
+		{
+			foreach($mt->get_types() as $t)
+			{
+				if($t->is_unknown())
+					return new PC_Obj_MultiType(array(new PC_Obj_Type(PC_Obj_Type::UNKNOWN)));
+				$types[$t->get_type()] = $t;
+			}
+		}
+		return new PC_Obj_MultiType(array_values($types));
+	}
+	
+	/**
+	 * Parses the given version
+	 * 
+	 * @param string $version the version
+	 * @return string the parsed version
+	 */
+	private function parse_version($version)
+	{
+		$lowest = '';
+		if($version)
+		{
+			$versions = explode(',',$version);
+			natsort($versions);
+			$lowest = $versions[0];
+			if(($pos = strpos($lowest,'PHP')) !== false)
+			{
+				$lowest = substr($lowest,$pos + 3);
+				if(($pos = strpos($lowest,'&lt;=')) !== false)
+					$lowest = '-'.trim(substr($lowest,$pos + 5));
+				else if(($pos = strpos($lowest,'&gt;=')) !== false)
+					$lowest = '+'.trim(substr($lowest,$pos + 5));
+				else
+					$lowest = '+'.trim($lowest);
+			}
+			else
+				$lowest = '';
+		}
+		return $lowest;
 	}
 	
 	/**
 	 * Parses a method-description into a PC_Obj_Method
 	 * 
 	 * @param string $desc the description
-	 * @param string $version the version-description
 	 * @return array an array of the class-name and the PC_Obj_Method
 	 * @throws PC_PHPRef_Exception if it failed
 	 */
-	private function parse_method_desc($desc,$version)
+	private function parse_method_desc($desc)
 	{
 		$classname = '';
 		// prepare description
@@ -122,6 +226,8 @@ final class PC_PHPRef_Function
 			$method->set_static(true);
 		if($modifier1 == 'final' || $modifier2 == 'final' || $modifier3 == 'final')
 			$method->set_final(true);
+		if($modifier1 == 'abstract' || $modifier2 == 'abstract' || $modifier3 == 'abstract')
+			$method->set_abstract(true);
 		if(in_array($modifier1,array('private','protected')))
 			$method->set_visibility($modifier1);
 		else if(in_array($modifier2,array('private','protected')))
@@ -131,27 +237,6 @@ final class PC_PHPRef_Function
 		if($return != 'void')
 			$method->set_return_type(PC_Obj_Type::get_type_by_name($return));
 		$method->set_name($name);
-		
-		// parse version-information
-		if($version)
-		{
-			$versions = explode(',',$version);
-			natsort($versions);
-			$lowest = $versions[0];
-			if(($pos = strpos($lowest,'PHP')) !== false)
-			{
-				$lowest = substr($lowest,$pos + 3);
-				if(($pos = strpos($lowest,'&lt;=')) !== false)
-					$lowest = '-'.trim(substr($lowest,$pos + 5));
-				else if(($pos = strpos($lowest,'&gt;=')) !== false)
-					$lowest = '+'.trim(substr($lowest,$pos + 5));
-				else
-					$lowest = '+'.trim($lowest);
-			}
-			else
-				$lowest = '';
-			$method->set_since($lowest);
-		}
 		
 		// check what kind of params we have
 		$optional = '';
@@ -206,10 +291,11 @@ final class PC_PHPRef_Function
 				}
 				else
 				{
-					// variable arguments are simply skipped; TODO actually we should store that in some way
+					// detect variable arguments
 					if(strpos($part,'...') !== false)
-						continue;
+						$param->set_first_vararg(true);
 					$parts = preg_split('/\s+/',$part);
+					// TODO actually, it may look like "string $ ..."
 					if(count($parts) != 2)
 						throw new PC_PHPRef_Exception(
 							'Parameter description has not 2 parts: "'.$part.'" in "'.$this->file.'"');

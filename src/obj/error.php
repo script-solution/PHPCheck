@@ -32,7 +32,6 @@ final class PC_Obj_Error extends FWS_Object
 	const E_T_FINAL_CLASS_INHERITANCE						= 21;
 	const E_T_CLASS_NOT_ABSTRACT								= 22;
 	const E_T_CLASS_MISSING											= 23;
-	const E_T_ABSTRACT_METHOD_CALL							= 24;
 	
 	/**
 	 * Determines the name of the given type
@@ -69,6 +68,13 @@ final class PC_Obj_Error extends FWS_Object
 			self::E_T_CLASS_MISSING =>									'Class missing'
 		);
 	}
+	
+	/**
+	 * The error-id
+	 * 
+	 * @var int
+	 */
+	private $id = 0;
 	
 	/**
 	 * The error-location
@@ -110,6 +116,24 @@ final class PC_Obj_Error extends FWS_Object
 		$this->loc = $loc;
 		$this->msg = $msg;
 		$this->type = $type;
+	}
+	
+	/**
+	 * @return int the id
+	 */
+	public function get_id()
+	{
+		return $this->id;
+	}
+	
+	/**
+	 * Sets the id
+	 * 
+	 * @param int $id the new value
+	 */
+	public function set_id($id)
+	{
+		$this->id = $id;
 	}
 	
 	/**
