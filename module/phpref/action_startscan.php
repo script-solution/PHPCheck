@@ -27,12 +27,13 @@ final class PC_Action_PHPRef_startscan extends FWS_Action_Base
 		$files = array();
 		foreach(FWS_FileUtils::get_list('phpman',false,false) as $file)
 		{
-			if(preg_match('/^(function)/',$file))
+			if(preg_match('/^(function|class)\./',$file))
 				$files[] = 'phpman/'.$file;
 		}
 		// store in session
 		$user->set_session_data('phpref_files',$files);
 		$user->set_session_data('phpref_aliases',array());
+		$user->set_session_data('phpref_versions',array());
 		
 		// clear position, just to be sure
 		$storage = new FWS_Progress_Storage_Session('pphprefscan_');

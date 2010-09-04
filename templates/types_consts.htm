@@ -44,7 +44,10 @@
 	<tr>
 		<td class="pc_main">{const:name}</td>
 		<td class="pc_main">{const:type}</td>
-		<td class="pc_main">{const:file}, line {const:line}</td>
+		<td class="pc_main">
+		{if const:file}{const:file}{else}<i>Unknown</i>{endif}
+		{if const:line > 0}, line {const:line}{endif}
+		</td>
 	</tr>
 	{endloop}
 	{endif}

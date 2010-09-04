@@ -123,15 +123,6 @@ final class PC_Compile_Analyzer extends FWS_Object
 							$this->_check_params($call,$m);
 						}
 					}
-					// check wether it's a buildin-php-class
-					else if($classname != PC_Obj_Class::UNKNOWN && !class_exists($classname,false))
-					{
-						$this->_report(
-							$call,
-							'The class "#'.$classname.'#" does not exist!',
-							PC_Obj_Error::E_S_CLASS_MISSING
-						);
-					}
 					else if($this->report_unknown && $classname == PC_Obj_Class::UNKNOWN)
 					{
 						$this->_report(
@@ -139,6 +130,31 @@ final class PC_Compile_Analyzer extends FWS_Object
 							'The class of the object in the call "'.$this->_get_call_link($call).'" is unknown!',
 							PC_Obj_Error::E_S_CLASS_UNKNOWN
 						);
+					}
+					else
+					{
+						if($types->is_db_used())
+						{
+							// check if its a builtin function we know
+							$c = PC_DAO::get_classes()->get_by_name($classname,PC_Project::PHPREF_ID);
+							if($c === null)
+							{
+								$this->_report(
+									$call,
+									'The class "#'.$classname.'#" does not exist!',
+									PC_Obj_Error::E_S_CLASS_MISSING
+								);
+							}
+						}
+						// if we should use no db, check at least wether it's a buildin-php-class
+						else if(!class_exists($classname))
+						{
+							$this->_report(
+								$call,
+								'The class "#'.$classname.'#" does not exist!',
+								PC_Obj_Error::E_S_CLASS_MISSING
+							);
+						}
 					}
 				}
 			}
@@ -205,7 +221,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 				$this->_report(
 					$class,
 					'The class "#'.$class->get_name().'#" is abstract but'
-						.' has no abstract method!',
+						.' has no abstract method! Intended?',
 					PC_Obj_Error::E_T_CLASS_POT_USELESS_ABSTRACT
 				);
 			}
@@ -220,7 +236,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 			}
 			
 			// check super-class
-			if($class->get_super_class() !== null)
+			if($class->get_super_class())
 			{
 				// do we know the class?
 				$sclass = $types->get_class($class->get_super_class());

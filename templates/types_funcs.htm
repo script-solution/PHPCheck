@@ -43,7 +43,10 @@
 	{loop funcs as f}
 	<tr>
 		<td class="pc_main">{f:func}</td>
-		<td class="pc_main">{f:file}, line {f:line}</td>
+		<td class="pc_main">
+		{if f:file}{f:file}{else}<i>Unknown</i>{endif}
+		{if f:line > 0}, line {f:line}{endif}
+		</td>
 		<td class="pc_main" align="center">{f:since}</td>
 	</tr>
 	{endloop}

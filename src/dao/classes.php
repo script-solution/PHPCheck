@@ -109,7 +109,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		$stmt->bind(1,$file);
 		$classes = array();
 		foreach($db->get_rows($stmt->get_statement()) as $row)
-			$classes[] = $this->_build_class($row);
+			$classes[] = $this->_build_class($row,$pid);
 		return $classes;
 	}
 	
@@ -135,7 +135,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		$stmt->bind(1,$name);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
-			return $this->_build_class($row);
+			return $this->_build_class($row,$pid);
 		return null;
 	}
 	
@@ -173,7 +173,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		if($class)
 			$stmt->bind(':class','%'.$class.'%');
 		foreach($db->get_rows($stmt->get_statement()) as $row)
-			$classes[] = $this->_build_class($row);
+			$classes[] = $this->_build_class($row,$pid);
 		return $classes;
 	}
 	
@@ -242,9 +242,10 @@ class PC_DAO_Classes extends FWS_Singleton
 	 * Builds an instance of PC_Obj_Class from the given row
 	 *
 	 * @param array $row the row from the db
+	 * @param int $pid the project-id
 	 * @return PC_Obj_Class the class
 	 */
-	private function _build_class($row)
+	private function _build_class($row,$pid)
 	{
 		$c = new PC_Obj_Class($row['file'],$row['line'],$row['id']);
 		$c->set_name($row['name']);
@@ -254,11 +255,11 @@ class PC_DAO_Classes extends FWS_Singleton
 		$c->set_final($row['final']);
 		foreach(FWS_Array_Utils::advanced_explode(',',$row['interfaces']) as $if)
 			$c->add_interface($if);
-		foreach(PC_DAO::get_constants()->get_list($row['id']) as $const)
+		foreach(PC_DAO::get_constants()->get_list($row['id'],'','',$pid) as $const)
 			$c->add_constant($const);
-		foreach(PC_DAO::get_classfields()->get_all($row['id']) as $field)
+		foreach(PC_DAO::get_classfields()->get_all($row['id'],$pid) as $field)
 			$c->add_field($field);
-		foreach(PC_DAO::get_functions()->get_list($row['id']) as $method)
+		foreach(PC_DAO::get_functions()->get_list($row['id'],0,0,'','',$pid) as $method)
 			$c->add_method($method);
 		return $c;
 	}

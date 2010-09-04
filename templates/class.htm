@@ -48,7 +48,10 @@
 	{loop methods as method}
 	<tr>
 		<td><a href="{method:url}">{method:name}</a>:</td>
-		<td>{method:type}</td>
+		<td>
+		{method:type}
+		{if method:since}, {method:since}{endif}
+		</td>
 	</tr>
 	{endloop}
 </table>

@@ -327,7 +327,7 @@ static_scalar(A) ::= T_STRING(sval). {
 		A = new PC_Obj_Type(PC_Obj_Type::BOOL,false);
 	else 
 		A = $this->state->get_constant_type(sval);
-} 
+}
 static_scalar(A) ::= PLUS static_scalar(sval). {
 	A = $this->state->handle_unary_op('+',new PC_Obj_Variable('',sval))->get_type();
 }

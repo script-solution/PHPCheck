@@ -35,14 +35,8 @@ FWS_Props::set_accessor($accessor);
 // value-return at all, etc.
 // TODO we could check thrown exceptions. i.e. check if @thrown is present and if it specifies
 // the thrown exceptions, etc.
-// TODO handle builtin functions with var-args
-// TODO some builtin functions are declared as:
-// string number_format ( float $number [, int $decimals ] )
-// string number_format ( float $number , int $decimals , string $dec_point , string $thousands_sep )
-// TODO currently we can't distinguish between parent::__construct and new <class>. that leads
-// to problems when the parent-class is abstract. atm we treat this as an error
-// TODO parent:: may be a static or not-static call. so maybe we need 3 values for static?
 // TODO we can't handle "null" (we detect it as string)
+// TODO handle "void" special?
 
 $doc = FWS_Props::get()->doc();
 echo $doc->render();

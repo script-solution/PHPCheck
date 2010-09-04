@@ -146,6 +146,10 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 			$cname = $class->get_type()->get_value();
 			if($cname == 'parent')
 			{
+				// in this case its no object-creation for us because it would lead to reports like
+				// instantiation of abstract classes when calling the constructor of an abstract
+				// parent-class
+				$call->set_object_creation(false);
 				$cname = $this->get_scope_part_name(T_CLASS_C);
 				$classobj = $this->types->get_class($cname);
 				if($classobj === null || $classobj->get_super_class() == '')

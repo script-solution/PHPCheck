@@ -42,7 +42,10 @@
 	{loop classes as c}
 	<tr>
 		<td class="pc_main">{c:name}</td>
-		<td class="pc_main">{c:file}, line {c:line}</td>
+		<td class="pc_main">
+		{if c:file}{c:file}{else}<i>Unknown</i>{endif}
+		{if c:line > 0}, line {c:line}{endif}
+		</td>
 	</tr>
 	{endloop}
 	{endif}

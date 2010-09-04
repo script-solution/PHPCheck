@@ -129,7 +129,8 @@ final class PC_Module_Class extends FWS_Module
 				'name' => $method->get_name(),
 				'type' => $method->__ToString(),
 				'line' => $method->get_line(),
-				'url' => $this->_get_url($classfile,$method)
+				'url' => $this->_get_url($classfile,$method),
+				'since' => $method->get_since()
 			);
 		}
 		$tpl->add_variable_ref('methods',$methods);

@@ -216,6 +216,8 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	{
 		if(isset($this->consts[$name]))
 			return $this->consts[$name]->get_type();
+		if(strcasecmp($name,'null') == 0)
+			return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 		return new PC_Obj_Type(PC_Obj_Type::STRING,$name);
 	}
 	

@@ -78,7 +78,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			 LEFT JOIN '.PC_TB_CLASSES.' c ON f.class = c.id AND f.project_id = c.project_id
 			 WHERE
 			 	f.project_id = :pid AND
-			 	((:class = "" AND c.id IS NULL) OR (:class != "" AND c.name = :funcname)) AND
+			 	((:class = "" AND c.id IS NULL) OR (:class != "" AND c.name = :class)) AND
 			 	f.name = :funcname'
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
@@ -98,9 +98,11 @@ class PC_DAO_Functions extends FWS_Singleton
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
 	 * @param string $file the file-name to search for
 	 * @param string $name the function-name to search for
+	 * @param int $pid the project-id (current by default)
 	 * @return array all found functions
 	 */
-	public function get_list($class = 0,$start = 0,$count = 0,$file = '',$name = '')
+	public function get_list($class = 0,$start = 0,$count = 0,$file = '',$name = '',
+		$pid = PC_PRoject::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -115,7 +117,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		$funcs = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_FUNCTIONS.'
-			 WHERE project_id = '.PC_Utils::get_project_id(PC_Project::CURRENT_ID).' AND class = '.$class.'
+			 WHERE project_id = '.PC_Utils::get_project_id($pid).' AND class = '.$class.'
 			 '.($file ? ' AND file LIKE :file' : '').'
 			 '.($name ? ' AND name LIKE :name' : '').'
 			 ORDER BY name

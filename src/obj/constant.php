@@ -41,13 +41,13 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	 * @param string $name the constant-name
 	 * @param PC_Obj_Type $type the type
 	 */
-	public function __construct($file,$line,$name,$type)
+	public function __construct($file,$line,$name,$type = null)
 	{
 		parent::__construct($file,$line);
 		
 		if(empty($name))
 			FWS_Helper::def_error('notempty','name',$name);
-		if(!($type instanceof PC_Obj_Type))
+		if($type !== null && !($type instanceof PC_Obj_Type))
 			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
 		
 		$this->_name = $name;

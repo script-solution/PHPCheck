@@ -116,11 +116,6 @@ abstract class myc {
 		$calls = $ascanner->get_calls();
 		self::assertEquals('myc->doit()',(string)$calls[0]->get_call(false,false));
 		self::assertEquals('myc2::mystatic()',(string)$calls[1]->get_call(false,false));
-		
-		$an = new PC_Compile_Analyzer();
-		$an->analyze_calls($typecon,$calls);
-		$errors = $an->get_errors();
-		self::assertEquals(PC_Obj_Error::E_T_ABSTRACT_METHOD_CALL,$errors[0]->get_type());
 	}
 }
 ?>

@@ -29,13 +29,17 @@ final class PC_URL extends FWS_URL
 	{
 		$file = $loc->get_file();
 		$line = $loc->get_line();
-		$classes = PC_DAO::get_classes()->get_by_file($file);
-		if(count($classes) == 1)
-			$url = PC_URL::get_mod_url('class')->set('name',$classes[0]->get_name());
-		else
-			$url = PC_URL::get_mod_url('file')->set('path',$file);
-		$url->set_anchor('l'.$line);
-		return $url->to_url();
+		if($file)
+		{
+			$classes = PC_DAO::get_classes()->get_by_file($file);
+			if(count($classes) == 1)
+				$url = PC_URL::get_mod_url('class')->set('name',$classes[0]->get_name());
+			else
+				$url = PC_URL::get_mod_url('file')->set('path',$file);
+			$url->set_anchor('l'.$line);
+			return $url->to_url();
+		}
+		return '#';
 	}
 	
 	/**
