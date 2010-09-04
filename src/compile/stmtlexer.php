@@ -501,7 +501,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 * Extracts the given part of the scope
 	 * 
 	 * @param int $part the part: T_METHOD_C, T_FUNCTION_C or T_CLASS_C
-	 * @return
+	 * @return PC_Obj_Variable the scope-part as variable
 	 */
 	public function get_scope_part($part)
 	{
@@ -514,7 +514,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 * Extracts the given part of the scope
 	 * 
 	 * @param int $part the part: T_METHOD_C, T_FUNCTION_C or T_CLASS_C
-	 * @return
+	 * @return string the scope-part-name
 	 */
 	private function get_scope_part_name($part)
 	{
