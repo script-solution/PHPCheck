@@ -10,9 +10,6 @@
  * @link				http://www.script-solution.de
  */
 
-define('REPORT_MIXED',true);
-define('REPORT_UNKNOWN',false);
-
 /**
  * Analyzes a given set of classes, functions, calls and so on and stores possible errors.
  *
@@ -62,6 +59,33 @@ final class PC_Compile_Analyzer extends FWS_Object
 	}
 	
 	/**
+	 * Checks wether the method with given name may be a method of a subclass of $class
+	 *
+	 * @param PC_Compile_TypeContainer $types the types
+	 * @param PC_Obj_Class $class the class
+	 * @param string $name the method-name
+	 */
+	private function is_method_of_sub($types,$class,$name)
+	{
+		if($class->is_final())
+			return false;
+		$cname = $class->get_name();
+		$isif = $class->is_interface();
+		foreach($types->get_classes() as $sub)
+		{
+			if($sub && ((!$isif && $sub->get_super_class() == $cname) ||
+				($isif && in_array($cname,$sub->get_interfaces()))))
+			{
+				if($sub->contains_method($name))
+					return true;
+				if($this->is_method_of_sub($types,$sub,$name))
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Analyzes the given function-/method-calls
 	 *
 	 * @param PC_Compile_TypeContainer $types the types
@@ -83,11 +107,14 @@ final class PC_Compile_Analyzer extends FWS_Object
 					{
 						if(!$c->contains_method($name))
 						{
-							$this->_report(
-								$call,
-								'The method "'.$name.'" does not exist in the class "#'.$classname.'#"!',
-								PC_Obj_Error::E_S_METHOD_MISSING
-							);
+							if(!$this->is_method_of_sub($types,$c,$name))
+							{
+								$this->_report(
+									$call,
+									'The method "'.$name.'" does not exist in the class "#'.$classname.'#"!',
+									PC_Obj_Error::E_S_METHOD_MISSING
+								);
+							}
 						}
 						else if($call->is_object_creation() && $c->is_abstract())
 						{
@@ -146,8 +173,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 								);
 							}
 						}
-						// if we should use no db, check at least wether it's a buildin-php-class
-						else if(!class_exists($classname))
+						else
 						{
 							$this->_report(
 								$call,
@@ -216,7 +242,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 					$abstractcount++;
 			}
 			
-			if($class->is_abstract() && $abstractcount == 0)
+			if($class->is_abstract() && !$class->is_interface() && $abstractcount == 0)
 			{
 				$this->_report(
 					$class,
@@ -241,23 +267,52 @@ final class PC_Compile_Analyzer extends FWS_Object
 				// do we know the class?
 				$sclass = $types->get_class($class->get_super_class());
 				
-				// check for buildin-php-classes, too
-				if($sclass === null && !class_exists($class->get_super_class(),false))
+				if($sclass === null)
 				{
-					$this->_report(
-						$class,
-						'The class "#'.$class->get_super_class().'#" does not exist!',
-						PC_Obj_Error::E_T_CLASS_MISSING
-					);
+					// check if its a builtin function we know
+					if($types->is_db_used())
+						$sclass = PC_DAO::get_classes()->get_by_name($class->get_super_class(),PC_Project::PHPREF_ID);
+					if($sclass === null)
+					{
+						$this->_report(
+							$class,
+							'The class "#'.$class->get_super_class().'#" does not exist!',
+							PC_Obj_Error::E_T_CLASS_MISSING
+						);
+					}
 				}
 				// super-class final?
-				else if($sclass !== null && $sclass->is_final())
+				else if($sclass->is_final())
 				{
 					$this->_report(
 						$class,
 						'The class "#'.$class->get_name().'#" inherits from the final '
 							.'class "#'.$sclass->get_name().'#"!',
 						PC_Obj_Error::E_T_FINAL_CLASS_INHERITANCE
+					);
+				}
+			}
+			
+			// check implemented interfaces
+			foreach($class->get_interfaces() as $ifname)
+			{
+				$if = $types->get_class($ifname);
+				if($if === null && $types->is_db_used())
+					$if = PC_DAO::get_classes()->get_by_name($ifname,PC_Project::PHPREF_ID);
+				if($if === null)
+				{
+					$this->_report(
+						$class,
+						'The interface "#'.$ifname.'#" does not exist!',
+						PC_Obj_Error::E_T_INTERFACE_MISSING
+					);
+				}
+				else if(!$if->is_interface())
+				{
+					$this->_report(
+						$class,
+						'"#'.$ifname.'#" is no interface, but implemented by class #'.$class->get_name().'#!',
+						PC_Obj_Error::E_T_IF_IS_NO_IF
 					);
 				}
 			}
@@ -290,31 +345,31 @@ final class PC_Compile_Analyzer extends FWS_Object
 		}
 		else
 		{
-			$tmixed = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,'mixed');
 			$tunknown = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 			$i = 0;
 			foreach($method->get_params() as $param)
 			{
 				/* @var $param PC_Obj_Parameter */
 				$arg = isset($arguments[$i]) ? $arguments[$i] : null;
-				if($this->report_mixed || (!$param->get_mtype()->contains($tmixed) &&
-					($arg === null || !$arg->equals($tmixed))))
+				// arg- or param-type unknown?
+				if(!$this->report_unknown &&
+					($arg === null || $arg->equals($tunknown) || $param->get_mtype()->is_unknown()))
 				{
-					if($this->report_unknown || $arg === null || !$arg->equals($tunknown))
-					{
-						if(!$this->_is_argument_ok($arg,$param))
-						{
-							$trequired = $param->get_mtype();
-							$tactual = $arg;
-							$this->_report(
-								$call,
-								'The argument '.($i + 1).' in "'.$this->_get_call_link($call).'" requires '
-									.$this->_get_article($trequired).' "'.$trequired.'" but you have given '
-									.$this->_get_article($tactual).' "'.($tactual === null ? "<i>NULL</i>" : $tactual).'"',
-								PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE
-							);
-						}
-					}
+					$i++;
+					continue;
+				}
+				
+				if(!$this->_is_argument_ok($arg,$param))
+				{
+					$trequired = $param->get_mtype();
+					$tactual = $arg;
+					$this->_report(
+						$call,
+						'The argument '.($i + 1).' in "'.$this->_get_call_link($call).'" requires '
+							.$this->_get_article($trequired).' "'.$trequired.'" but you have given '
+							.$this->_get_article($tactual).' "'.($tactual === null ? "<i>NULL</i>" : $tactual).'"',
+						PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE
+					);
 				}
 				$i++;
 			}
@@ -361,10 +416,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 		$str = '';
 		if($call->get_class())
 		{
-			$url = new FWS_URL();
-			$url->set('module','class');
-			$url->set('name',$call->get_class());
-			$str .= '<a href="'.$url->to_url().'">'.$call->get_class().'</a>';
+			$str .= '#'.$call->get_class().'#';
 			if($call->is_static())
 				$str .= '::';
 			else
@@ -389,7 +441,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 	private function _get_article($type)
 	{
 		$str = $type === null ? 'x' : $type->__ToString();
-		return isset($str[0]) && in_array($str[0],array('i','a','o','u','e')) ? 'an' : 'a';
+		return isset($str[0]) && in_array(strtolower($str[0]),array('i','a','o','u','e')) ? 'an' : 'a';
 	}
 	
 	protected function get_dump_vars()

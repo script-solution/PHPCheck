@@ -163,7 +163,7 @@ class PC_DAO_Classes extends FWS_Singleton
 			'SELECT * FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = :pid'
 				.($file ? ' AND file LIKE :file' : '')
-				.($class ? ' AND name LIKE :class' : '')
+				.($class ? ' AND (name LIKE :class OR superclass LIKE :class OR interfaces LIKE :class)' : '')
 			.' ORDER BY name ASC
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);

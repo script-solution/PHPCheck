@@ -83,7 +83,7 @@ class PC_Utils extends FWS_UtilBase
 		{
 			$l = '';
 			if($x == $line)
-				$l = '<div style="display: inline; background-color: #ffff00;">';
+				$l = '<span style="background-color: #ffff00;">';
 			if($start_line > 0)
 			{
 				if($links)
@@ -95,7 +95,7 @@ class PC_Utils extends FWS_UtilBase
 			}
 			$l .= $str;
 			if($x == $line)
-				$l .= '</div>';
+				$l .= '</span>';
 			$lines[] = $l;
 			$x++;
 		}

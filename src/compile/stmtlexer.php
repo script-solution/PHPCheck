@@ -262,13 +262,13 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 				$mname = $prop[0]['data'];
 				if($mname->get_type()->is_unknown() || $mname->get_type()->get_value() === null)
 					return $this->get_unknown();
-				$method = $class->get_method($mname->get_type()->get_value());
-				if($method === null)
-					return $this->get_unknown();
 				$this->add_call(
 					new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,$class->get_name())),
 					$mname,$args,false
 				);
+				$method = $class->get_method($mname->get_type()->get_value());
+				if($method === null)
+					return $this->get_unknown();
 				$res = $method->get_return_type();
 			}
 			$objt = $res;

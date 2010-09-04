@@ -4842,94 +4842,102 @@ static public $yy_action = array(
     function yy_r188(){
 	$this->_retvalue = array();
 	$param = new PC_Obj_Parameter($this->yystack[$this->yyidx + -2]->minor);
-	if($this->yystack[$this->yyidx + -4]->minor->is_unknown())
+	if($this->yystack[$this->yyidx + 0]->minor)
+		$this->yystack[$this->yyidx + 0]->minor->set_value(null); // value is not interesting here
+	if($this->yystack[$this->yyidx + 0]->minor && $this->yystack[$this->yyidx + -4]->minor->is_unknown())
 		$param->set_mtype(new PC_Obj_MultiType(array($this->yystack[$this->yyidx + 0]->minor)));
 	else
 		$param->set_mtype(new PC_Obj_MultiType(array($this->yystack[$this->yyidx + -4]->minor)));
 	$param->set_optional(true);
 	$this->_retvalue[] = $param;
     }
-#line 4857 "src/compile/typeparser.php"
-#line 437 "src/compile/typeparser.y"
+#line 4858 "src/compile/typeparser.php"
+#line 438 "src/compile/typeparser.y"
     function yy_r189(){
 	$this->_retvalue = array();
 	$param = new PC_Obj_Parameter($this->yystack[$this->yyidx + -2]->minor);
-	if($this->yystack[$this->yyidx + -3]->minor->is_unknown())
+	if($this->yystack[$this->yyidx + 0]->minor)
+		$this->yystack[$this->yyidx + 0]->minor->set_value(null); // value is not interesting here
+	if($this->yystack[$this->yyidx + 0]->minor && $this->yystack[$this->yyidx + -3]->minor->is_unknown())
 		$param->set_mtype(new PC_Obj_MultiType(array($this->yystack[$this->yyidx + 0]->minor)));
 	else
 		$param->set_mtype(new PC_Obj_MultiType(array($this->yystack[$this->yyidx + -3]->minor)));
 	$param->set_optional(true);
 	$this->_retvalue[] = $param;
     }
-#line 4869 "src/compile/typeparser.php"
-#line 448 "src/compile/typeparser.y"
+#line 4871 "src/compile/typeparser.php"
+#line 450 "src/compile/typeparser.y"
     function yy_r190(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -3]->minor;
 	$param = new PC_Obj_Parameter($this->yystack[$this->yyidx + 0]->minor);
 	$param->set_mtype(new PC_Obj_MultiType(array($this->yystack[$this->yyidx + -1]->minor)));
 	$this->_retvalue[] = $param;
     }
-#line 4877 "src/compile/typeparser.php"
-#line 455 "src/compile/typeparser.y"
+#line 4879 "src/compile/typeparser.php"
+#line 457 "src/compile/typeparser.y"
     function yy_r191(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -4]->minor;
 	$param = new PC_Obj_Parameter($this->yystack[$this->yyidx + 0]->minor);
 	$param->set_mtype(new PC_Obj_MultiType(array($this->yystack[$this->yyidx + -2]->minor)));
 	$this->_retvalue[] = $param;
     }
-#line 4885 "src/compile/typeparser.php"
-#line 462 "src/compile/typeparser.y"
+#line 4887 "src/compile/typeparser.php"
+#line 464 "src/compile/typeparser.y"
     function yy_r192(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -6]->minor;
 	$param = new PC_Obj_Parameter($this->yystack[$this->yyidx + -2]->minor);
-	if($this->yystack[$this->yyidx + -4]->minor->is_unknown())
+	if($this->yystack[$this->yyidx + 0]->minor)
+		$this->yystack[$this->yyidx + 0]->minor->set_value(null); // value is not interesting here
+	if($this->yystack[$this->yyidx + 0]->minor && $this->yystack[$this->yyidx + -4]->minor->is_unknown())
 		$param->set_mtype(new PC_Obj_MultiType(array($this->yystack[$this->yyidx + 0]->minor)));
 	else
 		$param->set_mtype(new PC_Obj_MultiType(array($this->yystack[$this->yyidx + -4]->minor)));
 	$param->set_optional(true);
 	$this->_retvalue[] = $param;
     }
-#line 4897 "src/compile/typeparser.php"
-#line 473 "src/compile/typeparser.y"
+#line 4900 "src/compile/typeparser.php"
+#line 476 "src/compile/typeparser.y"
     function yy_r193(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -5]->minor;
 	$param = new PC_Obj_Parameter($this->yystack[$this->yyidx + -2]->minor);
-	if($this->yystack[$this->yyidx + -3]->minor->is_unknown())
+	if($this->yystack[$this->yyidx + 0]->minor)
+		$this->yystack[$this->yyidx + 0]->minor->set_value(null); // value is not interesting here
+	if($this->yystack[$this->yyidx + 0]->minor && $this->yystack[$this->yyidx + -3]->minor->is_unknown())
 		$param->set_mtype(new PC_Obj_MultiType(array($this->yystack[$this->yyidx + 0]->minor)));
 	else
 		$param->set_mtype(new PC_Obj_MultiType(array($this->yystack[$this->yyidx + -3]->minor)));
 	$param->set_optional(true);
 	$this->_retvalue[] = $param;
     }
-#line 4909 "src/compile/typeparser.php"
-#line 485 "src/compile/typeparser.y"
+#line 4913 "src/compile/typeparser.php"
+#line 489 "src/compile/typeparser.y"
     function yy_r194(){ $this->_retvalue = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$this->yystack[$this->yyidx + 0]->minor);     }
-#line 4912 "src/compile/typeparser.php"
-#line 487 "src/compile/typeparser.y"
+#line 4916 "src/compile/typeparser.php"
+#line 491 "src/compile/typeparser.y"
     function yy_r196(){ $this->_retvalue = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);     }
-#line 4915 "src/compile/typeparser.php"
-#line 492 "src/compile/typeparser.y"
-    function yy_r199(){ $this->_retvalue = array($this->yystack[$this->yyidx + 0]->minor);     }
-#line 4918 "src/compile/typeparser.php"
+#line 4919 "src/compile/typeparser.php"
 #line 496 "src/compile/typeparser.y"
+    function yy_r199(){ $this->_retvalue = array($this->yystack[$this->yyidx + 0]->minor);     }
+#line 4922 "src/compile/typeparser.php"
+#line 500 "src/compile/typeparser.y"
     function yy_r202(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 4924 "src/compile/typeparser.php"
-#line 506 "src/compile/typeparser.y"
+#line 4928 "src/compile/typeparser.php"
+#line 510 "src/compile/typeparser.y"
     function yy_r204(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -3]->minor;
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 4930 "src/compile/typeparser.php"
-#line 524 "src/compile/typeparser.y"
+#line 4934 "src/compile/typeparser.php"
+#line 528 "src/compile/typeparser.y"
     function yy_r214(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 4936 "src/compile/typeparser.php"
-#line 530 "src/compile/typeparser.y"
+#line 4940 "src/compile/typeparser.php"
+#line 534 "src/compile/typeparser.y"
     function yy_r216(){
 	$this->_retvalue = new PC_Obj_Field($this->state->get_file(),$this->state->get_line());
 	$this->_retvalue->set_name($this->yystack[$this->yyidx + -1]->minor->metadata['name']);
@@ -4944,8 +4952,8 @@ static public $yy_action = array(
 		$this->_retvalue->set_type($this->yystack[$this->yyidx + -1]->minor->metadata['val']);
 	$this->state->parse_field_doc($this->_retvalue);
     }
-#line 4952 "src/compile/typeparser.php"
-#line 544 "src/compile/typeparser.y"
+#line 4956 "src/compile/typeparser.php"
+#line 548 "src/compile/typeparser.y"
     function yy_r217(){
 	$this->_retvalue = new PC_Obj_Constant(
 		$this->state->get_file(),$this->state->get_line(),$this->yystack[$this->yyidx + -1]->minor->metadata['name'],
@@ -4953,8 +4961,8 @@ static public $yy_action = array(
 	);
 	$this->state->parse_const_doc($this->_retvalue);
     }
-#line 4961 "src/compile/typeparser.php"
-#line 552 "src/compile/typeparser.y"
+#line 4965 "src/compile/typeparser.php"
+#line 556 "src/compile/typeparser.y"
     function yy_r218(){
 	$this->_retvalue = new PC_Obj_Method($this->state->get_file(),$this->state->get_last_function_line(),false);
 	$this->_retvalue->set_name($this->yystack[$this->yyidx + -4]->minor);
@@ -4971,65 +4979,65 @@ static public $yy_action = array(
 		$this->_retvalue->put_param($param);
 	$this->state->parse_method_doc($this->_retvalue);
     }
-#line 4979 "src/compile/typeparser.php"
-#line 574 "src/compile/typeparser.y"
+#line 4983 "src/compile/typeparser.php"
+#line 578 "src/compile/typeparser.y"
     function yy_r222(){ $this->_retvalue = new PC_Type_yyToken('',array('public'));     }
-#line 4982 "src/compile/typeparser.php"
-#line 580 "src/compile/typeparser.y"
+#line 4986 "src/compile/typeparser.php"
+#line 584 "src/compile/typeparser.y"
     function yy_r226(){
 	$this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + -1]->minor);
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 4988 "src/compile/typeparser.php"
-#line 585 "src/compile/typeparser.y"
+#line 4992 "src/compile/typeparser.php"
+#line 589 "src/compile/typeparser.y"
     function yy_r227(){
 	$this->_retvalue = new PC_Type_yyToken('',array($this->yystack[$this->yyidx + 0]->minor));
     }
-#line 4993 "src/compile/typeparser.php"
-#line 589 "src/compile/typeparser.y"
+#line 4997 "src/compile/typeparser.php"
+#line 593 "src/compile/typeparser.y"
     function yy_r228(){
 	$this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + -2]->minor);
 	$this->_retvalue[] = array('name' => substr($this->yystack[$this->yyidx + 0]->minor,1));
     }
-#line 4999 "src/compile/typeparser.php"
-#line 594 "src/compile/typeparser.y"
+#line 5003 "src/compile/typeparser.php"
+#line 598 "src/compile/typeparser.y"
     function yy_r229(){
 	$this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + -4]->minor);
 	$this->_retvalue[] = array('name' => substr($this->yystack[$this->yyidx + -2]->minor,1),'val' => $this->yystack[$this->yyidx + 0]->minor);
     }
-#line 5005 "src/compile/typeparser.php"
-#line 598 "src/compile/typeparser.y"
+#line 5009 "src/compile/typeparser.php"
+#line 602 "src/compile/typeparser.y"
     function yy_r230(){
 	$this->_retvalue = new PC_Type_yyToken('',array('name' => substr($this->yystack[$this->yyidx + 0]->minor,1)));
     }
-#line 5010 "src/compile/typeparser.php"
-#line 601 "src/compile/typeparser.y"
+#line 5014 "src/compile/typeparser.php"
+#line 605 "src/compile/typeparser.y"
     function yy_r231(){
 	$this->_retvalue = new PC_Type_yyToken('',array('name' => substr($this->yystack[$this->yyidx + -2]->minor,1),'val' => $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 5015 "src/compile/typeparser.php"
-#line 606 "src/compile/typeparser.y"
+#line 5019 "src/compile/typeparser.php"
+#line 610 "src/compile/typeparser.y"
     function yy_r232(){
 	$this->_retvalue = new PC_Type_yyToken($this->yystack[$this->yyidx + -4]->minor);
 	$this->_retvalue[] = array('name' => $this->yystack[$this->yyidx + -2]->minor,'val' => $this->yystack[$this->yyidx + 0]->minor);
     }
-#line 5021 "src/compile/typeparser.php"
-#line 610 "src/compile/typeparser.y"
+#line 5025 "src/compile/typeparser.php"
+#line 614 "src/compile/typeparser.y"
     function yy_r233(){
 	$this->_retvalue = new PC_Type_yyToken('',array('name' => $this->yystack[$this->yyidx + -2]->minor,'val' => $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 5026 "src/compile/typeparser.php"
-#line 735 "src/compile/typeparser.y"
+#line 5030 "src/compile/typeparser.php"
+#line 739 "src/compile/typeparser.y"
     function yy_r320(){
 	if(strcasecmp($this->yystack[$this->yyidx + -3]->minor,'define') == 0)
 		$this->state->handle_define($this->yystack[$this->yyidx + -1]->minor);
     }
-#line 5032 "src/compile/typeparser.php"
-#line 751 "src/compile/typeparser.y"
+#line 5036 "src/compile/typeparser.php"
+#line 755 "src/compile/typeparser.y"
     function yy_r325(){
 	$this->_retvalue = new PC_Obj_Type(PC_Obj_Type::STRING);
     }
-#line 5037 "src/compile/typeparser.php"
+#line 5041 "src/compile/typeparser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -5154,7 +5162,7 @@ static public $yy_action = array(
     }
 	echo "\n";	
     throw new Exception('Unexpected ' . $this->tokenName($yymajor) . '(' . $TOKEN. '), expected one of: ' . implode(',', $expect));
-#line 5163 "src/compile/typeparser.php"
+#line 5167 "src/compile/typeparser.php"
     }
 
     /**

@@ -23,8 +23,6 @@ FWS_Props::set_accessor($accessor);
 
 // TODO handle list() so that it declares the variables as unknown?
 // TODO type-hinting in catch-blocks is not supported yet
-// FIXME the parameters of BS_User_Current->login() are wrong
-// TODO is it possible to get the required types of builtin functions etc.?
 // TODO we should recognize /* @var $<var> <type> */ as type-hints
 // TODO if a method does not exist, we could look for subclasses of the class and check if the
 // method exists there. this is a bit guessing of course, but the user could enable/disable this.
@@ -35,8 +33,10 @@ FWS_Props::set_accessor($accessor);
 // value-return at all, etc.
 // TODO we could check thrown exceptions. i.e. check if @thrown is present and if it specifies
 // the thrown exceptions, etc.
-// TODO we can't handle "null" (we detect it as string)
 // TODO handle "void" special?
+// TODO detect calls of private/protected methods
+// TODO perhaps we should change the whole type-system. so that we use the multitype everywhere.
+// otherwise there is no way to handle multitypes in return-values
 
 $doc = FWS_Props::get()->doc();
 echo $doc->render();

@@ -426,7 +426,9 @@ non_empty_parameter_list(A) ::= optional_class_type(vtype) AMPERSAND T_VARIABLE(
 																EQUALS static_scalar(vval). {
 	A = array();
 	$param = new PC_Obj_Parameter(vname);
-	if(vtype->is_unknown())
+	if(vval)
+		vval->set_value(null); // value is not interesting here
+	if(vval && vtype->is_unknown())
 		$param->set_mtype(new PC_Obj_MultiType(array(vval)));
 	else
 		$param->set_mtype(new PC_Obj_MultiType(array(vtype)));
@@ -437,7 +439,9 @@ non_empty_parameter_list(A) ::= optional_class_type(vtype) T_VARIABLE(vname)
 																EQUALS static_scalar(vval). {
 	A = array();
 	$param = new PC_Obj_Parameter(vname);
-	if(vtype->is_unknown())
+	if(vval)
+		vval->set_value(null); // value is not interesting here
+	if(vval && vtype->is_unknown())
 		$param->set_mtype(new PC_Obj_MultiType(array(vval)));
 	else
 		$param->set_mtype(new PC_Obj_MultiType(array(vtype)));
@@ -462,7 +466,9 @@ non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA optional_cl
 																AMPERSAND T_VARIABLE(vname) EQUALS static_scalar(vval). {
 	A = list;
 	$param = new PC_Obj_Parameter(vname);
-	if(vtype->is_unknown())
+	if(vval)
+		vval->set_value(null); // value is not interesting here
+	if(vval && vtype->is_unknown())
 		$param->set_mtype(new PC_Obj_MultiType(array(vval)));
 	else
 		$param->set_mtype(new PC_Obj_MultiType(array(vtype)));
@@ -473,7 +479,9 @@ non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA optional_cl
 																T_VARIABLE(vname) EQUALS static_scalar(vval). {
 	A = list;
 	$param = new PC_Obj_Parameter(vname);
-	if(vtype->is_unknown())
+	if(vval)
+		vval->set_value(null); // value is not interesting here
+	if(vval && vtype->is_unknown())
 		$param->set_mtype(new PC_Obj_MultiType(array(vval)));
 	else
 		$param->set_mtype(new PC_Obj_MultiType(array(vtype)));

@@ -32,6 +32,8 @@ final class PC_Obj_Error extends FWS_Object
 	const E_T_FINAL_CLASS_INHERITANCE						= 21;
 	const E_T_CLASS_NOT_ABSTRACT								= 22;
 	const E_T_CLASS_MISSING											= 23;
+	const E_T_INTERFACE_MISSING									= 24;
+	const E_T_IF_IS_NO_IF												= 25;
 	
 	/**
 	 * Determines the name of the given type
@@ -65,7 +67,9 @@ final class PC_Obj_Error extends FWS_Object
 			self::E_T_CLASS_POT_USELESS_ABSTRACT =>			'Abstract class',
 			self::E_T_FINAL_CLASS_INHERITANCE =>				'Final class inheritance',
 			self::E_T_CLASS_NOT_ABSTRACT =>							'Class not abstract',
-			self::E_T_CLASS_MISSING =>									'Class missing'
+			self::E_T_CLASS_MISSING =>									'Class missing',
+			self::E_T_INTERFACE_MISSING =>							'Interface missing',
+			self::E_T_IF_IS_NO_IF =>										'Implemented class'
 		);
 	}
 	

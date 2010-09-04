@@ -270,7 +270,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 				list($type,$name) = explode(' ',trim($part));
 				$param = new PC_Obj_Parameter();
 				$param->set_name(trim($name));
-				$param->set_mtype(new PC_Obj_MultiType(array(PC_Obj_Type::get_type_by_name(trim($type)))));
+				$param->set_mtype(self::get_param_type($type));
 				$method->put_param($param);
 			}
 		}
@@ -315,19 +315,42 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 					list($type,$name) = $parts;
 				}
 				$param->set_name(trim($name));
-				$otype = PC_Obj_Type::get_type_by_name(trim($type));
-				if($default !== null && strcasecmp($default,'null') != 0)
-				{
-					if($default == 'array()')
-						$otype->set_value(array());
-					else
-						$otype->set_value($default);
-				}
-				$param->set_mtype(new PC_Obj_MultiType(array($otype)));
+				$param->set_mtype(self::get_param_type($type,$default));
 				$method->put_param($param);
 			}
 		}
 		return array('func',$classname,$method);
+	}
+	
+	/**
+	 * Determines the multi-type from given type-name and default-value
+	 * 
+	 * @param string $type the type-name
+	 * @param string $default the default-value
+	 * @return PC_Obj_MultiType the multitype
+	 */
+	private static function get_param_type($type,$default = null)
+	{
+		$type = trim($type);
+		// "callback" is a pseudo-type that may be an array (with classname and funcname) or
+		// a string (the funcname)
+		if(strcasecmp($type,'callback') == 0)
+		{
+			return new PC_Obj_MultiType(array(
+				new PC_Obj_Type(PC_Obj_Type::TARRAY),
+				new PC_Obj_Type(PC_Obj_Type::STRING)
+			));
+		}
+		
+		$otype = PC_Obj_Type::get_type_by_name(trim($type));
+		if($default !== null && strcasecmp($default,'null') != 0)
+		{
+			if($default == 'array()')
+				$otype->set_value(array());
+			else
+				$otype->set_value($default);
+		}
+		return new PC_Obj_MultiType(array($otype));
 	}
 }
 ?>
