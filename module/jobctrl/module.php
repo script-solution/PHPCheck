@@ -2,7 +2,7 @@
 /**
  * Contains the jobctrl-module
  * 
- * @version			$Id: module.php 25 2008-12-13 15:41:52Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>

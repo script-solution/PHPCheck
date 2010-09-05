@@ -2,7 +2,7 @@
 /**
  * Contains the cli-job-interface
  * 
- * @version			$Id: module.php 57 2010-09-03 23:13:08Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>

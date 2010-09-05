@@ -2,7 +2,7 @@
 /**
  * Tests the analyzer
  *
- * @version			$Id: arrays.php 49 2010-09-02 08:11:48Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	tests
  * @author			Nils Asmussen <nils@script-solution.de>

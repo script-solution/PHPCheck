@@ -2,7 +2,7 @@
 /**
  * Contains the cli-call-analyzer-module
  * 
- * @version			$Id: module.php 57 2010-09-03 23:13:08Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	cli
  * @author			Nils Asmussen <nils@script-solution.de>

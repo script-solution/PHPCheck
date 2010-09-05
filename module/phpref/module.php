@@ -2,7 +2,7 @@
 /**
  * Contains the phpref-module
  *
- * @version			$Id: module.php 23 2008-12-13 11:07:36Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>

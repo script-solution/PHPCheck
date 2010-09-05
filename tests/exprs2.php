@@ -2,7 +2,7 @@
 /**
  * Tests more expressions
  *
- * @version			$Id: arrays.php 47 2010-08-31 20:23:10Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	tests
  * @author			Nils Asmussen <nils@script-solution.de>

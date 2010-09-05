@@ -2,7 +2,7 @@
 /**
  * Contains the phpref-task
  *
- * @version			$Id: scan.php 34 2010-08-27 14:30:53Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>

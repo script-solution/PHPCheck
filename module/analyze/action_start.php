@@ -2,7 +2,7 @@
 /**
  * Contains the start-action
  *
- * @version			$Id: action_startscan.php 27 2008-12-13 17:11:45Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>

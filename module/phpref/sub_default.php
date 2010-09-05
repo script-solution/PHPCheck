@@ -2,7 +2,7 @@
 /**
  * Contains the default-phpref-submodule
  * 
- * @version			$Id: sub_default.php 38 2010-08-29 22:07:05Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	module
  * @author			Nils Asmussen <nils@script-solution.de>
