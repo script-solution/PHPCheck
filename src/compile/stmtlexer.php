@@ -41,6 +41,12 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	}
 	
 	/**
+	 * The last comment we've checked for "@var $<name> <type>"
+	 * 
+	 * @var string
+	 */
+	private $lastCheckComment = '';
+	/**
 	 * The current scope
 	 * 
 	 * @var string
@@ -139,6 +145,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		
 		// determine class- and function-name
 		$fname = $func->get_type()->get_value();
+		$cname = '';
 		$call->set_function($fname);
 		$call->set_object_creation(strcasecmp($fname,'__construct') == 0);
 		if($class !== null)
@@ -911,10 +918,33 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 				case T_TRY:
 					$this->start_cond();
 					break;
+					
+				case T_COMMENT:
+				case self::$T_DOC_COMMENT:
+					$wascomment = true;
+					break;
 			}
 		}
 		
-		return parent::advance($parser);
+		$res = parent::advance($parser);
+		if($this->lastComment && $this->lastComment != $this->lastCheckComment)
+		{
+			// it was a comment, so lets see if it contains a "@var $<name> <type>" that gives us a
+			// hint what type a variable has.
+			$matches = array();
+			if(preg_match('/\@var\s+\$([a-z0-9_]+)\s+(\S+)/i',$this->lastComment,$matches))
+			{
+				// do we know that variable?
+				if(isset($this->vars[$this->scope][$matches[1]]))
+				{
+					// ok, determine type and set it
+					$type = PC_Obj_Type::get_type_by_name($matches[2]);
+					$this->vars[$this->scope][$matches[1]]->set_type($type);
+				}
+			}
+			$this->lastCheckComment = $this->lastComment;
+		}
+		return $res;
 	}
 	
 	/**

@@ -285,7 +285,7 @@ class PC_Compile_BaseLexer
 				case self::$T_DOC_COMMENT;
 				case T_COMMENT:
 					if(substr($this->tokens[$this->pos][1],0,2) == '/*')
-						$this->lastComment = $this->tokens[$this->pos][1];
+						$this->lastComment .= $this->tokens[$this->pos][1];
 					$this->line += substr_count($this->tokens[$this->pos][1],"\n");
 					$this->pos++;
 					continue;
