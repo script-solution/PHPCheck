@@ -24,7 +24,7 @@ final class PC_Module_StmtScan extends PC_SubModuleContainer
 	 */
 	public function __construct()
 	{
-		parent::__construct('stmtscan',array('default','scan'),'default');
+		parent::__construct('stmtscan',array('default','scan','cliscan'),'default');
 	}
 	
 	/**

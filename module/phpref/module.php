@@ -24,7 +24,7 @@ final class PC_Module_PHPRef extends PC_SubModuleContainer
 	 */
 	public function __construct()
 	{
-		parent::__construct('phpref',array('default','scan'),'default');
+		parent::__construct('phpref',array('default','scan','cliscan'),'default');
 	}
 	
 	/**

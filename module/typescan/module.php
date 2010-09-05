@@ -24,7 +24,7 @@ final class PC_Module_TypeScan extends PC_SubModuleContainer
 	 */
 	public function __construct()
 	{
-		parent::__construct('typescan',array('default','scan'),'default');
+		parent::__construct('typescan',array('default','scan','cliscan'),'default');
 	}
 	
 	/**

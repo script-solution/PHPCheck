@@ -1,0 +1,29 @@
+{include "inc_header.htm"}
+
+{if module_error == false}
+<script type="text/javascript" src="{gjs.get_file('src/functions.js')}"></script>
+<script type="text/javascript" language="javascript">
+startJobs(
+	'{gurl.build_mod_url("jobctrl")}',
+	'{gurl.build_mod_url("jobstate")}',
+	{file_count},
+	{files_per_job},
+	{check_interval}
+);
+</script>
+
+<div class="pc_border pc_padtop">
+	<h1 class="pc_topic">Scanning for types</h1>
+	<div class="pc_main">
+		<img id="status_img" alt="0%" src="images/topic.gif" width="0%" height="20" />
+	</div>
+	<div class="pc_main" style="text-align: center;">
+		<div id="status_msg"></div>
+		<div id="finish_area" class="pc_body" style="display: none; padding-top: 5px;">
+		<a href="{gurl.build_mod_url()}">Back</a>
+		</div>
+	</div>
+</div>
+{endif}
+
+{include "inc_footer.htm"}

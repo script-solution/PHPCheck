@@ -34,14 +34,22 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	private $_type;
 	
 	/**
+	 * The class-id
+	 * 
+	 * @var int
+	 */
+	private $_class;
+	
+	/**
 	 * Constructor
 	 *
 	 * @param string $file the file of the class-def
 	 * @param int $line the line of the class-def
 	 * @param string $name the constant-name
 	 * @param PC_Obj_Type $type the type
+	 * @param int $classid the class-id if loaded from db
 	 */
-	public function __construct($file,$line,$name,$type = null)
+	public function __construct($file,$line,$name,$type = null,$classid = 0)
 	{
 		parent::__construct($file,$line);
 		
@@ -52,6 +60,15 @@ final class PC_Obj_Constant extends PC_Obj_Location
 		
 		$this->_name = $name;
 		$this->_type = $type;
+		$this->_class = $classid;
+	}
+	
+	/**
+	 * @return int the class-id (just present if loaded from db!)
+	 */
+	public function get_class()
+	{
+		return $this->_class;
 	}
 	
 	/**

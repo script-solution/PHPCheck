@@ -1,23 +1,23 @@
 <?php
 /**
- * Contains the phpref-task
- *
- * @version			$Id: scan.php 34 2010-08-27 14:30:53Z nasmussen $
+ * Contains the cli-phpref-scan-module
+ * 
+ * @version			$Id: module.php 57 2010-09-03 23:13:08Z nasmussen $
  * @package			PHPCheck
- * @subpackage	module
+ * @subpackage	cli
  * @author			Nils Asmussen <nils@script-solution.de>
  * @copyright		2003-2008 Nils Asmussen
  * @link				http://www.script-solution.de
  */
 
 /**
- * The task to scan the php-reference
- *
+ * The cli-phpref-scan-module
+ * 
  * @package			PHPCheck
- * @subpackage	module
+ * @subpackage	cli
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Module_PHPRef_Task_Scan extends FWS_Object implements FWS_Progress_Task
+final class PC_CLI_PHPRef implements PC_CLIJob
 {
 	/**
 	 * Collected aliases
@@ -32,56 +32,38 @@ final class PC_Module_PHPRef_Task_Scan extends FWS_Object implements FWS_Progres
 	 */
 	private $versions = array();
 	
-	/**
-	 * @see FWS_Progress_Task::get_total_operations()
-	 *
-	 * @return int
-	 */
-	public function get_total_operations()
+	public function run($args)
 	{
 		$user = FWS_Props::get()->user();
-		return count($user->get_session_data('phpref_files',array()));
-	}
-
-	/**
-	 * @see FWS_Progress_Task::run()
-	 *
-	 * @param int $pos
-	 * @param int $ops
-	 */
-	public function run($pos,$ops)
-	{
-		$msgs = FWS_Props::get()->msgs();
-		$user = FWS_Props::get()->user();
-		
-		$files = $user->get_session_data('phpref_files');
-		$this->aliases = $user->get_session_data('phpref_aliases');
-		$this->versions = $user->get_session_data('phpref_versions');
+		$errors = array();
 		$typecon = new PC_Compile_TypeContainer(PC_Project::PHPREF_ID);
-		
-		for($i = $pos, $end = min($pos + $ops,$this->get_total_operations()); $i < $end; $i++)
+		foreach($args as $file)
 		{
 			try
 			{
-				if(preg_match('/\/function\./',$files[$i]))
-					$this->grab_function($typecon,$files[$i]);
+				if(preg_match('/\/function\./',$file))
+					$this->grab_function($typecon,$file);
 				else
-					$this->grab_class($typecon,$files[$i]);
+					$this->grab_class($typecon,$file);
 			}
 			catch(PC_PHPRef_Exception $e)
 			{
-				$msgs->add_error($e->getMessage().' in file "'.$files[$i].'"');
+				$errors[] = $e->getMessage().' in file "'.$file.'"';
 			}
 		}
 		
-		// finally add aliases
-		if($pos + $ops >= $this->get_total_operations())
-		{
-			$fin = new PC_PHPRef_Finalizer($this->aliases,$this->versions);
-			$fin->finalize();
-		}
-		$user->set_session_data('phpref_aliases',$this->aliases);
-		$user->set_session_data('phpref_versions',$this->versions);
+		// write stuff to shared data
+		$mutex = new FWS_MutexFile(PC_CLI_MUTEX_FILE);
+		$mutex->aquire();
+		$data = unserialize($mutex->read());
+		/* @var $data PC_JobData */
+		$data->add_errors($errors);
+		$misc = $data->get_misc();
+		$misc['versions'] = array_merge($misc['versions'],$this->versions);
+		$misc['aliases'] = array_merge($misc['aliases'],$this->aliases);
+		$data->set_misc($misc);
+		$mutex->write(serialize($data));
+		$mutex->close();
 	}
 	
 	/**
@@ -120,16 +102,6 @@ final class PC_Module_PHPRef_Task_Scan extends FWS_Object implements FWS_Progres
 			else
 					PC_DAO::get_functions()->create($method,0,PC_Project::PHPREF_ID);
 		}
-	}
-
-	/**
-	 * @see FWS_Object::get_dump_vars()
-	 *
-	 * @return array
-	 */
-	protected function get_dump_vars()
-	{
-		return get_object_vars($this);
 	}
 }
 ?>

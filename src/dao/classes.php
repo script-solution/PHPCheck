@@ -172,9 +172,8 @@ class PC_DAO_Classes extends FWS_Singleton
 			$stmt->bind(':file','%'.$file.'%');
 		if($class)
 			$stmt->bind(':class','%'.$class.'%');
-		foreach($db->get_rows($stmt->get_statement()) as $row)
-			$classes[] = $this->_build_class($row,$pid);
-		return $classes;
+		$rows = $db->get_rows($stmt->get_statement());
+		return $this->_build_complete_classes($rows,$pid);
 	}
 	
 	/**
@@ -239,15 +238,38 @@ class PC_DAO_Classes extends FWS_Singleton
 	}
 	
 	/**
+	 * Builds the classes from given rows completely, i.e. without lazy-loading
+	 * 
+	 * @param array $rows the rows
+	 * @param int $pid the project-id
+	 * @return array the class-objects
+	 */
+	private function _build_complete_classes($rows,$pid)
+	{
+		$classes = array();
+		foreach($rows as $row)
+			$classes[$row['id']] = $this->_build_class($row,$pid,false);
+		$cids = array_keys($classes);
+		foreach(PC_DAO::get_constants()->get_list($cids,'','',$pid) as $const)
+			$classes[$const->get_class()]->add_constant($const);
+		foreach(PC_DAO::get_classfields()->get_all($cids,$pid) as $field)
+			$classes[$field->get_class()]->add_field($field);
+		foreach(PC_DAO::get_functions()->get_list($cids,0,0,'','',$pid) as $method)
+			$classes[$method->get_class()]->add_method($method);
+		return $classes;
+	}
+	
+	/**
 	 * Builds an instance of PC_Obj_Class from the given row
 	 *
 	 * @param array $row the row from the db
 	 * @param int $pid the project-id
+	 * @param bool $lazy wether to load it lazy
 	 * @return PC_Obj_Class the class
 	 */
-	private function _build_class($row,$pid)
+	private function _build_class($row,$pid,$lazy = true)
 	{
-		$c = new PC_Obj_Class($row['file'],$row['line'],$row['id']);
+		$c = new PC_Obj_Class($row['file'],$row['line'],$row['id'],$pid,$lazy);
 		$c->set_name($row['name']);
 		$c->set_super_class($row['superclass']);
 		$c->set_abstract($row['abstract']);
@@ -255,12 +277,6 @@ class PC_DAO_Classes extends FWS_Singleton
 		$c->set_final($row['final']);
 		foreach(FWS_Array_Utils::advanced_explode(',',$row['interfaces']) as $if)
 			$c->add_interface($if);
-		foreach(PC_DAO::get_constants()->get_list($row['id'],'','',$pid) as $const)
-			$c->add_constant($const);
-		foreach(PC_DAO::get_classfields()->get_all($row['id'],$pid) as $field)
-			$c->add_field($field);
-		foreach(PC_DAO::get_functions()->get_list($row['id'],0,0,'','',$pid) as $method)
-			$c->add_method($method);
 		return $c;
 	}
 }

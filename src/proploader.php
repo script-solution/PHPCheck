@@ -26,7 +26,7 @@ final class PC_PropLoader extends FWS_PropLoader
 	 */
 	protected function sessions()
 	{
-		return new FWS_Session_Manager(new FWS_Session_Storage_PHP(),true);
+		return new FWS_Session_Manager(new PC_Session_Storage_File(),true);
 	}
 
 	/**

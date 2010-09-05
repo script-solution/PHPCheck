@@ -5150,18 +5150,12 @@ static public $yy_action = array(
     function yy_syntax_error($yymajor, $TOKEN)
     {
 #line 4 "src/compile/typeparser.y"
-
-    echo "Syntax Error " . ($this->state->get_file() ? "in file " . $this->state->get_file()." " : '');
-		echo "on line " . $this->state->get_line() . ": token '" . htmlspecialchars($this->state->get_value()) . "'";
-		echo " (".token_name($this->state->get_token()).") while parsing rule: ";
-    foreach ($this->yystack as $entry) {
-        echo $this->tokenName($entry->major) . '->';
-    }
-    foreach ($this->yy_get_expected_tokens($yymajor) as $token) {
-        $expect[] = self::$yyTokenName[$token];
-    }
-	echo "\n";	
-    throw new Exception('Unexpected ' . $this->tokenName($yymajor) . '(' . $TOKEN. '), expected one of: ' . implode(',', $expect));
+	    foreach ($this->yy_get_expected_tokens($yymajor) as $token) {
+	        $expect[] = self::$yyTokenName[$token];
+	    }
+			throw new PC_Compile_Exception(
+				$this->state->get_file(),$this->state->get_line(),$this->tokenName($yymajor),$TOKEN,$expect
+			);
 #line 5167 "src/compile/typeparser.php"
     }
 

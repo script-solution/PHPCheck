@@ -72,9 +72,10 @@ final class PC_SubModule_PHPRef_scan extends PC_SubModule implements FWS_Progres
 	public function progress_finished()
 	{
 		$this->_populate_template();
-		//$user = FWS_Props::get()->user();
-		//$user->delete_session_data('phpref_files');
-		//$user->delete_session_data('phpref_aliases');
+		$user = FWS_Props::get()->user();
+		$user->delete_session_data('phpref_files');
+		$user->delete_session_data('phpref_aliases');
+		$user->delete_session_data('phpref_versions');
 	}
 	
 	/**

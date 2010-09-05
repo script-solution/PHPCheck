@@ -164,8 +164,10 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 				{
 					// if we're in a non-static method, its a static-call if the method we're calling is
 					// static, and not if its not. i.e. we basically don't detect errors here
+					$func = null;
 					$super = $this->types->get_class($cname);
-					$func = $super->get_method($fname);
+					if($super !== null)
+						$func = $super->get_method($fname);
 					$static = $func !== null && $func->is_static();
 				}
 			}

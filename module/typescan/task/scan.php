@@ -39,20 +39,27 @@ final class PC_Module_TypeScan_Task_Scan extends FWS_Object implements FWS_Progr
 	public function run($pos,$ops)
 	{
 		$user = FWS_Props::get()->user();
+		$msgs = FWS_Props::get()->msgs();
 		
-		//$tscanner = new PC_Compile_TypeScanner();
 		$files = $user->get_session_data('typescan_files',array());
 		$end = min($pos + $ops,count($files));
 		for($i = $pos;$i < $end;$i++)
 		{
 			$tscanner = new PC_Compile_TypeScannerFrontend();
-			$tscanner->scan_file($files[$i]);
-			foreach($tscanner->get_classes() as $class)
-				PC_DAO::get_classes()->create($class);
-			foreach($tscanner->get_constants() as $const)
-				PC_DAO::get_constants()->create($const);
-			foreach($tscanner->get_functions() as $func)
-				PC_DAO::get_functions()->create($func);
+			try
+			{
+				$tscanner->scan_file($files[$i]);
+				foreach($tscanner->get_classes() as $class)
+					PC_DAO::get_classes()->create($class);
+				foreach($tscanner->get_constants() as $const)
+					PC_DAO::get_constants()->create($const);
+				foreach($tscanner->get_functions() as $func)
+					PC_DAO::get_functions()->create($func);
+			}
+			catch(PC_Compile_Exception $e)
+			{
+				$msgs->add_error($e->__toString());
+			}
 		}
 		
 		// finish all classes if the typescan is finished

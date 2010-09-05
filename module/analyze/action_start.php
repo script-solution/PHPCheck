@@ -39,7 +39,10 @@ final class PC_Action_analyze_start extends FWS_Action_Base
 		$project = FWS_Props::get()->project();
 		PC_DAO::get_errors()->delete_by_project($project->get_id());
 		
-		$this->set_redirect(true,PC_URL::get_submod_url(0,'scan'));
+		if(PC_PARALLEL_JOB_COUNT == 0)
+			$this->set_redirect(true,PC_URL::get_submod_url(0,'scan'));
+		else
+			$this->set_redirect(true,PC_URL::get_submod_url(0,'cliscan'));
 		$this->set_show_status_page(false);
 		$this->set_action_performed(true);
 

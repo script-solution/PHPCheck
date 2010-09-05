@@ -43,7 +43,10 @@ final class PC_Action_PHPRef_startscan extends FWS_Action_Base
 		PC_DAO::get_functions()->delete_by_project(PC_Project::PHPREF_ID);
 		PC_DAO::get_classes()->delete_by_project(PC_Project::PHPREF_ID);
 		
-		$this->set_redirect(true,PC_URL::get_submod_url(0,'scan'));
+		if(PC_PARALLEL_JOB_COUNT == 0)
+			$this->set_redirect(true,PC_URL::get_submod_url(0,'scan'));
+		else
+			$this->set_redirect(true,PC_URL::get_submod_url(0,'cliscan'));
 		$this->set_show_status_page(false);
 		$this->set_action_performed(true);
 

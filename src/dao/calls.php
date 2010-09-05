@@ -149,16 +149,23 @@ class PC_DAO_Calls extends FWS_Singleton
 			FWS_Helper::def_error('instance','call','PC_Obj_Call',$call);
 		
 		$project = FWS_Props::get()->project();
-		return $db->insert(PC_TB_CALLS,array(
-			'project_id' => $project !== null ? $project->get_id() : 0,
-			'file' => $call->get_file(),
-			'line' => $call->get_line(),
-			'function' => $call->get_function(),
-			'class' => $call->get_class() === null ? null : $call->get_class(),
-			'static' => $call->is_static() ? 1 : 0,
-			'objcreation' => $call->is_object_creation() ? 1 : 0,
-			'arguments' => serialize($call->get_arguments())
-		));
+		return $db->insert(PC_TB_CALLS,$this->build_fields($call,$project));
+	}
+	
+	/**
+	 * Creates the given calls
+	 * 
+	 * @param array $calls an array of PC_Obj_Call
+	 */
+	public function create_bulk($calls)
+	{
+		$db = FWS_Props::get()->db();
+		
+		$project = FWS_Props::get()->project();
+		$rows = array();
+		foreach($calls as $call)
+			$rows[] = $this->build_fields($call,$project);
+		$db->insert_bulk(PC_TB_CALLS,$rows);
 	}
 	
 	/**
@@ -200,6 +207,27 @@ class PC_DAO_Calls extends FWS_Singleton
 		foreach($args as $arg)
 			$c->add_argument($arg);
 		return $c;
+	}
+	
+	/**
+	 * Builds the fields to insert for the given call and project
+	 * 
+	 * @param PC_Obj_Call $call the call
+	 * @param PC_Project $project the project
+	 * @return array an associative array with the fields
+	 */
+	private function build_fields($call,$project)
+	{
+		return array(
+			'project_id' => $project !== null ? $project->get_id() : 0,
+			'file' => $call->get_file(),
+			'line' => $call->get_line(),
+			'function' => $call->get_function(),
+			'class' => $call->get_class() === null ? null : $call->get_class(),
+			'static' => $call->is_static() ? 1 : 0,
+			'objcreation' => $call->is_object_creation() ? 1 : 0,
+			'arguments' => serialize($call->get_arguments())
+		);
 	}
 }
 ?>

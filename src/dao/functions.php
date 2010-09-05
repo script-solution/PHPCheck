@@ -93,7 +93,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	/**
 	 * Returns all functions
 	 *
-	 * @param int $class the class-id (0 = free functions)
+	 * @param int|array $class the class-id (0 = free functions) (or ids, if its an array)
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
 	 * @param string $file the file-name to search for
@@ -110,14 +110,18 @@ class PC_DAO_Functions extends FWS_Singleton
 			FWS_Helper::def_error('intge0','start',$start);
 		if(!FWS_Helper::is_integer($count) || $count < 0)
 			FWS_Helper::def_error('intge0','count',$count);
-		if(!FWS_Helper::is_integer($class) || $class < 0)
+		if(!FWS_Array_Utils::is_integer($class) && (!FWS_Helper::is_integer($class) || $class < 0))
 			FWS_Helper::def_error('intge0','class',$class);
+		
+		if(is_array($class) && count($class) == 0)
+			return array();
 		
 		$project = FWS_Props::get()->project();
 		$funcs = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_FUNCTIONS.'
-			 WHERE project_id = '.PC_Utils::get_project_id($pid).' AND class = '.$class.'
+			 WHERE project_id = '.PC_Utils::get_project_id($pid).' AND'
+			 .(is_array($class) ? ' class IN ('.implode(',',$class).')' : ' class = '.$class).'
 			 '.($file ? ' AND file LIKE :file' : '').'
 			 '.($name ? ' AND name LIKE :name' : '').'
 			 ORDER BY name
@@ -250,7 +254,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	 */
 	private function _build_func($row)
 	{
-		$c = new PC_Obj_Method($row['file'],$row['line'],$row['class'] == 0,$row['id']);
+		$c = new PC_Obj_Method($row['file'],$row['line'],$row['class'] == 0,$row['id'],$row['class']);
 		$c->set_name($row['name']);
 		$c->set_visibility($row['visibility']);
 		$c->set_abstract($row['abstract']);

@@ -2,17 +2,12 @@
 %declare_class {class PC_Compile_TypeParser}
 
 %syntax_error {
-    echo "Syntax Error " . ($this->state->get_file() ? "in file " . $this->state->get_file()." " : '');
-		echo "on line " . $this->state->get_line() . ": token '" . htmlspecialchars($this->state->get_value()) . "'";
-		echo " (".token_name($this->state->get_token()).") while parsing rule: ";
-    foreach ($this->yystack as $entry) {
-        echo $this->tokenName($entry->major) . '->';
-    }
     foreach ($this->yy_get_expected_tokens($yymajor) as $token) {
         $expect[] = self::$yyTokenName[$token];
     }
-	echo "\n";	
-    throw new Exception('Unexpected ' . $this->tokenName($yymajor) . '(' . $TOKEN. '), expected one of: ' . implode(',', $expect));
+		throw new PC_Compile_Exception(
+			$this->state->get_file(),$this->state->get_line(),$this->tokenName($yymajor),$TOKEN,$expect
+		);
 }
 
 %include_class {

@@ -17,7 +17,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_PHPRef_Function
+final class PC_PHPRef_Function extends FWS_Object
 {
 	/**
 	 * The file
@@ -33,6 +33,7 @@ final class PC_PHPRef_Function
 	 */
 	public function __construct($file)
 	{
+		parent::__construct();
 		$this->file = $file;
 	}
 	
@@ -91,6 +92,11 @@ final class PC_PHPRef_Function
 		}
 		$methods[0][2]->set_since($version);
 		return $methods[0];
+	}
+	
+	protected function get_dump_vars()
+	{
+		return get_object_vars($this);
 	}
 }
 ?>

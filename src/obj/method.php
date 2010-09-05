@@ -69,14 +69,22 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	private $since = '';
 	
 	/**
+	 * The class-id
+	 * 
+	 * @var int
+	 */
+	private $class;
+	
+	/**
 	 * Constructor
 	 *
 	 * @param string $file the file of the def
 	 * @param int $line the line of the def
 	 * @param boolean $free wether it is a free function
 	 * @param int $id the function-id
+	 * @param int $classid the class-id if loaded from db
 	 */
-	public function __construct($file,$line,$free,$id = 0)
+	public function __construct($file,$line,$free,$id = 0,$classid = 0)
 	{
 		parent::__construct($file,$line);
 		
@@ -84,6 +92,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 		$this->params = array();
 		$this->return = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 		$this->free = $free;
+		$this->class = $classid;
 	}
 	
 	/**
@@ -102,6 +111,14 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	public function set_id($id)
 	{
 		$this->id = $id;
+	}
+	
+	/**
+	 * @return int the class-id (just present if loaded from db!)
+	 */
+	public function get_class()
+	{
+		return $this->class;
 	}
 	
 	/**

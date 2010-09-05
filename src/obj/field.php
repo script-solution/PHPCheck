@@ -46,6 +46,13 @@ class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 	private $static = false;
 	
 	/**
+	 * The class-id
+	 * 
+	 * @var int
+	 */
+	private $class;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param string $file the file of the field
@@ -53,14 +60,24 @@ class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 	 * @param string $name the name of the field
 	 * @param PC_Obj_Type $type the type of the field
 	 * @param string $visibility the visibility
+	 * @param int $classid the class-id if loaded from db
 	 */
-	public function __construct($file,$line,$name = '',$type = null,$visibility = self::V_PUBLIC)
+	public function __construct($file,$line,$name = '',$type = null,$visibility = self::V_PUBLIC,$classid = 0)
 	{
 		parent::__construct($file,$line);
 		
 		$this->name = $name;
 		$this->visibility = $visibility;
 		$this->type = $type === null ? new PC_Obj_Type(PC_Obj_Type::UNKNOWN) : $type;
+		$this->class = $classid;
+	}
+	
+	/**
+	 * @return int the class-id (just present if loaded from db!)
+	 */
+	public function get_class()
+	{
+		return $this->class;
 	}
 	
 	/**

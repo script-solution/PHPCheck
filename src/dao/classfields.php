@@ -33,7 +33,7 @@ class PC_DAO_ClassFields extends FWS_Singleton
 	/**
 	 * Returns all fields of the given class
 	 *
-	 * @param int $class the class-id
+	 * @param int|array $class the class-id (or ids, if its an array)
 	 * @param int $pid the project-id (default = current)
 	 * @return array an array of PC_Obj_Field objects
 	 */
@@ -41,13 +41,17 @@ class PC_DAO_ClassFields extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!FWS_Helper::is_integer($class) || $class <= 0)
-			FWS_Helper::def_error('intgt0','class',$class);
+		if(!FWS_Array_Utils::is_integer($class) && (!FWS_Helper::is_integer($class) || $class < 0))
+			FWS_Helper::def_error('intge0','class',$class);
+		
+		if(is_array($class) && count($class) == 0)
+			return array();
 		
 		$fields = array();
 		$rows = $db->get_rows(
 			'SELECT * FROM '.PC_TB_CLASS_FIELDS.'
-			 WHERE project_id = '.PC_Utils::get_project_id($pid).' AND class = '.$class
+			 WHERE project_id = '.PC_Utils::get_project_id($pid).' AND'
+			 .(is_array($class) ? ' class IN ('.implode(',',$class).')' : ' class = '.$class)
 		);
 		foreach($rows as $row)
 		{
@@ -55,7 +59,9 @@ class PC_DAO_ClassFields extends FWS_Singleton
 				$type = new PC_Obj_Type($row['type'],null,$row['value']);
 			else
 				$type = new PC_Obj_Type($row['type'],unserialize($row['value']));
-			$fields[] = new PC_Obj_Field($row['file'],$row['line'],$row['name'],$type,$row['visibility']);
+			$fields[] = new PC_Obj_Field(
+				$row['file'],$row['line'],$row['name'],$type,$row['visibility'],$row['class']
+			);
 		}
 		return $fields;
 	}

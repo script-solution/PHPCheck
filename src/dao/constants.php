@@ -109,7 +109,7 @@ class PC_DAO_Constants extends FWS_Singleton
 	/**
 	 * Returns all constants
 	 *
-	 * @param int $class the class-id (0 = freestanding)
+	 * @param int|array $class the class-id (0 = freestanding) (or ids, if its an array)
 	 * @param string $file the file to search for
 	 * @param string $name the name to search for
 	 * @param int $pid the project-id (0 = current)
@@ -122,23 +122,26 @@ class PC_DAO_Constants extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!FWS_Helper::is_integer($class) || $class < 0)
+		if(!FWS_Array_Utils::is_integer($class) && (!FWS_Helper::is_integer($class) || $class < 0))
 			FWS_Helper::def_error('intge0','class',$class);
 		if(!FWS_Helper::is_integer($start) || $start < 0)
 			FWS_Helper::def_error('intge0','start',$start);
 		if(!FWS_Helper::is_integer($count) || $count < 0)
 			FWS_Helper::def_error('intge0','count',$count);
 		
+		if(is_array($class) && count($class) == 0)
+			return array();
+		
 		$consts = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CONSTANTS.'
-			 WHERE project_id = :pid AND class = :class'
+			 WHERE project_id = :pid AND'
+			 .(is_array($class) ? ' class IN ('.implode(',',$class).')' : ' class = '.$class)
 			 .($file ? ' AND file LIKE :file' : '')
 			 .($name ? ' AND name LIKE :name' : '')
 			.($count > 0 ? ' LIMIT '.$start.','.$count : '')
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
-		$stmt->bind(':class',$class);
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($name)
@@ -212,7 +215,7 @@ class PC_DAO_Constants extends FWS_Singleton
 			$type = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$row['value']);
 		else
 			$type = new PC_Obj_Type($row['type'],unserialize($row['value']));
-		return new PC_Obj_Constant($row['file'],$row['line'],$row['name'],$type);
+		return new PC_Obj_Constant($row['file'],$row['line'],$row['name'],$type,$row['class']);
 	}
 }
 ?>
