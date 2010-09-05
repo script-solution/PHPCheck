@@ -140,11 +140,14 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		// determine class- and function-name
 		$fname = $func->get_type()->get_value();
 		$call->set_function($fname);
-		$call->set_object_creation($fname == '__construct');
+		$call->set_object_creation(strcasecmp($fname,'__construct') == 0);
 		if($class !== null)
 		{
 			$cname = $class->get_type()->get_value();
-			if($cname == 'parent')
+			// support for php4 constructors
+			if(strcasecmp($cname,$fname) == 0)
+				$call->set_object_creation(true);
+			else if(strcasecmp($cname,'parent') == 0)
 			{
 				// in this case its no object-creation for us because it would lead to reports like
 				// instantiation of abstract classes when calling the constructor of an abstract
@@ -171,11 +174,11 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 					$static = $func !== null && $func->is_static();
 				}
 			}
-			else if($cname == 'self')
+			else if(strcasecmp($cname,'self') == 0)
 			{
 				$cname = $this->get_scope_part_name(T_CLASS_C);
 				// self is static if its not a constructor-call
-				$static = $fname != '__construct';
+				$static = strcasecmp($fname,'__construct') != 0 && strcasecmp($fname,$cname) != 0;
 			}
 			$call->set_class($cname);
 		}
@@ -187,7 +190,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		$this->calls[] = $call;
 		
 		// if its a constructor we know the type directly
-		if($fname == '__construct')
+		if(strcasecmp($fname,'__construct') == 0 || strcasecmp($fname,$cname) == 0)
 			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$cname));
 		// get function-object and determine return-type
 		$funcobj = null;

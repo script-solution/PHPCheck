@@ -20,6 +20,8 @@
  */
 class PC_DAO_Calls extends FWS_Singleton
 {
+	const MAX_ARGS_LEN			= 8192;
+	
 	/**
 	 * @return PC_DAO_Calls the instance of this class
 	 */
@@ -201,7 +203,7 @@ class PC_DAO_Calls extends FWS_Singleton
 		$c->set_function($row['function']);
 		$c->set_static($row['static']);
 		$c->set_object_creation($row['objcreation']);
-		$args = unserialize($row['arguments']);
+		$args = $row['arguments'] ? unserialize($row['arguments']) : array();
 		if($args === false)
 			throw new Exception("Unable to unserialize '".$row['arguments']."'");
 		foreach($args as $arg)
@@ -218,6 +220,16 @@ class PC_DAO_Calls extends FWS_Singleton
 	 */
 	private function build_fields($call,$project)
 	{
+		$args = serialize($call->get_arguments());
+		if(strlen($args) > self::MAX_ARGS_LEN)
+		{
+			$argarray = clone $call->get_arguments();
+			foreach($argarray as $arg)
+				$argarray->set_value(null);
+			$args = serialize($argarray);
+			if(strlen($args) > self::MAX_ARGS_LEN)
+				$args = '';
+		}
 		return array(
 			'project_id' => $project !== null ? $project->get_id() : 0,
 			'file' => $call->get_file(),
@@ -226,7 +238,7 @@ class PC_DAO_Calls extends FWS_Singleton
 			'class' => $call->get_class() === null ? null : $call->get_class(),
 			'static' => $call->is_static() ? 1 : 0,
 			'objcreation' => $call->is_object_creation() ? 1 : 0,
-			'arguments' => serialize($call->get_arguments())
+			'arguments' => $args
 		);
 	}
 }

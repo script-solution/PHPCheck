@@ -107,7 +107,9 @@ final class PC_Compile_Analyzer extends FWS_Object
 					{
 						if(!$c->contains_method($name))
 						{
-							if(!$this->is_method_of_sub($types,$c,$name))
+							// no obj-creation here because the constructor can be named '__construct' or
+							// '<classname>'. the call uses always '__construct'.
+							if(!$call->is_object_creation() && !$this->is_method_of_sub($types,$c,$name))
 							{
 								$this->_report(
 									$call,

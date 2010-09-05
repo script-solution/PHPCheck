@@ -67,7 +67,8 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 			
 			// add missing constructor
 			$c = $this->_classes[$name];
-			if(!$c->is_interface() && $c->get_method('__construct') === null)
+			if(!$c->is_interface() && $c->get_method('__construct') === null &&
+				$c->get_method($c->get_name()) === null)
 			{
 				$method = new PC_Obj_Method($c->get_file(),-1,false);
 				$method->set_name('__construct');
@@ -103,6 +104,10 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 				{
 					if($function->get_visibility() != PC_Obj_Visible::V_PRIVATE)
 					{
+						// don't inherit a constructor if the class has a old-style-one
+						if($function->get_name() == '__construct' && $data->get_method($data->get_name()) !== null)
+							continue;
+						
 						// if we don't want to overwrite the methods and the method is already there
 						// we add just the types that are not known yet
 						if(!$overwrite && ($f = $data->get_method($function->get_name())) !== null)
@@ -131,6 +136,9 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 						else
 						{
 							$clone = clone $function;
+							// change constructor-name, if it is an old-style-one
+							if($function->get_name() == $cobj->get_name())
+								$clone->set_name($data->get_name());
 							$clone->set_id($this->_storage->create_function($clone,$data->get_id()));
 							$data->add_method($clone);
 						}
