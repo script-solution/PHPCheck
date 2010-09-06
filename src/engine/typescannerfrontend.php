@@ -22,7 +22,7 @@ class PC_Engine_TypeScannerFrontend extends FWS_Object
 	/**
 	 * Our lexer
 	 * 
-	 * @var PC_Engine_TypeLexer
+	 * @var PC_Engine_TypeScanner
 	 */
 	private $lexer;
 	
@@ -57,7 +57,7 @@ class PC_Engine_TypeScannerFrontend extends FWS_Object
 	 */
 	public function scan_file($file)
 	{
-		$this->lexer = PC_Engine_TypeLexer::get_for_file($file);
+		$this->lexer = PC_Engine_TypeScanner::get_for_file($file);
 		$this->parse();
 	}
 	
@@ -68,7 +68,7 @@ class PC_Engine_TypeScannerFrontend extends FWS_Object
 	 */
 	public function scan($source)
 	{
-		$this->lexer = PC_Engine_TypeLexer::get_for_string($source);
+		$this->lexer = PC_Engine_TypeScanner::get_for_string($source);
 		$this->parse();
 	}
 	

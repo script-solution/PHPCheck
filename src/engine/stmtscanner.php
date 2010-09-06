@@ -18,12 +18,12 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Engine_StmtLexer extends PC_Engine_BaseLexer
+class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 {
 	/**
 	 * @param string $file the filename
 	 * @param PC_Engine_TypeContainer $types the type-container
-	 * @return PC_Engine_StmtLexer the instance for lexing a file
+	 * @return PC_Engine_StmtScanner the instance for lexing a file
 	 */
 	public static function get_for_file($file,$types)
 	{
@@ -33,7 +33,7 @@ class PC_Engine_StmtLexer extends PC_Engine_BaseLexer
 	/**
 	 * @param string $string the string
 	 * @param PC_Engine_TypeContainer $types the type-container
-	 * @return PC_Engine_StmtLexer the instance for lexing a string
+	 * @return PC_Engine_StmtScanner the instance for lexing a string
 	 */
 	public static function get_for_string($string,$types)
 	{
