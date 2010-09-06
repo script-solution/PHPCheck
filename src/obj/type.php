@@ -25,7 +25,6 @@ final class PC_Obj_Type extends FWS_Object
 	const TARRAY		= 4;
 	const OBJECT		= 5;
 	const RESOURCE	= 6;
-	const UNKNOWN		= 7;
 	
 	/**
 	 * Determines the type-instance by the given type-name
@@ -66,11 +65,12 @@ final class PC_Obj_Type extends FWS_Object
 				return new self(self::RESOURCE);
 			
 			case 'mixed':
+				return null;
+			
 			case 'object':
-				return new self(self::UNKNOWN);
+				return new self(self::OBJECT,null,'');
 			
 			default:
-				// TODO check if we know the class?
 				return new self(self::OBJECT,null,$name);
 		}
 	}
@@ -88,7 +88,7 @@ final class PC_Obj_Type extends FWS_Object
 		{
 			$array = new self(self::TARRAY);
 			foreach($value as $k => $v)
-				$array->set_array_type($k,self::get_type_by_value($v));
+				$array->set_array_type($k,new PC_Obj_MultiType(self::get_type_by_value($v)));
 			return $array;
 		}
 		$type = self::get_type_by_name(gettype($value));
@@ -170,6 +170,35 @@ final class PC_Obj_Type extends FWS_Object
 	}
 	
 	/**
+	 * @return bool true if the value is known
+	 */
+	public function is_val_unknown()
+	{
+		return $this->_value === null;
+	}
+	
+	/**
+	 * For arrays: Check if any element is unknown
+	 * 
+	 * @return boolean true if any element is unknown
+	 */
+	public function is_array_unknown()
+	{
+		if($this->_type == self::TARRAY)
+		{
+			if(!is_array($this->_value))
+				return true;
+			foreach($this->_value as $v)
+			{
+				if($v->is_array_unknown())
+					return true;
+			}
+			return false;
+		}
+		return $this->is_val_unknown();
+	}
+	
+	/**
 	 * @return int the number of elements in the array
 	 */
 	public function get_array_count()
@@ -214,20 +243,30 @@ final class PC_Obj_Type extends FWS_Object
 	 * Sets the array-element-type for the given key to given type
 	 *
 	 * @param mixed $key the key
-	 * @param PC_Obj_Type $type the element-type
+	 * @param PC_Obj_MultiType $type the element-type
 	 */
 	public function set_array_type($key,$type)
 	{
-		if($type !== null && !($type instanceof PC_Obj_Type))
-			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
+		if($key === null)
+		{
+			$this->_value = null;
+			return;
+		}
+		if($type !== null && !($type instanceof PC_Obj_MultiType))
+			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
+		if(!($key instanceof PC_Obj_MultiType) && !is_scalar($key))
+			FWS_Helper::error('$key has to be a scalar or PC_Obj_MultiType (got '.gettype($key).')');
 		
 		// convert implicitly to an array
 		$this->_type = self::TARRAY;
 		if(!is_array($this->_value))
 			$this->_value = array();
-		if($key instanceof PC_Obj_Type)
-			$key = $key->get_value_for_use();
-		$this->_value[$key] = $type === null ? new PC_Obj_Type(PC_Obj_Type::UNKNOWN) : $type;
+		if($key instanceof PC_Obj_MultiType)
+		{
+			assert(!$key->is_unknown() && !$key->is_multiple());
+			$key = $key->get_first()->get_value_for_use();
+		}
+		$this->_value[$key] = $type === null ? new PC_Obj_MultiType() : $type;
 	}
 	
 	/**
@@ -236,32 +275,6 @@ final class PC_Obj_Type extends FWS_Object
 	public function is_scalar()
 	{
 		return in_array($this->_type,array(self::BOOL,self::FLOAT,self::INT,self::STRING));
-	}
-	
-	/**
-	 * @return boolean true if the type is unknown
-	 */
-	public function is_unknown()
-	{
-		return $this->_type == self::UNKNOWN;
-	}
-	
-	/**
-	 * For arrays: Check if any element is unknown
-	 * 
-	 * @return boolean true if any element is unknown
-	 */
-	public function is_array_unknown()
-	{
-		if(is_array($this->_value))
-		{
-			foreach($this->_value as $v)
-			{
-				if($v->is_unknown() || $v->is_array_unknown())
-					return true;
-			}
-		}
-		return false;
 	}
 	
 	/**
@@ -294,21 +307,12 @@ final class PC_Obj_Type extends FWS_Object
 	}
 	
 	/**
-	 * @return mixed the value that should be used for arithmethic (+,-,...)
-	 */
-	public function get_value_as_number()
-	{
-		if($this->_value === null || !in_array($this->_type,array(self::BOOL,self::FLOAT,self::INT)))
-			return 0;
-		return $this->_value;
-	}
-	
-	/**
 	 * @return string the value as string
 	 */
 	public function get_value_as_str()
 	{
-		if($this->_value === null || $this->_type == self::UNKNOWN)
+		// TODO remove!
+		if($this->_value === null)
 			return '\'\'';
 		if($this->_type == self::STRING)
 			return (string)$this->_value;
@@ -320,7 +324,7 @@ final class PC_Obj_Type extends FWS_Object
 	 */
 	public function get_value_for_use()
 	{
-		if($this->_value === null || $this->_type == self::UNKNOWN)
+		if($this->_value === null)
 			return 0;
 		switch($this->_type)
 		{
@@ -342,7 +346,7 @@ final class PC_Obj_Type extends FWS_Object
 	 */
 	public function get_value_for_eval()
 	{
-		if($this->_value === null || $this->_type == self::UNKNOWN)
+		if($this->_value === null)
 			return '0';
 		if($this->_type == self::BOOL)
 			return $this->_value ? 'true' : 'false';
@@ -372,7 +376,9 @@ final class PC_Obj_Type extends FWS_Object
 						$str .= '\''.$k.'\'';
 					else
 						$str .= (string)$k;
-					$str .= ' => '.$this->array_to_str($v).',';
+					$types = $v->get_types();
+					assert(count($types) == 1);
+					$str .= ' => '.$this->array_to_str($types[0]).',';
 				}
 				return substr($str,0,-1).')';
 			}
@@ -452,8 +458,8 @@ final class PC_Obj_Type extends FWS_Object
 				return 'array';
 			case self::RESOURCE:
 				return 'resource';
-			default:
-				return 'unknown';
+			case self::OBJECT:
+				return 'object';
 		}
 	}
 	
@@ -474,7 +480,7 @@ final class PC_Obj_Type extends FWS_Object
 	 */
 	public function __toString()
 	{
-		if($this->_type == self::OBJECT)
+		if($this->_type == self::OBJECT && $this->_class)
 			return (string)$this->_class;
 		if($this->_type == self::TARRAY)
 		{

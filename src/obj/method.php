@@ -50,7 +50,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	/**
 	 * The return-type
 	 *
-	 * @var PC_Obj_Type
+	 * @var PC_Obj_MultiType
 	 */
 	private $return;
 	
@@ -90,7 +90,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 		
 		$this->id = $id;
 		$this->params = array();
-		$this->return = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
+		$this->return = new PC_Obj_MultiType();
 		$this->free = $free;
 		$this->class = $classid;
 	}
@@ -172,7 +172,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	}
 	
 	/**
-	 * @return PC_Obj_Type the return-type
+	 * @return PC_Obj_MultiType the return-type
 	 */
 	public function get_return_type()
 	{
@@ -182,12 +182,12 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	/**
 	 * Sets the return-type of this method
 	 *
-	 * @param PC_Obj_Type $type the new value
+	 * @param PC_Obj_MultiType $type the new value
 	 */
 	public function set_return_type($type)
 	{
-		if(!($type instanceof PC_Obj_Type))
-			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
+		if(!($type instanceof PC_Obj_MultiType))
+			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
 		
 		$this->return = $type;
 	}

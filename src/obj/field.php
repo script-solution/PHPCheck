@@ -34,7 +34,7 @@ class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 	/**
 	 * The type of the variable
 	 *
-	 * @var PC_Obj_Type
+	 * @var PC_Obj_MultiType
 	 */
 	private $type;
 	
@@ -58,7 +58,7 @@ class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 	 * @param string $file the file of the field
 	 * @param int $line the line of the field
 	 * @param string $name the name of the field
-	 * @param PC_Obj_Type $type the type of the field
+	 * @param PC_Obj_MultiType $type the type of the field
 	 * @param string $visibility the visibility
 	 * @param int $classid the class-id if loaded from db
 	 */
@@ -68,8 +68,9 @@ class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 		
 		$this->name = $name;
 		$this->visibility = $visibility;
-		$this->type = $type === null ? new PC_Obj_Type(PC_Obj_Type::UNKNOWN) : $type;
 		$this->class = $classid;
+		$type = $type === null ? new PC_Obj_MultiType() : $type;
+		$this->set_type($type);
 	}
 	
 	/**
@@ -117,7 +118,7 @@ class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 	}
 	
 	/**
-	 * @return PC_Obj_Type the type of the variable
+	 * @return PC_Obj_MultiType the type of the variable
 	 */
 	public function get_type()
 	{
@@ -127,12 +128,12 @@ class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 	/**
 	 * Sets the type of the variable
 	 *
-	 * @param PC_Obj_Type $type the new value
+	 * @param PC_Obj_MultiType $type the new value
 	 */
 	public function set_type($type)
 	{
-		if(!($type instanceof PC_Obj_Type))
-			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
+		if(!($type instanceof PC_Obj_MultiType))
+			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
 		
 		$this->type = $type;
 	}

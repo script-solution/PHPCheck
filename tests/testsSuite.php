@@ -67,12 +67,12 @@ class testsSuite extends PHPUnit_Framework_TestSuite
 	public function __construct()
 	{
 		$this->setName('testsSuite');
-		/*$this->addTestSuite('PC_Tests_Vars');
+		$this->addTestSuite('PC_Tests_Vars');
 		$this->addTestSuite('PC_Tests_Funcs');
 		$this->addTestSuite('PC_Tests_OOP');
 		$this->addTestSuite('PC_Tests_Arrays');
 		$this->addTestSuite('PC_Tests_Exprs');
-		$this->addTestSuite('PC_Tests_Exprs2');*/
+		$this->addTestSuite('PC_Tests_Exprs2');
 		$this->addTestSuite('PC_Tests_Analyzer');
 	}
 	

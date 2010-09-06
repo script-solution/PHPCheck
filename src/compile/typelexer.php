@@ -189,7 +189,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	/**
 	 * Handles a define
 	 * 
-	 * @param array $args an array of arguments (PC_Obj_Type)
+	 * @param array $args an array of arguments (PC_Obj_MultiType)
 	 */
 	public function handle_define($args)
 	{
@@ -197,12 +197,10 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 		if(count($args) != 2 && count($args) != 3)
 			return;
 		// if the type of the name is unknown, do nothing
-		if($args[0] === null || $args[0]->is_unknown())
+		$name = $args[0] ? $args[0]->get_string() : null;
+		if($name === null)
 			return;
-		if($args[0]->get_type() != PC_Obj_Type::STRING)
-			return;
-		$name = $args[0]->get_value();
-		$type = $args[1] !== null ? $args[1] : new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
+		$type = $args[1] !== null ? $args[1] : null;
 		$this->consts[$name] = new PC_Obj_Constant($this->get_file(),$this->get_line(),$name,$type);
 	}
 	
@@ -210,15 +208,15 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	 * Returns the value of the given constant
 	 * 
 	 * @param string $name the constant-name
-	 * @return PC_Obj_Type the type
+	 * @return PC_Obj_MultiType the type
 	 */
 	public function get_constant_type($name)
 	{
 		if(isset($this->consts[$name]))
 			return $this->consts[$name]->get_type();
 		if(strcasecmp($name,'null') == 0)
-			return new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
-		return new PC_Obj_Type(PC_Obj_Type::STRING,$name);
+			return new PC_Obj_MultiType();
+		return PC_Obj_MultiType::create_string($name);
 	}
 	
 	/**
@@ -258,7 +256,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 		{
 			// if we already know the value, we don't have to use the phpdoc
 			// TODO we could issue a warning here if the type differs
-			if($const->get_type()->get_value() === null)
+			if($const->get_type()->is_unknown())
 			{
 				$type = $this->parse_var_from($this->constComments[$const->get_name()]);
 				if($type !== null)
@@ -279,7 +277,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 		{
 			// if we already know the value, we don't have to use the phpdoc
 			// TODO we could issue a warning here if the type differs
-			if($field->get_type()->get_value() === null)
+			if($field->get_type()->is_unknown())
 			{
 				$type = $this->parse_var_from($this->fieldComments[$field->get_name()]);
 				if($type !== null)
@@ -293,13 +291,13 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	 * Parses the PHPdoc-tag "var" from the given doc
 	 * 
 	 * @param string $doc the doc-comment
-	 * @return PC_Obj_Type the type or null
+	 * @return PC_Obj_MultiType the type or null
 	 */
 	private function parse_var_from($doc)
 	{
 		$matches = array();
 		if(preg_match('/\@var\s+([^\s]+)/',$doc,$matches))
-			return PC_Obj_Type::get_type_by_name($matches[1]);
+			return PC_Obj_MultiType::get_type_by_name($matches[1]);
 		return null;
 	}
 
@@ -326,7 +324,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 			
 			// look for return-type
 			if(preg_match('/\@return\s+([^\s]+)/',$doc,$matches))
-				$func->set_return_type(PC_Obj_Type::get_type_by_name($matches[1]));
+				$func->set_return_type(PC_Obj_MultiType::get_type_by_name($matches[1]));
 			unset($this->funcComments[$func->get_name()]);
 		}
 	}

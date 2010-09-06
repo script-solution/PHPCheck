@@ -98,12 +98,10 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 		$types = array();
 		foreach($mtypes as $mt)
 		{
+			if($mt->is_unknown())
+				return new PC_Obj_MultiType();
 			foreach($mt->get_types() as $t)
-			{
-				if($t->is_unknown())
-					return new PC_Obj_MultiType(array(new PC_Obj_Type(PC_Obj_Type::UNKNOWN)));
 				$types[$t->get_type()] = $t;
-			}
 		}
 		return new PC_Obj_MultiType(array_values($types));
 	}
@@ -182,13 +180,13 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 				$field->set_visibility($modifier3);
 		}
 		if($type)
-			$field->set_type(PC_Obj_Type::get_type_by_name($type));
-		if(isset($match[6]) && $match[6] !== '')
+			$field->set_type(PC_Obj_MultiType::get_type_by_name($type));
+		if(isset($match[6]) && $match[6] !== '' && !$field->get_type()->is_multiple())
 		{
 			if($type)
-				$field->get_type()->set_value($match[6]);
+				$field->get_type()->get_first()->set_value($match[6]);
 			else
-				$field->set_type(PC_Obj_Type::get_type_by_value($match[6]));
+				$field->set_type(new PC_Obj_MultiType(PC_Obj_Type::get_type_by_value($match[6])));
 		}
 		return $field;
 	}
@@ -245,7 +243,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 		else if(in_array($modifier3,array('private','protected')))
 			$method->set_visibility($modifier3);
 		if($return && $return != 'void')
-			$method->set_return_type(PC_Obj_Type::get_type_by_name($return));
+			$method->set_return_type(PC_Obj_MultiType::get_type_by_name($return));
 		$method->set_name($name);
 		
 		// check what kind of params we have
@@ -342,15 +340,16 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 			));
 		}
 		
-		$otype = PC_Obj_Type::get_type_by_name(trim($type));
-		if($default !== null && strcasecmp($default,'null') != 0)
+		$otype = PC_Obj_MultiType::get_type_by_name(trim($type));
+		if(!$otype->is_unknown() && !$otype->is_multiple() &&
+			$default !== null && strcasecmp($default,'null') != 0)
 		{
 			if($default == 'array()')
-				$otype->set_value(array());
+				$otype->get_first()->set_value(array());
 			else
-				$otype->set_value($default);
+				$otype->get_first()->set_value($default);
 		}
-		return new PC_Obj_MultiType(array($otype));
+		return $otype;
 	}
 }
 ?>

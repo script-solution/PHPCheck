@@ -77,13 +77,13 @@ abstract class myc {
 		self::assertEquals('a',$func->get_name());
 		self::assertEquals(0,$func->get_param_count());
 		self::assertEquals(0,$func->get_required_param_count());
-		self::assertEquals(PC_Obj_Type::UNKNOWN,$func->get_return_type()->get_type());
+		self::assertEquals((string)new PC_Obj_MultiType(),(string)$func->get_return_type());
 		
 		$func = $functions['b'];
 		self::assertEquals('b',$func->get_name());
 		self::assertEquals(1,$func->get_param_count());
 		self::assertEquals(1,$func->get_required_param_count());
-		self::assertEquals(PC_Obj_Type::UNKNOWN,$func->get_return_type()->get_type());
+		self::assertEquals((string)new PC_Obj_MultiType(),(string)$func->get_return_type());
 		self::assertEquals('string',(string)$func->get_param('$a'));
 		
 		$class = $classes['myc2'];
@@ -92,7 +92,7 @@ abstract class myc {
 		self::assertEquals('c',$func->get_name());
 		self::assertEquals(2,$func->get_param_count());
 		self::assertEquals(1,$func->get_required_param_count());
-		self::assertEquals(PC_Obj_Type::UNKNOWN,$func->get_return_type()->get_type());
+		self::assertEquals((string)new PC_Obj_MultiType(),(string)$func->get_return_type());
 		self::assertEquals('array',(string)$func->get_param('$a'));
 		self::assertEquals('integer?',(string)$func->get_param('$b'));
 		
@@ -100,7 +100,7 @@ abstract class myc {
 		self::assertEquals('d',$func->get_name());
 		self::assertEquals(3,$func->get_param_count());
 		self::assertEquals(0,$func->get_required_param_count());
-		self::assertEquals(PC_Obj_Type::INT,$func->get_return_type()->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_int(),(string)$func->get_return_type());
 		self::assertEquals('integer?',(string)$func->get_param('$a'));
 		self::assertEquals('string?',(string)$func->get_param('$b'));
 		self::assertEquals('bool?',(string)$func->get_param('$c'));
@@ -109,7 +109,7 @@ abstract class myc {
 		self::assertEquals('doit',$func->get_name());
 		self::assertEquals(2,$func->get_param_count());
 		self::assertEquals(2,$func->get_required_param_count());
-		self::assertEquals(PC_Obj_Type::UNKNOWN,$func->get_return_type()->get_type());
+		self::assertEquals((string)new PC_Obj_MultiType(),(string)$func->get_return_type());
 		self::assertEquals('MyClass',(string)$func->get_param('$c'));
 		self::assertEquals('integer',(string)$func->get_param('$d'));
 		

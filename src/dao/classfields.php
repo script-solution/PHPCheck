@@ -55,12 +55,8 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		);
 		foreach($rows as $row)
 		{
-			if($row['type'] == PC_Obj_Type::OBJECT)
-				$type = new PC_Obj_Type($row['type'],null,$row['value']);
-			else
-				$type = new PC_Obj_Type($row['type'],unserialize($row['value']));
 			$fields[] = new PC_Obj_Field(
-				$row['file'],$row['line'],$row['name'],$type,$row['visibility'],$row['class']
+				$row['file'],$row['line'],$row['name'],unserialize($row['type']),$row['visibility'],$row['class']
 			);
 		}
 		return $fields;
@@ -83,9 +79,7 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		if(!FWS_Helper::is_integer($class) || $class <= 0)
 			FWS_Helper::def_error('intgt0','class',$class);
 		
-		$otype = $field->get_type();
-		$type = $otype->get_type();
-		$val = $type == PC_Obj_Type::OBJECT ? $otype->get_class() : serialize($otype->get_value());
+		$val = serialize($field->get_type());
 		if(strlen($val) > self::MAX_VALUE_LEN)
 			$val = serialize(null);
 		return $db->insert(PC_TB_CLASS_FIELDS,array(
@@ -94,8 +88,7 @@ class PC_DAO_ClassFields extends FWS_Singleton
 			'file' => $field->get_file(),
 			'line' => $field->get_line(),
 			'name' => $field->get_name(),
-			'type' => $type,
-			'value' => $val,
+			'type' => $val,
 			'visibility' => $field->get_visibility(),
 			'static' => $field->is_static() ? 1 : 0
 		));

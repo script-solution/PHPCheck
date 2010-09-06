@@ -19,6 +19,84 @@
 class PC_Obj_MultiType extends FWS_Object
 {
 	/**
+	 * Creates a multitype with given type and no value
+	 * 
+	 * @param int $type the type
+	 * @return PC_Obj_MultiType the multitype
+	 */
+	public static function create_type($type)
+	{
+		return new self(array(new PC_Obj_Type($type)));
+	}
+	
+	/**
+	 * Creates a multitype with type OBJECT and given class-name
+	 * 
+	 * @param string $classname the class-name
+	 * @return PC_Obj_MultiType the multitype
+	 */
+	public static function create_object($classname)
+	{
+		return new self(array(new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$classname)));
+	}
+	
+	/**
+	 * Creates a multitype with type OBJECT and given class-name
+	 * 
+	 * @param string $value the value
+	 * @return PC_Obj_MultiType the multitype
+	 */
+	public static function create_string($value = null)
+	{
+		return new self(array(new PC_Obj_Type(PC_Obj_Type::STRING,$value)));
+	}
+	
+	/**
+	 * Creates a multitype with type TARRAY and given value
+	 * 
+	 * @param array $value the value
+	 * @return PC_Obj_MultiType the multitype
+	 */
+	public static function create_array($value = null)
+	{
+		$val = $value !== null ? PC_Obj_Type::get_type_by_value($value) : null;
+		return new self(array(new PC_Obj_Type(PC_Obj_Type::TARRAY,$val)));
+	}
+	
+	/**
+	 * Creates a multitype with type INT and given value
+	 * 
+	 * @param int $value the value
+	 * @return PC_Obj_MultiType the multitype
+	 */
+	public static function create_int($value = null)
+	{
+		return new self(array(new PC_Obj_Type(PC_Obj_Type::INT,$value)));
+	}
+	
+	/**
+	 * Creates a multitype with type FLOAT and given value
+	 * 
+	 * @param float $value the value
+	 * @return PC_Obj_MultiType the multitype
+	 */
+	public static function create_float($value = null)
+	{
+		return new self(array(new PC_Obj_Type(PC_Obj_Type::FLOAT,$value)));
+	}
+	
+	/**
+	 * Creates a multitype with type BOOL and given value
+	 * 
+	 * @param bool $value the value
+	 * @return PC_Obj_MultiType the multitype
+	 */
+	public static function create_bool($value = null)
+	{
+		return new self(array(new PC_Obj_Type(PC_Obj_Type::BOOL,$value)));
+	}
+	
+	/**
 	 * Builds the MultiType-instance from the given name. '|' will be assumed as separator
 	 * of the types.
 	 *
@@ -32,7 +110,9 @@ class PC_Obj_MultiType extends FWS_Object
 		foreach($types as $type)
 		{
 			$type = trim($type);
-			$ts[] = PC_Obj_Type::get_type_by_name($type);
+			$typeobj = PC_Obj_Type::get_type_by_name($type);
+			if($typeobj !== null)
+				$ts[] = $typeobj;
 		}
 		return new PC_Obj_MultiType($ts);
 	}
@@ -47,13 +127,138 @@ class PC_Obj_MultiType extends FWS_Object
 	/**
 	 * Constructor
 	 *
-	 * @param array $types the types to set
+	 * @param PC_Obj_Type|array $types the types to set
 	 */
 	public function __construct($types = array())
 	{
 		parent::__construct();
 		
-		$this->types = $types;
+		if($types instanceof PC_Obj_Type)
+			$this->types = array($types);
+		else if(is_array($types))
+			$this->types = $types;
+	}
+	
+	public function __clone()
+	{
+		parent::__clone();
+		
+		foreach($this->types as $k => $t)
+			$this->types[$k] = clone $t;
+	}
+	
+	/**
+	 * Merges all types in the given multitype into this one
+	 * 
+	 * @param PC_Obj_MultiType $mtype the type to merge with
+	 */
+	public function merge($mtype)
+	{
+		foreach($mtype->types as $type)
+		{
+			$found = false;
+			foreach($this->types as $ttype)
+			{
+				if($ttype->equals($type))
+				{
+					$found = true;
+					break;
+				}
+			}
+			// if we already have this type, check if the values are different
+			if($found)
+			{
+				// if so simply unset the value, because we don't know it anymore
+				if($ttype->get_value() !== $type->get_value())
+					$ttype->set_value(null);
+			}
+			// otherwise add the type
+			else
+				$this->types[] = clone $type;
+		}
+	}
+	
+	/**
+	 * Clears the value in all types
+	 */
+	public function clear_values()
+	{
+		foreach($this->types as $t)
+			$t->set_value(null);
+	}
+	
+	/**
+	 * @return PC_Obj_Type the first type of this multitype
+	 */
+	public function get_first()
+	{
+		return $this->types[0];
+	}
+	
+	/**
+	 * Expects that this multitype contains one type, a scalar. If so and the value is known the
+	 * value is returned. Otherwise you get null.
+	 * 
+	 * @return int|float|bool|string the value of this multitype, otherwise null
+	 */
+	public function get_scalar()
+	{
+		if(count($this->types) != 1)
+			return false;
+		$first = $this->get_first();
+		if($first->is_scalar() && !$first->is_val_unknown())
+			return $first->get_value();
+		return null;
+	}
+	
+	/**
+	 * Expects that this multitype contains one type, a scalar. If so and the value is known the
+	 * value is returned, as string. Otherwise you get null.
+	 * 
+	 * @return string the value of this multitype as string, otherwise null
+	 */
+	public function get_string()
+	{
+		if(count($this->types) != 1)
+			return null;
+		$first = $this->get_first();
+		if($first->is_scalar() && !$first->is_val_unknown())
+			return (string)$first->get_value();
+		return null;
+	}
+	
+	/**
+	 * Expects that this multitype contains one type, an array. If so it is returned. Otherwise null
+	 * is returned
+	 * 
+	 * @return array the array or null
+	 */
+	public function get_array()
+	{
+		if(count($this->types) != 1)
+			return null;
+		$first = $this->get_first();
+		if($first->get_type() != PC_Obj_Type::TARRAY)
+			return null;
+		$val = $first->get_value();
+		return $val === null ? array() : $val;
+	}
+	
+	/**
+	 * Expects that this multitype contains one type, an object. If so and the classname is known
+	 * it is returned. Otherwise null is returned
+	 * 
+	 * @return string the classname or null
+	 */
+	public function get_classname()
+	{
+		if(count($this->types) != 1)
+			return null;
+		$first = $this->get_first();
+		if($first->get_type() != PC_Obj_Type::OBJECT)
+			return null;
+		$name = $first->get_class();
+		return $name ? $name : null;
 	}
 	
 	/**
@@ -61,16 +266,27 @@ class PC_Obj_MultiType extends FWS_Object
 	 */
 	public function is_unknown()
 	{
-		if(count($this->types) == 0)
+		return count($this->types) == 0;
+	}
+	
+	/**
+	 * @return boolean wether the value is unknown (which is also true, if the type is unknown etc.)
+	 */
+	public function is_val_unknown()
+	{
+		return count($this->types) != 1 || $this->get_first()->is_val_unknown();
+	}
+	
+	/**
+	 * For arrays: Check if any element is unknown
+	 * 
+	 * @return boolean true if any element is unknown
+	 */
+	public function is_array_unknown()
+	{
+		if(count($this->types) != 1)
 			return true;
-		
-		// TODO keep this?
-		foreach($this->types as $type)
-		{
-			if($type->is_unknown())
-				return true;
-		}
-		return false;
+		return $this->get_first()->is_array_unknown();
 	}
 	
 	/**
@@ -99,10 +315,6 @@ class PC_Obj_MultiType extends FWS_Object
 	{
 		if(!($type instanceof PC_Obj_Type))
 			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
-		
-		// special case
-		if($type->get_type() == PC_Obj_Type::UNKNOWN && count($this->types) == 0)
-			return true;
 		
 		foreach($this->types as $t)
 		{

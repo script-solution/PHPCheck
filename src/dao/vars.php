@@ -87,7 +87,11 @@ class PC_DAO_Vars extends FWS_Singleton
 		$project = FWS_Props::get()->project();
 		$type = serialize($var->get_type());
 		if(strlen($type) > self::MAX_VALUE_LEN)
-			$type = serialize(new PC_Obj_Type($var->get_type()->get_type()));
+		{
+			$clone = clone $var->get_type();
+			$clone->clear_values();
+			$type = serialize($clone);
+		}
 		return $db->insert(PC_TB_VARS,array(
 			'project_id' => PC_Utils::get_project_id(PC_Project::CURRENT_ID),
 			'name' => $var->get_name(),

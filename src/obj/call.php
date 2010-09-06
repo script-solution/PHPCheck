@@ -170,12 +170,12 @@ class PC_Obj_Call extends PC_Obj_Location
 	/**
 	 * Adds the given type as argument
 	 *
-	 * @param PC_Obj_Type $type the type
+	 * @param PC_Obj_MultiType $type the type
 	 */
 	public function add_argument($type)
 	{
-		if(!($type instanceof PC_Obj_Type))
-			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
+		if(!($type instanceof PC_Obj_MultiType))
+			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
 		
 		$this->arguments[] = clone $type;
 	}

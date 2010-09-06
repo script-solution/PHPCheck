@@ -205,31 +205,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	 */
 	private function _get_fields($function,$class,$pid = PC_Project::CURRENT_ID)
 	{
-		$params = '';
-		foreach($function->get_params() as $param)
-		{
-			$params .= $param->get_name();
-			if($param->is_optional())
-				$params .= '?';
-			else if($param->is_first_vararg())
-				$params .= '*';
-			$params .= ':';
-			$types = array();
-			foreach($param->get_mtype()->get_types() as $type)
-			{
-				if($type->get_type() == PC_Obj_Type::OBJECT)
-					$types[] = $type->get_class();
-				else
-					$types[] = $type->get_type();
-			}
-			if(count($types) > 0)
-				$params .= implode('|',$types);
-			else
-				$params .= PC_Obj_Type::UNKNOWN;
-			$params .= ';';
-		}
-		
-		$type = $function->get_return_type()->get_type();
+		$params = serialize($function->get_params());
 		return array(
 			'project_id' => PC_UTils::get_project_id($pid),
 			'file' => $function->get_file(),
@@ -240,7 +216,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			'final' => $function->is_final() ? 1 : 0,
 			'static' => $function->is_static() ? 1 : 0,
 			'visibility' => $function->get_visibility(),
-			'return_type' => $type == PC_Obj_Type::OBJECT ? $function->get_return_type()->get_class() : $type,
+			'return_type' => serialize($function->get_return_type()),
 			'params' => $params,
 			'since' => $function->get_since()
 		);
@@ -261,37 +237,9 @@ class PC_DAO_Functions extends FWS_Singleton
 		$c->set_static($row['static']);
 		$c->set_final($row['final']);
 		$c->set_since($row['since']);
-		foreach(FWS_Array_Utils::advanced_explode(';',$row['params']) as $param)
-		{
-			list($name,$type) = explode(':',$param);
-			$p = new PC_Obj_Parameter();
-			$types = array();
-			foreach(explode('|',$type) as $t)
-			{
-				if(is_numeric($t))
-					$types[] = new PC_Obj_Type($t);
-				else
-					$types[] = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$t);
-			}
-			$p->set_mtype(new PC_Obj_MultiType($types));
-			if(FWS_String::ends_with($name,'?'))
-			{
-				$p->set_optional(true);
-				$name = FWS_String::substr($name,0,-1);
-			}
-			else if(FWS_String::ends_with($name,'*'))
-			{
-				$p->set_first_vararg(true);
-				$name = FWS_String::substr($name,0,-1);
-			}
-			$p->set_name($name);
-			$c->put_param($p);
-		}
-		if(is_numeric($row['return_type']))
-			$rettype = new PC_Obj_Type($row['return_type']);
-		else
-			$rettype = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$row['return_type']);
-		$c->set_return_type($rettype);
+		foreach(unserialize($row['params']) as $param)
+			$c->put_param($param);
+		$c->set_return_type(unserialize($row['return_type']));
 		return $c;
 	}
 }

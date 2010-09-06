@@ -29,7 +29,7 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	/**
 	 * The type (and maybe value)
 	 *
-	 * @var PC_Obj_Type
+	 * @var PC_Obj_MultiType
 	 */
 	private $_type;
 	
@@ -46,7 +46,7 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	 * @param string $file the file of the class-def
 	 * @param int $line the line of the class-def
 	 * @param string $name the constant-name
-	 * @param PC_Obj_Type $type the type
+	 * @param PC_Obj_MultiType $type the type
 	 * @param int $classid the class-id if loaded from db
 	 */
 	public function __construct($file,$line,$name,$type = null,$classid = 0)
@@ -55,8 +55,8 @@ final class PC_Obj_Constant extends PC_Obj_Location
 		
 		if(empty($name))
 			FWS_Helper::def_error('notempty','name',$name);
-		if($type !== null && !($type instanceof PC_Obj_Type))
-			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
+		if($type !== null && !($type instanceof PC_Obj_MultiType))
+			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
 		
 		$this->_name = $name;
 		$this->_type = $type;
@@ -80,7 +80,7 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	}
 	
 	/**
-	 * @return PC_Obj_Type the type (and maybe value) of the constant
+	 * @return PC_Obj_MultiType the type (and maybe value) of the constant
 	 */
 	public function get_type()
 	{
@@ -90,10 +90,13 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	/**
 	 * Sets the type
 	 * 
-	 * @param PC_Obj_Type $type the new type
+	 * @param PC_Obj_MultiType $type the new type
 	 */
 	public function set_type($type)
 	{
+		if($type !== null && !($type instanceof PC_Obj_MultiType))
+			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
+		
 		$this->_type = $type;
 	}
 	

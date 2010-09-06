@@ -21,6 +21,90 @@ class PC_Obj_Variable extends FWS_Object
 	 * Represents the global scope
 	 */
 	const SCOPE_GLOBAL = '#global';
+
+	/**
+	 * Creates a variable with given type and no value
+	 * 
+	 * @param int $type the type
+	 * @param string $varname optionally, the variable-name
+	 * @return PC_Obj_Variable the variable
+	 */
+	public static function create_type($type,$varname = '')
+	{
+		return new self($varname,PC_Obj_MultiType::create_type($type));
+	}
+	
+	/**
+	 * Creates a variable with type OBJECT and given class-name
+	 * 
+	 * @param string $classname the class-name
+	 * @param string $varname optionally, the variable-name
+	 * @return PC_Obj_Variable the variable
+	 */
+	public static function create_object($classname,$varname = '')
+	{
+		return new self($varname,PC_Obj_MultiType::create_object($classname));
+	}
+	
+	/**
+	 * Creates a variable with type STRING and given value
+	 * 
+	 * @param string $value the value
+	 * @param string $varname optionally, the variable-name
+	 * @return PC_Obj_Variable the variable
+	 */
+	public static function create_string($value = null,$varname = '')
+	{
+		return new self($varname,PC_Obj_MultiType::create_string($value));
+	}
+	
+	/**
+	 * Creates a variable with type TARRAY and given value
+	 * 
+	 * @param array $value the value
+	 * @param string $varname optionally, the variable-name
+	 * @return PC_Obj_Variable the variable
+	 */
+	public static function create_array($value = null,$varname = '')
+	{
+		return new self($varname,PC_Obj_MultiType::create_array($value));
+	}
+	
+	/**
+	 * Creates a variable with type INT and given value
+	 * 
+	 * @param int $value the value
+	 * @param string $varname optionally, the variable-name
+	 * @return PC_Obj_Variable the variable
+	 */
+	public static function create_int($value = null,$varname = '')
+	{
+		return new self($varname,PC_Obj_MultiType::create_int($value));
+	}
+	
+	/**
+	 * Creates a variable with type FLOAT and given value
+	 * 
+	 * @param float $value the value
+	 * @param string $varname optionally, the variable-name
+	 * @return PC_Obj_Variable the variable
+	 */
+	public static function create_float($value = null,$varname = '')
+	{
+		return new self($varname,PC_Obj_MultiType::create_float($value));
+	}
+	
+	/**
+	 * Creates a multitype with type BOOL and given value
+	 * 
+	 * @param bool $value the value
+	 * @param string $varname optionally, the variable-name
+	 * @return PC_Obj_Variable the variable
+	 */
+	public static function create_bool($value = null,$varname = '')
+	{
+		return new self($varname,PC_Obj_MultiType::create_bool($value));
+	}
 	
 	/**
 	 * For assigning values to array-elements: Store the reference to the array so that we can
@@ -61,7 +145,7 @@ class PC_Obj_Variable extends FWS_Object
 	/**
 	 * The type of the variable
 	 *
-	 * @var PC_Obj_Type
+	 * @var PC_Obj_MultiType
 	 */
 	private $type;
 	
@@ -69,19 +153,19 @@ class PC_Obj_Variable extends FWS_Object
 	 * Constructor
 	 * 
 	 * @param string $name the name
-	 * @param PC_Obj_Type $type the type
+	 * @param PC_Obj_MultiType $type the type
 	 * @param string $function the function-name (scope)
 	 * @param string $class the class-name (scope)
 	 */
-	public function __construct($name,$type,$function = '',$class = '')
+	public function __construct($name,$type = null,$function = '',$class = '')
 	{
 		parent::__construct();
 		
-		if(!($type instanceof PC_Obj_Type))
-			FWS_Helper::def_error('instance','type','PC_Obj_Type',$type);
+		if($type !== null && !($type instanceof PC_Obj_MultiType))
+			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
 		
 		$this->name = $name;
-		$this->type = $type;
+		$this->type = $type ? $type : new PC_Obj_MultiType();
 		$this->function = $function;
 		$this->class = $class;
 	}
@@ -103,7 +187,7 @@ class PC_Obj_Variable extends FWS_Object
 	}
 	
 	/**
-	 * @return PC_Obj_Type the type
+	 * @return PC_Obj_MultiType the type
 	 */
 	public function get_type()
 	{
@@ -113,10 +197,13 @@ class PC_Obj_Variable extends FWS_Object
 	/**
 	 * Sets the type
 	 * 
-	 * @param PC_Obj_Type $type the new value
+	 * @param PC_Obj_MultiType $type the new value
 	 */
 	public function set_type($type)
 	{
+		if(!($type instanceof PC_Obj_MultiType))
+			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
+		
 		if($this->arrayref !== null)
 			$this->arrayref->set_array_type($this->arrayoff,$type);
 		$this->type = $type;
@@ -127,20 +214,23 @@ class PC_Obj_Variable extends FWS_Object
 	 * will be created as soon as the type is assigned.
 	 *
 	 * @param mixed $key the key (null = append)
-	 * @return PC_Obj_Type the type of the element
+	 * @return PC_Obj_Variable the type of the element
 	 */
 	public function array_offset($key)
 	{
+		assert(!$this->type->is_multiple() && !$this->type->is_unknown());
+		$first = $this->type->get_first();
+		assert($first->get_type() == PC_Obj_Type::TARRAY);
 		if($key === null)
-			$key = $this->type->get_next_array_key();
+			$key = $first->get_next_array_key();
 		
 		// fetch element or create it
-		$el = $this->type->get_array_type($key);
+		$el = $first->get_array_type($key);
 		if($el === null)
-			$el = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
+			$el = new PC_Obj_MultiType();
 		$var = new self('',$el);
 		// connect the var to us
-		$var->arrayref = $this->type;
+		$var->arrayref = $first;
 		$var->arrayoff = $key;
 		return $var;
 	}

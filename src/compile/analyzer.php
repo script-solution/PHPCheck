@@ -347,7 +347,6 @@ final class PC_Compile_Analyzer extends FWS_Object
 		}
 		else
 		{
-			$tunknown = new PC_Obj_Type(PC_Obj_Type::UNKNOWN);
 			$i = 0;
 			foreach($method->get_params() as $param)
 			{
@@ -355,7 +354,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 				$arg = isset($arguments[$i]) ? $arguments[$i] : null;
 				// arg- or param-type unknown?
 				if(!$this->report_unknown &&
-					($arg === null || $arg->equals($tunknown) || $param->get_mtype()->is_unknown()))
+					($arg === null || $arg->is_unknown() || $param->get_mtype()->is_unknown()))
 				{
 					$i++;
 					continue;
@@ -381,7 +380,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 	/**
 	 * Checks wether $arg is ok for $param
 	 *
-	 * @param PC_Obj_Type $arg the argument
+	 * @param PC_Obj_MultiType $arg the argument
 	 * @param PC_Obj_Parameter $param the parameter
 	 * @return boolean true if so
 	 */
@@ -396,14 +395,15 @@ final class PC_Compile_Analyzer extends FWS_Object
 			return true;
 		
 		// arg in the allowed types?
-		if($param->get_mtype()->contains($arg))
-			return true;
-		
-		// every int can be converted to float
-		if($arg->get_type() == PC_Obj_Type::INT &&
-				$param->get_mtype()->contains(new PC_Obj_Type(PC_Obj_Type::FLOAT)))
-			return true;
-		
+		foreach($arg->get_types() as $type)
+		{
+			// every int can be converted to float
+			if($type->get_type() == PC_Obj_Type::INT &&
+					$param->get_mtype()->contains(new PC_Obj_Type(PC_Obj_Type::FLOAT)))
+				return true;
+			if($param->get_mtype()->contains($type))
+				return true;
+		}
 		return false;
 	}
 	

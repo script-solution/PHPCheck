@@ -135,22 +135,19 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	public function add_call($class,$func,$args,$static = false)
 	{
 		// if we don't know the function- or class-name, we can't do anything here
-		if($func->get_type()->is_unknown() || $func->get_type()->get_value() === null)
-			return $this->get_unknown();
-		if($class !== null && ($class->get_type()->is_unknown() || $class->get_type()->get_value() === null))
+		$cname = $class !== null ? $class->get_type()->get_string() : null;
+		$fname = $func->get_type()->get_string();
+		if($fname === null || ($class !== null && $cname === null))
 			return $this->get_unknown();
 		
 		// create call
 		$call = new PC_Obj_Call($this->get_file(),$this->get_line());
 		
 		// determine class- and function-name
-		$fname = $func->get_type()->get_value();
-		$cname = '';
 		$call->set_function($fname);
 		$call->set_object_creation(strcasecmp($fname,'__construct') == 0);
 		if($class !== null)
 		{
-			$cname = $class->get_type()->get_value();
 			// support for php4 constructors
 			if(strcasecmp($cname,$fname) == 0)
 				$call->set_object_creation(true);
@@ -198,7 +195,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		
 		// if its a constructor we know the type directly
 		if(strcasecmp($fname,'__construct') == 0 || strcasecmp($fname,$cname) == 0)
-			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$cname));
+			return PC_Obj_Variable::create_object($cname);
 		// get function-object and determine return-type
 		$funcobj = null;
 		if($class !== null)
@@ -230,17 +227,18 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		{
 			$classname = $this->get_scope_part_name(T_CLASS_C);
 			if($classname)
-				$objt = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$classname);
+				$objt = PC_Obj_MultiType::create_object($classname);
 		}
 		else
 			$objt = $obj->get_type();
 		foreach($chain as $access)
 		{
 			// if we don't know the class-name or its no object, stop here
-			if($objt === null || $objt->get_type() != PC_Obj_Type::OBJECT || !$objt->get_class())
+			$classname = $objt->get_classname();
+			if($classname === null)
 				return $this->get_unknown();
 			// if we don't know the class, give up, as well
-			$class = $this->types->get_class($objt->get_class());
+			$class = $this->types->get_class($classname);
 			if($class === null)
 				return $this->get_unknown();
 			
@@ -249,10 +247,11 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 			assert(count($prop) > 0 && $prop[0]['type'] == 'name');
 			if(count($prop) > 1 || $args === null)
 			{
-				$fieldname = $prop[0]['data'];
-				if($fieldname->get_type()->is_unknown() || $fieldname->get_type()->get_value() === null)
+				$fieldvar = $prop[0]['data'];
+				$fieldname = $fieldvar->get_type()->get_string();
+				if($fieldname === null)
 					return $this->get_unknown();
-				$field = $class->get_field($fieldname->get_type()->get_value());
+				$field = $class->get_field($fieldname);
 				if($field === null)
 					return $this->get_unknown();
 				$res = $field->get_type();
@@ -262,23 +261,22 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 					$offset = $prop[$i]['data'];
 					// if the offset is null it means that we should append to the array. this is not supported
 					// for class-fields. therefore stop here and return unknown
-					if($offset === null || $res === null || $res->get_type() != PC_Obj_Type::TARRAY)
+					if($offset === null || $res === null || $res->get_array() === null)
 						return $this->get_unknown();
-					if($offset->get_type()->is_unknown() || $offset->get_type()->get_value() === null)
+					$off = $offset->get_type()->get_scalar();
+					if($off === null)
 						return $this->get_unknown();
-					$res = $res->get_array_type($offset->get_type()->get_value());
+					$res = $res->get_first()->get_array_type($off);
 				}
 			}
 			else
 			{
-				$mname = $prop[0]['data'];
-				if($mname->get_type()->is_unknown() || $mname->get_type()->get_value() === null)
+				$mnamevar = $prop[0]['data'];
+				$mname = $mnamevar->get_type()->get_string();
+				if($mname === null)
 					return $this->get_unknown();
-				$this->add_call(
-					new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,$class->get_name())),
-					$mname,$args,false
-				);
-				$method = $class->get_method($mname->get_type()->get_value());
+				$this->add_call(PC_Obj_Variable::create_string($class->get_name()),$mnamevar,$args,false);
+				$method = $class->get_method($mname);
 				if($method === null)
 					return $this->get_unknown();
 				$res = $method->get_return_type();
@@ -314,11 +312,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	public function get_var($var)
 	{
 		if($var == 'this')
-		{
-			return new PC_Obj_Variable(
-				'',new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$this->get_scope_part_name(T_CLASS_C))
-			);
-		}
+			return PC_Obj_Variable::create_object($this->get_scope_part_name(T_CLASS_C));
 		if(!isset($this->vars[$this->scope][$var]))
 			return $this->get_unknown($var);
 		return $this->vars[$this->scope][$var];
@@ -335,13 +329,22 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	{
 		$varname = $var->get_name();
 		// if we're in a condition save a backup of the current var for later comparisons
-		if($varname && count($this->layers) > 0)
+		if(count($this->layers) > 0)
 		{
-			$layer = &$this->layers[count($this->layers) - 1];
-			if(!isset($layer[$varname]))
+			if($varname)
 			{
-				$clone = isset($this->vars[$this->scope][$varname]) ? clone $var : null;
-				$layer[$varname] = $clone;
+				$layer = &$this->layers[count($this->layers) - 1];
+				if(!isset($layer[$varname]))
+				{
+					$clone = isset($this->vars[$this->scope][$varname]) ? clone $var : null;
+					$layer[$varname] = $clone;
+				}
+			}
+			else
+			{
+				// if its an array-element, simply set it to unknown
+				$var->set_type(new PC_Obj_MultiType());
+				return $value;
 			}
 		}
 		if($value === null)
@@ -392,11 +395,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		$param = $func->get_param('$'.$varname);
 		if($param === null)
 			return $this->get_unknown();
-		$mtype = $param->get_mtype();
-		if($mtype->is_unknown() || $mtype->is_multiple())
-			return $this->get_unknown();
-		$types = $mtype->get_types();
-		return new PC_Obj_Variable('',$types[0]);
+		return new PC_Obj_Variable('',$param->get_mtype());
 	}
 	
 	/**
@@ -498,14 +497,14 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		foreach($changes as $name => $var)
 		{
 			$curvar = $this->vars[$this->scope][$name];
-			/* @var $var PC_Obj_Variable */
-			// if the variable was created in the condition/loop or the type has changed in it, we don't
-			// know the type behind the condition/loop. since we don't know wether the cond/loop is executed
-			if($var === null || !$curvar->get_type()->equals($var->get_type()))
-				$curvar->set_type(new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
-			// if the variable was known before and the value changed, clear the value
-			else if($var !== null && $curvar->get_type()->get_value() !== $var->get_type()->get_value())
-				$curvar->get_type()->set_value(null);
+			/* @var $curvar PC_Obj_Variable */
+			// if the variable was created in the condition/loop we don't know wether it exists behind
+			// it or not. since we don't know wether the cond/loop is executed
+			if($var === null)
+				$curvar->set_type(new PC_Obj_MultiType());
+			// otherwise, merge the types
+			else
+				$curvar->get_type()->merge($var->get_type());
 		}
 	}
 	
@@ -517,9 +516,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	public function get_scope_part($part)
 	{
-		return new PC_Obj_Variable(
-			'',new PC_Obj_Type(PC_Obj_Type::STRING,$this->get_scope_part_name($part))
-		);
+		return PC_Obj_Variable::create_string($this->get_scope_part_name($part));
 	}
 	
 	/**
@@ -560,11 +557,10 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	public function handle_classconst_access($classname,$constname)
 	{
-		$ctype = $classname->get_type();
-		if($ctype->get_type() != PC_Obj_Type::STRING || $ctype->get_value() === null)
+		$cname = $classname->get_type()->get_string();
+		if($cname === null)
 			return $this->get_unknown();
 		
-		$cname = $ctype->get_value();
 		$class = $this->types->get_class($cname);
 		if($class === null)
 			return $this->get_unknown();
@@ -583,11 +579,11 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	public function handle_field_access($class,$field)
 	{
-		$ctype = $class->get_type();
+		$cname = $class->get_type()->get_string();
 		$fname = $field->get_name();
-		if($ctype->get_type() != PC_Obj_Type::STRING || $ctype->get_value() === null)
+		if($cname === null)
 			return $this->get_unknown();
-		$classobj = $this->types->get_class($ctype->get_value());
+		$classobj = $this->types->get_class($cname);
 		if($classobj === null)
 			return $this->get_unknown();
 		$fieldobj = $classobj->get_field($fname);
@@ -608,15 +604,14 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		// if we don't know the variable-type, we can't do anything; additionally, better do nothing
 		// if its no array.
 		// note that null as value is okay because it might be an empty array
-		$t = $var->get_type();
-		if($t->is_unknown() || $t->get_type() != PC_Obj_Type::TARRAY)
+		if($var->get_type()->get_array() === null)
 			return $this->get_unknown();
 		// if we don't know the offset, we can't do anything, either
-		if($offset !== null && ($offset->get_type()->is_unknown() || $offset->get_type()->get_value() === null))
+		if($offset !== null && $offset->get_type()->is_val_unknown())
 			return $this->get_unknown();
 		
 		// PC_Obj_Variable will do the rest for us; simply access the offset
-		return $var->array_offset($offset !== null ? $offset->get_type()->get_value() : null);
+		return $var->array_offset($offset !== null ? $offset->get_type()->get_first()->get_value() : null);
 	}
 	
 	/**
@@ -629,7 +624,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	public function handle_unary_op($op,$e)
 	{
 		if($this->loopdepth > 0)
-			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$e->get_type())));
+			return $this->get_type_from_op($op,$e->get_type());
 		return parent::handle_unary_op($op,$e);
 	}
 	
@@ -662,24 +657,24 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		$t2 = $e2->get_type();
 		// if we're in a loop, don't try to provide the value since we don't know how often it is done
 		if($this->loopdepth > 0)
-			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$t1,$t2)));
+			return  $this->get_type_from_op($op,$t1,$t2);
 		// if we don't know one of the types or values, try to determine the type by the operator
-		if($t1->is_unknown() || $t2->is_unknown() || $t1->get_value() === null || $t2->get_value() === null)
-			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$t1,$t2)));
+		if($t1->is_val_unknown() || $t2->is_val_unknown())
+			return $this->get_type_from_op($op,$t1,$t2);
 		// if we have an array-operation, check if we know all elements
-		if($t1->get_type() == PC_Obj_Type::TARRAY && $t2->get_type() == PC_Obj_Type::TARRAY)
+		if($t1->get_array() !== null && $t2->get_array() !== null)
 		{
 			// if not, we know at least, that its an array
 			if($t1->is_array_unknown() || $t2->is_array_unknown())
-				return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
+				return PC_Obj_Variable::create_array();
 		}
 		// type and value is known, therefore calculate the result
 		$res = 0;
-		$rval = $t2->get_value_for_eval();
+		$rval = $t2->get_first()->get_value_for_eval();
 		// prevent division-by-zero error
 		if($op == '/' && $rval == 0)
-			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::INT));
-		eval('$res = '.$t1->get_value_for_eval().' '.$op.' '.$rval.';');
+			return PC_Obj_Variable::create_int();
+		eval('$res = '.$t1->get_first()->get_value_for_eval().' '.$op.' '.$rval.';');
 		return $this->get_type_from_php($res);
 	}
 	
@@ -697,16 +692,16 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		$t2 = $e2->get_type();
 		$t3 = $e3->get_type();
 		// don't try to evalulate $e1 in loops or if its unknown
-		if($this->loopdepth > 0 || $t1->is_unknown() || $t1->get_value() === null)
+		if($this->loopdepth > 0 || $t1->is_val_unknown())
 		{
-			// if the type is the same, we know the result-type
-			if($t2->get_type() == $t3->get_type())
-				return new PC_Obj_Variable('',new PC_Obj_Type($t2->get_type()));
-			return $this->get_unknown();
+			// merge the types, because the result can be of both types
+			$res = clone $t2;
+			$res->merge($t3);
+			return new PC_Obj_Variable('',$res);
 		}
 		// type and value is known, so we can evalulate the result
 		$res = false;
-		eval('$res = '.$t1->get_value_for_eval().';');
+		eval('$res = '.$t1->get_first()->get_value_for_eval().';');
 		if($res)
 			return new PC_Obj_Variable('',clone $t2);
 		return new PC_Obj_Variable('',clone $t3);
@@ -726,23 +721,25 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		$t2 = $e2->get_type();
 		// if we don't know one of the types or values, try to determine the type by the operator
 		// if we're in a loop, do that, too.
-		if($this->loopdepth > 0 || $t1->is_unknown() || $t2->is_unknown() || $t1->get_value() === null
-				|| $t2->get_value() === null)
-			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$t1,$t2)));
+		if($this->loopdepth > 0 || $t1->is_val_unknown() || $t2->is_val_unknown())
+			return $this->get_type_from_op($op,$t1,$t2);
 		// if we have an array-operation, just return bool, because we would have to do it ourself
 		// and I think its not worth the effort.
-		if($t1->get_type() == PC_Obj_Type::TARRAY && $t2->get_type() == PC_Obj_Type::TARRAY)
-			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
+		if($t1->get_first()->get_type() == PC_Obj_Type::TARRAY &&
+				$t2->get_first()->get_type() == PC_Obj_Type::TARRAY)
+			return PC_Obj_Variable::create_bool();
 		
 		$val = false;
+		$f1 = $t1->get_first();
+		$f2 = $t2->get_first();
 		switch($op)
 		{
 			// its not a good idea to use eval in this case because it might change the type
 			case '===':
-				$val = $t1->get_value_for_use() === $t2->get_value_for_use();
+				$val = $f1->get_value_for_use() === $f2->get_value_for_use();
 				break;
 			case '!==':
-				$val = $t1->get_value_for_use() !== $t2->get_value_for_use();
+				$val = $f1->get_value_for_use() !== $f2->get_value_for_use();
 				break;
 			
 			case '==':
@@ -751,10 +748,10 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 			case '>':
 			case '<=':
 			case '>=':
-				eval('$val = '.$t1->get_value_for_eval().' '.$op.' '.$t2->get_value_for_eval().';');
+				eval('$val = '.$f1->get_value_for_eval().' '.$op.' '.$f2->get_value_for_eval().';');
 				break;
 		}
-		return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,$val));
+		return PC_Obj_Variable::create_bool($val);
 	}
 	
 	/**
@@ -768,12 +765,12 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	{
 		$type = $var->get_type();
 		// in loops always by op
-		if($this->loopdepth > 0 || $type->is_unknown() || $type->get_value() === null)
-			$res = new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
+		if($this->loopdepth > 0 || $type->is_val_unknown())
+			$res = $this->get_type_from_op($op,$type);
 		else
 		{
 			$res = 0;
-			eval('$res = '.$type->get_value_for_eval().$op.'1;');
+			eval('$res = '.$type->get_first()->get_value_for_eval().$op.'1;');
 			$res = $this->get_type_from_php($res);
 		}
 		return $this->set_var($var,$res);
@@ -791,12 +788,12 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		$clone = clone $var;
 		$type = $var->get_type();
 		// in loops always by op
-		if($this->loopdepth > 0 || $type->is_unknown() || $type->get_value() === null)
-			$res = new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
+		if($this->loopdepth > 0 || $type->is_val_unknown())
+			$res = $this->get_type_from_op($op,$type);
 		else
 		{
 			$res = 0;
-			eval('$res = '.$type->get_value_for_eval().$op.'1;');
+			eval('$res = '.$type->get_first()->get_value_for_eval().$op.'1;');
 			$res = $this->get_type_from_php($res);
 		}
 		$this->set_var($var,$res);
@@ -819,12 +816,12 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		
 		$t = $e->get_type();
 		// if we don't know the type or value, just provide the type; in loops as well
-		if($this->loopdepth > 0 || $t->is_unknown() || $t->get_value() === null)
-			return new PC_Obj_Variable('',PC_Obj_Type::get_type_by_name($cast));
+		if($this->loopdepth > 0 || $t->is_val_unknown())
+			return new PC_Obj_Variable('',PC_Obj_MultiType::get_type_by_name($cast));
 		
 		// we know the value, so perform a cast
 		$res = 0;
-		eval('$res = ('.$cast.')'.$t->get_value_for_eval().';');
+		eval('$res = ('.$cast.')'.$t->get_first()->get_value_for_eval().';');
 		return $this->get_type_from_php($res);
 	}
 	
@@ -836,31 +833,31 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	public function handle_instanceof($e,$name)
 	{
+		$name = $name->get_type()->get_string();
 		// if we're in a loop or the name is not a string, give up
-		if($this->loopdepth > 0 || $name->get_type()->get_type() != PC_Obj_Type::STRING)
-			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
+		if($this->loopdepth > 0 || $name === null)
+			return PC_Obj_Variable::create_bool();
 		
 		// if we don't know the type or its class we can't say wether its a superclass
-		$name = $name->get_type()->get_value();
-		$type = $e->get_type();
-		if($type->is_unknown() || $type->get_type() != PC_Obj_Type::OBJECT || $type->get_class() == '')
-			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
+		$classname = $e->get_type()->get_classname();
+		if($classname === null)
+			return PC_Obj_Variable::create_bool();
 		
 		// class-name equal?
-		if(strcasecmp($type->get_class(),$name) == 0)
-				return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,true));
+		if(strcasecmp($classname,$name) == 0)
+			return PC_Obj_Variable::create_bool(true);
 		
 		// if the class is unknown we can't say more
-		$class = $this->types->get_class($type->get_class());
+		$class = $this->types->get_class($classname);
 		if($class === null)
-			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
+			return PC_Obj_Variable::create_bool();
 		
 		// check super-classes
 		$super = $class->get_super_class();
 		while($super != '')
 		{
 			if(strcasecmp($super,$name) == 0)
-				return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,true));
+				return PC_Obj_Variable::create_bool(true);
 			$superobj = $this->types->get_class($super);
 			if($superobj === null)
 				break;
@@ -869,8 +866,8 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		
 		// check interfaces
 		if($this->is_instof_interface($class->get_interfaces(),$name))
-			return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,true));
-		return new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,false));
+			return PC_Obj_Variable::create_bool(true);
+		return PC_Obj_Variable::create_bool(false);
 	}
 	
 	/**
@@ -938,7 +935,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 				if(isset($this->vars[$this->scope][$matches[1]]))
 				{
 					// ok, determine type and set it
-					$type = PC_Obj_Type::get_type_by_name($matches[2]);
+					$type = PC_Obj_MultiType::get_type_by_name($matches[2]);
 					$this->vars[$this->scope][$matches[1]]->set_type($type);
 				}
 			}
@@ -973,7 +970,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	private function get_unknown($name = '')
 	{
-		return new PC_Obj_Variable($name,new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+		return new PC_Obj_Variable($name,new PC_Obj_MultiType());
 	}
 	
 	private function get_type_name()

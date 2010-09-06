@@ -170,9 +170,9 @@ class PC_Compile_BaseLexer
 	public function handle_unary_op($op,$e)
 	{
 		$type = $e->get_type();
-		if($type->is_unknown() || $type->get_value() === null)
-			return new PC_Obj_Variable('',new PC_Obj_Type($this->get_type_from_op($op,$type)));
-		eval('$res = '.$op.$type->get_value_for_eval().';');
+		if($type->is_val_unknown())
+			return $this->get_type_from_op($op,$type);
+		eval('$res = '.$op.$type->get_first()->get_value_for_eval().';');
 		return $this->get_type_from_php($res);
 	}
 	
@@ -183,11 +183,11 @@ class PC_Compile_BaseLexer
 	protected function get_type_from_php($val)
 	{
 		if(is_array($val))
-			return new PC_Obj_Variable('',PC_Obj_Type::get_type_by_value($val));
+			return new PC_Obj_Variable('',new PC_Obj_MultiType(PC_Obj_Type::get_type_by_value($val)));
 		else
 		{
 			$type = PC_Obj_Type::get_type_by_name(gettype($val));
-			return new PC_Obj_Variable('',new PC_Obj_Type($type->get_type(),$val));
+			return new PC_Obj_Variable('',new PC_Obj_MultiType(new PC_Obj_Type($type->get_type(),$val)));
 		}
 	}
 	
@@ -195,9 +195,9 @@ class PC_Compile_BaseLexer
 	 * Determines the type from the operation (assumes that the type or the value is unknown)
 	 * 
 	 * @param string $op the operator
-	 * @param PC_Obj_Type $t1 the type of the first operand
-	 * @param PC_Obj_Type $t2 the type of the second operand (may be null for unary ops)
-	 * @return int the type
+	 * @param PC_Obj_MultiType $t1 the type of the first operand
+	 * @param PC_Obj_MultiType $t2 the type of the second operand (may be null for unary ops)
+	 * @return PC_Obj_Variable the variable
 	 */
 	protected function get_type_from_op($op,$t1,$t2 = null)
 	{
@@ -210,11 +210,11 @@ class PC_Compile_BaseLexer
 			case '>>':
 			case '<<':
 			case '~':
-				return PC_Obj_Type::INT;
+				return PC_Obj_Variable::create_int();
 			
 			// concatenation leads always to string
 			case '.':
-				return PC_Obj_Type::STRING;
+				return PC_Obj_Variable::create_string();
 			
 			case '+':
 			case '-':
@@ -222,16 +222,19 @@ class PC_Compile_BaseLexer
 			case '/':
 			case '%':
 				// if one of them is unknown we don't know wether we would get a float or int
-				if($t1->is_unknown() || ($t2 !== null && $t2->is_unknown()))
-					return PC_Obj_Type::UNKNOWN;
+				if($t1->is_unknown() || $t1->is_multiple() ||
+						($t2 !== null && ($t2->is_unknown() || $t2->is_multiple())))
+					return new PC_Obj_Variable('');
+				$ti1 = $t1->get_first()->get_type();
+				$ti2 = $t2 === null ? -1 : $t2->get_first()->get_type();
 				// if both are arrays, the result is an array
-				if($t1->get_type() == PC_Obj_Type::TARRAY && $t2->get_type() == PC_Obj_Type::TARRAY)
-					return PC_Obj_Type::TARRAY;
+				if($ti1 == PC_Obj_Type::TARRAY && $ti2 == PC_Obj_Type::TARRAY)
+					return PC_Obj_Variable::create_array();
 				// if one of them is float, the result is float
-				if($t1->get_type() == PC_Obj_Type::FLOAT || ($t2 !== null && $t2->get_type() == PC_Obj_Type::FLOAT))
-					return PC_Obj_Type::FLOAT;
+				if($ti1 == PC_Obj_Type::FLOAT || $ti2 == PC_Obj_Type::FLOAT)
+					return PC_Obj_Variable::create_float();
 				// otherwise its always int
-				return PC_Obj_Type::INT;
+				return PC_Obj_Variable::create_int();
 			
 			case '==':
 			case '!=':
@@ -246,7 +249,7 @@ class PC_Compile_BaseLexer
 			case 'xor':
 			case '!':
 				// always bool
-				return PC_Obj_Type::BOOL;
+				return PC_Obj_Variable::create_bool();
 			
 			default:
 				FWS_Helper::error('Unknown operator "'.$op.'"');

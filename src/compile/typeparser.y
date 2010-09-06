@@ -301,25 +301,25 @@ exit_expr ::= LPAREN RPAREN.
 exit_expr ::= LPAREN expr RPAREN.
 exit_expr ::= .
 
-common_scalar(A) ::= T_LNUMBER(sval). { A = new PC_Obj_Type(PC_Obj_Type::INT,sval); }
-common_scalar(A) ::= T_DNUMBER(sval). { A = new PC_Obj_Type(PC_Obj_Type::FLOAT,sval); }
+common_scalar(A) ::= T_LNUMBER(sval). { A = PC_Obj_MultiType::create_int(sval); }
+common_scalar(A) ::= T_DNUMBER(sval). { A = PC_Obj_MultiType::create_float(sval); }
 common_scalar(A) ::= T_CONSTANT_ENCAPSED_STRING(sval). {
-	A = new PC_Obj_Type(PC_Obj_Type::STRING,substr(sval,1,-1));
+	A = PC_Obj_MultiType::create_string(substr(sval,1,-1));
 }
-common_scalar(A) ::= T_LINE. { A = new PC_Obj_Type(PC_Obj_Type::INT,$this->state->get_line()); }
-common_scalar(A) ::= T_FILE. { A = new PC_Obj_Type(PC_Obj_Type::STRING,$this->state->get_file()); }
+common_scalar(A) ::= T_LINE. { A = PC_Obj_MultiType::create_int($this->state->get_line()); }
+common_scalar(A) ::= T_FILE. { A = PC_Obj_MultiType::create_string($this->state->get_file()); }
 common_scalar(A) ::= T_CLASS_C|T_METHOD_C|T_FUNC_C. {
 	// TODO value
-	A = new PC_Obj_Type(PC_Obj_Type::STRING);
+	A = PC_Obj_MultiType::create_string();
 }
 
 /* compile-time evaluated scalars */
 static_scalar(A) ::= common_scalar(sval). { A = sval; }
 static_scalar(A) ::= T_STRING(sval). {
 	if(strcasecmp(sval,"true") == 0)
-		A = new PC_Obj_Type(PC_Obj_Type::BOOL,true);
+		A = PC_Obj_MultiType::create_bool(true);
 	else if(strcasecmp(sval,"false") == 0)
-		A = new PC_Obj_Type(PC_Obj_Type::BOOL,false);
+		A = PC_Obj_MultiType::create_bool(false);
 	else 
 		A = $this->state->get_constant_type(sval);
 }
@@ -334,25 +334,25 @@ static_scalar(A) ::= static_class_constant. { /* TODO */ A = null; }
 
 static_array_pair_list(A) ::= non_empty_static_array_pair_list(list). { A = list; }
 static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA. { A = list; }
-static_array_pair_list(A) ::= . { A = new PC_Obj_Type(PC_Obj_Type::TARRAY); }
+static_array_pair_list(A) ::= . { A = PC_Obj_MultiType::create_array(); }
 
 non_empty_static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA
 																				static_scalar(skey) T_DOUBLE_ARROW static_scalar(sval). {
 	A = list;
-	A->set_array_type(skey,sval);
+	A->get_first()->set_array_type(skey,sval);
 }
 non_empty_static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA
 																				static_scalar(sval). {
 	A = list;
-	A->set_array_type(A->get_next_array_key(),sval);
+	A->get_first()->set_array_type(A->get_first()->get_next_array_key(),sval);
 }
 non_empty_static_array_pair_list(A) ::= static_scalar(skey) T_DOUBLE_ARROW static_scalar(sval). {
-	A = new PC_Obj_Type(PC_Obj_Type::TARRAY);
-	A->set_array_type(skey,sval);
+	A = PC_Obj_MultiType::create_array();
+	A->get_first()->set_array_type(skey,sval);
 }
 non_empty_static_array_pair_list(A) ::= static_scalar(sval). {
-	A = new PC_Obj_Type(PC_Obj_Type::TARRAY);
-	A->set_array_type(0,sval);
+	A = PC_Obj_MultiType::create_array();
+	A->get_first()->set_array_type(0,sval);
 }
 
 static_class_constant ::= T_STRING T_PAAMAYIM_NEKUDOTAYIM T_STRING.
@@ -408,13 +408,13 @@ parameter_list(A) ::= . { A = array(); }
 non_empty_parameter_list(A) ::= optional_class_type(vtype) T_VARIABLE(vname). {
 	A = array();
 	$param = new PC_Obj_Parameter(vname);
-	$param->set_mtype(new PC_Obj_MultiType(array(vtype)));
+	$param->set_mtype(vtype);
 	A[] = $param;
 }
 non_empty_parameter_list(A) ::= optional_class_type(vtype) AMPERSAND T_VARIABLE(vname). {
 	A = array();
 	$param = new PC_Obj_Parameter(vname);
-	$param->set_mtype(new PC_Obj_MultiType(array(vtype)));
+	$param->set_mtype(vtype);
 	A[] = $param;
 }
 non_empty_parameter_list(A) ::= optional_class_type(vtype) AMPERSAND T_VARIABLE(vname)
@@ -422,11 +422,11 @@ non_empty_parameter_list(A) ::= optional_class_type(vtype) AMPERSAND T_VARIABLE(
 	A = array();
 	$param = new PC_Obj_Parameter(vname);
 	if(vval)
-		vval->set_value(null); // value is not interesting here
+		vval->clear_values(); // value is not interesting here
 	if(vval && vtype->is_unknown())
-		$param->set_mtype(new PC_Obj_MultiType(array(vval)));
+		$param->set_mtype(vval);
 	else
-		$param->set_mtype(new PC_Obj_MultiType(array(vtype)));
+		$param->set_mtype(vtype);
 	$param->set_optional(true);
 	A[] = $param;
 }
@@ -435,11 +435,11 @@ non_empty_parameter_list(A) ::= optional_class_type(vtype) T_VARIABLE(vname)
 	A = array();
 	$param = new PC_Obj_Parameter(vname);
 	if(vval)
-		vval->set_value(null); // value is not interesting here
+		vval->clear_values(); // value is not interesting here
 	if(vval && vtype->is_unknown())
-		$param->set_mtype(new PC_Obj_MultiType(array(vval)));
+		$param->set_mtype(vval);
 	else
-		$param->set_mtype(new PC_Obj_MultiType(array(vtype)));
+		$param->set_mtype(vtype);
 	$param->set_optional(true);
 	A[] = $param;
 }
@@ -447,14 +447,14 @@ non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA optional_cl
 																T_VARIABLE(vname). {
 	A = list;
 	$param = new PC_Obj_Parameter(vname);
-	$param->set_mtype(new PC_Obj_MultiType(array(vtype)));
+	$param->set_mtype(vtype);
 	A[] = $param;
 }
 non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA optional_class_type(vtype)
 																AMPERSAND T_VARIABLE(vname). {
 	A = list;
 	$param = new PC_Obj_Parameter(vname);
-	$param->set_mtype(new PC_Obj_MultiType(array(vtype)));
+	$param->set_mtype(vtype);
 	A[] = $param;
 }
 non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA optional_class_type(vtype)
@@ -462,11 +462,11 @@ non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA optional_cl
 	A = list;
 	$param = new PC_Obj_Parameter(vname);
 	if(vval)
-		vval->set_value(null); // value is not interesting here
+		vval->clear_values(); // value is not interesting here
 	if(vval && vtype->is_unknown())
-		$param->set_mtype(new PC_Obj_MultiType(array(vval)));
+		$param->set_mtype(vval);
 	else
-		$param->set_mtype(new PC_Obj_MultiType(array(vtype)));
+		$param->set_mtype(vtype);
 	$param->set_optional(true);
 	A[] = $param;
 }
@@ -475,19 +475,19 @@ non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA optional_cl
 	A = list;
 	$param = new PC_Obj_Parameter(vname);
 	if(vval)
-		vval->set_value(null); // value is not interesting here
+		vval->clear_values(); // value is not interesting here
 	if(vval && vtype->is_unknown())
-		$param->set_mtype(new PC_Obj_MultiType(array(vval)));
+		$param->set_mtype(vval);
 	else
-		$param->set_mtype(new PC_Obj_MultiType(array(vtype)));
+		$param->set_mtype(vtype);
 	$param->set_optional(true);
 	A[] = $param;
 }
 
 
-optional_class_type(A) ::= T_STRING(vtype). { A = new PC_Obj_Type(PC_Obj_Type::OBJECT,null,vtype); }
-optional_class_type(A) ::= T_ARRAY. { A = new PC_Obj_Type(PC_Obj_Type::TARRAY); }
-optional_class_type(A) ::= . { A = new PC_Obj_Type(PC_Obj_Type::UNKNOWN); }
+optional_class_type(A) ::= T_STRING(vtype). { A = PC_Obj_MultiType::create_object(vtype); }
+optional_class_type(A) ::= T_ARRAY. { A = PC_Obj_MultiType::create_array(); }
+optional_class_type(A) ::= . { A = new PC_Obj_MultiType(); }
 
 function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list). { A = list; }
 function_call_parameter_list(A) ::= . { A = array(); }
@@ -547,7 +547,7 @@ class_statement(A) ::= variable_modifiers(mmodifiers) class_variable_declaration
 class_statement(A) ::= class_constant_declaration(constdecl) SEMI. {
 	A = new PC_Obj_Constant(
 		$this->state->get_file(),$this->state->get_line(),constdecl->metadata['name'],
-		isset(constdecl->metadata['val']) ? constdecl->metadata['val'] : new PC_Obj_Type(PC_Obj_Type::UNKNOWN)
+		isset(constdecl->metadata['val']) ? constdecl->metadata['val'] : new PC_Obj_MultiType()
 	);
 	$this->state->parse_const_doc(A);
 }
@@ -745,25 +745,25 @@ function_call ::= variable_without_objects LPAREN function_call_parameter_list R
 
 scalar(A) ::= T_STRING(str). {
 	if(strcasecmp(str,"true") == 0)
-		A = new PC_Obj_Type(PC_Obj_Type::BOOL,true);
+		A = PC_Obj_MultiType::create_bool(true);
 	else if(strcasecmp(str,"false") == 0)
-		A = new PC_Obj_Type(PC_Obj_Type::BOOL,false);
+		A = PC_Obj_MultiType::create_bool(false);
 	else 
 		A = $this->state->get_constant_type(str);
 }
 scalar(A) ::= T_STRING_VARNAME. {
-	A = new PC_Obj_Type(PC_Obj_Type::STRING);
+	A = PC_Obj_MultiType::create_string();
 }
 scalar(A) ::= class_constant.
 scalar(A) ::= common_scalar(sc). { A = sc; }
 scalar(A) ::= DOUBLEQUOTE encaps_list DOUBLEQUOTE. {
-	A = new PC_Obj_Type(PC_Obj_Type::STRING);
+	A = PC_Obj_MultiType::create_string();
 }
 scalar(A) ::= SINGLEQUOTE encaps_list SINGLEQUOTE. {
-	A = new PC_Obj_Type(PC_Obj_Type::STRING);
+	A = PC_Obj_MultiType::create_string();
 }
 scalar(A) ::= T_START_HEREDOC encaps_list T_END_HEREDOC. {
-	A = new PC_Obj_Type(PC_Obj_Type::STRING);
+	A = PC_Obj_MultiType::create_string();
 }
 
 class_name_reference ::= T_STRING.

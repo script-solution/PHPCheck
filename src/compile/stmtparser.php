@@ -101,7 +101,7 @@ class PC_Compile_StmtParser#line 102 "src/compile/stmtparser.php"
 {
 /* First off, code is included which follows the "include_class" declaration
 ** in the input file. */
-#line 18 "src/compile/stmtparser.y"
+#line 13 "src/compile/stmtparser.y"
 
 		// current state, i.e. the function, class and variables in scope
 		private $state;
@@ -4711,10 +4711,6 @@ static public $yy_action = array(
         280 => 128,
         338 => 128,
         129 => 129,
-        325 => 129,
-        328 => 129,
-        329 => 129,
-        330 => 129,
         134 => 134,
         135 => 135,
         136 => 136,
@@ -4789,6 +4785,10 @@ static public $yy_action = array(
         321 => 321,
         322 => 322,
         323 => 323,
+        325 => 325,
+        328 => 325,
+        329 => 325,
+        330 => 325,
     );
     /* Beginning here are the reduction cases.  A typical example
     ** follows:
@@ -4796,466 +4796,468 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 120 "src/compile/stmtparser.y"
+#line 115 "src/compile/stmtparser.y"
     function yy_r9(){
 	$this->state->end_cond();
     }
 #line 4808 "src/compile/stmtparser.php"
-#line 127 "src/compile/stmtparser.y"
+#line 122 "src/compile/stmtparser.y"
     function yy_r11(){
 	$this->state->end_loop();
     }
 #line 4813 "src/compile/stmtparser.php"
-#line 205 "src/compile/stmtparser.y"
+#line 200 "src/compile/stmtparser.y"
     function yy_r48(){
 	$this->state->end_function();
     }
 #line 4818 "src/compile/stmtparser.php"
-#line 214 "src/compile/stmtparser.y"
+#line 209 "src/compile/stmtparser.y"
     function yy_r49(){
 	$this->state->end_class();
     }
 #line 4823 "src/compile/stmtparser.php"
-#line 244 "src/compile/stmtparser.y"
+#line 239 "src/compile/stmtparser.y"
     function yy_r63(){ $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;     }
 #line 4826 "src/compile/stmtparser.php"
-#line 248 "src/compile/stmtparser.y"
+#line 243 "src/compile/stmtparser.y"
     function yy_r66(){
 	$this->_retvalue = $this->state->set_var($this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4831 "src/compile/stmtparser.php"
-#line 251 "src/compile/stmtparser.y"
+#line 246 "src/compile/stmtparser.y"
     function yy_r67(){
 	$this->_retvalue = $this->state->set_var($this->yystack[$this->yyidx + -3]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4836 "src/compile/stmtparser.php"
-#line 255 "src/compile/stmtparser.y"
+#line 250 "src/compile/stmtparser.y"
     function yy_r68(){
-	$func = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,'__construct'));
+	$func = PC_Obj_Variable::create_string('__construct');
 	$obj = $this->state->add_call($this->yystack[$this->yyidx + -1]->minor,$func,$this->yystack[$this->yyidx + 0]->minor);
 	$this->_retvalue = $this->state->set_var($this->yystack[$this->yyidx + -5]->minor,$obj);
     }
 #line 4843 "src/compile/stmtparser.php"
-#line 260 "src/compile/stmtparser.y"
+#line 255 "src/compile/stmtparser.y"
     function yy_r69(){
-	$func = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,'__construct'));
+	$func = PC_Obj_Variable::create_string('__construct');
 	$this->_retvalue = $this->state->add_call($this->yystack[$this->yyidx + -1]->minor,$func,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4849 "src/compile/stmtparser.php"
-#line 264 "src/compile/stmtparser.y"
+#line 259 "src/compile/stmtparser.y"
     function yy_r70(){
 	$this->_retvalue = clone $this->yystack[$this->yyidx + 0]->minor;
     }
 #line 4854 "src/compile/stmtparser.php"
-#line 267 "src/compile/stmtparser.y"
+#line 262 "src/compile/stmtparser.y"
     function yy_r71(){
 	$this->_retvalue = $this->state->handle_bin_assign_op('+',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4859 "src/compile/stmtparser.php"
-#line 270 "src/compile/stmtparser.y"
+#line 265 "src/compile/stmtparser.y"
     function yy_r72(){
 	$this->_retvalue = $this->state->handle_bin_assign_op('-',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4864 "src/compile/stmtparser.php"
-#line 273 "src/compile/stmtparser.y"
+#line 268 "src/compile/stmtparser.y"
     function yy_r73(){
 	$this->_retvalue = $this->state->handle_bin_assign_op('*',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4869 "src/compile/stmtparser.php"
-#line 276 "src/compile/stmtparser.y"
+#line 271 "src/compile/stmtparser.y"
     function yy_r74(){
 	$this->_retvalue = $this->state->handle_bin_assign_op('/',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4874 "src/compile/stmtparser.php"
-#line 279 "src/compile/stmtparser.y"
+#line 274 "src/compile/stmtparser.y"
     function yy_r75(){
 	$this->_retvalue = $this->state->handle_bin_assign_op('.',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4879 "src/compile/stmtparser.php"
-#line 282 "src/compile/stmtparser.y"
+#line 277 "src/compile/stmtparser.y"
     function yy_r76(){
 	$this->_retvalue = $this->state->handle_bin_assign_op('%',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4884 "src/compile/stmtparser.php"
-#line 285 "src/compile/stmtparser.y"
+#line 280 "src/compile/stmtparser.y"
     function yy_r77(){
 	$this->_retvalue = $this->state->handle_bin_assign_op('&',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4889 "src/compile/stmtparser.php"
-#line 288 "src/compile/stmtparser.y"
+#line 283 "src/compile/stmtparser.y"
     function yy_r78(){
 	$this->_retvalue = $this->state->handle_bin_assign_op('|',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4894 "src/compile/stmtparser.php"
-#line 291 "src/compile/stmtparser.y"
+#line 286 "src/compile/stmtparser.y"
     function yy_r79(){
 	$this->_retvalue = $this->state->handle_bin_assign_op('^',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4899 "src/compile/stmtparser.php"
-#line 294 "src/compile/stmtparser.y"
+#line 289 "src/compile/stmtparser.y"
     function yy_r80(){
 	$this->_retvalue = $this->state->handle_bin_assign_op('<<',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4904 "src/compile/stmtparser.php"
-#line 297 "src/compile/stmtparser.y"
+#line 292 "src/compile/stmtparser.y"
     function yy_r81(){
 	$this->_retvalue = $this->state->handle_bin_assign_op('>>',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4909 "src/compile/stmtparser.php"
-#line 300 "src/compile/stmtparser.y"
+#line 295 "src/compile/stmtparser.y"
     function yy_r82(){
 	$this->_retvalue = $this->state->handle_post_op('+',$this->yystack[$this->yyidx + -1]->minor);
     }
 #line 4914 "src/compile/stmtparser.php"
-#line 303 "src/compile/stmtparser.y"
+#line 298 "src/compile/stmtparser.y"
     function yy_r83(){
 	$this->_retvalue = $this->state->handle_pre_op('+',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4919 "src/compile/stmtparser.php"
-#line 306 "src/compile/stmtparser.y"
+#line 301 "src/compile/stmtparser.y"
     function yy_r84(){
 	$this->_retvalue = $this->state->handle_post_op('-',$this->yystack[$this->yyidx + -1]->minor);
     }
 #line 4924 "src/compile/stmtparser.php"
-#line 309 "src/compile/stmtparser.y"
+#line 304 "src/compile/stmtparser.y"
     function yy_r85(){
 	$this->_retvalue = $this->state->handle_pre_op('-',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4929 "src/compile/stmtparser.php"
-#line 312 "src/compile/stmtparser.y"
+#line 307 "src/compile/stmtparser.y"
     function yy_r86(){
 	$this->_retvalue = $this->state->handle_bin_op('||',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4934 "src/compile/stmtparser.php"
-#line 315 "src/compile/stmtparser.y"
+#line 310 "src/compile/stmtparser.y"
     function yy_r87(){
 	$this->_retvalue = $this->state->handle_bin_op('&&',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4939 "src/compile/stmtparser.php"
-#line 324 "src/compile/stmtparser.y"
+#line 319 "src/compile/stmtparser.y"
     function yy_r90(){
 	$this->_retvalue = $this->state->handle_bin_op('xor',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4944 "src/compile/stmtparser.php"
-#line 327 "src/compile/stmtparser.y"
+#line 322 "src/compile/stmtparser.y"
     function yy_r91(){
 	$this->_retvalue = $this->state->handle_bin_op('|',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4949 "src/compile/stmtparser.php"
-#line 330 "src/compile/stmtparser.y"
+#line 325 "src/compile/stmtparser.y"
     function yy_r92(){
 	$this->_retvalue = $this->state->handle_bin_op('&',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4954 "src/compile/stmtparser.php"
-#line 333 "src/compile/stmtparser.y"
+#line 328 "src/compile/stmtparser.y"
     function yy_r93(){
 	$this->_retvalue = $this->state->handle_bin_op('^',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4959 "src/compile/stmtparser.php"
-#line 336 "src/compile/stmtparser.y"
+#line 331 "src/compile/stmtparser.y"
     function yy_r94(){
 	$this->_retvalue = $this->state->handle_bin_op('.',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4964 "src/compile/stmtparser.php"
-#line 339 "src/compile/stmtparser.y"
+#line 334 "src/compile/stmtparser.y"
     function yy_r95(){
 	$this->_retvalue = $this->state->handle_bin_op('+',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4969 "src/compile/stmtparser.php"
-#line 342 "src/compile/stmtparser.y"
+#line 337 "src/compile/stmtparser.y"
     function yy_r96(){
 	$this->_retvalue = $this->state->handle_bin_op('-',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4974 "src/compile/stmtparser.php"
-#line 345 "src/compile/stmtparser.y"
+#line 340 "src/compile/stmtparser.y"
     function yy_r97(){
 	$this->_retvalue = $this->state->handle_bin_op('*',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4979 "src/compile/stmtparser.php"
-#line 348 "src/compile/stmtparser.y"
+#line 343 "src/compile/stmtparser.y"
     function yy_r98(){
 	$this->_retvalue = $this->state->handle_bin_op('/',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4984 "src/compile/stmtparser.php"
-#line 351 "src/compile/stmtparser.y"
+#line 346 "src/compile/stmtparser.y"
     function yy_r99(){
 	$this->_retvalue = $this->state->handle_bin_op('%',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4989 "src/compile/stmtparser.php"
-#line 354 "src/compile/stmtparser.y"
+#line 349 "src/compile/stmtparser.y"
     function yy_r100(){
 	$this->_retvalue = $this->state->handle_bin_op('<<',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4994 "src/compile/stmtparser.php"
-#line 357 "src/compile/stmtparser.y"
+#line 352 "src/compile/stmtparser.y"
     function yy_r101(){
 	$this->_retvalue = $this->state->handle_bin_op('>>',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 4999 "src/compile/stmtparser.php"
-#line 360 "src/compile/stmtparser.y"
+#line 355 "src/compile/stmtparser.y"
     function yy_r102(){
 	$this->_retvalue = $this->state->handle_unary_op('+',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5004 "src/compile/stmtparser.php"
-#line 363 "src/compile/stmtparser.y"
+#line 358 "src/compile/stmtparser.y"
     function yy_r103(){
 	$this->_retvalue = $this->state->handle_unary_op('-',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5009 "src/compile/stmtparser.php"
-#line 366 "src/compile/stmtparser.y"
+#line 361 "src/compile/stmtparser.y"
     function yy_r104(){
 	$this->_retvalue = $this->state->handle_unary_op('!',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5014 "src/compile/stmtparser.php"
-#line 369 "src/compile/stmtparser.y"
+#line 364 "src/compile/stmtparser.y"
     function yy_r105(){
 	$this->_retvalue = $this->state->handle_unary_op('~',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5019 "src/compile/stmtparser.php"
-#line 372 "src/compile/stmtparser.y"
+#line 367 "src/compile/stmtparser.y"
     function yy_r106(){
 	$this->_retvalue = $this->state->handle_cmp('===',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5024 "src/compile/stmtparser.php"
-#line 375 "src/compile/stmtparser.y"
+#line 370 "src/compile/stmtparser.y"
     function yy_r107(){
 	$this->_retvalue = $this->state->handle_cmp('!==',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5029 "src/compile/stmtparser.php"
-#line 378 "src/compile/stmtparser.y"
+#line 373 "src/compile/stmtparser.y"
     function yy_r108(){
 	$this->_retvalue = $this->state->handle_cmp('==',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5034 "src/compile/stmtparser.php"
-#line 381 "src/compile/stmtparser.y"
+#line 376 "src/compile/stmtparser.y"
     function yy_r109(){
 	$this->_retvalue = $this->state->handle_cmp('!=',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5039 "src/compile/stmtparser.php"
-#line 384 "src/compile/stmtparser.y"
+#line 379 "src/compile/stmtparser.y"
     function yy_r110(){
 	$this->_retvalue = $this->state->handle_cmp('<',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5044 "src/compile/stmtparser.php"
-#line 387 "src/compile/stmtparser.y"
+#line 382 "src/compile/stmtparser.y"
     function yy_r111(){
 	$this->_retvalue = $this->state->handle_cmp('<=',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5049 "src/compile/stmtparser.php"
-#line 390 "src/compile/stmtparser.y"
+#line 385 "src/compile/stmtparser.y"
     function yy_r112(){
 	$this->_retvalue = $this->state->handle_cmp('>',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5054 "src/compile/stmtparser.php"
-#line 393 "src/compile/stmtparser.y"
+#line 388 "src/compile/stmtparser.y"
     function yy_r113(){
 	$this->_retvalue = $this->state->handle_cmp('>=',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5059 "src/compile/stmtparser.php"
-#line 396 "src/compile/stmtparser.y"
+#line 391 "src/compile/stmtparser.y"
     function yy_r114(){
 	$this->_retvalue = $this->state->handle_instanceof($this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5064 "src/compile/stmtparser.php"
-#line 399 "src/compile/stmtparser.y"
+#line 394 "src/compile/stmtparser.y"
     function yy_r115(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     }
 #line 5069 "src/compile/stmtparser.php"
-#line 402 "src/compile/stmtparser.y"
+#line 397 "src/compile/stmtparser.y"
     function yy_r116(){
 	$this->_retvalue = $this->state->handle_tri_op($this->yystack[$this->yyidx + -4]->minor,$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5074 "src/compile/stmtparser.php"
-#line 405 "src/compile/stmtparser.y"
+#line 400 "src/compile/stmtparser.y"
     function yy_r117(){
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
 #line 5079 "src/compile/stmtparser.php"
-#line 408 "src/compile/stmtparser.y"
+#line 403 "src/compile/stmtparser.y"
     function yy_r118(){
 	$this->_retvalue = $this->state->handle_cast('int',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5084 "src/compile/stmtparser.php"
-#line 411 "src/compile/stmtparser.y"
+#line 406 "src/compile/stmtparser.y"
     function yy_r119(){
 	$this->_retvalue = $this->state->handle_cast('float',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5089 "src/compile/stmtparser.php"
-#line 414 "src/compile/stmtparser.y"
+#line 409 "src/compile/stmtparser.y"
     function yy_r120(){
 	$this->_retvalue = $this->state->handle_cast('string',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5094 "src/compile/stmtparser.php"
-#line 417 "src/compile/stmtparser.y"
+#line 412 "src/compile/stmtparser.y"
     function yy_r121(){
 	$this->_retvalue = $this->state->handle_cast('array',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5099 "src/compile/stmtparser.php"
-#line 420 "src/compile/stmtparser.y"
+#line 415 "src/compile/stmtparser.y"
     function yy_r122(){
 	$this->_retvalue = $this->state->handle_cast('object',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5104 "src/compile/stmtparser.php"
-#line 423 "src/compile/stmtparser.y"
+#line 418 "src/compile/stmtparser.y"
     function yy_r123(){
 	$this->_retvalue = $this->state->handle_cast('bool',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5109 "src/compile/stmtparser.php"
-#line 426 "src/compile/stmtparser.y"
+#line 421 "src/compile/stmtparser.y"
     function yy_r124(){
 	$this->_retvalue = $this->state->handle_cast('unset',$this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5114 "src/compile/stmtparser.php"
-#line 429 "src/compile/stmtparser.y"
+#line 424 "src/compile/stmtparser.y"
     function yy_r125(){ $this->_retvalue = null;     }
 #line 5117 "src/compile/stmtparser.php"
-#line 432 "src/compile/stmtparser.y"
+#line 427 "src/compile/stmtparser.y"
     function yy_r128(){ $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;     }
 #line 5120 "src/compile/stmtparser.php"
-#line 433 "src/compile/stmtparser.y"
+#line 428 "src/compile/stmtparser.y"
     function yy_r129(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING));
+	$this->_retvalue = PC_Obj_Variable::create_string();
     }
 #line 5125 "src/compile/stmtparser.php"
-#line 442 "src/compile/stmtparser.y"
+#line 437 "src/compile/stmtparser.y"
     function yy_r134(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::INT,$this->yystack[$this->yyidx + 0]->minor));
+	$this->_retvalue = PC_Obj_Variable::create_int($this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5130 "src/compile/stmtparser.php"
-#line 445 "src/compile/stmtparser.y"
+#line 440 "src/compile/stmtparser.y"
     function yy_r135(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::FLOAT,$this->yystack[$this->yyidx + 0]->minor));
+	$this->_retvalue = PC_Obj_Variable::create_float($this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5135 "src/compile/stmtparser.php"
-#line 448 "src/compile/stmtparser.y"
+#line 443 "src/compile/stmtparser.y"
     function yy_r136(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,substr($this->yystack[$this->yyidx + 0]->minor,1,-1)));
+	$this->_retvalue = PC_Obj_Variable::create_string(substr($this->yystack[$this->yyidx + 0]->minor,1,-1));
     }
 #line 5140 "src/compile/stmtparser.php"
-#line 451 "src/compile/stmtparser.y"
+#line 446 "src/compile/stmtparser.y"
     function yy_r137(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::INT,$this->state->get_line()));
+	$this->_retvalue = PC_Obj_Variable::create_int($this->state->get_line());
     }
 #line 5145 "src/compile/stmtparser.php"
-#line 454 "src/compile/stmtparser.y"
+#line 449 "src/compile/stmtparser.y"
     function yy_r138(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,$this->state->get_file()));
+	$this->_retvalue = PC_Obj_Variable::create_string($this->state->get_file());
     }
 #line 5150 "src/compile/stmtparser.php"
-#line 457 "src/compile/stmtparser.y"
+#line 452 "src/compile/stmtparser.y"
     function yy_r139(){
 	$this->_retvalue = $this->state->get_scope_part($this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5155 "src/compile/stmtparser.php"
-#line 463 "src/compile/stmtparser.y"
+#line 458 "src/compile/stmtparser.y"
     function yy_r141(){
 	if(strcasecmp($this->yystack[$this->yyidx + 0]->minor,"true") == 0)
-		$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,true));
+		$this->_retvalue = PC_Obj_Variable::create_bool(true);
 	else if(strcasecmp($this->yystack[$this->yyidx + 0]->minor,"false") == 0)
-		$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL,false));
+		$this->_retvalue = PC_Obj_Variable::create_bool(false);
 	else
 		$this->_retvalue = $this->state->get_constant_type($this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5165 "src/compile/stmtparser.php"
-#line 471 "src/compile/stmtparser.y"
+#line 466 "src/compile/stmtparser.y"
     function yy_r142(){ $this->_retvalue = $this->state->handle_unary_op('+',$this->yystack[$this->yyidx + 0]->minor);     }
 #line 5168 "src/compile/stmtparser.php"
-#line 472 "src/compile/stmtparser.y"
+#line 467 "src/compile/stmtparser.y"
     function yy_r143(){ $this->_retvalue = $this->state->handle_unary_op('-',$this->yystack[$this->yyidx + 0]->minor);     }
 #line 5171 "src/compile/stmtparser.php"
-#line 478 "src/compile/stmtparser.y"
+#line 473 "src/compile/stmtparser.y"
     function yy_r148(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
+	$this->_retvalue = PC_Obj_Variable::create_array();
     }
 #line 5176 "src/compile/stmtparser.php"
-#line 483 "src/compile/stmtparser.y"
+#line 478 "src/compile/stmtparser.y"
     function yy_r149(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -4]->minor;
-	$this->_retvalue->get_type()->set_array_type($this->yystack[$this->yyidx + -2]->minor->get_type()->get_value(),$this->yystack[$this->yyidx + 0]->minor->get_type());
+	$this->_retvalue->get_type()->get_first()->set_array_type($this->yystack[$this->yyidx + -2]->minor->get_type()->get_scalar(),$this->yystack[$this->yyidx + 0]->minor->get_type());
     }
 #line 5182 "src/compile/stmtparser.php"
-#line 488 "src/compile/stmtparser.y"
+#line 483 "src/compile/stmtparser.y"
     function yy_r150(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
-	$this->_retvalue->get_type()->set_array_type($this->_retvalue->get_type()->get_next_array_key(),$this->yystack[$this->yyidx + 0]->minor->get_type());
+	$this->_retvalue->get_type()->get_first()->set_array_type(
+		$this->_retvalue->get_type()->get_first()->get_next_array_key(),$this->yystack[$this->yyidx + 0]->minor->get_type()
+	);
     }
-#line 5188 "src/compile/stmtparser.php"
-#line 492 "src/compile/stmtparser.y"
+#line 5190 "src/compile/stmtparser.php"
+#line 489 "src/compile/stmtparser.y"
     function yy_r151(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
-	$this->_retvalue->get_type()->set_array_type($this->yystack[$this->yyidx + -2]->minor->get_type()->get_value(),$this->yystack[$this->yyidx + 0]->minor->get_type());
+	$this->_retvalue = PC_Obj_Variable::create_array();
+	$this->_retvalue->get_type()->get_first()->set_array_type($this->yystack[$this->yyidx + -2]->minor->get_type()->get_scalar(),$this->yystack[$this->yyidx + 0]->minor->get_type());
     }
-#line 5194 "src/compile/stmtparser.php"
-#line 496 "src/compile/stmtparser.y"
+#line 5196 "src/compile/stmtparser.php"
+#line 493 "src/compile/stmtparser.y"
     function yy_r152(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
-	$this->_retvalue->get_type()->set_array_type(0,$this->yystack[$this->yyidx + 0]->minor->get_type());
+	$this->_retvalue = PC_Obj_Variable::create_array();
+	$this->_retvalue->get_type()->get_first()->set_array_type(0,$this->yystack[$this->yyidx + 0]->minor->get_type());
     }
-#line 5200 "src/compile/stmtparser.php"
-#line 501 "src/compile/stmtparser.y"
+#line 5202 "src/compile/stmtparser.php"
+#line 498 "src/compile/stmtparser.y"
     function yy_r153(){
-	$cname = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,$this->yystack[$this->yyidx + -2]->minor));
+	$cname = PC_Obj_Variable::create_string($this->yystack[$this->yyidx + -2]->minor);
 	$this->_retvalue = $this->state->handle_classconst_access($cname,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 5206 "src/compile/stmtparser.php"
-#line 554 "src/compile/stmtparser.y"
+#line 5208 "src/compile/stmtparser.php"
+#line 551 "src/compile/stmtparser.y"
     function yy_r186(){
-  $varname = new PC_Obj_Variable(substr($this->yystack[$this->yyidx + 0]->minor,1),new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+  $varname = new PC_Obj_Variable(substr($this->yystack[$this->yyidx + 0]->minor,1));
 	$this->state->set_var($varname,$this->yystack[$this->yyidx + -1]->minor);
     }
-#line 5211 "src/compile/stmtparser.php"
-#line 557 "src/compile/stmtparser.y"
+#line 5214 "src/compile/stmtparser.php"
+#line 555 "src/compile/stmtparser.y"
     function yy_r187(){
-  $varname = new PC_Obj_Variable(substr($this->yystack[$this->yyidx + 0]->minor,1),new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+  $varname = new PC_Obj_Variable(substr($this->yystack[$this->yyidx + 0]->minor,1));
 	$this->state->set_var($varname,$this->yystack[$this->yyidx + -2]->minor);
     }
-#line 5216 "src/compile/stmtparser.php"
-#line 560 "src/compile/stmtparser.y"
+#line 5220 "src/compile/stmtparser.php"
+#line 559 "src/compile/stmtparser.y"
     function yy_r188(){
-  $varname = new PC_Obj_Variable(substr($this->yystack[$this->yyidx + -2]->minor,1),new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+  $varname = new PC_Obj_Variable(substr($this->yystack[$this->yyidx + -2]->minor,1));
 	$this->state->set_var($varname,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 5221 "src/compile/stmtparser.php"
-#line 583 "src/compile/stmtparser.y"
-    function yy_r194(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$this->yystack[$this->yyidx + 0]->minor));
-    }
 #line 5226 "src/compile/stmtparser.php"
-#line 592 "src/compile/stmtparser.y"
+#line 588 "src/compile/stmtparser.y"
+    function yy_r194(){
+	$this->_retvalue = PC_Obj_Variable::create_object($this->yystack[$this->yyidx + 0]->minor);
+    }
+#line 5231 "src/compile/stmtparser.php"
+#line 597 "src/compile/stmtparser.y"
     function yy_r198(){ $this->_retvalue = array();     }
-#line 5229 "src/compile/stmtparser.php"
-#line 594 "src/compile/stmtparser.y"
+#line 5234 "src/compile/stmtparser.php"
+#line 599 "src/compile/stmtparser.y"
     function yy_r199(){ $this->_retvalue = array($this->yystack[$this->yyidx + 0]->minor);     }
-#line 5232 "src/compile/stmtparser.php"
-#line 598 "src/compile/stmtparser.y"
+#line 5237 "src/compile/stmtparser.php"
+#line 603 "src/compile/stmtparser.y"
     function yy_r202(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 5238 "src/compile/stmtparser.php"
-#line 608 "src/compile/stmtparser.y"
+#line 5243 "src/compile/stmtparser.php"
+#line 613 "src/compile/stmtparser.y"
     function yy_r204(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -3]->minor;
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 5244 "src/compile/stmtparser.php"
-#line 616 "src/compile/stmtparser.y"
-    function yy_r207(){ $this->state->do_global(substr($this->yystack[$this->yyidx + 0]->minor,1));     }
-#line 5247 "src/compile/stmtparser.php"
+#line 5249 "src/compile/stmtparser.php"
 #line 621 "src/compile/stmtparser.y"
+    function yy_r207(){ $this->state->do_global(substr($this->yystack[$this->yyidx + 0]->minor,1));     }
+#line 5252 "src/compile/stmtparser.php"
+#line 626 "src/compile/stmtparser.y"
     function yy_r210(){
-	$var = new PC_Obj_Variable(substr($this->yystack[$this->yyidx + 0]->minor,1),new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
-	$this->state->set_var($var,new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::UNKNOWN)));
+	$var = new PC_Obj_Variable(substr($this->yystack[$this->yyidx + 0]->minor,1));
+	$this->state->set_var($var,new PC_Obj_Variable(''));
     }
-#line 5253 "src/compile/stmtparser.php"
-#line 625 "src/compile/stmtparser.y"
+#line 5258 "src/compile/stmtparser.php"
+#line 630 "src/compile/stmtparser.y"
     function yy_r211(){
-	$var = new PC_Obj_Variable(substr($this->yystack[$this->yyidx + -2]->minor,1),new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+	$var = new PC_Obj_Variable(substr($this->yystack[$this->yyidx + -2]->minor,1));
 	$this->state->set_var($var,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 5259 "src/compile/stmtparser.php"
-#line 689 "src/compile/stmtparser.y"
+#line 5264 "src/compile/stmtparser.php"
+#line 694 "src/compile/stmtparser.y"
     function yy_r244(){
 	$chain = array();
 	$chain[] = array(
@@ -5264,128 +5266,135 @@ static public $yy_action = array(
 	);
 	$this->_retvalue = $this->state->handle_object_prop_chain($this->yystack[$this->yyidx + -4]->minor,array_merge($chain,$this->yystack[$this->yyidx + 0]->minor));
     }
-#line 5269 "src/compile/stmtparser.php"
-#line 701 "src/compile/stmtparser.y"
+#line 5274 "src/compile/stmtparser.php"
+#line 706 "src/compile/stmtparser.y"
     function yy_r246(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 5275 "src/compile/stmtparser.php"
-#line 707 "src/compile/stmtparser.y"
+#line 5280 "src/compile/stmtparser.php"
+#line 712 "src/compile/stmtparser.y"
     function yy_r248(){
 	$this->_retvalue = array(
 		'prop' => $this->yystack[$this->yyidx + -1]->minor,
 		'args' => $this->yystack[$this->yyidx + 0]->minor
 	);
     }
-#line 5283 "src/compile/stmtparser.php"
-#line 718 "src/compile/stmtparser.y"
-    function yy_r252(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
-    }
 #line 5288 "src/compile/stmtparser.php"
-#line 722 "src/compile/stmtparser.y"
+#line 723 "src/compile/stmtparser.y"
+    function yy_r252(){
+	$this->_retvalue = new PC_Obj_Variable('');
+    }
+#line 5293 "src/compile/stmtparser.php"
+#line 727 "src/compile/stmtparser.y"
     function yy_r253(){
 	$this->_retvalue = $this->state->handle_field_access($this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 5293 "src/compile/stmtparser.php"
-#line 730 "src/compile/stmtparser.y"
+#line 5298 "src/compile/stmtparser.php"
+#line 735 "src/compile/stmtparser.y"
     function yy_r257(){ /* TODO */ $this->_retvalue = null;     }
-#line 5296 "src/compile/stmtparser.php"
-#line 733 "src/compile/stmtparser.y"
+#line 5301 "src/compile/stmtparser.php"
+#line 738 "src/compile/stmtparser.y"
     function yy_r259(){
 	$this->_retvalue = $this->state->handle_array_access($this->yystack[$this->yyidx + -3]->minor,$this->yystack[$this->yyidx + -1]->minor);
     }
-#line 5301 "src/compile/stmtparser.php"
-#line 736 "src/compile/stmtparser.y"
+#line 5306 "src/compile/stmtparser.php"
+#line 741 "src/compile/stmtparser.y"
     function yy_r260(){
 	// TODO
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+	$this->_retvalue = new PC_Obj_Variable('');
     }
-#line 5307 "src/compile/stmtparser.php"
-#line 744 "src/compile/stmtparser.y"
+#line 5312 "src/compile/stmtparser.php"
+#line 749 "src/compile/stmtparser.y"
     function yy_r262(){
 	$this->_retvalue = $this->state->get_var(substr($this->yystack[$this->yyidx + 0]->minor,1));
     }
-#line 5312 "src/compile/stmtparser.php"
-#line 747 "src/compile/stmtparser.y"
+#line 5317 "src/compile/stmtparser.php"
+#line 752 "src/compile/stmtparser.y"
     function yy_r263(){
-	if($this->yystack[$this->yyidx + -1]->minor->get_type()->get_value() !== null)
-		$this->_retvalue = $this->state->get_var($this->yystack[$this->yyidx + -1]->minor->get_type()->get_value_as_str());
+	if(($str = $this->yystack[$this->yyidx + -1]->minor->get_type()->get_string()) !== null)
+		$this->_retvalue = $this->state->get_var($str);
 	else
-		$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::UNKNOWN));
+		$this->_retvalue = new PC_Obj_Variable('');
     }
-#line 5320 "src/compile/stmtparser.php"
-#line 758 "src/compile/stmtparser.y"
+#line 5325 "src/compile/stmtparser.php"
+#line 763 "src/compile/stmtparser.y"
     function yy_r267(){
 	$this->_retvalue = array(array('type' => 'name','data' => $this->yystack[$this->yyidx + 0]->minor));
     }
-#line 5325 "src/compile/stmtparser.php"
-#line 762 "src/compile/stmtparser.y"
+#line 5330 "src/compile/stmtparser.php"
+#line 767 "src/compile/stmtparser.y"
     function yy_r268(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -3]->minor;
 	$this->_retvalue[] = array('type' => 'array','data' => $this->yystack[$this->yyidx + -1]->minor);
     }
-#line 5331 "src/compile/stmtparser.php"
-#line 774 "src/compile/stmtparser.y"
-    function yy_r271(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,$this->yystack[$this->yyidx + 0]->minor));
-    }
 #line 5336 "src/compile/stmtparser.php"
-#line 790 "src/compile/stmtparser.y"
-    function yy_r281(){ $this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));     }
-#line 5339 "src/compile/stmtparser.php"
-#line 809 "src/compile/stmtparser.y"
+#line 779 "src/compile/stmtparser.y"
+    function yy_r271(){
+	$this->_retvalue = PC_Obj_Variable::create_string($this->yystack[$this->yyidx + 0]->minor);
+    }
+#line 5341 "src/compile/stmtparser.php"
+#line 795 "src/compile/stmtparser.y"
+    function yy_r281(){ $this->_retvalue = PC_Obj_Variable::create_array();     }
+#line 5344 "src/compile/stmtparser.php"
+#line 816 "src/compile/stmtparser.y"
     function yy_r286(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -5]->minor;
-	$this->_retvalue->get_type()->set_array_type($this->yystack[$this->yyidx + -3]->minor->get_type()->get_value(),$this->yystack[$this->yyidx + 0]->minor->get_type());
+	$this->_retvalue->get_type()->get_first()->set_array_type($this->yystack[$this->yyidx + -3]->minor->get_type()->get_scalar(),$this->yystack[$this->yyidx + 0]->minor->get_type());
     }
-#line 5345 "src/compile/stmtparser.php"
-#line 813 "src/compile/stmtparser.y"
+#line 5350 "src/compile/stmtparser.php"
+#line 820 "src/compile/stmtparser.y"
     function yy_r287(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -3]->minor;
-	$this->_retvalue->get_type()->set_array_type($this->_retvalue->get_type()->get_next_array_key(),$this->yystack[$this->yyidx + 0]->minor->get_type());
+	$this->_retvalue->get_type()->get_first()->set_array_type(
+		$this->_retvalue->get_type()->get_first()->get_next_array_key(),$this->yystack[$this->yyidx + 0]->minor->get_type()
+	);
     }
-#line 5351 "src/compile/stmtparser.php"
-#line 817 "src/compile/stmtparser.y"
+#line 5358 "src/compile/stmtparser.php"
+#line 826 "src/compile/stmtparser.y"
     function yy_r288(){
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::TARRAY));
-	$this->_retvalue->get_type()->set_array_type($this->yystack[$this->yyidx + -3]->minor->get_type()->get_value(),$this->yystack[$this->yyidx + 0]->minor->get_type());
+	$this->_retvalue = PC_Obj_Variable::create_array();
+	$this->_retvalue->get_type()->get_first()->set_array_type($this->yystack[$this->yyidx + -3]->minor->get_type()->get_scalar(),$this->yystack[$this->yyidx + 0]->minor->get_type());
     }
-#line 5357 "src/compile/stmtparser.php"
-#line 850 "src/compile/stmtparser.y"
+#line 5364 "src/compile/stmtparser.php"
+#line 859 "src/compile/stmtparser.y"
     function yy_r309(){
 	// TODO evaluate?
-	$this->_retvalue = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::BOOL));
+	$this->_retvalue = PC_Obj_Variable::create_bool();
     }
-#line 5363 "src/compile/stmtparser.php"
-#line 867 "src/compile/stmtparser.y"
+#line 5370 "src/compile/stmtparser.php"
+#line 876 "src/compile/stmtparser.y"
     function yy_r318(){
 	$this->_retvalue = $this->state->handle_classconst_access($this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 5368 "src/compile/stmtparser.php"
-#line 875 "src/compile/stmtparser.y"
+#line 5375 "src/compile/stmtparser.php"
+#line 884 "src/compile/stmtparser.y"
     function yy_r320(){
-	$fname = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,$this->yystack[$this->yyidx + -3]->minor));
+	$fname = PC_Obj_Variable::create_string($this->yystack[$this->yyidx + -3]->minor);
 	$this->_retvalue = $this->state->add_call(null,$fname,$this->yystack[$this->yyidx + -1]->minor);
     }
-#line 5374 "src/compile/stmtparser.php"
-#line 880 "src/compile/stmtparser.y"
+#line 5381 "src/compile/stmtparser.php"
+#line 889 "src/compile/stmtparser.y"
     function yy_r321(){
-	$fname = new PC_Obj_Variable('',new PC_Obj_Type(PC_Obj_Type::STRING,$this->yystack[$this->yyidx + -3]->minor));
+	$fname = PC_Obj_Variable::create_string($this->yystack[$this->yyidx + -3]->minor);
 	$this->_retvalue = $this->state->add_call($this->yystack[$this->yyidx + -5]->minor,$fname,$this->yystack[$this->yyidx + -1]->minor,true);
     }
-#line 5380 "src/compile/stmtparser.php"
-#line 885 "src/compile/stmtparser.y"
+#line 5387 "src/compile/stmtparser.php"
+#line 894 "src/compile/stmtparser.y"
     function yy_r322(){
 	$this->_retvalue = $this->state->add_call($this->yystack[$this->yyidx + -5]->minor,$this->yystack[$this->yyidx + -3]->minor,$this->yystack[$this->yyidx + -1]->minor,true);
     }
-#line 5385 "src/compile/stmtparser.php"
-#line 888 "src/compile/stmtparser.y"
+#line 5392 "src/compile/stmtparser.php"
+#line 897 "src/compile/stmtparser.y"
     function yy_r323(){
 	$this->_retvalue = $this->state->add_call(null,$this->yystack[$this->yyidx + -3]->minor,$this->yystack[$this->yyidx + -1]->minor);
     }
-#line 5390 "src/compile/stmtparser.php"
+#line 5397 "src/compile/stmtparser.php"
+#line 909 "src/compile/stmtparser.y"
+    function yy_r325(){
+	$this->_retvalue = PC_Obj_Variable::create_string();
+    }
+#line 5402 "src/compile/stmtparser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -5498,13 +5507,14 @@ static public $yy_action = array(
     function yy_syntax_error($yymajor, $TOKEN)
     {
 #line 4 "src/compile/stmtparser.y"
-	    foreach ($this->yy_get_expected_tokens($yymajor) as $token) {
-	        $expect[] = self::$yyTokenName[$token];
-	    }
-			throw new PC_Compile_Exception(
-				$this->state->get_file(),$this->state->get_line(),$this->tokenName($yymajor),$TOKEN,$expect
-			);
-#line 5516 "src/compile/stmtparser.php"
+
+    foreach ($this->yy_get_expected_tokens($yymajor) as $token) {
+        $expect[] = self::$yyTokenName[$token];
+    }
+		throw new PC_Compile_Exception(
+			$this->state->get_file(),$this->state->get_line(),$this->tokenName($yymajor),$TOKEN,$expect
+		);
+#line 5523 "src/compile/stmtparser.php"
     }
 
     /**
