@@ -27,46 +27,27 @@ class PC_Compile_TypeScannerFrontend extends FWS_Object
 	private $lexer;
 	
 	/**
-	 * The found functions
+	 * The found types and errors
 	 * 
-	 * @var array
+	 * @var PC_Compile_TypeContainer
 	 */
-	private $functions = array();
-	/**
-	 * The found classes
-	 * 
-	 * @var array
-	 */
-	private $classes = array();
-	/**
-	 * The found constants
-	 * 
-	 * @var array
-	 */
-	private $consts = array();
+	private $types;
 	
 	/**
-	 * @return array the found functions
+	 * Constructor
 	 */
-	public function get_functions()
+	public function __construct()
 	{
-		return $this->functions;
+		parent::__construct();
+		$this->types = new PC_Compile_TypeContainer(PC_Project::CURRENT_ID,false);
 	}
-	
+
 	/**
-	 * @return array the found classes
+	 * @return PC_Compile_TypeContainer the found types and errors
 	 */
-	public function get_classes()
+	public function get_types()
 	{
-		return $this->classes;
-	}
-	
-	/**
-	 * @return array the found constants
-	 */
-	public function get_constants()
-	{
-		return $this->consts;
+		return $this->types;
 	}
 	
 	/**
@@ -101,9 +82,7 @@ class PC_Compile_TypeScannerFrontend extends FWS_Object
 			$parser->doParse($this->lexer->get_token(),$this->lexer->get_value());
 		$parser->doParse(0,0);
 		
-		$this->functions = array_merge($this->functions,$this->lexer->get_functions());
-		$this->classes = array_merge($this->classes,$this->lexer->get_classes());
-		$this->consts = array_merge($this->consts,$this->lexer->get_constants());
+		$this->types->add($this->lexer->get_types());
 	}
 	
 	protected function get_dump_vars()

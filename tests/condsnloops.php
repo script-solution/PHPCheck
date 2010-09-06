@@ -17,17 +17,13 @@ class PC_Tests_CondsNLoops extends PHPUnit_Framework_Testcase
 		$tscanner = new PC_Compile_TypeScannerFrontend();
 		$tscanner->scan($code);
 		
-		$typecon = new PC_Compile_TypeContainer(0,false);
-		$typecon->add_classes($tscanner->get_classes());
-		$typecon->add_functions($tscanner->get_functions());
-		$typecon->add_constants($tscanner->get_constants());
-		
+		$typecon = $tscanner->get_types();
 		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
 		$fin->finalize();
 		
-		$stmt = new PC_Compile_StmtScannerFrontend();
-		$stmt->scan($code,$typecon);
-		return array($stmt->get_vars(),$stmt->get_calls());
+		$stmt = new PC_Compile_StmtScannerFrontend($typecon);
+		$stmt->scan($code);
+		return array($stmt->get_vars(),$typecon->get_calls());
 	}
 	
 	public function testConditions()

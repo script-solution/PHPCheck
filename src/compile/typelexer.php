@@ -71,23 +71,23 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	private $constComments = array();
 	
 	/**
-	 * The found functions
+	 * The found types and errors
 	 * 
-	 * @var array
+	 * @var PC_Compile_TypeContainer
 	 */
-	private $functions = array();
+	private $types;
+	
 	/**
-	 * The found classes
+	 * Constructor
 	 * 
-	 * @var array
+	 * @param string $str the file or string
+	 * @param bool $is_file wether $str is a file
 	 */
-	private $classes = array();
-	/**
-	 * The found constants
-	 * 
-	 * @var array
-	 */
-	private $consts = array();
+	protected function __construct($str,$is_file)
+	{
+		parent::__construct($str,$is_file);
+		$this->types = new PC_Compile_TypeContainer(PC_Project::CURRENT_ID,false);
+	}
 	
 	/**
 	 * @return int the line in which the last function was declared
@@ -106,27 +106,11 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	}
 	
 	/**
-	 * @return array the found functions
+	 * @return PC_Compile_TypeContainer the found types and errors
 	 */
-	public function get_functions()
+	public function get_types()
 	{
-		return $this->functions;
-	}
-	
-	/**
-	 * @return array the found classes
-	 */
-	public function get_classes()
-	{
-		return $this->classes;
-	}
-	
-	/**
-	 * @return array the found constants
-	 */
-	public function get_constants()
-	{
-		return $this->consts;
+		return $this->types;
 	}
 	
 	/**
@@ -142,7 +126,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 		foreach($params as $param)
 			$func->put_param($param);
 		$this->parse_method_doc($func);
-		$this->functions[$func->get_name()] = $func;
+		$this->types->add_functions(array($func));
 	}
 	
 	/**
@@ -164,7 +148,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 		foreach($implements as $if)
 			$class->add_interface($if);
 		$this->handle_class_stmts($class,$stmts);
-		$this->classes[$class->get_name()] = $class;
+		$this->types->add_classes(array($class));
 	}
 	
 	/**
@@ -183,7 +167,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 		foreach($extends as $if)
 			$class->add_interface($if);
 		$this->handle_class_stmts($class,$stmts);
-		$this->classes[$class->get_name()] = $class;
+		$this->types->add_classes(array($class));
 	}
 	
 	/**
@@ -201,7 +185,9 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 		if($name === null)
 			return;
 		$type = $args[1] !== null ? $args[1] : null;
-		$this->consts[$name] = new PC_Obj_Constant($this->get_file(),$this->get_line(),$name,$type);
+		$this->types->add_constants(array(
+			new PC_Obj_Constant($this->get_file(),$this->get_line(),$name,$type)
+		));
 	}
 	
 	/**
@@ -212,8 +198,8 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	 */
 	public function get_constant_type($name)
 	{
-		if(isset($this->consts[$name]))
-			return $this->consts[$name]->get_type();
+		if(($const = $this->types->get_constant($name)) !== null)
+			return $const->get_type();
 		if(strcasecmp($name,'null') == 0)
 			return new PC_Obj_MultiType();
 		return PC_Obj_MultiType::create_string($name);
@@ -319,7 +305,19 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 				$param = $matches[2][$k];
 				// does the param exist?
 				if(($fp = $func->get_param($param)) !== null)
+				{
 					$fp->set_mtype(PC_Obj_MultiType::get_type_by_name($match));
+					$fp->set_has_doc(true);
+				}
+				else
+				{
+					$this->report_error(
+						'Found PHPDoc for parameter "'.$param.'" ('.$match.'),'
+						.' but the parameter does not exist',
+						PC_Obj_Error::E_T_DOC_WITHOUT_PARAM,
+						$func->get_line()
+					);
+				}
 			}
 			
 			// look for return-type
@@ -327,6 +325,34 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 				$func->set_return_type(PC_Obj_MultiType::get_type_by_name($matches[1]));
 			unset($this->funcComments[$func->get_name()]);
 		}
+	}
+	
+	/**
+	 * Adds the given type and param to the potential errors we should process in the finalizer
+	 * 
+	 * @param int $type the error-type
+	 * @param array $info information about the pot-error
+	 * @param int $line if you know better than $this->get_line(), provide the line-number
+	 */
+	private function report_pot_error($type,$info,$line = 0)
+	{
+		$this->types->add_pot_errors(array(array(
+			$type,$info,$this->get_file(),$line === 0 ? $this->get_line() : $line
+		)));
+	}
+	
+	/**
+	 * Adds the given message and type to the errors
+	 * 
+	 * @param string $msg the message
+	 * @param int $type the error-type (PC_Obj_Error::*)
+	 * @param int $line if you know better than $this->get_line(), provide the line-number
+	 */
+	private function report_error($msg,$type,$line = 0)
+	{
+		$this->types->add_errors(array(new PC_Obj_Error(
+			new PC_Obj_Location($this->get_file(),$line === 0 ? $this->get_line() : $line),$msg,$type
+		)));
 	}
 	
 	public function advance($parser)

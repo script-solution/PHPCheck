@@ -488,7 +488,7 @@ non_empty_static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) C
 }
 non_empty_static_array_pair_list(A) ::= static_scalar(skey) T_DOUBLE_ARROW static_scalar(sval). {
 	A = PC_Obj_Variable::create_array();
-	A->get_type()->get_first()->set_array_type(skey->get_type()->get_value(),sval->get_type());
+	A->get_type()->get_first()->set_array_type(skey->get_type()->get_first()->get_value(),sval->get_type());
 }
 non_empty_static_array_pair_list(A) ::= static_scalar(sval). {
 	A = PC_Obj_Variable::create_array();

@@ -51,14 +51,14 @@ final class PC_Module_StmtScan_Task_Scan extends FWS_Object implements FWS_Progr
 		
 		// scan for statements
 		$types = new PC_Compile_TypeContainer();
-		$ascanner = new PC_Compile_StmtScannerFrontend();
+		$ascanner = new PC_Compile_StmtScannerFrontend($types);
 		$files = $user->get_session_data('stmtscan_files',array());
 		$end = min($pos + $ops,count($files));
 		for($i = $pos;$i < $end;$i++)
 		{
 			try
 			{
-				$ascanner->scan_file($files[$i],$types);
+				$ascanner->scan_file($files[$i]);
 			}
 			catch(PC_Compile_Exception $e)
 			{
@@ -67,7 +67,7 @@ final class PC_Module_StmtScan_Task_Scan extends FWS_Object implements FWS_Progr
 		}
 		
 		// insert vars and calls into db
-		$calls = $ascanner->get_calls();
+		$calls = $types->get_calls();
 		for($i = 0, $len = count($calls); $i < $len; $i += self::CALLS_AT_ONCE)
 			PC_DAO::get_calls()->create_bulk(array_slice($calls,$i,self::CALLS_AT_ONCE));
 	}

@@ -39,6 +39,13 @@ class PC_Obj_Parameter extends FWS_Object
 	private $first_var_arg = false;
 	
 	/**
+	 * Wether this parameter has a PHPDoc-description
+	 * 
+	 * @var boolean
+	 */
+	private $has_doc = false;
+	
+	/**
 	 * The possible types of the parameter
 	 *
 	 * @var PC_Obj_MultiType
@@ -74,6 +81,24 @@ class PC_Obj_Parameter extends FWS_Object
 	public function set_name($name)
 	{
 		$this->name = $name;
+	}
+	
+	/**
+	 * @return boolean wether this parameter has a PHPDoc-description
+	 */
+	public function has_doc()
+	{
+		return $this->has_doc;
+	}
+	
+	/**
+	 * Sets wether this parameter has a PHPDoc-description
+	 * 
+	 * @param boolean $has_doc the new value
+	 */
+	public function set_has_doc($has_doc)
+	{
+		$this->has_doc = $has_doc;
 	}
 	
 	/**

@@ -44,6 +44,24 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	 * @var array
 	 */
 	private $_constants = array();
+	/**
+	 * The found errors
+	 * 
+	 * @var array
+	 */
+	private $_errors = array();
+	/**
+	 * The potential errors, processed later in the finalizer
+	 * 
+	 * @var array
+	 */
+	private $_poterrors = array();
+	/**
+	 * The calls
+	 * 
+	 * @var array
+	 */
+	private $_calls = array();
 	
 	/**
 	 * Wether the db should be queried if a type can't be found
@@ -68,6 +86,7 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	 */
 	public function __construct($pid = PC_Project::CURRENT_ID,$use_db = true,$use_phpref = true)
 	{
+		parent::__construct();
 		$this->_pid = PC_Utils::get_project_id($pid);
 		$this->_use_db = $use_db;
 		$this->_use_phpref = $use_db && $use_phpref;
@@ -79,6 +98,20 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	public function is_db_used()
 	{
 		return $this->_use_db;
+	}
+	
+	/**
+	 * Adds all from the given type-container into this one (does not make clones of the objects!)
+	 * 
+	 * @param PC_Compile_TypeContainer $typecon the container
+	 */
+	public function add($typecon)
+	{
+		$this->add_functions($typecon->get_functions());
+		$this->add_classes($typecon->get_classes());
+		$this->add_constants($typecon->get_constants());
+		$this->add_errors($typecon->get_errors());
+		$this->add_pot_errors($typecon->get_pot_errors());
 	}
 	
 	/**
@@ -150,6 +183,14 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	}
 	
 	/**
+	 * @return array an associative array of <code>array(<name> => <function>)</code>
+	 */
+	public function get_functions()
+	{
+		return $this->_functions;
+	}
+	
+	/**
 	 * Adds all given constants to the container
 	 *
 	 * @param array $consts an array of constants
@@ -177,6 +218,78 @@ final class PC_Compile_TypeContainer extends FWS_Object
 		if(isset($this->_constants[$name]))
 			return $this->_constants[$name];
 		return null;
+	}
+	
+	/**
+	 * @return array an associative array of <code>array(<name> => <const>)</code>
+	 */
+	public function get_constants()
+	{
+		return $this->_constants;
+	}
+	
+	/**
+	 * Adds the given errors
+	 * 
+	 * @param array $errors the errors to add
+	 */
+	public function add_errors($errors)
+	{
+		$this->_errors = array_merge($this->_errors,$errors);
+	}
+	
+	/**
+	 * @return array the found errors
+	 */
+	public function get_errors()
+	{
+		return $this->_errors;
+	}
+	
+	/**
+	 * Adds the given potential errors
+	 * 
+	 * @param array $errors the errors to add
+	 */
+	public function add_pot_errors($errors)
+	{
+		$this->_poterrors = array_merge($this->_poterrors,$errors);
+	}
+	
+	/**
+	 * @return array the found potential errors
+	 */
+	public function get_pot_errors()
+	{
+		return $this->_poterrors;
+	}
+	
+	/**
+	 * Removes the pot-error with given index
+	 * 
+	 * @param int $index the index
+	 */
+	public function remove_pot_error($index)
+	{
+		unset($this->_poterrors[$index]);
+	}
+	
+	/**
+	 * Adds the given call
+	 * 
+	 * @param PC_Obj_Call $call the call
+	 */
+	public function add_call($call)
+	{
+		$this->_calls[] = $call;
+	}
+	
+	/**
+	 * @return array the found function-calls
+	 */
+	public function get_calls()
+	{
+		return $this->_calls;
 	}
 
 	/**

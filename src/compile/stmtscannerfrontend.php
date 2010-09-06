@@ -25,18 +25,30 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	 * @var PC_Compile_StmtLexer
 	 */
 	private $lexer;
+	
+	/**
+	 * The found types and errors
+	 * 
+	 * @var PC_Compile_TypeContainer
+	 */
+	private $types;
 	/**
 	 * The variables
 	 * 
 	 * @var array
 	 */
 	private $vars = array();
+	
 	/**
-	 * The found function-calls
+	 * Constructor
 	 * 
-	 * @var array
+	 * @param PC_Compile_TypeContainer $types the type-container
 	 */
-	private $calls = array();
+	public function __construct($types)
+	{
+		parent::__construct();
+		$this->types = $types;
+	}
 	
 	/**
 	 * @return array the found variables
@@ -45,24 +57,23 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	{
 		return $this->vars;
 	}
-	
+
 	/**
-	 * @return array the found function-calls
+	 * @return PC_Compile_TypeContainer the found types and errors
 	 */
-	public function get_calls()
+	public function get_types()
 	{
-		return $this->calls;
+		return $this->types;
 	}
 	
 	/**
 	 * Scans the given file
 	 *
 	 * @param string $file the file to scan
-	 * @param PC_Compile_TypeContainer $types the type-container
 	 */
-	public function scan_file($file,$types)
+	public function scan_file($file)
 	{
-		$this->lexer = PC_Compile_StmtLexer::get_for_file($file,$types);
+		$this->lexer = PC_Compile_StmtLexer::get_for_file($file,$this->types);
 		$this->parse();
 	}
 	
@@ -70,12 +81,10 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	 * Scannes the given string
 	 *
 	 * @param string $source the string to scan
-	 * @param PC_Compile_TypeContainer $types the type-container
 	 */
-	public function scan($source,$types)
+	public function scan($source)
 	{
-		$this->lexer = PC_Compile_StmtLexer::get_for_string($source,$types);
-		//PC_Compile_StmtParser::PrintTrace();
+		$this->lexer = PC_Compile_StmtLexer::get_for_string($source,$this->types);
 		$this->parse();
 	}
 	
@@ -90,7 +99,6 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 		$parser->doParse(0,0);
 		
 		$this->vars = array_merge($this->vars,$this->lexer->get_vars());
-		$this->calls = array_merge($this->calls,$this->lexer->get_calls());
 	}
 	
 	protected function get_dump_vars()

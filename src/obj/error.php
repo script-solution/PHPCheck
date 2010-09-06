@@ -34,6 +34,8 @@ final class PC_Obj_Error extends FWS_Object
 	const E_T_CLASS_MISSING											= 23;
 	const E_T_INTERFACE_MISSING									= 24;
 	const E_T_IF_IS_NO_IF												= 25;
+	const E_T_DOC_WITHOUT_PARAM									= 26;
+	const E_T_PARAM_WITHOUT_DOC									= 27;
 	
 	/**
 	 * Determines the name of the given type
@@ -69,7 +71,9 @@ final class PC_Obj_Error extends FWS_Object
 			self::E_T_CLASS_NOT_ABSTRACT =>							'Class not abstract',
 			self::E_T_CLASS_MISSING =>									'Class missing',
 			self::E_T_INTERFACE_MISSING =>							'Interface missing',
-			self::E_T_IF_IS_NO_IF =>										'Implemented class'
+			self::E_T_IF_IS_NO_IF =>										'Implemented class',
+			self::E_T_DOC_WITHOUT_PARAM =>							'Doc without param',
+			self::E_T_PARAM_WITHOUT_DOC =>							'Param without doc',
 		);
 	}
 	

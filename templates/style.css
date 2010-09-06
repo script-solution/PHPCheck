@@ -43,6 +43,10 @@ a:hover {
 	margin-bottom: 0.9em;
 }
 
+.pc_padbottom_big {
+	margin-bottom: 1.5em;
+}
+
 /* ------------ FORMULARS ------------ */
 
 fieldset.pc_form {

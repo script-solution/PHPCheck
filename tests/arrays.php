@@ -43,18 +43,15 @@ $d[1][0] = 2;
 		$tscanner = new PC_Compile_TypeScannerFrontend();
 		$tscanner->scan(self::$code);
 		
-		$typecon = new PC_Compile_TypeContainer(0,false);
-		$typecon->add_classes($tscanner->get_classes());
-		$typecon->add_functions($tscanner->get_functions());
-		
+		$typecon = $tscanner->get_types();
 		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
 		$fin->finalize();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_Compile_StmtScannerFrontend();
-		$ascanner->scan(self::$code,$typecon);
+		$ascanner = new PC_Compile_StmtScannerFrontend($typecon);
+		$ascanner->scan(self::$code);
 		$vars = $ascanner->get_vars();
-		$calls = $ascanner->get_calls();
+		$calls = $typecon->get_calls();
 		
 		$args = $calls[0]->get_arguments();
 		self::assertEquals((string)PC_Obj_MultiType::create_int(1),(string)$args[0]);

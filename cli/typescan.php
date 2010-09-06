@@ -22,24 +22,28 @@ final class PC_CLI_TypeScan implements PC_CLIJob
 	public function run($args)
 	{
 		$errors = array();
+		$tscanner = new PC_Compile_TypeScannerFrontend();
 		foreach($args as $file)
 		{
-			$tscanner = new PC_Compile_TypeScannerFrontend();
 			try
 			{
 				$tscanner->scan_file($file);
-				foreach($tscanner->get_classes() as $class)
-					PC_DAO::get_classes()->create($class);
-				foreach($tscanner->get_constants() as $const)
-					PC_DAO::get_constants()->create($const);
-				foreach($tscanner->get_functions() as $func)
-					PC_DAO::get_functions()->create($func);
 			}
 			catch(PC_Compile_Exception $e)
 			{
 				$errors[] = $e->__toString();
 			}
 		}
+		
+		$typecon = $tscanner->get_types();
+		foreach($typecon->get_classes() as $class)
+			PC_DAO::get_classes()->create($class);
+		foreach($typecon->get_constants() as $const)
+			PC_DAO::get_constants()->create($const);
+		foreach($typecon->get_functions() as $func)
+			PC_DAO::get_functions()->create($func);
+		foreach($typecon->get_errors() as $err)
+			PC_DAO::get_errors()->create($err);
 		
 		// write errors to shared data
 		$mutex = new FWS_MutexFile(PC_CLI_MUTEX_FILE);

@@ -17,6 +17,7 @@ var rowHL = new FWS_TableRowSelector('row_','check_');
 		<tr>
 			<td class="pc_left">Name</td>
 			<td class="pc_left" align="center">Created</td>
+			<td class="pc_left" align="center">Clean</td>
 			<td align="center" class="pc_left">Delete</td>
 		</tr>
 		{if projects.length == 0}
@@ -28,6 +29,9 @@ var rowHL = new FWS_TableRowSelector('row_','check_');
 		<tr id="row_{row}" class="hlRow">
 			<td class="hlCol">{form.get_textbox('name['~project:id~']',project:name,30)}</td>
 			<td class="hlCol" align="center">{project:created}</td>
+			<td class="hlCol" align="center">
+			<a href="{project:clean_url}">Clean</a>
+			</td>
 			<td class="hlCol" align="center" onclick="rowHL.toggleRowSelected({row});">
 			<input id="check_{row}" type="checkbox" name="delete[]" value="{project:id}" />
 			</td>
@@ -41,6 +45,7 @@ var rowHL = new FWS_TableRowSelector('row_','check_');
 </form>
 
 <div class="pc_padtop">
+	<b>Note:</b> &quot;Clean&quot; deletes all data (except the settings) of a project!
 	<a class="pc_button_big" href="{add_project_url}">Add new project</a>
 	<br style="clear: both;" />
 </div>

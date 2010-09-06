@@ -28,13 +28,6 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 	private $_types;
 	
 	/**
-	 * The classes to finalize
-	 *
-	 * @var array
-	 */
-	private $_classes;
-	
-	/**
 	 * The storage-implementation
 	 *
 	 * @var PC_Compile_TypeStorage
@@ -49,23 +42,27 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 	 */
 	public function __construct($types,$storage)
 	{
+		parent::__construct();
 		$this->_types = $types;
-		$this->_classes = $this->_types->get_classes();
 		$this->_storage = $storage;
 	}
 	
 	/**
 	 * Finishes the classes. That means, inheritance will be performed and missing
-	 * constructors will be added.
+	 * constructors will be added. Additionally it finalizes the given potential errors,
+	 * i.e. it removes the ones that are none anymore.
 	 */
 	public function finalize()
 	{
-		foreach($this->_classes as $name => $c)
+		foreach($this->_types->get_classes() as $name => $c)
 		{
-			$this->_add_members($this->_classes[$name],$c->get_name());
+			/* @var $c PC_Obj_Class */
+			$this->_add_members($c,$c->get_name());
+			
+			foreach($c->get_methods() as $m)
+				$this->_check_method($m,$c->get_name());
 			
 			// add missing constructor
-			$c = $this->_classes[$name];
 			if(!$c->is_interface() && $c->get_method('__construct') === null &&
 				$c->get_method($c->get_name()) === null)
 			{
@@ -76,13 +73,39 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 				$this->_storage->create_function($method,$c->get_id());
 			}
 		}
+		
+		foreach($this->_types->get_functions() as $func)
+			$this->_check_method($func);
+	}
+	
+	/**
+	 * Checks the method for missing PHPDoc-tags
+	 * 
+	 * @param PC_Obj_Method $method the method
+	 * @param string $class the class-name, if present
+	 */
+	private function _check_method($method,$class = '')
+	{
+		foreach($method->get_params() as $param)
+		{
+			if(!$param->has_doc())
+			{
+				$this->_types->add_errors(array(
+					new PC_Obj_Error(
+						new PC_Obj_Location($method->get_file(),$method->get_line()),
+						'The parameter "'.$param->get_name().'" ('.$param.')'
+						.' of "'.($class ? $class.'::' : '').$method->get_name().'" has no PHPDoc',
+						PC_Obj_Error::E_T_PARAM_WITHOUT_DOC
+					),
+				));
+			}
+		}
 	}
 	
 	/**
 	 * Adds the member from <var>$class</var> to <var>$data</var>. That means, inheritance is
 	 * performed.
 	 *
-	 * @param PC_Compile_TypeContainer $types the type-container
 	 * @param PC_Obj_Class $data the class to which the members should be added
 	 * @param string $class the class-name
 	 * @param boolean $overwrite just internal: wether the members should be overwritten

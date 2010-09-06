@@ -65,6 +65,7 @@ final class PC_Action_typescan_startscan extends FWS_Action_Base
 		PC_DAO::get_functions()->delete_by_project($project->get_id());
 		PC_DAO::get_constants()->delete_by_project($project->get_id());
 		PC_DAO::get_classfields()->delete_by_project($project->get_id());
+		PC_DAO::get_errors()->delete_by_project($project->get_id());
 		
 		if(PC_PARALLEL_JOB_COUNT == 0)
 			$this->set_redirect(true,PC_URL::get_submod_url(0,'scan'));

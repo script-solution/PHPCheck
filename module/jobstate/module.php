@@ -49,10 +49,10 @@ final class PC_Module_jobstate extends PC_Module
 		$res = $data->get_done().';';
 		if(count($data->get_errors()))
 		{
-			$res .= '<ul>';
+			$res .= '<div style="text-align: left; padding-left: 3em;"><ul>';
 			foreach($data->get_errors() as $err)
 				$res .= '<li>'.$err.'</li>';
-			$res .= '</ul>';
+			$res .= '</ul></div>';
 		}
 		
 		$renderer->set_content($res);

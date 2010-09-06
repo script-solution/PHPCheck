@@ -16,6 +16,9 @@ include_once(FWS_PATH.'init.php');
 include_once('src/autoloader.php');
 FWS_AutoLoader::register_loader('PC_autoloader');
 
+// set error-handling
+error_reporting((E_ALL | E_STRICT) & ~E_DEPRECATED);
+
 // set our loader and accessor
 $accessor = new PC_PropAccessor();
 $accessor->set_loader(new PC_PropLoader());
@@ -39,6 +42,7 @@ FWS_Props::set_accessor($accessor);
 // doc and params with default-value, that don't specify that in the type
 // TODO detect use of unknown class-fields
 // TODO the method-links in calls are wrong if the call belongs to a super-class
+// TODO detect missing parent::__construct calls for classes that have a superclass
 
 $doc = FWS_Props::get()->doc();
 echo $doc->render();

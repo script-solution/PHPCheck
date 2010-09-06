@@ -17,20 +17,16 @@ class PC_Tests_Analyzer extends PHPUnit_Framework_Testcase
 		$tscanner = new PC_Compile_TypeScannerFrontend();
 		$tscanner->scan($code);
 		
-		$typecon = new PC_Compile_TypeContainer(0,false);
-		$typecon->add_classes($tscanner->get_classes());
-		$typecon->add_functions($tscanner->get_functions());
-		$typecon->add_constants($tscanner->get_constants());
-		
+		$typecon = $tscanner->get_types();
 		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
 		$fin->finalize();
 		
-		$stmt = new PC_Compile_StmtScannerFrontend();
-		$stmt->scan($code,$typecon);
+		$stmt = new PC_Compile_StmtScannerFrontend($typecon);
+		$stmt->scan($code);
 		
 		$an = new PC_Compile_Analyzer($report_mixed,$report_unknown);
-		$an->analyze_classes($typecon,$tscanner->get_classes());
-		$an->analyze_calls($typecon,$stmt->get_calls());
+		$an->analyze_classes($typecon,$typecon->get_classes());
+		$an->analyze_calls($typecon,$typecon->get_calls());
 		return $an->get_errors();
 	}
 	

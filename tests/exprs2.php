@@ -104,16 +104,13 @@ $ad = array(1) <> array($_);
 		$tscanner = new PC_Compile_TypeScannerFrontend();
 		$tscanner->scan(self::$code);
 		
-		$typecon = new PC_Compile_TypeContainer(0,false);
-		$typecon->add_classes($tscanner->get_classes());
-		$typecon->add_functions($tscanner->get_functions());
-		
+		$typecon = $tscanner->get_types();
 		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
 		$fin->finalize();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_Compile_StmtScannerFrontend();
-		$ascanner->scan(self::$code,$typecon);
+		$ascanner = new PC_Compile_StmtScannerFrontend($typecon);
+		$ascanner->scan(self::$code);
 		$vars = $ascanner->get_vars();
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];

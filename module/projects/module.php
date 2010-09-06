@@ -31,6 +31,7 @@ final class PC_Module_projects extends PC_Module
 		$renderer->add_action(PC_ACTION_SAVE_PROJECTS,'save');
 		$renderer->add_action(PC_ACTION_ADD_PROJECT,'add');
 		$renderer->add_action(PC_ACTION_DELETE_PROJECTS,'delete');
+		$renderer->add_action(PC_ACTION_CLEAN_PROJECT,'clean');
 		$renderer->add_breadcrumb('Projects',PC_URL::build_mod_url());
 	}
 
@@ -67,10 +68,14 @@ final class PC_Module_projects extends PC_Module
 		$projects = array();
 		foreach(PC_DAO::get_projects()->get_all() as $project)
 		{
+			$cleanurl = PC_URL::get_mod_url();
+			$cleanurl->set('id',$project->get_id());
+			$cleanurl->set('aid',PC_ACTION_CLEAN_PROJECT);
 			$projects[] = array(
 				'name' => $project->get_name(),
 				'id' => $project->get_id(),
-				'created' => FWS_Date::get_date($project->get_created())
+				'created' => FWS_Date::get_date($project->get_created()),
+				'clean_url' => $cleanurl->to_url()
 			);
 		}
 		

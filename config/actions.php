@@ -49,4 +49,9 @@ define('PC_ACTION_CHG_PROJECT',7);
  * The start-phpref-scan-action
  */
 define('PC_ACTION_START_PHPREFSCAN',8);
+
+/**
+ * Cleans a project
+ */
+define('PC_ACTION_CLEAN_PROJECT',9);
 ?>

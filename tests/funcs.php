@@ -58,19 +58,16 @@ abstract class myc {
 		$tscanner = new PC_Compile_TypeScannerFrontend();
 		$tscanner->scan(self::$code);
 		
-		$typecon = new PC_Compile_TypeContainer(0,false);
-		$typecon->add_classes($tscanner->get_classes());
-		$typecon->add_functions($tscanner->get_functions());
-		
+		$typecon = $tscanner->get_types();
 		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
 		$fin->finalize();
 		
-		$functions = $tscanner->get_functions();
-		$classes = $tscanner->get_classes();
+		$functions = $typecon->get_functions();
+		$classes = $typecon->get_classes();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_Compile_StmtScannerFrontend();
-		$ascanner->scan(self::$code,$typecon);
+		$ascanner = new PC_Compile_StmtScannerFrontend($typecon);
+		$ascanner->scan(self::$code);
 		
 		$func = $functions['a'];
 		/* @var $func PC_Obj_Method */
@@ -113,7 +110,7 @@ abstract class myc {
 		self::assertEquals('MyClass',(string)$func->get_param('$c'));
 		self::assertEquals('integer',(string)$func->get_param('$d'));
 		
-		$calls = $ascanner->get_calls();
+		$calls = $typecon->get_calls();
 		self::assertEquals('myc->doit()',(string)$calls[0]->get_call(false,false));
 		self::assertEquals('myc2::mystatic()',(string)$calls[1]->get_call(false,false));
 	}

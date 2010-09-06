@@ -5186,7 +5186,7 @@ static public $yy_action = array(
 #line 489 "src/compile/stmtparser.y"
     function yy_r151(){
 	$this->_retvalue = PC_Obj_Variable::create_array();
-	$this->_retvalue->get_type()->get_first()->set_array_type($this->yystack[$this->yyidx + -2]->minor->get_type()->get_value(),$this->yystack[$this->yyidx + 0]->minor->get_type());
+	$this->_retvalue->get_type()->get_first()->set_array_type($this->yystack[$this->yyidx + -2]->minor->get_type()->get_first()->get_value(),$this->yystack[$this->yyidx + 0]->minor->get_type());
     }
 #line 5196 "src/compile/stmtparser.php"
 #line 493 "src/compile/stmtparser.y"

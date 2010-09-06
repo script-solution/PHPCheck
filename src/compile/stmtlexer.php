@@ -84,6 +84,13 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 * @var array
 	 */
 	private $layers = array();
+	
+	/**
+	 * The known types
+	 * 
+	 * @var PC_Compile_TypeContainer
+	 */
+	private $types;
 	/**
 	 * The variables
 	 * 
@@ -92,19 +99,6 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	private $vars = array(
 		PC_Obj_Variable::SCOPE_GLOBAL => array()
 	);
-	/**
-	 * The found function-calls
-	 * 
-	 * @var array
-	 */
-	private $calls = array();
-	
-	/**
-	 * The known types
-	 * 
-	 * @var PC_Compile_TypeContainer
-	 */
-	private $types;
 	
 	/**
 	 * Constructor
@@ -126,14 +120,6 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	public function get_vars()
 	{
 		return $this->vars;
-	}
-	
-	/**
-	 * @return array the found function-calls
-	 */
-	public function get_calls()
-	{
-		return $this->calls;
 	}
 	
 	/**
@@ -204,7 +190,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		foreach($args as $arg)
 			$call->add_argument(clone $arg->get_type());
 		$call->set_static($static);
-		$this->calls[] = $call;
+		$this->types->add_call($call);
 		
 		// if its a constructor we know the type directly
 		if(strcasecmp($fname,'__construct') == 0 || strcasecmp($fname,$cname) == 0)
@@ -615,7 +601,16 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		}
 		// otherwise the type is unknown
 		else
-			$this->vars[$this->scope][$name]->set_type(new PC_Obj_MultiType());
+		{
+			if(!isset($this->vars[$this->scope][$name]))
+			{
+				$this->vars[$this->scope][$name] = new PC_Obj_Variable(
+					$name,new PC_Obj_MultiType(),$this->get_func(),$this->get_class()
+				);
+			}
+			else
+				$this->vars[$this->scope][$name]->set_type(new PC_Obj_MultiType());
+		}
 		
 		// if there is a previous layer and the var is not known there in the last block, put
 		// the first backup from this block in it. because this is the previous value for the previous
@@ -624,7 +619,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		{
 			$prevlayer = &$this->layers[count($this->layers) - 1];
 			if(!isset($prevlayer['vars'][$prevlayer['blockno']][$name]))
-				$prevlayer['vars'][$prevlayer['blockno']][$name] = $layer['vars'][0][$name];
+				$prevlayer['vars'][$prevlayer['blockno']][$name] = $backup;
 		}
 	}
 	

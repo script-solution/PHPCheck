@@ -89,18 +89,15 @@ $r = $p[1]->test2($b);
 		$tscanner = new PC_Compile_TypeScannerFrontend();
 		$tscanner->scan(self::$code);
 		
-		$typecon = new PC_Compile_TypeContainer(0,false);
-		$typecon->add_classes($tscanner->get_classes());
-		$typecon->add_functions($tscanner->get_functions());
-		
+		$typecon = $tscanner->get_types();
 		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
 		$fin->finalize();
 			
-		$classes = $tscanner->get_classes();
+		$classes = $typecon->get_classes();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_Compile_StmtScannerFrontend();
-		$ascanner->scan(self::$code,$typecon);
+		$ascanner = new PC_Compile_StmtScannerFrontend($typecon);
+		$ascanner->scan(self::$code);
 		$vars = $ascanner->get_vars();
 		
 		$a = $classes['a'];
@@ -249,7 +246,7 @@ $r = $p[1]->test2($b);
 		);
 		
 		// check calls
-		$calls = $ascanner->get_calls();
+		$calls = $typecon->get_calls();
 		$this->assertCall($calls[0],'b','get42',true);
 		$this->assertCall($calls[1],'a','test',false);
 		$this->assertCall($calls[2],'a','__construct',false);
