@@ -154,6 +154,12 @@ class PC_Obj_MultiType extends FWS_Object
 	 */
 	public function merge($mtype)
 	{
+		// if one is unknown, the merged type is unknown as well
+		if($this->is_unknown() || $mtype->is_unknown())
+		{
+			$this->types = array();
+			return;
+		}
 		foreach($mtype->types as $type)
 		{
 			$found = false;

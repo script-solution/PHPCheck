@@ -75,6 +75,7 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	public function scan($source,$types)
 	{
 		$this->lexer = PC_Compile_StmtLexer::get_for_string($source,$types);
+		//PC_Compile_StmtParser::PrintTrace();
 		$this->parse();
 	}
 	

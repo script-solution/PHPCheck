@@ -47,6 +47,19 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	private $lastCheckComment = '';
 	/**
+	 * Wether we should ignore the next while-token. This is used for "do ... while" since in that
+	 * case while is the end of a loop, not the beginning.
+	 * 
+	 * @var bool
+	 */
+	private $ignoreNextWhile = false;
+	/**
+	 * Wether the last (usefull) token was an T_ELSE
+	 * 
+	 * @var bool
+	 */
+	private $lastWasElse = false;
+	/**
 	 * The current scope
 	 * 
 	 * @var string
@@ -202,11 +215,21 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		{
 			$classobj = $this->types->get_class($cname);
 			if($classobj === null)
-				return $this->get_unknown();
+			{
+				// TODO we should do that in the type-container!
+				$classobj = PC_DAO::get_classes()->get_by_name($cname,PC_Project::PHPREF_ID);
+				if($classobj === null)
+					return $this->get_unknown();
+			}
 			$funcobj = $classobj->get_method($fname);
 		}
 		else
+		{
 			$funcobj = $this->types->get_function($fname);
+			// TODO we should do that in the type-container!
+			if($funcobj === null)
+				$funcobj = PC_DAO::get_functions()->get_by_name($fname,PC_Project::PHPREF_ID);
+		}
 		
 		if($funcobj === null)
 			return $this->get_unknown();
@@ -334,10 +357,12 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 			if($varname)
 			{
 				$layer = &$this->layers[count($this->layers) - 1];
-				if(!isset($layer[$varname]))
+				$blockno = $layer['blockno'];
+				if(!isset($layer['vars'][$blockno][$varname]))
 				{
-					$clone = isset($this->vars[$this->scope][$varname]) ? clone $var : null;
-					$layer[$varname] = $clone;
+					// don't use null because isset() is false if the value is null
+					$clone = isset($this->vars[$this->scope][$varname]) ? clone $var : 0;
+					$layer['vars'][$blockno][$varname] = $clone;
 				}
 			}
 			else
@@ -455,7 +480,12 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	private function start_loop()
 	{
-		array_push($this->layers,array());
+		array_push($this->layers,array(
+			'blockno' => 0,
+			'haseelse' => false,
+			'elseifs' => 0,
+			'vars' => array(array())
+		));
 		$this->loopdepth++;
 	}
 	
@@ -471,11 +501,29 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	
 	/**
 	 * Starts a condition
+	 * 
+	 * @param bool $newblock wether a new block is opened in the current layer
+	 * @param bool $is_else wether an T_ELSE opened this block
 	 */
-	private function start_cond()
+	private function start_cond($newblock = false,$is_else = false)
 	{
-		array_push($this->layers,array());
-		$this->conddepth++;
+		if($newblock)
+		{
+			$layer = &$this->layers[count($this->layers) - 1];
+			$layer['haselse'] = $is_else;
+			$layer['blockno']++;
+			$layer['vars'][] = array();
+		}
+		else
+		{
+			array_push($this->layers,array(
+				'blockno' => 0,
+				'elseifs' => 0,
+				'haselse' => false,
+				'vars' => array(array())
+			));
+			$this->conddepth++;
+		}
 	}
 	
 	/**
@@ -484,8 +532,11 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	public function end_cond()
 	{
 		assert($this->conddepth > 0);
-		$this->conddepth--;
-		$this->perform_pending_changes();
+		if($this->layers[count($this->layers) - 1]['elseifs']-- == 0)
+		{
+			$this->conddepth--;
+			$this->perform_pending_changes();
+		}
 	}
 	
 	/**
@@ -493,18 +544,97 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 */
 	private function perform_pending_changes()
 	{
-		$changes = array_pop($this->layers);
-		foreach($changes as $name => $var)
+		$layer = array_pop($this->layers);
+		// if there is only one block (loops, if without else)
+		if(count($layer['vars']) == 1)
 		{
-			$curvar = $this->vars[$this->scope][$name];
-			/* @var $curvar PC_Obj_Variable */
-			// if the variable was created in the condition/loop we don't know wether it exists behind
-			// it or not. since we don't know wether the cond/loop is executed
-			if($var === null)
-				$curvar->set_type(new PC_Obj_MultiType());
-			// otherwise, merge the types
-			else
-				$curvar->get_type()->merge($var->get_type());
+			// its never present in all blocks here since we never have an else-block
+			foreach($layer['vars'][0] as $name => $var)
+				$this->change_var($layer,$name,$var,false);
+		}
+		else
+		{
+			// otherwise there were multiple blocks (if-elseif-else, ...)
+			// we start with the variables in the first block; vars that are not present there, will
+			// be added later
+			$changed = array();
+			foreach($layer['vars'] as $blockno => $vars)
+			{
+				foreach($vars as $name => $var)
+				{
+					if(!isset($changed[$name]))
+					{
+						// check if the variable is present in all blocks. this is not the case if we have no
+						// else-block or if has not been assigned in at least one block
+						$present = false;
+						// we need to check this only in the first block, since if we're in the second block
+						// and don't have changed this var yet (see isset above), it is at least not present
+						// in the first block.
+						if($blockno == 0 && $layer['haselse'])
+						{
+							$present = true;
+							for($i = 1; $i <= $layer['blockno']; $i++)
+							{
+								if(!isset($layer['vars'][$i][$name]))
+								{
+									$present = false;
+									break;
+								}
+							}
+						}
+						$this->change_var($layer,$name,$var,$present);
+						$changed[$name] = true;
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Changes the variable with given name in the current scope
+	 * 
+	 * @param array $layer the current layer
+	 * @param string $name the var-name
+	 * @param PC_Obj_Variable $backup the backup (0 if not present before the layer)
+	 * @param bool $present wether its present in all blocks in this layer
+	 */
+	private function change_var($layer,$name,$backup,$present)
+	{
+		// if its present in all blocks, merge the types
+		if($present)
+		{
+			// start with the type in scope; thats the one from the last block
+			$mtype = $this->vars[$this->scope][$name]->get_type();
+			// don't include the first block since thats the backup from the previous layer
+			for($i = 1; $i <= $layer['blockno']; $i++)
+				$mtype->merge($layer['vars'][$i][$name]->get_type());
+			// note that this may discard the old value, if the variable was present
+			$this->vars[$this->scope][$name] = new PC_Obj_Variable(
+				$name,$mtype,$this->get_func(),$this->get_class()
+			);
+		}
+		// if it was present before, we know that it is either the old or one of the new ones
+		else if($backup !== 0)
+		{
+			$mtype = $this->vars[$this->scope][$name]->get_type();
+			for($i = 0; $i <= $layer['blockno']; $i++)
+			{
+				if(isset($layer['vars'][$i][$name]))
+					$mtype->merge($layer['vars'][$i][$name]->get_type());
+			}
+		}
+		// otherwise the type is unknown
+		else
+			$this->vars[$this->scope][$name]->set_type(new PC_Obj_MultiType());
+		
+		// if there is a previous layer and the var is not known there in the last block, put
+		// the first backup from this block in it. because this is the previous value for the previous
+		// block, if it hasn't been assigned there
+		if(count($this->layers) > 0)
+		{
+			$prevlayer = &$this->layers[count($this->layers) - 1];
+			if(!isset($prevlayer['vars'][$prevlayer['blockno']][$name]))
+				$prevlayer['vars'][$prevlayer['blockno']][$name] = $layer['vars'][0][$name];
 		}
 	}
 	
@@ -896,8 +1026,14 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		if($this->pos >= 0)
 		{
 			$type = $this->tokens[$this->pos][0];
+			//$this->debug(array($this->vars,$this->conddepth,$this->lastWasElse,$this->layers));
 			switch($type)
 			{
+				case T_COMMENT:
+				case self::$T_DOC_COMMENT:
+					$wascomment = true;
+					break;
+				
 				case T_FUNCTION:
 					$this->start_function($this->get_type_name());
 					break;
@@ -906,21 +1042,41 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 					break;
 				case T_FOR:
 				case T_FOREACH:
-				case T_WHILE:
-				case T_DO:
 					$this->start_loop();
 					break;
-				case T_IF:
+				case T_DO:
+					$this->ignoreNextWhile = true;
+					$this->start_loop();
+					break;
+				case T_WHILE:
+					if(!$this->ignoreNextWhile)
+						$this->start_loop();
+					$this->ignoreNextWhile = false;
+					break;
 				case T_SWITCH:
 				case T_TRY:
 					$this->start_cond();
 					break;
-					
-				case T_COMMENT:
-				case self::$T_DOC_COMMENT:
-					$wascomment = true;
+				
+				case T_IF:
+					if(!$this->lastWasElse)
+						$this->start_cond();
+					else
+					{
+						// count the number of "T_ELSE T_IF" because for each of those we get another call
+						// to end_cond()
+						$this->layers[count($this->layers) - 1]['elseifs']++;
+						$this->layers[count($this->layers) - 1]['haselse'] = false;
+					}
+					break;
+				case T_ELSEIF:
+					$this->start_cond(true,false);
+					break;
+				case T_ELSE:
+					$this->start_cond(true,true);
 					break;
 			}
+			$this->lastWasElse = $type == T_ELSE;
 		}
 		
 		$res = parent::advance($parser);
