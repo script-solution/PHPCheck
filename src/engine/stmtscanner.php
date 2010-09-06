@@ -1011,7 +1011,6 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if($this->pos >= 0)
 		{
 			$type = $this->tokens[$this->pos][0];
-			//$this->debug(array($this->vars,$this->conddepth,$this->lastWasElse,$this->layers));
 			switch($type)
 			{
 				case T_COMMENT:
@@ -1116,7 +1115,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	
 	private function get_type_name()
 	{
-		for($i = $this->pos + 1; $i < $this->N; $i++)
+		for($i = $this->pos + 1; $i < $this->tokCount; $i++)
 		{
 			if($this->tokens[$i][0] == T_STRING)
 				return $this->tokens[$i][1];

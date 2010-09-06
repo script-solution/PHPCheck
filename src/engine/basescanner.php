@@ -63,7 +63,7 @@ class PC_Engine_BaseScanner
 	 * 
 	 * @var int
 	 */
-	protected $N;
+	protected $tokCount;
 	/**
 	 * The tokens
 	 * 
@@ -97,8 +97,8 @@ class PC_Engine_BaseScanner
 			$str = FWS_FileUtils::read($str);
 		}
 		$this->tokens = token_get_all($str);
-		$this->N = count($this->tokens);
-		for($i = 0; $i < $this->N; $i++)
+		$this->tokCount = count($this->tokens);
+		for($i = 0; $i < $this->tokCount; $i++)
 		{
 			if(!is_array($this->tokens[$i]))
 				$this->tokens[$i] = array(ord($this->tokens[$i]),$this->tokens[$i]);
@@ -265,7 +265,7 @@ class PC_Engine_BaseScanner
 	public function advance($parser)
 	{
 		$this->pos++;
-		while($this->pos < $this->N)
+		while($this->pos < $this->tokCount)
 		{
 			if($this->debug)
 			{

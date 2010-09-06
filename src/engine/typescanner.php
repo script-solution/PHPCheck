@@ -380,7 +380,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 			else if($type == T_VAR || $type == T_PUBLIC || $type == T_PRIVATE || $type == T_PROTECTED)
 			{
 				// save the last comment for this field so that we don't loose it
-				for($i = $this->pos + 1; $i < $this->N; $i++)
+				for($i = $this->pos + 1; $i < $this->tokCount; $i++)
 				{
 					// seems that this was no field..
 					if($this->tokens[$i][0] == T_FUNCTION)
@@ -400,7 +400,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	
 	private function get_name_for_comment()
 	{
-		for($i = $this->pos + 1; $i < $this->N; $i++)
+		for($i = $this->pos + 1; $i < $this->tokCount; $i++)
 		{
 			if($this->tokens[$i][0] == T_STRING)
 				return $this->tokens[$i][1];
