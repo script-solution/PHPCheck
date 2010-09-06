@@ -23,7 +23,6 @@ FWS_Props::set_accessor($accessor);
 
 // TODO handle list() so that it declares the variables as unknown?
 // TODO type-hinting in catch-blocks is not supported yet
-// TODO we should recognize /* @var $<var> <type> */ as type-hints
 // TODO if a method does not exist, we could look for subclasses of the class and check if the
 // method exists there. this is a bit guessing of course, but the user could enable/disable this.
 // TODO we could detect if conditions are always true/false
@@ -35,8 +34,11 @@ FWS_Props::set_accessor($accessor);
 // the thrown exceptions, etc.
 // TODO handle "void" special?
 // TODO detect calls of private/protected methods
-// TODO perhaps we should change the whole type-system. so that we use the multitype everywhere.
-// otherwise there is no way to handle multitypes in return-values
+// TODO we could extend the type-hinting in doc-comments: array(int,ClassName,float)
+// TODO we could check parameter-docs. i.e. docs to not present params, params with not present
+// doc and params with default-value, that don't specify that in the type
+// TODO detect use of unknown class-fields
+// TODO the method-links in calls are wrong if the call belongs to a super-class
 
 $doc = FWS_Props::get()->doc();
 echo $doc->render();

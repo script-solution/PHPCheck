@@ -162,27 +162,11 @@ final class PC_Compile_Analyzer extends FWS_Object
 					}
 					else
 					{
-						if($types->is_db_used())
-						{
-							// check if its a builtin function we know
-							$c = PC_DAO::get_classes()->get_by_name($classname,PC_Project::PHPREF_ID);
-							if($c === null)
-							{
-								$this->_report(
-									$call,
-									'The class "#'.$classname.'#" does not exist!',
-									PC_Obj_Error::E_S_CLASS_MISSING
-								);
-							}
-						}
-						else
-						{
-							$this->_report(
-								$call,
-								'The class "#'.$classname.'#" does not exist!',
-								PC_Obj_Error::E_S_CLASS_MISSING
-							);
-						}
+						$this->_report(
+							$call,
+							'The class "#'.$classname.'#" does not exist!',
+							PC_Obj_Error::E_S_CLASS_MISSING
+						);
 					}
 				}
 			}
@@ -191,31 +175,11 @@ final class PC_Compile_Analyzer extends FWS_Object
 				$func = $types->get_function($name);
 				if($func === null)
 				{
-					if($types->is_db_used())
-					{
-						// check if its a builtin function we know
-						$func = PC_DAO::get_functions()->get_by_name($name,PC_Project::PHPREF_ID);
-						if($func === null)
-						{
-							$this->_report(
-								$call,
-								'The function "'.$name.'" does not exist!',
-								PC_Obj_Error::E_S_FUNCTION_MISSING
-							);
-						}
-						// if so, check params
-						else
-							$this->_check_params($call,$func);
-					}
-					// if we should use no db, check at least if the function exists currently */
-					else if(!function_exists($name))
-					{
-						$this->_report(
-							$call,
-							'The function "'.$name.'" does not exist!',
-							PC_Obj_Error::E_S_FUNCTION_MISSING
-						);
-					}
+					$this->_report(
+						$call,
+						'The function "'.$name.'" does not exist!',
+						PC_Obj_Error::E_S_FUNCTION_MISSING
+					);
 				}
 				else
 					$this->_check_params($call,$func);
@@ -271,17 +235,11 @@ final class PC_Compile_Analyzer extends FWS_Object
 				
 				if($sclass === null)
 				{
-					// check if its a builtin function we know
-					if($types->is_db_used())
-						$sclass = PC_DAO::get_classes()->get_by_name($class->get_super_class(),PC_Project::PHPREF_ID);
-					if($sclass === null)
-					{
-						$this->_report(
-							$class,
-							'The class "#'.$class->get_super_class().'#" does not exist!',
-							PC_Obj_Error::E_T_CLASS_MISSING
-						);
-					}
+					$this->_report(
+						$class,
+						'The class "#'.$class->get_super_class().'#" does not exist!',
+						PC_Obj_Error::E_T_CLASS_MISSING
+					);
 				}
 				// super-class final?
 				else if($sclass->is_final())
@@ -299,8 +257,6 @@ final class PC_Compile_Analyzer extends FWS_Object
 			foreach($class->get_interfaces() as $ifname)
 			{
 				$if = $types->get_class($ifname);
-				if($if === null && $types->is_db_used())
-					$if = PC_DAO::get_classes()->get_by_name($ifname,PC_Project::PHPREF_ID);
 				if($if === null)
 				{
 					$this->_report(

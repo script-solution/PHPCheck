@@ -32,14 +32,12 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	 * @var array
 	 */
 	private $_classes = array();
-	
 	/**
 	 * All currently known functions
 	 *
 	 * @var array
 	 */
 	private $_functions = array();
-	
 	/**
 	 * All currently known constants
 	 *
@@ -53,17 +51,26 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	 * @var bool
 	 */
 	private $_use_db;
+	/**
+	 * Whether to query also the phpref-entries in the db
+	 *
+	 * @var bool
+	 */
+	private $_use_phpref;
 	
 	/**
 	 * Constructor
 	 *
 	 * @param int $pid the project-id
 	 * @param bool $use_db wether the db should be queried if a type can't be found
+	 * @param bool $use_phpref whether to query also the phpref-entries in the db
+	 * 	(ignored if $use_db is false)
 	 */
-	public function __construct($pid = PC_Project::CURRENT_ID,$use_db = true)
+	public function __construct($pid = PC_Project::CURRENT_ID,$use_db = true,$use_phpref = true)
 	{
 		$this->_pid = PC_Utils::get_project_id($pid);
 		$this->_use_db = $use_db;
+		$this->_use_phpref = $use_db && $use_phpref;
 	}
 	
 	/**
@@ -103,10 +110,12 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
+		if(!isset($this->_classes[$name]) && $this->_use_db)
+			$this->_classes[$name] = PC_DAO::get_classes()->get_by_name($name,$this->_pid);
+		if(!isset($this->_classes[$name]) && $this->_use_phpref)
+			$this->_classes[$name] = PC_DAO::get_classes()->get_by_name($name,PC_Project::PHPREF_ID);
 		if(isset($this->_classes[$name]))
 			return $this->_classes[$name];
-		if($this->_use_db)
-			return $this->_classes[$name] = PC_DAO::get_classes()->get_by_name($name,$this->_pid);
 		return null;
 	}
 	
@@ -131,10 +140,12 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
+		if(!isset($this->_functions[$name]) && $this->_use_db)
+			$this->_functions[$name] = PC_DAO::get_functions()->get_by_name($name,$this->_pid);
+		if(!isset($this->_functions[$name]) && $this->_use_phpref)
+			$this->_functions[$name] = PC_DAO::get_functions()->get_by_name($name,PC_Project::PHPREF_ID);
 		if(isset($this->_functions[$name]))
 			return $this->_functions[$name];
-		if($this->_use_db)
-			return $this->_functions[$name] = PC_DAO::get_functions()->get_by_name($name,$this->_pid);
 		return null;
 	}
 	
@@ -159,10 +170,12 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
+		if(!isset($this->_constants[$name]) && $this->_use_db)
+			$this->_constants[$name] = PC_DAO::get_constants()->get_by_name($name,$this->_pid);
+		if(!isset($this->_constants[$name]) && $this->_use_phpref)
+			$this->_constants[$name] = PC_DAO::get_constants()->get_by_name($name,PC_Project::PHPREF_ID);
 		if(isset($this->_constants[$name]))
 			return $this->_constants[$name];
-		if($this->_use_db)
-			return $this->_constants[$name] = PC_DAO::get_constants()->get_by_name($name,$this->_pid);
 		return null;
 	}
 

@@ -262,7 +262,7 @@ if($_)
 		// here we know that f is an int
 		func6($f);
 	}
-	// here we know still know that because $f was assigned in this block before
+	// here we still know that because $f was assigned in this block before
 	func7($f);
 }
 // here we dont know that anymore since it didnt exist before

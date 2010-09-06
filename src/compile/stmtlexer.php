@@ -215,21 +215,11 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 		{
 			$classobj = $this->types->get_class($cname);
 			if($classobj === null)
-			{
-				// TODO we should do that in the type-container!
-				$classobj = PC_DAO::get_classes()->get_by_name($cname,PC_Project::PHPREF_ID);
-				if($classobj === null)
-					return $this->get_unknown();
-			}
+				return $this->get_unknown();
 			$funcobj = $classobj->get_method($fname);
 		}
 		else
-		{
 			$funcobj = $this->types->get_function($fname);
-			// TODO we should do that in the type-container!
-			if($funcobj === null)
-				$funcobj = PC_DAO::get_functions()->get_by_name($fname,PC_Project::PHPREF_ID);
-		}
 		
 		if($funcobj === null)
 			return $this->get_unknown();

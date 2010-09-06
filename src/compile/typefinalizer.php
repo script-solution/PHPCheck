@@ -50,7 +50,6 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 	public function __construct($types,$storage)
 	{
 		$this->_types = $types;
-		$this->_phpreftypes = new PC_Compile_TypeContainer(PC_Project::PHPREF_ID);
 		$this->_classes = $this->_types->get_classes();
 		$this->_storage = $storage;
 	}
@@ -91,10 +90,6 @@ final class PC_Compile_TypeFinalizer extends FWS_Object
 	private function _add_members($data,$class,$overwrite = true)
 	{
 		$cobj = $this->_types->get_class($class);
-		// if not found, check if its a builtin-class we know
-		if($cobj === null)
-			$cobj = $this->_phpreftypes->get_class($class);
-			
 		if($cobj !== null)
 		{
 			if($class != $data->get_name())

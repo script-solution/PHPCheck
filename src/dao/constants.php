@@ -208,8 +208,11 @@ class PC_DAO_Constants extends FWS_Singleton
 	 */
 	private function _build_const($row)
 	{
+		$type = unserialize($row['type']);
+		if($type === null)
+			$type = new PC_Obj_MultiType();
 		return new PC_Obj_Constant(
-			$row['file'],$row['line'],$row['name'],unserialize($row['type']),$row['class']
+			$row['file'],$row['line'],$row['name'],$type,$row['class']
 		);
 	}
 }
