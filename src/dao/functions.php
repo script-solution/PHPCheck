@@ -216,7 +216,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			'final' => $function->is_final() ? 1 : 0,
 			'static' => $function->is_static() ? 1 : 0,
 			'visibility' => $function->get_visibility(),
-			'return_type' => serialize($function->get_return_type()),
+			'return_type' => serialize(array($function->has_return_doc(),$function->get_return_type())),
 			'params' => $params,
 			'since' => $function->get_since()
 		);
@@ -239,7 +239,9 @@ class PC_DAO_Functions extends FWS_Singleton
 		$c->set_since($row['since']);
 		foreach(unserialize($row['params']) as $param)
 			$c->put_param($param);
-		$c->set_return_type(unserialize($row['return_type']));
+		list($hasretdoc,$rettype) = unserialize($row['return_type']);
+		$c->set_has_return_doc($hasretdoc);
+		$c->set_return_type($rettype);
 		return $c;
 	}
 }

@@ -22,14 +22,14 @@ final class PC_CLI_TypeScan implements PC_CLIJob
 	public function run($args)
 	{
 		$errors = array();
-		$tscanner = new PC_Compile_TypeScannerFrontend();
+		$tscanner = new PC_Engine_TypeScannerFrontend();
 		foreach($args as $file)
 		{
 			try
 			{
 				$tscanner->scan_file($file);
 			}
-			catch(PC_Compile_Exception $e)
+			catch(PC_Engine_Exception $e)
 			{
 				$errors[] = $e->__toString();
 			}

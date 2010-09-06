@@ -22,11 +22,11 @@ final class PC_CLI_AnalyzeCalls implements PC_CLIJob
 	public function run($args)
 	{
 		$project = FWS_Props::get()->project();
-		$an = new PC_Compile_Analyzer(
+		$an = new PC_Engine_Analyzer(
 			$project !== null ? $project->get_report_mixed() : false,
 			$project !== null ? $project->get_report_unknown() : false
 		);
-		$types = new PC_Compile_TypeContainer();
+		$types = new PC_Engine_TypeContainer();
 		
 		// analyze calls
 		$calls = PC_DAO::get_calls()->get_list();

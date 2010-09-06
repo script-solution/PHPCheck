@@ -28,6 +28,10 @@ final class PC_Obj_Error extends FWS_Object
 	const E_S_FUNCTION_MISSING									= 6;
 	const E_S_WRONG_ARGUMENT_COUNT							= 7;
 	const E_S_WRONG_ARGUMENT_TYPE								= 8;
+	const E_S_MIXED_RET_AND_NO_RET							= 9;
+	const E_S_RETURNS_DIFFER_FROM_SPEC					= 10;
+	const E_S_RET_SPEC_BUT_NO_RET								= 11;
+	const E_S_RET_BUT_NO_RET_SPEC								= 12;
 	const E_T_CLASS_POT_USELESS_ABSTRACT				= 20;
 	const E_T_FINAL_CLASS_INHERITANCE						= 21;
 	const E_T_CLASS_NOT_ABSTRACT								= 22;
@@ -74,6 +78,10 @@ final class PC_Obj_Error extends FWS_Object
 			self::E_T_IF_IS_NO_IF =>										'Implemented class',
 			self::E_T_DOC_WITHOUT_PARAM =>							'Doc without param',
 			self::E_T_PARAM_WITHOUT_DOC =>							'Param without doc',
+			self::E_S_MIXED_RET_AND_NO_RET =>						'Mixed return',
+			self::E_S_RETURNS_DIFFER_FROM_SPEC =>				'Returns differ from spec',
+			self::E_S_RET_SPEC_BUT_NO_RET =>						'Return spec but no return',
+			self::E_S_RET_BUT_NO_RET_SPEC =>						'Returns but no return spec'
 		);
 	}
 	

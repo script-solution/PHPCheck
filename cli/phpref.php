@@ -36,7 +36,7 @@ final class PC_CLI_PHPRef implements PC_CLIJob
 	{
 		$user = FWS_Props::get()->user();
 		$errors = array();
-		$typecon = new PC_Compile_TypeContainer(PC_Project::PHPREF_ID);
+		$typecon = new PC_Engine_TypeContainer(PC_Project::PHPREF_ID);
 		foreach($args as $file)
 		{
 			try
@@ -69,7 +69,7 @@ final class PC_CLI_PHPRef implements PC_CLIJob
 	/**
 	 * Grabs a class from the given file
 	 * 
-	 * @param PC_Compile_TypeContainer $typecon the type-container
+	 * @param PC_Engine_TypeContainer $typecon the type-container
 	 * @param string $file the file
 	 */
 	private function grab_class($typecon,$file)
@@ -81,7 +81,7 @@ final class PC_CLI_PHPRef implements PC_CLIJob
 	/**
 	 * Grabs a function from the given file
 	 * 
-	 * @param PC_Compile_TypeContainer $typecon the type-container
+	 * @param PC_Engine_TypeContainer $typecon the type-container
 	 * @param string $file the file
 	 */
 	private function grab_function($typecon,$file)

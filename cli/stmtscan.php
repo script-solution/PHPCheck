@@ -22,8 +22,8 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 	public function run($args)
 	{
 		$errors = array();
-		$types = new PC_Compile_TypeContainer();
-		$ascanner = new PC_Compile_StmtScannerFrontend($types);
+		$types = new PC_Engine_TypeContainer();
+		$ascanner = new PC_Engine_StmtScannerFrontend($types);
 		
 		foreach($args as $file)
 		{
@@ -31,7 +31,7 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 			{
 				$ascanner->scan_file($file);
 			}
-			catch(PC_Compile_Exception $e)
+			catch(PC_Engine_Exception $e)
 			{
 				$errors[] = $e->__toString();
 			}
@@ -39,6 +39,8 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 		
 		if(count($types->get_calls()))
 			PC_DAO::get_calls()->create_bulk($types->get_calls());
+		foreach($types->get_errors() as $err)
+			PC_DAO::get_errors()->create($err);
 		
 		// write errors to shared data
 		$mutex = new FWS_MutexFile(PC_CLI_MUTEX_FILE);

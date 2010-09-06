@@ -43,6 +43,7 @@ FWS_Props::set_accessor($accessor);
 // TODO detect use of unknown class-fields
 // TODO the method-links in calls are wrong if the call belongs to a super-class
 // TODO detect missing parent::__construct calls for classes that have a superclass
+// TODO detect if the liscovsche substitution law is violated?
 
 $doc = FWS_Props::get()->doc();
 echo $doc->render();

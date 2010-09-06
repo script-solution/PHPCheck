@@ -70,6 +70,8 @@ final class PC_Module_StmtScan_Task_Scan extends FWS_Object implements FWS_Progr
 		$calls = $types->get_calls();
 		for($i = 0, $len = count($calls); $i < $len; $i += self::CALLS_AT_ONCE)
 			PC_DAO::get_calls()->create_bulk(array_slice($calls,$i,self::CALLS_AT_ONCE));
+		foreach($types->get_errors() as $err)
+			PC_DAO::get_errors()->create($err);
 	}
 
 	/**

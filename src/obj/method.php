@@ -55,6 +55,13 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	private $return;
 	
 	/**
+	 * Whether this method has a PHPDoc-description of the return-type
+	 * 
+	 * @var bool
+	 */
+	private $has_return_doc = false;
+	
+	/**
 	 * An array of parameter
 	 * 
 	 * @var array
@@ -111,6 +118,24 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	public function set_id($id)
 	{
 		$this->id = $id;
+	}
+	
+	/**
+	 * @return bool whether this method has a PHPDoc-description of the return-type
+	 */
+	public function has_return_doc()
+	{
+		return $this->has_return_doc;
+	}
+	
+	/**
+	 * Sets whether this method has a PHPDoc-description of the return-type
+	 * 
+	 * @param bool $hasdoc the new value
+	 */
+	public function set_has_return_doc($hasdoc)
+	{
+		$this->has_return_doc = $hasdoc;
 	}
 	
 	/**

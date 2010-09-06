@@ -143,9 +143,15 @@ unticked_statement ::= T_BREAK SEMI.
 unticked_statement ::= T_BREAK expr SEMI.
 unticked_statement ::= T_CONTINUE SEMI.
 unticked_statement ::= T_CONTINUE expr SEMI.
-unticked_statement ::= T_RETURN SEMI.
-unticked_statement ::= T_RETURN expr_without_variable SEMI.
-unticked_statement ::= T_RETURN variable SEMI.
+unticked_statement ::= T_RETURN SEMI. {
+	$this->state->add_return(null);
+}
+unticked_statement ::= T_RETURN expr_without_variable(e) SEMI. {
+	$this->state->add_return(e);
+}
+unticked_statement ::= T_RETURN variable(var) SEMI. {
+	$this->state->add_return(var);
+}
 unticked_statement ::= T_GLOBAL global_var_list SEMI.
 unticked_statement ::= T_STATIC static_var_list SEMI.
 unticked_statement ::= T_ECHO echo_expr_list SEMI.
@@ -166,14 +172,14 @@ unticked_statement ::= T_FOREACH LPAREN expr_without_variable T_AS
 unticked_statement ::= T_DECLARE LPAREN declare_list RPAREN declare_statement.
 unticked_statement ::= SEMI.
 unticked_statement ::= T_TRY LCURLY inner_statement_list RCURLY
-		T_CATCH LPAREN
-		fully_qualified_class_name
-		T_VARIABLE RPAREN
+		catch_head
 		LCURLY inner_statement_list RCURLY
 		additional_catches. {
 	$this->state->end_cond();
 }
-unticked_statement ::= T_THROW expr SEMI.
+unticked_statement ::= T_THROW expr(e) SEMI. {
+	$this->state->add_throw(e);
+}
 
 additional_catches ::= non_empty_additional_catches.
 additional_catches ::= .
@@ -181,7 +187,11 @@ additional_catches ::= .
 non_empty_additional_catches ::= additional_catch.
 non_empty_additional_catches ::= non_empty_additional_catches additional_catch.
 
-additional_catch ::= T_CATCH LPAREN fully_qualified_class_name T_VARIABLE RPAREN LCURLY inner_statement_list RCURLY.
+catch_head ::= T_CATCH LPAREN fully_qualified_class_name(class) T_VARIABLE(var) RPAREN. {
+	$type = PC_Obj_Variable::create_object(class->get_type()->get_string());
+	$this->state->set_var(new PC_Obj_Variable(substr(var,1)),$type);
+}
+additional_catch ::= catch_head LCURLY inner_statement_list RCURLY.
 
 inner_statement_list ::= inner_statement_list inner_statement.
 inner_statement_list ::= .

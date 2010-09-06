@@ -99,6 +99,12 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	private $vars = array(
 		PC_Obj_Variable::SCOPE_GLOBAL => array()
 	);
+	/**
+	 * An array of all return-types of the current function/method
+	 * 
+	 * @var array
+	 */
+	private $allrettypes = array();
 	
 	/**
 	 * Constructor
@@ -195,18 +201,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		// if its a constructor we know the type directly
 		if(strcasecmp($fname,'__construct') == 0 || strcasecmp($fname,$cname) == 0)
 			return PC_Obj_Variable::create_object($cname);
-		// get function-object and determine return-type
-		$funcobj = null;
-		if($class !== null)
-		{
-			$classobj = $this->types->get_class($cname);
-			if($classobj === null)
-				return $this->get_unknown();
-			$funcobj = $classobj->get_method($fname);
-		}
-		else
-			$funcobj = $this->types->get_function($fname);
 		
+		// get function-object and determine return-type
+		$funcobj = $this->get_method_object($cname,$fname);
 		if($funcobj === null)
 			return $this->get_unknown();
 		return new PC_Obj_Variable('',$funcobj->get_return_type());
@@ -352,24 +349,11 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		{
 			// if a variable-type is unknown and we're in a function/class, check if we know the type
 			// from the type-scanner
-			if(($pos = strpos($this->scope,'::')) !== false)
-			{
-				$class = $this->types->get_class(substr($this->scope,0,$pos));
-				if($class === null)
-					$value = $this->get_unknown();
-				else
-				{
-					$func = $class->get_method(substr($this->scope,$pos + 2));
-					$value = $this->get_funcparam_type($func,$varname);
-				}
-			}
-			else if($this->scope != PC_Obj_Variable::SCOPE_GLOBAL)
-			{
-				$func = $this->types->get_function($this->scope);
-				$value = $this->get_funcparam_type($func,$varname);
-			}
-			else
+			$func = $this->get_method_object($this->get_class(),$this->get_func());
+			if($func === null)
 				$value = $this->get_unknown();
+			else
+				$value = $this->get_funcparam_type($func,$varname);
 		}
 		$var->set_type($value->get_type());
 		if($varname)
@@ -397,6 +381,26 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if($param === null)
 			return $this->get_unknown();
 		return new PC_Obj_Variable('',$param->get_mtype());
+	}
+	
+	/**
+	 * Adds the given return-statement
+	 * 
+	 * @param PC_Obj_Variable $expr the expression; null if its a "return;"
+	 */
+	public function add_return($expr)
+	{
+		$this->allrettypes[] = $expr;
+	}
+	
+	/**
+	 * Adds the given expression as thrown
+	 * 
+	 * @param PC_Obj_Variable $expr the expression
+	 */
+	public function add_throw($expr)
+	{
+		echo FWS_Printer::to_string(array(__FUNCTION__,$expr));
 	}
 	
 	/**
@@ -434,6 +438,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	private function start_function($name)
 	{
+		$this->allrettypes = array();
 		if($this->scope != PC_Obj_Variable::SCOPE_GLOBAL)
 			$this->scope .= '::'.$name;
 		else
@@ -445,10 +450,138 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	public function end_function()
 	{
+		$this->analyze_rettypes();
 		if(($pos = strpos($this->scope,'::')) !== false)
 			$this->scope = substr($this->scope,0,$pos);
 		else
 			$this->scope = PC_Obj_Variable::SCOPE_GLOBAL;
+	}
+	
+	/**
+	 * Analyzes the return-types of the current function and reports errors, if necessary
+	 */
+	private function analyze_rettypes()
+	{
+		$funcname = $this->get_func();
+		$classname = $this->get_class();
+		$func = $this->get_method_object($classname,$funcname);
+		if($func && !$func->is_abstract())
+		{
+			$hasnull = false;
+			$hasother = false;
+			foreach($this->allrettypes as $t)
+			{
+				if($t === null)
+					$hasnull = true;
+				else
+					$hasother = true;
+			}
+			
+			$name = ($classname ? '#'.$classname.'#::' : '').$funcname;
+			// empty return-expression and non-empty?
+			if($hasnull && $hasother)
+			{
+				$this->report_error(
+					$func,
+					'The function/method "'.$name.'" has return-'
+					.'statements without expression and return-statements with expression',
+					PC_Obj_Error::E_S_MIXED_RET_AND_NO_RET
+				);
+			}
+			if($func->has_return_doc() && !$hasother)
+			{
+				$this->report_error(
+					$func,
+					'The function/method "'.$name.'" has a return-specification in PHPDoc'
+					.', but does not return a value',
+					PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET
+				);
+			}
+			else if(!$func->has_return_doc() && $hasother)
+			{
+				$this->report_error(
+					$func,
+					'The function/method "'.$name.'" has no return-specification in PHPDoc'
+					.', but does return a value',
+					PC_Obj_Error::E_S_RET_BUT_NO_RET_SPEC
+				);
+			}
+			else if($this->has_forbidden($this->allrettypes,$func->get_return_type()))
+			{
+				$merged = new PC_Obj_MultiType();
+				foreach($this->allrettypes as $t)
+				{
+					if($t !== null)
+						$merged->merge($t->get_type(),false);
+				}
+				$this->report_error(
+					$func,
+					'The return-specification (PHPDoc) of function/method "'.$name.'" does not match with '
+					.'the returned values (spec="'.$func->get_return_type().'", returns="'.$merged.'")',
+					PC_Obj_Error::E_S_RETURNS_DIFFER_FROM_SPEC
+				);
+			}
+		}
+	}
+	
+	/**
+	 * Checks wether $vars contains a variable, that may have a type that is not contained in $mtype.
+	 * 
+	 * @param array $vars the variables
+	 * @param PC_Obj_MultiType $mtype the multitype
+	 * @return bool true if so
+	 */
+	private function has_forbidden($vars,$mtype)
+	{
+		foreach($vars as $v)
+		{
+			if($v !== null)
+			{
+				foreach($v->get_type()->get_types() as $t)
+				{
+					if(!$mtype->contains($t))
+						return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Reports the given error
+	 * 
+	 * @param PC_Obj_Location $locsrc an object from which the location will be copied
+	 * @param string $msg the error-message
+	 * @param int $type the error-type
+	 */
+	private function report_error($locsrc,$msg,$type)
+	{
+		$this->types->add_errors(array(
+			new PC_Obj_Error(new PC_Obj_Location($locsrc->get_file(),$locsrc->get_line()),$msg,$type)
+		));
+	}
+	
+	/**
+	 * Returns the method-object for the given function or method
+	 * 
+	 * @param string $classname the class-name (may be empty)
+	 * @param string $funcname the function-name (may be empty)
+	 * @return PC_Obj_Method the method or null
+	 */
+	private function get_method_object($classname,$funcname)
+	{
+		if($funcname)
+		{
+			if($classname)
+			{
+				$classobj = $this->types->get_class($classname);
+				if($classobj === null)
+					return null;
+				return $classobj->get_method($funcname);
+			}
+			return $this->types->get_function($funcname);
+		}
+		return null;
 	}
 	
 	/**
@@ -1085,7 +1218,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
-	 * @return string the classname of the current scope
+	 * @return string the classname of the current scope (empty if not in a class)
 	 */
 	private function get_class()
 	{
@@ -1095,13 +1228,15 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
-	 * @return string the function-name of the current scope
+	 * @return string the function-name of the current scope (empty if not in a function)
 	 */
 	private function get_func()
 	{
 		if(($pos = strpos($this->scope,'::')) !== false)
 			return substr($this->scope,$pos + 2);
-		return $this->scope;
+		if($this->scope != PC_Obj_Variable::SCOPE_GLOBAL)
+			return $this->scope;
+		return '';
 	}
 	
 	/**

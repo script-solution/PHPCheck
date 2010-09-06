@@ -132,9 +132,10 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 						{
 							$changed = false;
 							/* @var $f PC_Obj_Method */
-							if($f->get_return_type()->is_unknown())
+							if(!$f->has_return_doc())
 							{
 								$f->set_return_type($function->get_return_type());
+								$f->set_has_return_doc($function->has_return_doc());
 								$changed = true;
 							}
 							foreach($function->get_params() as $param)

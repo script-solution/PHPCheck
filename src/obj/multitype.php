@@ -148,18 +148,45 @@ class PC_Obj_MultiType extends FWS_Object
 	}
 	
 	/**
-	 * Merges all types in the given multitype into this one
+	 * Checks wether all types in the given multitype are equal to those in $this
+	 * 
+	 * @param PC_Obj_MultiType $mtype the multitype
+	 * @return bool true if equal
+	 */
+	public function equals($mtype)
+	{
+		if(!($mtype instanceof PC_Obj_MultiType))
+			return false;
+		
+		$tcount = count($this->types);
+		if($tcount != count($mtype->types))
+			return false;
+		$ttypes = array();
+		$mtypes = array();
+		for($i = 0; $i < $tcount; $i++)
+		{
+			$ttypes[$this->types[$i]->get_type()] = true;
+			$mtypes[$mtype->types[$i]->get_type()] = true;
+		}
+		return count(array_diff_key($ttypes,$mtypes)) == 0;
+	}
+	
+	/**
+	 * Merges all types in the given multitype into this one. Clones the types in it.
 	 * 
 	 * @param PC_Obj_MultiType $mtype the type to merge with
+	 * @param bool $set_unknown whether to set the types to unknown when $this or $mtype is unknown
 	 */
-	public function merge($mtype)
+	public function merge($mtype,$set_unknown = true)
 	{
 		// if one is unknown, the merged type is unknown as well
-		if($this->is_unknown() || $mtype->is_unknown())
+		if($set_unknown && ($this->is_unknown() || $mtype->is_unknown()))
 		{
 			$this->types = array();
 			return;
 		}
+		if(!isset($mtype->types))
+			return;
 		foreach($mtype->types as $type)
 		{
 			$found = false;
