@@ -18,7 +18,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-interface PC_Compile_TypeStorage
+interface PC_Engine_TypeStorage
 {
 	/**
 	 * Creates the given function for the given class-id

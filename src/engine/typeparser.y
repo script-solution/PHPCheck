@@ -1,11 +1,11 @@
 %name PC_Type_
-%declare_class {class PC_Compile_TypeParser}
+%declare_class {class PC_Engine_TypeParser}
 
 %syntax_error {
     foreach ($this->yy_get_expected_tokens($yymajor) as $token) {
         $expect[] = self::$yyTokenName[$token];
     }
-		throw new PC_Compile_Exception(
+		throw new PC_Engine_Exception(
 			$this->state->get_file(),$this->state->get_line(),$this->tokenName($yymajor),$TOKEN,$expect
 		);
 }

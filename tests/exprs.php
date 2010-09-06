@@ -130,15 +130,15 @@ $bi = array(
 	
 	public function testExprs()
 	{
-		$tscanner = new PC_Compile_TypeScannerFrontend();
+		$tscanner = new PC_Engine_TypeScannerFrontend();
 		$tscanner->scan(self::$code);
 		
 		$typecon = $tscanner->get_types();
-		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
+		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
 		$fin->finalize();
 		
 		// scan files for function-calls and variables
-		$ascanner = new PC_Compile_StmtScannerFrontend($typecon);
+		$ascanner = new PC_Engine_StmtScannerFrontend($typecon);
 		$ascanner->scan(self::$code);
 		$vars = $ascanner->get_vars();
 		

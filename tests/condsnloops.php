@@ -14,14 +14,14 @@ class PC_Tests_CondsNLoops extends PHPUnit_Framework_Testcase
 {
 	private function do_analyze($code)
 	{
-		$tscanner = new PC_Compile_TypeScannerFrontend();
+		$tscanner = new PC_Engine_TypeScannerFrontend();
 		$tscanner->scan($code);
 		
 		$typecon = $tscanner->get_types();
-		$fin = new PC_Compile_TypeFinalizer($typecon,new PC_Compile_TypeStorage_Null());
+		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
 		$fin->finalize();
 		
-		$stmt = new PC_Compile_StmtScannerFrontend($typecon);
+		$stmt = new PC_Engine_StmtScannerFrontend($typecon);
 		$stmt->scan($code);
 		return array($stmt->get_vars(),$typecon->get_calls());
 	}

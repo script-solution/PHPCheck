@@ -18,7 +18,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Compile_TypeStorage_Null implements PC_Compile_TypeStorage
+final class PC_Engine_TypeStorage_Null implements PC_Engine_TypeStorage
 {
 	public function create_function($method,$classid)
 	{

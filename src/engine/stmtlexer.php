@@ -18,12 +18,12 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
+class PC_Engine_StmtLexer extends PC_Engine_BaseLexer
 {
 	/**
 	 * @param string $file the filename
-	 * @param PC_Compile_TypeContainer $types the type-container
-	 * @return PC_Compile_StmtLexer the instance for lexing a file
+	 * @param PC_Engine_TypeContainer $types the type-container
+	 * @return PC_Engine_StmtLexer the instance for lexing a file
 	 */
 	public static function get_for_file($file,$types)
 	{
@@ -32,8 +32,8 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	
 	/**
 	 * @param string $string the string
-	 * @param PC_Compile_TypeContainer $types the type-container
-	 * @return PC_Compile_StmtLexer the instance for lexing a string
+	 * @param PC_Engine_TypeContainer $types the type-container
+	 * @return PC_Engine_StmtLexer the instance for lexing a string
 	 */
 	public static function get_for_string($string,$types)
 	{
@@ -88,7 +88,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	/**
 	 * The known types
 	 * 
-	 * @var PC_Compile_TypeContainer
+	 * @var PC_Engine_TypeContainer
 	 */
 	private $types;
 	/**
@@ -105,7 +105,7 @@ class PC_Compile_StmtLexer extends PC_Compile_BaseLexer
 	 * 
 	 * @param string $str the file or string
 	 * @param bool $is_file wether $str is a file
-	 * @param PC_Compile_TypeContainer $types the type-container
+	 * @param PC_Engine_TypeContainer $types the type-container
 	 */
 	protected function __construct($str,$is_file,$types)
 	{

@@ -18,11 +18,11 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
+class PC_Engine_TypeLexer extends PC_Engine_BaseLexer
 {
 	/**
 	 * @param string $file the filename
-	 * @return PC_Compile_TypeLexer the instance for lexing a file
+	 * @return PC_Engine_TypeLexer the instance for lexing a file
 	 */
 	public static function get_for_file($file)
 	{
@@ -31,7 +31,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	
 	/**
 	 * @param string $string the string
-	 * @return PC_Compile_TypeLexer the instance for lexing a string
+	 * @return PC_Engine_TypeLexer the instance for lexing a string
 	 */
 	public static function get_for_string($string)
 	{
@@ -73,7 +73,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	/**
 	 * The found types and errors
 	 * 
-	 * @var PC_Compile_TypeContainer
+	 * @var PC_Engine_TypeContainer
 	 */
 	private $types;
 	
@@ -86,7 +86,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	protected function __construct($str,$is_file)
 	{
 		parent::__construct($str,$is_file);
-		$this->types = new PC_Compile_TypeContainer(PC_Project::CURRENT_ID,false);
+		$this->types = new PC_Engine_TypeContainer(PC_Project::CURRENT_ID,false);
 	}
 	
 	/**
@@ -106,7 +106,7 @@ class PC_Compile_TypeLexer extends PC_Compile_BaseLexer
 	}
 	
 	/**
-	 * @return PC_Compile_TypeContainer the found types and errors
+	 * @return PC_Engine_TypeContainer the found types and errors
 	 */
 	public function get_types()
 	{

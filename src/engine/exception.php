@@ -17,7 +17,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Compile_Exception extends Exception
+final class PC_Engine_Exception extends Exception
 {
 	/**
 	 * The current line

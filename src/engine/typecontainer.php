@@ -17,7 +17,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Compile_TypeContainer extends FWS_Object
+final class PC_Engine_TypeContainer extends FWS_Object
 {
 	/**
 	 * The project-id
@@ -103,7 +103,7 @@ final class PC_Compile_TypeContainer extends FWS_Object
 	/**
 	 * Adds all from the given type-container into this one (does not make clones of the objects!)
 	 * 
-	 * @param PC_Compile_TypeContainer $typecon the container
+	 * @param PC_Engine_TypeContainer $typecon the container
 	 */
 	public function add($typecon)
 	{

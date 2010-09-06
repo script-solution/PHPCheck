@@ -50,8 +50,8 @@ final class PC_Module_StmtScan_Task_Scan extends FWS_Object implements FWS_Progr
 		$msgs = FWS_Props::get()->msgs();
 		
 		// scan for statements
-		$types = new PC_Compile_TypeContainer();
-		$ascanner = new PC_Compile_StmtScannerFrontend($types);
+		$types = new PC_Engine_TypeContainer();
+		$ascanner = new PC_Engine_StmtScannerFrontend($types);
 		$files = $user->get_session_data('stmtscan_files',array());
 		$end = min($pos + $ops,count($files));
 		for($i = $pos;$i < $end;$i++)
@@ -60,7 +60,7 @@ final class PC_Module_StmtScan_Task_Scan extends FWS_Object implements FWS_Progr
 			{
 				$ascanner->scan_file($files[$i]);
 			}
-			catch(PC_Compile_Exception $e)
+			catch(PC_Engine_Exception $e)
 			{
 				$msgs->add_error($e->__toString());
 			}

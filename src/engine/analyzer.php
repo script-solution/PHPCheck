@@ -17,7 +17,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Compile_Analyzer extends FWS_Object
+final class PC_Engine_Analyzer extends FWS_Object
 {
 	/**
 	 * Wether errors with mixed types involved should be reported
@@ -61,7 +61,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 	/**
 	 * Checks wether the method with given name may be a method of a subclass of $class
 	 *
-	 * @param PC_Compile_TypeContainer $types the types
+	 * @param PC_Engine_TypeContainer $types the types
 	 * @param PC_Obj_Class $class the class
 	 * @param string $name the method-name
 	 */
@@ -88,7 +88,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 	/**
 	 * Analyzes the given function-/method-calls
 	 *
-	 * @param PC_Compile_TypeContainer $types the types
+	 * @param PC_Engine_TypeContainer $types the types
 	 * @param array $calls an array with function-/method-calls
 	 */
 	public function analyze_calls($types,$calls)
@@ -190,7 +190,7 @@ final class PC_Compile_Analyzer extends FWS_Object
 	/**
 	 * Analyzes the given classes
 	 * 
-	 * @param PC_Compile_TypeContainer $types the types
+	 * @param PC_Engine_TypeContainer $types the types
 	 * @param array $classes an array with classes (name as key)
 	 */
 	public function analyze_classes($types,$classes)

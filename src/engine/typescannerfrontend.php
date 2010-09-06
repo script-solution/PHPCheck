@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains the frontend for the statement-scanner
+ * Contains the frontend for the type-scanner
  *
  * @version			$Id$
  * @package			PHPCheck
@@ -11,55 +11,39 @@
  */
 
 /**
- * The frontend for the statement-scanner
+ * The frontend for the type-scanner
  *
  * @package			PHPCheck
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Compile_StmtScannerFrontend extends FWS_Object
+class PC_Engine_TypeScannerFrontend extends FWS_Object
 {
 	/**
 	 * Our lexer
 	 * 
-	 * @var PC_Compile_StmtLexer
+	 * @var PC_Engine_TypeLexer
 	 */
 	private $lexer;
 	
 	/**
 	 * The found types and errors
 	 * 
-	 * @var PC_Compile_TypeContainer
+	 * @var PC_Engine_TypeContainer
 	 */
 	private $types;
-	/**
-	 * The variables
-	 * 
-	 * @var array
-	 */
-	private $vars = array();
 	
 	/**
 	 * Constructor
-	 * 
-	 * @param PC_Compile_TypeContainer $types the type-container
 	 */
-	public function __construct($types)
+	public function __construct()
 	{
 		parent::__construct();
-		$this->types = $types;
-	}
-	
-	/**
-	 * @return array the found variables
-	 */
-	public function get_vars()
-	{
-		return $this->vars;
+		$this->types = new PC_Engine_TypeContainer(PC_Project::CURRENT_ID,false);
 	}
 
 	/**
-	 * @return PC_Compile_TypeContainer the found types and errors
+	 * @return PC_Engine_TypeContainer the found types and errors
 	 */
 	public function get_types()
 	{
@@ -73,7 +57,7 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	 */
 	public function scan_file($file)
 	{
-		$this->lexer = PC_Compile_StmtLexer::get_for_file($file,$this->types);
+		$this->lexer = PC_Engine_TypeLexer::get_for_file($file);
 		$this->parse();
 	}
 	
@@ -84,7 +68,7 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	 */
 	public function scan($source)
 	{
-		$this->lexer = PC_Compile_StmtLexer::get_for_string($source,$this->types);
+		$this->lexer = PC_Engine_TypeLexer::get_for_string($source);
 		$this->parse();
 	}
 	
@@ -93,12 +77,12 @@ class PC_Compile_StmtScannerFrontend extends FWS_Object
 	 */
 	private function parse()
 	{
-		$parser = new PC_Compile_StmtParser($this->lexer);
+		$parser = new PC_Engine_TypeParser($this->lexer);
 		while($this->lexer->advance($parser))
 			$parser->doParse($this->lexer->get_token(),$this->lexer->get_value());
 		$parser->doParse(0,0);
 		
-		$this->vars = array_merge($this->vars,$this->lexer->get_vars());
+		$this->types->add($this->lexer->get_types());
 	}
 	
 	protected function get_dump_vars()

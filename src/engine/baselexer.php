@@ -17,7 +17,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Compile_BaseLexer
+class PC_Engine_BaseLexer
 {
 	/**
 	 * Value of T_DOC_COMMENT

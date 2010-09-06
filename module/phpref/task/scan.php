@@ -57,7 +57,7 @@ final class PC_Module_PHPRef_Task_Scan extends FWS_Object implements FWS_Progres
 		$files = $user->get_session_data('phpref_files');
 		$this->aliases = $user->get_session_data('phpref_aliases');
 		$this->versions = $user->get_session_data('phpref_versions');
-		$typecon = new PC_Compile_TypeContainer(PC_Project::PHPREF_ID,true,false);
+		$typecon = new PC_Engine_TypeContainer(PC_Project::PHPREF_ID,true,false);
 		
 		for($i = $pos, $end = min($pos + $ops,$this->get_total_operations()); $i < $end; $i++)
 		{
@@ -87,7 +87,7 @@ final class PC_Module_PHPRef_Task_Scan extends FWS_Object implements FWS_Progres
 	/**
 	 * Grabs a class from the given file
 	 * 
-	 * @param PC_Compile_TypeContainer $typecon the type-container
+	 * @param PC_Engine_TypeContainer $typecon the type-container
 	 * @param string $file the file
 	 */
 	private function grab_class($typecon,$file)
@@ -99,7 +99,7 @@ final class PC_Module_PHPRef_Task_Scan extends FWS_Object implements FWS_Progres
 	/**
 	 * Grabs a function from the given file
 	 * 
-	 * @param PC_Compile_TypeContainer $typecon the type-container
+	 * @param PC_Engine_TypeContainer $typecon the type-container
 	 * @param string $file the file
 	 */
 	private function grab_function($typecon,$file)

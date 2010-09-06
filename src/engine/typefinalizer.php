@@ -18,27 +18,27 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Compile_TypeFinalizer extends FWS_Object
+final class PC_Engine_TypeFinalizer extends FWS_Object
 {
 	/**
 	 * The type-container
 	 *
-	 * @var PC_Compile_TypeContainer
+	 * @var PC_Engine_TypeContainer
 	 */
 	private $_types;
 	
 	/**
 	 * The storage-implementation
 	 *
-	 * @var PC_Compile_TypeStorage
+	 * @var PC_Engine_TypeStorage
 	 */
 	private $_storage;
 	
 	/**
 	 * Constructor
 	 * 
-	 * @param PC_Compile_TypeContainer $types the type-container, containing the classes to finalize
-	 * @param PC_Compile_TypeStorage $storage the storage that handles the changes
+	 * @param PC_Engine_TypeContainer $types the type-container, containing the classes to finalize
+	 * @param PC_Engine_TypeStorage $storage the storage that handles the changes
 	 */
 	public function __construct($types,$storage)
 	{
