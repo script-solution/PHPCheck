@@ -44,6 +44,8 @@ FWS_Props::set_accessor($accessor);
 // TODO the method-links in calls are wrong if the call belongs to a super-class
 // TODO detect missing parent::__construct calls for classes that have a superclass
 // TODO detect if the liscovsche substitution law is violated?
+// TODO the errors in the parallel-version should be appended to the document, not replaced
+// TODO each phase has to clear its own errors
 
 $doc = FWS_Props::get()->doc();
 echo $doc->render();

@@ -120,7 +120,7 @@ class PC_DAO_Errors extends FWS_Singleton
 				.($file ? ' AND file LIKE :file' : '')
 				.($msg ? ' AND message LIKE :msg' : '')
 				.(count($types) ? ' AND type IN ('.implode(',',$types).')' : '')
-				.' ORDER BY id ASC'
+				.' ORDER BY file ASC, line ASC'
 				.($count > 0 ? ' LIMIT '.$start.','.$count : '')
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));

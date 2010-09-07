@@ -868,11 +868,21 @@ internal_functions_in_yacc(A) ::= T_EMPTY LPAREN variable RPAREN. {
 	// TODO evaluate?
 	A = PC_Obj_Variable::create_bool();
 }
-internal_functions_in_yacc ::= T_INCLUDE expr.
-internal_functions_in_yacc ::= T_INCLUDE_ONCE expr.
-internal_functions_in_yacc ::= T_EVAL LPAREN expr RPAREN.
-internal_functions_in_yacc ::= T_REQUIRE expr.
-internal_functions_in_yacc ::= T_REQUIRE_ONCE expr.
+internal_functions_in_yacc(A) ::= T_INCLUDE expr. {
+	A = new PC_Obj_Variable('',new PC_Obj_MultiType());
+}
+internal_functions_in_yacc(A) ::= T_INCLUDE_ONCE expr. {
+	A = new PC_Obj_Variable('',new PC_Obj_MultiType());
+}
+internal_functions_in_yacc(A) ::= T_EVAL LPAREN expr RPAREN. {
+	A = new PC_Obj_Variable('',new PC_Obj_MultiType());
+}
+internal_functions_in_yacc(A) ::= T_REQUIRE expr. {
+	A = new PC_Obj_Variable('',new PC_Obj_MultiType());
+}
+internal_functions_in_yacc(A) ::= T_REQUIRE_ONCE expr. {
+	A = new PC_Obj_Variable('',new PC_Obj_MultiType());
+}
 
 isset_variables ::= variable.
 isset_variables ::= isset_variables COMMA variable.

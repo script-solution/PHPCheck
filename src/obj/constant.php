@@ -53,14 +53,17 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	{
 		parent::__construct($file,$line);
 		
-		if(empty($name))
-			FWS_Helper::def_error('notempty','name',$name);
-		if($type !== null && !($type instanceof PC_Obj_MultiType))
-			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
-		
-		$this->_name = $name;
-		$this->_type = $type;
+		$this->set_name($name);
+		$this->set_type($type);
 		$this->_class = $classid;
+	}
+	
+	public function __clone()
+	{
+		parent::__clone();
+		
+		if($this->_type !== null)
+			$this->_type = clone $this->_type;
 	}
 	
 	/**
@@ -77,6 +80,19 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	public function get_name()
 	{
 		return $this->_name;
+	}
+	
+	/**
+	 * Sets the name
+	 * 
+	 * @param string $name the new name
+	 */
+	public function set_name($name)
+	{
+		if(empty($name))
+			FWS_Helper::def_error('notempty','name',$name);
+		
+		$this->_name = $name;
 	}
 	
 	/**

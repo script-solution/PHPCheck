@@ -526,47 +526,67 @@ static_var_list ::= T_VARIABLE EQUALS static_scalar.
 
 class_statement_list(A) ::= class_statement_list(list) class_statement(stmt). {
 	A = list;
-	A[] = stmt;
+	foreach(stmt as $st)
+		A[] = $st;
 }
 class_statement_list(A) ::= . { A = array(); }
 
 class_statement(A) ::= variable_modifiers(mmodifiers) class_variable_declaration(var) SEMI. {
-	A = new PC_Obj_Field($this->state->get_file(),$this->state->get_line());
-	A->set_name(var->metadata['name']);
-	A->set_static(in_array('static',mmodifiers->metadata));
+	A = array();
+	$base = new PC_Obj_Field(
+		$this->state->get_file(),$this->state->get_line(),
+		var->metadata[0]['name']
+	);
+	$base->set_static(in_array('static',mmodifiers->metadata));
 	if(in_array('private',mmodifiers->metadata))
-		A->set_visibility(PC_Obj_Visible::V_PRIVATE);
+		$base->set_visibility(PC_Obj_Visible::V_PRIVATE);
 	else if(in_array('protected',mmodifiers->metadata))
-		A->set_visibility(PC_Obj_Visible::V_PROTECTED);
+		$base->set_visibility(PC_Obj_Visible::V_PROTECTED);
 	else
-		A->set_visibility(PC_Obj_Visible::V_PUBLIC);
-	if(isset(var->metadata['val']))
-		A->set_type(var->metadata['val']);
-	$this->state->parse_field_doc(A);
+		$base->set_visibility(PC_Obj_Visible::V_PUBLIC);
+	$this->state->parse_field_doc($base);
+	
+	foreach(var->metadata as $v)
+	{
+		$field = clone $base;
+		$field->set_name($v['name']);
+		if(!$field->get_type()->is_multiple() && isset($v['val']))
+			$field->set_type($v['val']);
+		A[] = $field;
+	}
 }
 class_statement(A) ::= class_constant_declaration(constdecl) SEMI. {
-	A = new PC_Obj_Constant(
-		$this->state->get_file(),$this->state->get_line(),constdecl->metadata['name'],
-		isset(constdecl->metadata['val']) ? constdecl->metadata['val'] : new PC_Obj_MultiType()
-	);
-	$this->state->parse_const_doc(A);
+	A = array();
+	$base = new PC_Obj_Constant($this->state->get_file(),$this->state->get_line(),'dummy');
+	$this->state->parse_const_doc($base);
+	
+	foreach(constdecl->metadata as $c)
+	{
+		$const = clone $base;
+		$const->set_name($c['name']);
+		if(isset($c['val']))
+			$const->set_type($c['val']);
+		A[] = $const;
+	}
 }
 class_statement(A) ::= method_modifiers(mmodifiers) T_FUNCTION is_reference T_STRING(mname)
 		LPAREN parameter_list(mparams) RPAREN method_body. {
-	A = new PC_Obj_Method($this->state->get_file(),$this->state->get_last_function_line(),false);
-	A->set_name(mname);
-	A->set_static(in_array('static',mmodifiers->metadata));
-	A->set_abstract(in_array('abstract',mmodifiers->metadata));
-	A->set_final(in_array('final',mmodifiers->metadata));
+	A = array();
+	$m = new PC_Obj_Method($this->state->get_file(),$this->state->get_last_function_line(),false);
+	$m->set_name(mname);
+	$m->set_static(in_array('static',mmodifiers->metadata));
+	$m->set_abstract(in_array('abstract',mmodifiers->metadata));
+	$m->set_final(in_array('final',mmodifiers->metadata));
 	if(in_array('private',mmodifiers->metadata))
-		A->set_visibility(PC_Obj_Visible::V_PRIVATE);
+		$m->set_visibility(PC_Obj_Visible::V_PRIVATE);
 	else if(in_array('protected',mmodifiers->metadata))
-		A->set_visibility(PC_Obj_Visible::V_PROTECTED);
+		$m->set_visibility(PC_Obj_Visible::V_PROTECTED);
 	else
-		A->set_visibility(PC_Obj_Visible::V_PUBLIC);
+		$m->set_visibility(PC_Obj_Visible::V_PUBLIC);
 	foreach(mparams as $param)
-		A->put_param($param);
-	$this->state->parse_method_doc(A);
+		$m->put_param($param);
+	$this->state->parse_method_doc($m);
+	A[] = $m;
 }
 
 
@@ -591,27 +611,27 @@ member_modifier(A) ::= T_PUBLIC|T_PROTECTED|T_PRIVATE|T_STATIC|T_ABSTRACT|T_FINA
 
 class_variable_declaration(A) ::= class_variable_declaration(decl) COMMA T_VARIABLE(varname). {
 	A = new PC_Type_yyToken(decl);
-	A[] = array('name' => substr(varname,1));
+	A[] = array(array('name' => substr(varname,1)));
 }
 class_variable_declaration(A) ::= class_variable_declaration(decl) COMMA T_VARIABLE(varname)
 																	EQUALS static_scalar(varval). {
 	A = new PC_Type_yyToken(decl);
-	A[] = array('name' => substr(varname,1),'val' => varval);
+	A[] = array(array('name' => substr(varname,1),'val' => varval));
 }
 class_variable_declaration(A) ::= T_VARIABLE(varname). {
-	A = new PC_Type_yyToken('',array('name' => substr(varname,1)));
+	A = new PC_Type_yyToken('',array(array('name' => substr(varname,1))));
 }
 class_variable_declaration(A) ::= T_VARIABLE(varname) EQUALS static_scalar(varval). {
-	A = new PC_Type_yyToken('',array('name' => substr(varname,1),'val' => varval));
+	A = new PC_Type_yyToken('',array(array('name' => substr(varname,1),'val' => varval)));
 }
 
 class_constant_declaration(A) ::= class_constant_declaration(decl) COMMA T_STRING(varname)
 																	EQUALS static_scalar(varval). {
 	A = new PC_Type_yyToken(decl);
-	A[] = array('name' => varname,'val' => varval);
+	A[] = array(array('name' => varname,'val' => varval));
 }
 class_constant_declaration(A) ::= T_CONST T_STRING(varname) EQUALS static_scalar(varval). {
-	A = new PC_Type_yyToken('',array('name' => varname,'val' => varval));
+	A = new PC_Type_yyToken('',array(array('name' => varname,'val' => varval)));
 }
 
 echo_expr_list ::= echo_expr_list COMMA expr.

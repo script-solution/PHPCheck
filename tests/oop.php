@@ -14,6 +14,13 @@ class PC_Tests_OOP extends PHPUnit_Framework_Testcase
 {
 	private static $code = '<?php
 class a {
+	/* @var int|string */
+	private $foo,$bar = -1;
+	/* @var string */
+	private $a,$b = "a";
+	
+	const ME = 4, YOU = "str";
+	
   const c = 0;
   private $f = "abc";
   protected $p = array(1,2,3);
@@ -107,11 +114,49 @@ $r = $p[1]->test2($b);
 		self::assertEquals(false,$a->is_final());
 		self::assertEquals(null,$a->get_super_class());
 		self::assertEquals(array(),$a->get_interfaces());
-		self::assertEquals((string)PC_Obj_MultiType::create_int(0),(string)$a->get_constant('c')->get_type());
+		
+		self::assertEquals(
+			(string)PC_Obj_MultiType::create_int(0),
+			(string)$a->get_constant('c')->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_MultiType::create_int(4),
+			(string)$a->get_constant('ME')->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_MultiType::create_string('str'),
+			(string)$a->get_constant('YOU')->get_type()
+		);
+		
 		self::assertEquals(
 			(string)new PC_Obj_Field('',0,'f',PC_Obj_MultiType::create_string('abc'),PC_Obj_Field::V_PRIVATE),
 			(string)$a->get_field('f')
 		);
+		self::assertEquals(
+			(string)new PC_Obj_Field(
+				'',0,'foo',PC_Obj_MultiType::get_type_by_name('int|string'),PC_Obj_Field::V_PRIVATE
+			),
+			(string)$a->get_field('foo')
+		);
+		self::assertEquals(
+			(string)new PC_Obj_Field(
+				'',0,'bar',PC_Obj_MultiType::get_type_by_name('int|string'),PC_Obj_Field::V_PRIVATE
+			),
+			(string)$a->get_field('bar')
+		);
+		self::assertEquals(
+			(string)new PC_Obj_Field(
+				'',0,'a',PC_Obj_MultiType::create_string(),PC_Obj_Field::V_PRIVATE
+			),
+			(string)$a->get_field('a')
+		);
+		self::assertEquals(
+			(string)new PC_Obj_Field(
+				'',0,'b',PC_Obj_MultiType::create_string('a'),PC_Obj_Field::V_PRIVATE
+			),
+			(string)$a->get_field('b')
+		);
+		
 		$array = PC_Obj_MultiType::create_array();
 		$array->get_first()->set_array_type(0,PC_Obj_MultiType::create_int(1));
 		$array->get_first()->set_array_type(1,PC_Obj_MultiType::create_int(2));
@@ -233,7 +278,7 @@ $r = $p[1]->test2($b);
 			(string)$global['n']->get_type()
 		);
 		self::assertEquals(
-			(string)PC_Obj_MultiType::create_int(67),
+			(string)PC_Obj_MultiType::create_int(74),
 			(string)$global['o']->get_type()
 		);
 		self::assertEquals(

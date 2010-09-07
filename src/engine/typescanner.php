@@ -282,7 +282,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	private function parse_var_from($doc)
 	{
 		$matches = array();
-		if(preg_match('/\@var\s+([^\s]+)/',$doc,$matches))
+		if(preg_match('/\@var\s+(\S+)/',$doc,$matches))
 			return PC_Obj_MultiType::get_type_by_name($matches[1]);
 		return null;
 	}

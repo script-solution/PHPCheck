@@ -73,6 +73,13 @@ class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 		$this->set_type($type);
 	}
 	
+	public function __clone()
+	{
+		parent::__clone();
+		
+		$this->type = clone $this->type;
+	}
+	
 	/**
 	 * @return int the class-id (just present if loaded from db!)
 	 */
