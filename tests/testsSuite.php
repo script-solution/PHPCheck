@@ -76,6 +76,7 @@ class testsSuite extends PHPUnit_Framework_TestSuite
 		$this->addTestSuite('PC_Tests_Analyzer');
 		$this->addTestSuite('PC_Tests_CondsNLoops');
 		$this->addTestSuite('PC_Tests_Returns');
+		$this->addTestSuite('PC_Tests_Magic');
 	}
 	
 	/**

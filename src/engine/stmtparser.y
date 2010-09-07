@@ -487,22 +487,20 @@ static_array_pair_list(A) ::= . {
 non_empty_static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA
 																				static_scalar(skey) T_DOUBLE_ARROW static_scalar(sval). {
 	A = list;
-	A->get_type()->get_first()->set_array_type(skey->get_type()->get_value(),sval->get_type());
+	A->get_type()->array_insert(skey->get_type(),sval->get_type());
 }
 non_empty_static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA
 																				static_scalar(sval). {
 	A = list;
-	A->get_type()->get_first()->set_array_type(
-		A->get_type()->get_first()->get_next_array_key(),sval->get_type()
-	);
+	A->get_type()->array_insert(null,sval->get_type());
 }
 non_empty_static_array_pair_list(A) ::= static_scalar(skey) T_DOUBLE_ARROW static_scalar(sval). {
 	A = PC_Obj_Variable::create_array();
-	A->get_type()->get_first()->set_array_type(skey->get_type()->get_first()->get_value(),sval->get_type());
+	A->get_type()->array_insert(skey->get_type(),sval->get_type());
 }
 non_empty_static_array_pair_list(A) ::= static_scalar(sval). {
 	A = PC_Obj_Variable::create_array();
-	A->get_type()->get_first()->set_array_type(0,sval->get_type());
+	A->get_type()->array_insert(PC_Obj_MultiType::create_int(0),sval->get_type());
 }
 
 static_class_constant(A) ::= T_STRING(class) T_PAAMAYIM_NEKUDOTAYIM T_STRING(const). {
@@ -806,40 +804,36 @@ array_pair_list(A) ::= . { A = PC_Obj_Variable::create_array(); }
 
 non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA expr(key) T_DOUBLE_ARROW expr(val). {
 	A = list;
-	A->get_type()->get_first()->set_array_type(key->get_type()->get_scalar(),val->get_type());
+	A->get_type()->array_insert(key->get_type(),val->get_type());
 }
 non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA expr(val). {
 	A = list;
-	A->get_type()->get_first()->set_array_type(
-		A->get_type()->get_first()->get_next_array_key(),val->get_type()
-	);
+	A->get_type()->array_insert(null,val->get_type());
 }
 non_empty_array_pair_list(A) ::= expr(key) T_DOUBLE_ARROW expr(val). {
 	A = PC_Obj_Variable::create_array();
-	A->get_type()->get_first()->set_array_type(key->get_type()->get_scalar(),val->get_type());
+	A->get_type()->array_insert(key->get_type(),val->get_type());
 }
 non_empty_array_pair_list(A) ::= expr(val). {
 	A = PC_Obj_Variable::create_array();
-	A->get_type()->get_first()->set_array_type(0,val->get_type());
+	A->get_type()->array_insert(PC_Obj_MultiType::create_int(0),val->get_type());
 }
 non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA
 								expr(key) T_DOUBLE_ARROW AMPERSAND w_variable(val). {
 	A = list;
-	A->get_type()->get_first()->set_array_type(key->get_type()->get_scalar(),val->get_type());
+	A->get_type()->array_insert(key->get_type(),val->get_type());
 }
 non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA AMPERSAND w_variable(val). {
 	A = list;
-	A->get_type()->get_first()->set_array_type(
-		A->get_type()->get_first()->get_next_array_key(),val->get_type()
-	);
+	A->get_type()->array_insert(null,val->get_type());
 }
 non_empty_array_pair_list(A) ::= expr(key) T_DOUBLE_ARROW AMPERSAND w_variable(val). {
 	A = PC_Obj_Variable::create_array();
-	A->get_type()->get_first()->set_array_type(key->get_type()->get_scalar(),val->get_type());
+	A->get_type()->array_insert(key->get_type(),val->get_type());
 }
 non_empty_array_pair_list(A) ::= AMPERSAND w_variable(val). {
 	A = PC_Obj_Variable::create_array();
-	A->get_type()->get_first()->set_array_type(0,val->get_type());
+	A->get_type()->array_insert(PC_Obj_MultiType::create_int(0),val->get_type());
 }
 
 encaps_list ::= encaps_list encaps_var.

@@ -41,8 +41,8 @@ final class PC_Engine_Analyzer extends FWS_Object
 	/**
 	 * Constructor
 	 * 
-	 * @param $report_mixed boolean wether errors with mixed types involved should be reported
-	 * @param $report_unknown boolean wether errors with unknown types involved should be reported
+	 * @param boolean $report_mixed wether errors with mixed types involved should be reported
+	 * @param boolean $report_unknown wether errors with unknown types involved should be reported
 	 */
 	public function __construct($report_mixed = false,$report_unknown = false)
 	{
@@ -64,6 +64,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 	 * @param PC_Engine_TypeContainer $types the types
 	 * @param PC_Obj_Class $class the class
 	 * @param string $name the method-name
+	 * @return bool true if so
 	 */
 	private function is_method_of_sub($types,$class,$name)
 	{
@@ -396,6 +397,12 @@ final class PC_Engine_Analyzer extends FWS_Object
 		$this->errors[] = new PC_Obj_Error($loc,$msg,$type);
 	}
 	
+	/**
+	 * Determines the article for the given type ('a' or 'an'), depending on the first char
+	 * 
+	 * @param PC_Obj_MultiType $type the type
+	 * @return string the article
+	 */
 	private function _get_article($type)
 	{
 		$str = $type === null ? 'x' : $type->__ToString();

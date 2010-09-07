@@ -47,9 +47,6 @@ final class PC_PHPRef_Finalizer extends FWS_Object
 	
 	/**
 	 * Fetches the page from the specified file and parses it for information about the function
-	 * 
-	 * @return PC_Obj_Method the method that was found
-	 * @throws PC_PHPRef_Exception if it failed
 	 */
 	public function finalize()
 	{

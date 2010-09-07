@@ -40,7 +40,7 @@ final class PC_PHPRef_Function extends FWS_Object
 	/**
 	 * Fetches the page from the specified file and parses it for information about the function
 	 * 
-	 * @return PC_Obj_Method the method that was found
+	 * @return array an array of the type and other information.
 	 * @throws PC_PHPRef_Exception if it failed
 	 */
 	public function get_method()

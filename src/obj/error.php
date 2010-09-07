@@ -40,6 +40,11 @@ final class PC_Obj_Error extends FWS_Object
 	const E_T_IF_IS_NO_IF												= 25;
 	const E_T_DOC_WITHOUT_PARAM									= 26;
 	const E_T_PARAM_WITHOUT_DOC									= 27;
+	const E_T_MAGIC_METHOD_PARAMS_INVALID				= 28;
+	const E_T_MAGIC_METHOD_RET_INVALID					= 29;
+	const E_T_MAGIC_NOT_PUBLIC									= 30;
+	const E_T_MAGIC_NOT_STATIC									= 31;
+	const E_T_MAGIC_IS_STATIC										= 32;
 	
 	/**
 	 * Determines the name of the given type
@@ -81,7 +86,12 @@ final class PC_Obj_Error extends FWS_Object
 			self::E_S_MIXED_RET_AND_NO_RET =>						'Mixed return',
 			self::E_S_RETURNS_DIFFER_FROM_SPEC =>				'Returns differ from spec',
 			self::E_S_RET_SPEC_BUT_NO_RET =>						'Return spec but no return',
-			self::E_S_RET_BUT_NO_RET_SPEC =>						'Returns but no return spec'
+			self::E_S_RET_BUT_NO_RET_SPEC =>						'Returns but no return spec',
+			self::E_T_MAGIC_METHOD_PARAMS_INVALID =>		'Magic params invalid',
+			self::E_T_MAGIC_METHOD_RET_INVALID =>				'Magic return invalid',
+			self::E_T_MAGIC_NOT_PUBLIC =>								'Magic not public',
+			self::E_T_MAGIC_NOT_STATIC =>								'Magic not static',
+			self::E_T_MAGIC_IS_STATIC =>								'Magic is static'
 		);
 	}
 	

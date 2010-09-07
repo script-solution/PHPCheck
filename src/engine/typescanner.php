@@ -401,6 +401,9 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 		return parent::advance($parser);
 	}
 	
+	/**
+	 * @return string the next following function/constant-name (token T_STRING)
+	 */
 	private function get_name_for_comment()
 	{
 		for($i = $this->pos + 1; $i < $this->tokCount; $i++)

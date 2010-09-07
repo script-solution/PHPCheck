@@ -42,7 +42,10 @@ final class PC_Module_filepart extends PC_Module
 		$id = $input->get_var('id','get',FWS_Input::INTEGER);
 		$type = $input->correct_var('type','get',FWS_Input::STRING,array('call','error'),'call');
 		if($id === null)
-			return $this->report_error();
+		{
+			$this->report_error();
+			return;
+		}
 		
 		$loc = null;
 		switch($type)
@@ -53,13 +56,19 @@ final class PC_Module_filepart extends PC_Module
 			case 'error':
 				$loc = PC_DAO::get_errors()->get_by_id($id);
 				if($loc === null)
-					return $this->report_error();
+				{
+					$this->report_error();
+					return;
+				}
 				$loc = $loc->get_loc();
 				break;
 		}
 		
 		if(!is_file($loc->get_file()))
-			return $this->report_error();
+		{
+			$this->report_error();
+			return;
+		}
 		
 		$lines = explode("\n",file_get_contents($loc->get_file()));
 		$start_line = max(1,$loc->get_line() - 4);

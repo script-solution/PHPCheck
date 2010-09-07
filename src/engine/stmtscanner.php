@@ -206,7 +206,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$funcobj = $this->get_method_object($cname,$fname);
 		if($funcobj === null)
 			return $this->get_unknown();
-		return new PC_Obj_Variable('',$funcobj->get_return_type());
+		return new PC_Obj_Variable('',clone $funcobj->get_return_type());
 	}
 	
 	/**
@@ -275,7 +275,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				$method = $class->get_method($mname);
 				if($method === null)
 					return $this->get_unknown();
-				$res = $method->get_return_type();
+				$res = clone $method->get_return_type();
 			}
 			$objt = $res;
 		}
@@ -533,6 +533,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	private function has_forbidden($vars,$mtype)
 	{
+		// if the type is unknown (mixed), its always ok
+		if($mtype->is_unknown())
+			return false;
 		foreach($vars as $v)
 		{
 			if($v !== null)
@@ -1078,6 +1081,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * 
 	 * @param PC_Obj_Variable $e the expression
 	 * @param PC_Obj_Variable $name the name of the class
+	 * @return PC_Obj_Variable the result
 	 */
 	public function handle_instanceof($e,$name)
 	{
@@ -1248,6 +1252,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		return new PC_Obj_Variable($name,new PC_Obj_MultiType());
 	}
 	
+	/**
+	 * @return string the value of the next following T_STRING-token
+	 */
 	private function get_type_name()
 	{
 		for($i = $this->pos + 1; $i < $this->tokCount; $i++)

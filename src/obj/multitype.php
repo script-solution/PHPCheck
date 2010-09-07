@@ -221,6 +221,22 @@ class PC_Obj_MultiType extends FWS_Object
 	}
 	
 	/**
+	 * If this multitype is an array and not multiple, it tries to insert $value at offset $key.
+	 * 
+	 * @param PC_Obj_MultiType $key the key; null = next array key
+	 * @param PC_Obj_MultiType $value the value to set
+	 */
+	public function array_insert($key,$value)
+	{
+		if($this->get_array() === null || ($key !== null && ($skey = $key->get_scalar()) === null))
+			return;
+		$first = $this->get_first();
+		if($key === null)
+			$skey = $first->get_next_array_key();
+		$first->set_array_type($skey,$value);
+	}
+	
+	/**
 	 * @return PC_Obj_Type the first type of this multitype
 	 */
 	public function get_first()
