@@ -38,8 +38,7 @@ FWS_Props::set_accessor($accessor);
 // TODO handle "void" special?
 // TODO detect calls of private/protected methods
 // TODO we could extend the type-hinting in doc-comments: array(int,ClassName,float)
-// TODO we could check parameter-docs. i.e. docs to not present params, params with not present
-// doc and params with default-value, that don't specify that in the type
+// TODO we could check params with default-value, that don't specify that in the type
 // TODO detect use of unknown class-fields
 // TODO the method-links in calls are wrong if the call belongs to a super-class
 // TODO detect missing parent::__construct calls for classes that have a superclass

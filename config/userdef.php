@@ -48,7 +48,7 @@ define('PC_STMT_FILES_PER_CYCLE',20);
 /**
  * The number of items per cycle in the analyzer (not yet used by the parallel version)
  */
-define('PC_ANALYZE_ITEMS_PER_CYCLE',5000);
+define('PC_ANALYZE_ITEMS_PER_CYCLE',8000);
 /**
  * The number of pages to parse per process/cycle
  */

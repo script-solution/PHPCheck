@@ -77,6 +77,7 @@ final class PC_Module_Analyze_Task_Scan extends FWS_Object implements FWS_Progre
 		{
 			$calls = PC_DAO::get_calls()->get_list($pos,$ops);
 			$an->analyze_calls($types,$calls);
+			$pos += count($calls);
 		}
 		
 		// analyze types

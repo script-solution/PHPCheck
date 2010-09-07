@@ -27,9 +27,6 @@ final class PC_CLI_AnalyzeTypes implements PC_CLIJob
 			$project !== null ? $project->get_report_unknown() : false
 		);
 		$types = new PC_Engine_TypeContainer();
-		// we need all classes in the type-container to be able to search for sub-classes and interface-
-		// implementations
-		$types->add_classes(PC_DAO::get_classes()->get_list());
 		
 		$classes = PC_DAO::get_classes()->get_list();
 		$an->analyze_classes($types,$classes);
