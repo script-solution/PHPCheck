@@ -43,14 +43,13 @@ final class PC_Obj_Error extends FWS_Object
 	const E_S_RET_BUT_NO_RET_SPEC								= 33;
 	const E_S_UNDEFINED_VAR											= 34;
 	
-	const E_A_CLASS_POT_USELESS_ABSTRACT				= 50;
+	const E_T_MAGIC_IS_STATIC										= 50;
 	const E_T_DOC_WITHOUT_PARAM									= 51;
 	const E_T_PARAM_WITHOUT_DOC									= 52;
 	const E_T_MAGIC_METHOD_PARAMS_INVALID				= 53;
 	const E_T_MAGIC_METHOD_RET_INVALID					= 54;
 	const E_T_MAGIC_NOT_PUBLIC									= 55;
 	const E_T_MAGIC_NOT_STATIC									= 56;
-	const E_T_MAGIC_IS_STATIC										= 57;
 	
 	/**
 	 * Determines the name of the given type
@@ -85,7 +84,6 @@ final class PC_Obj_Error extends FWS_Object
 			self::E_A_CLASS_NOT_ABSTRACT =>							'Class not abstract',
 			self::E_A_INTERFACE_MISSING =>							'Interface missing',
 			self::E_A_IF_IS_NO_IF =>										'Implemented class',
-			self::E_A_CLASS_POT_USELESS_ABSTRACT =>			'Abstract class',
 			
 			self::E_S_MIXED_RET_AND_NO_RET =>						'Mixed return',
 			self::E_S_RETURNS_DIFFER_FROM_SPEC =>				'Returns differ from spec',
@@ -144,7 +142,6 @@ final class PC_Obj_Error extends FWS_Object
 				self::E_A_CLASS_MISSING,
 				self::E_A_INTERFACE_MISSING,
 				self::E_A_IF_IS_NO_IF,
-				self::E_A_CLASS_POT_USELESS_ABSTRACT,
 			)
 		);
 		return $rep2types[$reporter];

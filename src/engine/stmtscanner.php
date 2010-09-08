@@ -237,7 +237,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		foreach($chain as $access)
 		{
 			// if we don't know the class-name or its no object, stop here
-			$classname = $objt->get_classname();
+			$classname = $objt !== null ? $objt->get_classname() : null;
 			if($classname === null)
 				return $this->get_unknown();
 			// if we don't know the class, give up, as well
@@ -374,6 +374,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	{
 		$varname = $var->get_name();
 		$scopename = $this->scope->get_name();
+		assert($value !== null);
 		// if we're in a condition save a backup of the current var for later comparisons
 		if(count($this->layers) > 0)
 		{
@@ -395,18 +396,6 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				return $value;
 			}
 		}
-		if($value === null)
-		{
-			// if a variable-type is unknown and we're in a function/class, check if we know the type
-			// from the type-scanner
-			$func = $this->get_method_object(
-				$this->scope->get_name_of(T_CLASS_C),$this->scope->get_name_of(T_FUNC_C)
-			);
-			if($func === null)
-				$value = $this->get_unknown();
-			else
-				$value = $this->get_funcparam_type($func,$varname);
-		}
 		if($isref)
 			$var->set_type($value->get_type());
 		else
@@ -421,6 +410,35 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
+	 * Sets the given function-parameter for the current scope
+	 * 
+	 * @param PC_Obj_Variable $var the variable
+	 * @param PC_Obj_Variable $hint the type from type-hinting (may be null)
+	 * @param PC_Obj_Variable $def the type from the default-value (may be null)
+	 */
+	public function set_func_param($var,$hint,$def)
+	{
+		// give type-hinting the highest prio, because I think its the most trustable type
+		if($hint !== null)
+		{
+			$this->set_var($var,$hint);
+			return;
+		}
+		
+		// if a variable-type is unknown and we're in a function/class, check if we know the type
+		// from the type-scanner
+		$func = $this->get_method_object(
+			$this->scope->get_name_of(T_CLASS_C),$this->scope->get_name_of(T_FUNC_C)
+		);
+		// if we have a doc, use it. otherwise use the default-value
+		$doc = $this->get_funcparam_type($func,$var->get_name());
+		if($doc !== null)
+			$this->set_var($var,$doc);
+		else
+			$this->set_var($var,$def ? $def : new PC_Obj_Variable(''));
+	}
+	
+	/**
 	 * Determines the type of the given function-parameter
 	 * 
 	 * @param PC_Obj_Method $func the function/method
@@ -430,11 +448,11 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	private function get_funcparam_type($func,$varname)
 	{
 		if($func === null)
-			return $this->get_unknown();
+			return null;
 		// TODO remove the '$' in the type-scanner
 		$param = $func->get_param('$'.$varname);
 		if($param === null)
-			return $this->get_unknown();
+			return null;
 		return new PC_Obj_Variable('',$param->get_mtype());
 	}
 	

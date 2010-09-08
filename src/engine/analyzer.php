@@ -209,16 +209,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 					$abstractcount++;
 			}
 			
-			if($class->is_abstract() && !$class->is_interface() && $abstractcount == 0)
-			{
-				$this->_report(
-					$class,
-					'The class "#'.$class->get_name().'#" is abstract but'
-						.' has no abstract method! Intended?',
-					PC_Obj_Error::E_A_CLASS_POT_USELESS_ABSTRACT
-				);
-			}
-			else if(!$class->is_abstract() && $abstractcount > 0)
+			if(!$class->is_abstract() && $abstractcount > 0)
 			{
 				$this->_report(
 					$class,

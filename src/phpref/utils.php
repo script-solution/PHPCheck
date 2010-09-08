@@ -245,7 +245,12 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 		else if(in_array($modifier3,array('private','protected')))
 			$method->set_visibility($modifier3);
 		if($return && $return != 'void')
+		{
 			$method->set_return_type(PC_Obj_MultiType::get_type_by_name($return));
+			// set this always for builtin types since it makes no sense to report errors for
+			// inherited classes or similar
+			$method->set_has_return_doc(true);
+		}
 		$method->set_name($name);
 		
 		// check what kind of params we have
@@ -271,6 +276,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 				$param = new PC_Obj_Parameter();
 				$param->set_name(trim($name));
 				$param->set_mtype(self::get_param_type($type));
+				$param->set_has_doc(true);
 				$method->put_param($param);
 			}
 		}
@@ -316,6 +322,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 				}
 				$param->set_name(trim($name));
 				$param->set_mtype(self::get_param_type($type,$default));
+				$param->set_has_doc(true);
 				$method->put_param($param);
 			}
 		}

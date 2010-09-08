@@ -563,40 +563,40 @@ new_else_single ::= .
 parameter_list ::= non_empty_parameter_list.
 parameter_list ::= .
 
-non_empty_parameter_list ::= optional_class_type(type) T_VARIABLE(var). {
+non_empty_parameter_list ::= optional_class_type(hint) T_VARIABLE(var). {
   $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_var($varname,type);
+	$this->state->set_func_param($varname,hint,null);
 }
-non_empty_parameter_list ::= optional_class_type(type) AMPERSAND T_VARIABLE(var). {
+non_empty_parameter_list ::= optional_class_type(hint) AMPERSAND T_VARIABLE(var). {
   $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_var($varname,type);
+	$this->state->set_func_param($varname,hint,null);
 }
-non_empty_parameter_list ::= optional_class_type AMPERSAND T_VARIABLE(var) EQUALS static_scalar(type). {
+non_empty_parameter_list ::= optional_class_type(hint) AMPERSAND T_VARIABLE(var) EQUALS static_scalar(def). {
   $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_var($varname,type);
+	$this->state->set_func_param($varname,hint,def);
 }
-non_empty_parameter_list ::= optional_class_type T_VARIABLE(var) EQUALS static_scalar(type). {
+non_empty_parameter_list ::= optional_class_type(hint) T_VARIABLE(var) EQUALS static_scalar(def). {
   $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_var($varname,type);
+	$this->state->set_func_param($varname,hint,def);
 }
-non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type(type) T_VARIABLE(var). {
+non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type(hint) T_VARIABLE(var). {
   $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_var($varname,type);
+	$this->state->set_func_param($varname,hint,null);
 }
-non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type(type) AMPERSAND
+non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type(hint) AMPERSAND
 														T_VARIABLE(var). {
   $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_var($varname,type);
+	$this->state->set_func_param($varname,hint,null);
 }
-non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type AMPERSAND
-														T_VARIABLE(var) EQUALS static_scalar(type). {
+non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type(hint) AMPERSAND
+														T_VARIABLE(var) EQUALS static_scalar(def). {
   $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_var($varname,type);
+	$this->state->set_func_param($varname,hint,def);
 }
-non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type
-														T_VARIABLE(var) EQUALS static_scalar(type). {
+non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type(hint)
+														T_VARIABLE(var) EQUALS static_scalar(def). {
   $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_var($varname,type);
+	$this->state->set_func_param($varname,hint,def);
 }
 
 
