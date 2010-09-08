@@ -327,5 +327,55 @@ $r = $p[1]->test2($b);
 		self::assertEquals($method,$call->get_function());
 		self::assertEquals($static,$call->is_static());
 	}
+	
+	public function testFields()
+	{
+		$code = '<?php
+class A {
+	public function foo() {
+		$this->a = 2;
+		$b = $this->x + 2;
+		$c = $this->y[2];
+	}
+}
+$a = new A();
+$a->asd = 4;
+$b = $a->foo;
+?>';
+		
+		$tscanner = new PC_Engine_TypeScannerFrontend();
+		$tscanner->scan($code);
+		
+		$typecon = $tscanner->get_types();
+		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
+		$fin->finalize();
+		
+		// scan files for function-calls and variables
+		$ascanner = new PC_Engine_StmtScannerFrontend($typecon);
+		$ascanner->scan($code);
+		
+		$errors = $typecon->get_errors();
+		self::assertEquals(5,count($errors));
+		
+		$error = $errors[0];
+		self::assertEquals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
+		self::assertRegExp('/Access of not-existing field "a" of class "#A#"/',$error->get_msg());
+		
+		$error = $errors[1];
+		self::assertEquals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
+		self::assertRegExp('/Access of not-existing field "x" of class "#A#"/',$error->get_msg());
+		
+		$error = $errors[2];
+		self::assertEquals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
+		self::assertRegExp('/Access of not-existing field "y" of class "#A#"/',$error->get_msg());
+		
+		$error = $errors[3];
+		self::assertEquals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
+		self::assertRegExp('/Access of not-existing field "asd" of class "#A#"/',$error->get_msg());
+		
+		$error = $errors[4];
+		self::assertEquals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
+		self::assertRegExp('/Access of not-existing field "foo" of class "#A#"/',$error->get_msg());
+	}
 }
 ?>

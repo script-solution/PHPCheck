@@ -42,6 +42,7 @@ final class PC_Obj_Error extends FWS_Object
 	const E_S_RET_SPEC_BUT_NO_RET								= 32;
 	const E_S_RET_BUT_NO_RET_SPEC								= 33;
 	const E_S_UNDEFINED_VAR											= 34;
+	const E_S_NOT_EXISTING_FIELD								= 35;
 	
 	const E_T_MAGIC_IS_STATIC										= 50;
 	const E_T_DOC_WITHOUT_PARAM									= 51;
@@ -90,6 +91,7 @@ final class PC_Obj_Error extends FWS_Object
 			self::E_S_RET_SPEC_BUT_NO_RET =>						'Return spec but no return',
 			self::E_S_RET_BUT_NO_RET_SPEC =>						'Returns but no return spec',
 			self::E_S_UNDEFINED_VAR =>									'Variable undefined',
+			self::E_S_NOT_EXISTING_FIELD =>							'Not existing field',
 			
 			self::E_T_MAGIC_METHOD_PARAMS_INVALID =>		'Magic params invalid',
 			self::E_T_MAGIC_METHOD_RET_INVALID =>				'Magic return invalid',
@@ -126,6 +128,7 @@ final class PC_Obj_Error extends FWS_Object
 				self::E_S_RET_SPEC_BUT_NO_RET,
 				self::E_S_RET_BUT_NO_RET_SPEC,
 				self::E_S_UNDEFINED_VAR,
+				self::E_S_NOT_EXISTING_FIELD,
 			),
 			self::R_ANALYZER => array(
 				self::E_A_METHOD_MISSING,

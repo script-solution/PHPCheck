@@ -236,7 +236,14 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 					return $this->get_unknown();
 				$field = $class->get_field($fieldname);
 				if($field === null)
+				{
+					$this->report_error(
+						null,
+						'Access of not-existing field "'.$fieldname.'" of class "#'.$classname.'#"',
+						PC_Obj_Error::E_S_NOT_EXISTING_FIELD
+					);
 					return $this->get_unknown();
+				}
 				$res = $field->get_type();
 				for($i = 1; $i < count($prop); $i++)
 				{
@@ -316,9 +323,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				
 				default:
 					$this->report_error(
-						new PC_Obj_Location($this->get_file(),$this->get_line()),
-						'The variable "$'.$name.'" is undefined',
-						PC_Obj_Error::E_S_UNDEFINED_VAR
+						null,'The variable "$'.$name.'" is undefined',PC_Obj_Error::E_S_UNDEFINED_VAR
 					);
 					break;
 			}
@@ -715,15 +720,17 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * Reports the given error
 	 * 
-	 * @param PC_Obj_Location $locsrc an object from which the location will be copied
+	 * @param PC_Obj_Location $locsrc an object from which the location will be copied (null = current)
 	 * @param string $msg the error-message
 	 * @param int $type the error-type
 	 */
 	private function report_error($locsrc,$msg,$type)
 	{
-		$this->types->add_errors(array(
-			new PC_Obj_Error(new PC_Obj_Location($locsrc->get_file(),$locsrc->get_line()),$msg,$type)
-		));
+		if($locsrc === null)
+			$locsrc = new PC_Obj_Location($this->get_file(),$this->get_line());
+		else
+			$locsrc = new PC_Obj_Location($locsrc->get_file(),$locsrc->get_line());
+		$this->types->add_errors(array(new PC_Obj_Error($locsrc,$msg,$type)));
 	}
 	
 	/**
