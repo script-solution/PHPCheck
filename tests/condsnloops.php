@@ -317,5 +317,69 @@ if($_)
 			(string)$calls[6]->get_call(false,false)
 		);
 	}
+	
+	public function testForeach()
+	{
+		$code = '<?php
+foreach(array(1,2,3) as $k => $v)
+	f1($k,$v);
+
+$a = array("foo","bar","test");
+foreach($a as &$v)
+	f2($v);
+
+foreach(array() as $v)
+	f3($v);
+
+foreach(array(1,"str",12.3) as $v)
+	f4($v);
+
+foreach(array(0 => 1,"a" => 2,12 => 3) as $k => $v)
+	f5($k,$v);
+
+foreach(array(0 => 1,2 => "2",12 => 3) as $k => $v)
+	f6($k,$v);
+
+foreach($_ as $k => $v)
+	f7($k,$v);
+?>';
+		
+		list($vars,$calls) = $this->do_analyze($code);
+		
+		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
+		
+		$type = new PC_Obj_MultiType();
+		self::assertEquals((string)$type,(string)$global['k']->get_type());
+		self::assertEquals((string)$type,(string)$global['v']->get_type());
+		
+		self::assertEquals(
+			'f1(integer, integer)',
+			(string)$calls[0]->get_call(false,false)
+		);
+		self::assertEquals(
+			'f2(string)',
+			(string)$calls[1]->get_call(false,false)
+		);
+		self::assertEquals(
+			'f3(unknown)',
+			(string)$calls[2]->get_call(false,false)
+		);
+		self::assertEquals(
+			'f4(unknown)',
+			(string)$calls[3]->get_call(false,false)
+		);
+		self::assertEquals(
+			'f5(unknown, integer)',
+			(string)$calls[4]->get_call(false,false)
+		);
+		self::assertEquals(
+			'f6(integer, unknown)',
+			(string)$calls[5]->get_call(false,false)
+		);
+		self::assertEquals(
+			'f7(unknown, unknown)',
+			(string)$calls[6]->get_call(false,false)
+		);
+	}
 }
 ?>

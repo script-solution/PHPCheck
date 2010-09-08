@@ -12,7 +12,24 @@
 
 class PC_Tests_Arrays extends PHPUnit_Framework_Testcase
 {
-	private static $code = '<?php
+	private function do_analyze($code)
+	{
+		$tscanner = new PC_Engine_TypeScannerFrontend();
+		$tscanner->scan($code);
+		
+		$typecon = $tscanner->get_types();
+		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
+		$fin->finalize();
+		
+		// scan files for function-calls and variables
+		$ascanner = new PC_Engine_StmtScannerFrontend($typecon);
+		$ascanner->scan($code);
+		return array($ascanner->get_vars(),$typecon->get_calls());
+	}
+	
+	public function testArrays()
+	{
+		$code = '<?php
 $x = array();
 $x[] = 4;
 $x[] = 5;
@@ -37,21 +54,8 @@ $a["Abc"] = "me";
 $d = array(0,array(1),2,3);
 $d[1][0] = 2;
 ?>';
-	
-	public function testArrays()
-	{
-		$tscanner = new PC_Engine_TypeScannerFrontend();
-		$tscanner->scan(self::$code);
 		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
-		$fin->finalize();
-		
-		// scan files for function-calls and variables
-		$ascanner = new PC_Engine_StmtScannerFrontend($typecon);
-		$ascanner->scan(self::$code);
-		$vars = $ascanner->get_vars();
-		$calls = $typecon->get_calls();
+		list($vars,$calls) = $this->do_analyze($code);
 		
 		$args = $calls[0]->get_arguments();
 		self::assertEquals((string)PC_Obj_MultiType::create_int(1),(string)$args[0]);
@@ -93,6 +97,72 @@ $d[1][0] = 2;
 		$type->get_first()->set_array_type(2,PC_Obj_MultiType::create_int(2));
 		$type->get_first()->set_array_type(3,PC_Obj_MultiType::create_int(3));
 		self::assertEquals((string)$type,(string)$global['d']->get_type());
+	}
+	
+	public function testList()
+	{
+		$code = '<?php
+$a = array(1,2,3);
+$b = list($a1,$a2,$a3) = $a;
+$a[] = 2;
+
+$c = list($c1,$c2,list($c3,$c4,list($c5)),$c6) = array(
+	1,2,array(3,4,array(5)),6
+);
+?>';
+		
+		list($vars,) = $this->do_analyze($code);
+		
+		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(array(1,2,3,2)),
+			(string)$global['a']->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(array(1,2,3)),
+			(string)$global['b']->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(1),
+			(string)$global['a1']->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(2),
+			(string)$global['a2']->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(3),
+			(string)$global['a3']->get_type()
+		);
+		
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(array(1,2,array(3,4,array(5)),6)),
+			(string)$global['c']->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(1),
+			(string)$global['c1']->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(2),
+			(string)$global['c2']->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(3),
+			(string)$global['c3']->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(4),
+			(string)$global['c4']->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(5),
+			(string)$global['c5']->get_type()
+		);
+		self::assertEquals(
+			(string)PC_Obj_Type::get_type_by_value(6),
+			(string)$global['c6']->get_type()
+		);
 	}
 }
 ?>

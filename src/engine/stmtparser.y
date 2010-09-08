@@ -159,14 +159,10 @@ unticked_statement ::= T_INLINE_HTML.
 unticked_statement ::= expr SEMI.
 unticked_statement ::= T_USE use_filename SEMI.
 unticked_statement ::= T_UNSET LPAREN unset_variables RPAREN SEMI.
-unticked_statement ::= T_FOREACH LPAREN variable T_AS 
-		foreach_variable foreach_optional_arg RPAREN
-		foreach_statement. {
+unticked_statement ::= foreach_var_head RPAREN foreach_statement. {
 	$this->state->end_loop();
 }
-unticked_statement ::= T_FOREACH LPAREN expr_without_variable T_AS 
-		w_variable foreach_optional_arg RPAREN
-		foreach_statement. {
+unticked_statement ::= foreach_novar_head RPAREN foreach_statement. {
 	$this->state->end_loop();
 }
 unticked_statement ::= T_DECLARE LPAREN declare_list RPAREN declare_statement.
@@ -179,6 +175,15 @@ unticked_statement ::= T_TRY LCURLY inner_statement_list RCURLY
 }
 unticked_statement ::= T_THROW expr(e) SEMI. {
 	$this->state->add_throw(e);
+}
+
+foreach_var_head ::= T_FOREACH LPAREN variable(var)
+										 T_AS foreach_variable(first) foreach_optional_arg(sec). {
+	$this->state->set_foreach_var(var,first,sec);
+}
+foreach_novar_head ::= T_FOREACH LPAREN expr_without_variable(evar)
+											 T_AS w_variable(first) foreach_optional_arg(sec). {
+	$this->state->set_foreach_var(evar,first,sec);
 }
 
 additional_catches ::= non_empty_additional_catches.
@@ -249,12 +254,14 @@ interface_list ::= interface_list COMMA fully_qualified_class_name.
 expr(A) ::= r_variable(var). { A = var; }
 expr(A) ::= expr_without_variable(e). { A = e; }
 
-expr_without_variable ::= T_LIST LPAREN assignment_list RPAREN EQUALS expr.
+expr_without_variable(A) ::= T_LIST LPAREN assignment_list(list) RPAREN EQUALS expr(e). {
+	A = $this->state->handle_list(list,e);
+}
 expr_without_variable(A) ::= variable(var) EQUALS expr(e). {
 	A = $this->state->set_var(var,e);
 }
 expr_without_variable(A) ::= variable(var) EQUALS AMPERSAND variable(e). {
-	A = $this->state->set_var(var,e);
+	A = $this->state->set_var(var,e,true);
 }
 expr_without_variable(A) ::= variable(var) EQUALS AMPERSAND T_NEW
 														 class_name_reference(name) ctor_arguments(args). {
@@ -508,11 +515,11 @@ static_class_constant(A) ::= T_STRING(class) T_PAAMAYIM_NEKUDOTAYIM T_STRING(con
 	A = $this->state->handle_classconst_access($cname,const);
 }
 
-foreach_optional_arg ::= T_DOUBLE_ARROW foreach_variable.
-foreach_optional_arg ::= .
+foreach_optional_arg(A) ::= T_DOUBLE_ARROW foreach_variable(var). { A = var; }
+foreach_optional_arg(A) ::= . { A = null; }
 
-foreach_variable ::= w_variable.
-foreach_variable ::= AMPERSAND w_variable.
+foreach_variable(A) ::= w_variable(wvar). { A = wvar; }
+foreach_variable(A) ::= AMPERSAND w_variable(wvar). { A = wvar; }
 
 for_statement ::= statement.
 for_statement ::= COLON inner_statement_list T_ENDFOR SEMI.
@@ -732,8 +739,33 @@ variable_without_objects(A) ::= simple_indirect_reference reference_variable. {
 	A = new PC_Obj_Variable('');
 }
 
-static_member(A) ::= fully_qualified_class_name(name) T_PAAMAYIM_NEKUDOTAYIM variable_without_objects(var). {
-	A = $this->state->handle_field_access(name,var);
+static_member(A) ::= fully_qualified_class_name(name) T_PAAMAYIM_NEKUDOTAYIM
+										 static_variable_without_objects(list). {
+	A = $this->state->handle_field_access(name,list);
+}
+
+static_variable_without_objects(A) ::= static_reference_variable(list). { A = list; }
+static_variable_without_objects(A) ::= simple_indirect_reference static_reference_variable. {
+	A = array();
+}
+
+static_reference_variable(A) ::= static_reference_variable(list) LBRACKET dim_offset(off) RBRACKET. {
+	A = list;
+	A[] = array('array',off);
+}
+static_reference_variable(A) ::= static_reference_variable(list) LCURLY expr(e) RCURLY. {
+	A = list;
+	A[] = array('simple',e);
+}
+static_reference_variable(A) ::= static_compound_variable(v). {
+	A = array(array('simple',v));
+}
+
+static_compound_variable(A) ::= T_VARIABLE(name). {
+	A = new PC_Obj_Variable('',PC_Obj_MultiType::create_string(substr(name,1)));
+}
+static_compound_variable(A) ::= DOLLAR LCURLY expr(e) RCURLY. {
+	A = e;
 }
 
 base_variable_with_function_calls(A) ::= base_variable(v). { A = v; }
@@ -792,12 +824,15 @@ variable_name(A) ::= LCURLY expr(e) RCURLY. { A = e; }
 simple_indirect_reference ::= DOLLAR.
 simple_indirect_reference ::= simple_indirect_reference DOLLAR.
 
-assignment_list ::= assignment_list COMMA assignment_list_element.
-assignment_list ::= assignment_list_element.
+assignment_list(A) ::= assignment_list(list) COMMA assignment_list_element(el). {
+	A = list;
+	A[] = el;
+}
+assignment_list(A) ::= assignment_list_element(el). { A = array(el); }
 
-assignment_list_element ::= variable.
-assignment_list_element ::= T_LIST LPAREN assignment_list RPAREN.
-assignment_list_element ::= .
+assignment_list_element(A) ::= variable(var). { A = var; }
+assignment_list_element(A) ::= T_LIST LPAREN assignment_list(list) RPAREN. { A = list; }
+assignment_list_element(A) ::= . { A = null; }
 
 array_pair_list(A) ::= non_empty_array_pair_list(list) possible_comma. { A = list; }
 array_pair_list(A) ::= . { A = PC_Obj_Variable::create_array(); }

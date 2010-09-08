@@ -172,6 +172,7 @@ class PC_Engine_BaseScanner
 		$type = $e->get_type();
 		if($type->is_val_unknown())
 			return $this->get_type_from_op($op,$type);
+		$res = 0;
 		eval('$res = '.$op.$type->get_first()->get_value_for_eval().';');
 		return $this->get_type_from_php($res);
 	}

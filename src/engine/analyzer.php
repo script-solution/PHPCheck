@@ -115,7 +115,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 								$this->_report(
 									$call,
 									'The method "'.$name.'" does not exist in the class "#'.$classname.'#"!',
-									PC_Obj_Error::E_S_METHOD_MISSING
+									PC_Obj_Error::E_A_METHOD_MISSING
 								);
 							}
 						}
@@ -124,7 +124,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 							$this->_report(
 								$call,
 								'You can\'t instantiate the abstract class "#'.$c->get_name().'#"!',
-								PC_Obj_Error::E_S_ABSTRACT_CLASS_INSTANTIATION
+								PC_Obj_Error::E_A_ABSTRACT_CLASS_INSTANTIATION
 							);
 						}
 						else
@@ -137,7 +137,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 									$call,
 									'Your call "'.$this->_get_call_link($call).'" calls "'.$m->get_name()
 										.'" statically, but the method is not static!',
-									PC_Obj_Error::E_S_STATIC_CALL
+									PC_Obj_Error::E_A_STATIC_CALL
 								);
 							}
 							else if(!$call->is_static() && $m->is_static())
@@ -146,7 +146,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 									$call,
 									'Your call "'.$this->_get_call_link($call).'" calls "'.$m->get_name()
 										.'" not statically, but the method is static!',
-									PC_Obj_Error::E_S_NONSTATIC_CALL
+									PC_Obj_Error::E_A_NONSTATIC_CALL
 								);
 							}
 							
@@ -158,7 +158,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 						$this->_report(
 							$call,
 							'The class of the object in the call "'.$this->_get_call_link($call).'" is unknown!',
-							PC_Obj_Error::E_S_CLASS_UNKNOWN
+							PC_Obj_Error::E_A_CLASS_UNKNOWN
 						);
 					}
 					else
@@ -166,7 +166,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 						$this->_report(
 							$call,
 							'The class "#'.$classname.'#" does not exist!',
-							PC_Obj_Error::E_S_CLASS_MISSING
+							PC_Obj_Error::E_A_CLASS_MISSING
 						);
 					}
 				}
@@ -179,7 +179,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 					$this->_report(
 						$call,
 						'The function "'.$name.'" does not exist!',
-						PC_Obj_Error::E_S_FUNCTION_MISSING
+						PC_Obj_Error::E_A_FUNCTION_MISSING
 					);
 				}
 				else
@@ -215,7 +215,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 					$class,
 					'The class "#'.$class->get_name().'#" is abstract but'
 						.' has no abstract method! Intended?',
-					PC_Obj_Error::E_T_CLASS_POT_USELESS_ABSTRACT
+					PC_Obj_Error::E_A_CLASS_POT_USELESS_ABSTRACT
 				);
 			}
 			else if(!$class->is_abstract() && $abstractcount > 0)
@@ -224,7 +224,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 					$class,
 					'The class "#'.$class->get_name().'#" is NOT abstract but'
 						.' contains abstract methods!',
-					PC_Obj_Error::E_T_CLASS_NOT_ABSTRACT
+					PC_Obj_Error::E_A_CLASS_NOT_ABSTRACT
 				);
 			}
 			
@@ -239,7 +239,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 					$this->_report(
 						$class,
 						'The class "#'.$class->get_super_class().'#" does not exist!',
-						PC_Obj_Error::E_T_CLASS_MISSING
+						PC_Obj_Error::E_A_CLASS_MISSING
 					);
 				}
 				// super-class final?
@@ -249,7 +249,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 						$class,
 						'The class "#'.$class->get_name().'#" inherits from the final '
 							.'class "#'.$sclass->get_name().'#"!',
-						PC_Obj_Error::E_T_FINAL_CLASS_INHERITANCE
+						PC_Obj_Error::E_A_FINAL_CLASS_INHERITANCE
 					);
 				}
 			}
@@ -263,7 +263,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 					$this->_report(
 						$class,
 						'The interface "#'.$ifname.'#" does not exist!',
-						PC_Obj_Error::E_T_INTERFACE_MISSING
+						PC_Obj_Error::E_A_INTERFACE_MISSING
 					);
 				}
 				else if(!$if->is_interface())
@@ -271,7 +271,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 					$this->_report(
 						$class,
 						'"#'.$ifname.'#" is no interface, but implemented by class #'.$class->get_name().'#!',
-						PC_Obj_Error::E_T_IF_IS_NO_IF
+						PC_Obj_Error::E_A_IF_IS_NO_IF
 					);
 				}
 			}
@@ -299,7 +299,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 				$call,
 				'The function/method called by "'.$this->_get_call_link($call).'" requires '.$reqparams
 					.' arguments but you have given '.count($arguments),
-				PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT
+				PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT
 			);
 		}
 		else
@@ -326,7 +326,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 						'The argument '.($i + 1).' in "'.$this->_get_call_link($call).'" requires '
 							.$this->_get_article($trequired).' "'.$trequired.'" but you have given '
 							.$this->_get_article($tactual).' "'.($tactual === null ? "<i>NULL</i>" : $tactual).'"',
-						PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE
+						PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE
 					);
 				}
 				$i++;

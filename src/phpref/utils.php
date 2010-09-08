@@ -149,6 +149,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 		$desc = trim(strip_tags($desc));
 		$desc = FWS_StringHelper::htmlspecialchars_back($desc);
 		// filter out modifier, return-type, name and params
+		$match = array();
 		$res = preg_match(
 			// first modifier
 			'/^(?:(const|readonly|static|public|protected|private)\s*)?'
@@ -205,6 +206,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 		$desc = trim(strip_tags($desc));
 		$desc = FWS_StringHelper::htmlspecialchars_back($desc);
 		// filter out modifier, return-type, name and params
+		$match = array();
 		$res = preg_match(
 			// first modifier
 			'/^(?:(abstract|static|final|public|protected|private)\s*)?'

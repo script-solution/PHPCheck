@@ -157,6 +157,27 @@ class PC_DAO_Errors extends FWS_Singleton
 	}
 	
 	/**
+	 * Deletes all given error-types for given project
+	 * 
+	 * @param array $types an array of the types
+	 * @param int $pid the project-id (default = current)
+	 * @return int the number of affected rows
+	 */
+	public function delete_by_type($types,$pid = PC_Project::CURRENT_ID)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(!FWS_Array_Utils::is_integer($types) || count($types) == 0)
+			FWS_Helper::def_error('intarray>0','types',$types);
+		
+		$pid = PC_Utils::get_project_id($pid);
+		$db->execute(
+			'DELETE FROM '.PC_TB_ERRORS.' WHERE project_id = '.$pid.' AND type IN ('.implode(',',$types).')'
+		);
+		return $db->get_affected_rows();
+	}
+	
+	/**
 	 * Deletes all errors from the project with given id
 	 *
 	 * @param int $id the project-id

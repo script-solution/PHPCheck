@@ -65,6 +65,9 @@ final class PC_Obj_Type extends FWS_Object
 				return new self(self::RESOURCE);
 			
 			case 'mixed':
+			case 'NULL':					// return from gettype()
+			case 'unknown type':	// return from gettype()
+			case 'unknown':
 				return null;
 			
 			case 'object':

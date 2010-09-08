@@ -37,7 +37,9 @@ final class PC_Action_analyze_start extends FWS_Action_Base
 		
 		// clear previous data in the db
 		$project = FWS_Props::get()->project();
-		PC_DAO::get_errors()->delete_by_project($project->get_id());
+		PC_DAO::get_errors()->delete_by_type(
+			PC_Obj_Error::get_types_of(PC_Obj_Error::R_ANALYZER),$project->get_id()
+		);
 		
 		if(PC_PARALLEL_JOB_COUNT == 0)
 			$this->set_redirect(true,PC_URL::get_submod_url(0,'scan'));

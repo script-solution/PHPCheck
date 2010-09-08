@@ -19,32 +19,38 @@
  */
 final class PC_Obj_Error extends FWS_Object
 {
-	const E_S_METHOD_MISSING										= 0;
-	const E_S_ABSTRACT_CLASS_INSTANTIATION			= 1;
-	const E_S_STATIC_CALL												= 2;
-	const E_S_NONSTATIC_CALL										= 3;
-	const E_S_CLASS_MISSING											= 4;
-	const E_S_CLASS_UNKNOWN											= 5;
-	const E_S_FUNCTION_MISSING									= 6;
-	const E_S_WRONG_ARGUMENT_COUNT							= 7;
-	const E_S_WRONG_ARGUMENT_TYPE								= 8;
-	const E_S_MIXED_RET_AND_NO_RET							= 9;
-	const E_S_RETURNS_DIFFER_FROM_SPEC					= 10;
-	const E_S_RET_SPEC_BUT_NO_RET								= 11;
-	const E_S_RET_BUT_NO_RET_SPEC								= 12;
-	const E_T_CLASS_POT_USELESS_ABSTRACT				= 20;
-	const E_T_FINAL_CLASS_INHERITANCE						= 21;
-	const E_T_CLASS_NOT_ABSTRACT								= 22;
-	const E_T_CLASS_MISSING											= 23;
-	const E_T_INTERFACE_MISSING									= 24;
-	const E_T_IF_IS_NO_IF												= 25;
-	const E_T_DOC_WITHOUT_PARAM									= 26;
-	const E_T_PARAM_WITHOUT_DOC									= 27;
-	const E_T_MAGIC_METHOD_PARAMS_INVALID				= 28;
-	const E_T_MAGIC_METHOD_RET_INVALID					= 29;
-	const E_T_MAGIC_NOT_PUBLIC									= 30;
-	const E_T_MAGIC_NOT_STATIC									= 31;
-	const E_T_MAGIC_IS_STATIC										= 32;
+	const R_TYPESCANNER													= 0;
+	const R_STMTSCANNER													= 1;
+	const R_ANALYZER														= 2;
+	
+	const E_A_METHOD_MISSING										= 0;
+	const E_A_ABSTRACT_CLASS_INSTANTIATION			= 1;
+	const E_A_STATIC_CALL												= 2;
+	const E_A_NONSTATIC_CALL										= 3;
+	const E_A_CLASS_MISSING											= 4;
+	const E_A_CLASS_UNKNOWN											= 5;
+	const E_A_FUNCTION_MISSING									= 6;
+	const E_A_WRONG_ARGUMENT_COUNT							= 7;
+	const E_A_WRONG_ARGUMENT_TYPE								= 8;
+	const E_A_FINAL_CLASS_INHERITANCE						= 9;
+	const E_A_CLASS_NOT_ABSTRACT								= 10;
+	const E_A_INTERFACE_MISSING									= 11;
+	const E_A_IF_IS_NO_IF												= 12;
+	
+	const E_S_MIXED_RET_AND_NO_RET							= 30;
+	const E_S_RETURNS_DIFFER_FROM_SPEC					= 31;
+	const E_S_RET_SPEC_BUT_NO_RET								= 32;
+	const E_S_RET_BUT_NO_RET_SPEC								= 33;
+	const E_S_UNDEFINED_VAR											= 34;
+	
+	const E_A_CLASS_POT_USELESS_ABSTRACT				= 50;
+	const E_T_DOC_WITHOUT_PARAM									= 51;
+	const E_T_PARAM_WITHOUT_DOC									= 52;
+	const E_T_MAGIC_METHOD_PARAMS_INVALID				= 53;
+	const E_T_MAGIC_METHOD_RET_INVALID					= 54;
+	const E_T_MAGIC_NOT_PUBLIC									= 55;
+	const E_T_MAGIC_NOT_STATIC									= 56;
+	const E_T_MAGIC_IS_STATIC										= 57;
 	
 	/**
 	 * Determines the name of the given type
@@ -65,34 +71,83 @@ final class PC_Obj_Error extends FWS_Object
 	 */
 	public static function get_types()
 	{
-		return array(
-			self::E_S_METHOD_MISSING =>									'Method missing',
-			self::E_S_ABSTRACT_CLASS_INSTANTIATION =>		'Abstract class instantiation',
-			self::E_S_STATIC_CALL => 										'Static call',
-			self::E_S_NONSTATIC_CALL =>									'Nonstatic call',
-			self::E_S_CLASS_MISSING =>									'Class missing',
-			self::E_S_CLASS_UNKNOWN =>									'Class unknown',
-			self::E_S_FUNCTION_MISSING =>								'Function missing',
-			self::E_S_WRONG_ARGUMENT_COUNT =>						'Wrong arg count',
-			self::E_S_WRONG_ARGUMENT_TYPE =>						'Wrong arg type',
-			self::E_T_CLASS_POT_USELESS_ABSTRACT =>			'Abstract class',
-			self::E_T_FINAL_CLASS_INHERITANCE =>				'Final class inheritance',
-			self::E_T_CLASS_NOT_ABSTRACT =>							'Class not abstract',
-			self::E_T_CLASS_MISSING =>									'Class missing',
-			self::E_T_INTERFACE_MISSING =>							'Interface missing',
-			self::E_T_IF_IS_NO_IF =>										'Implemented class',
-			self::E_T_DOC_WITHOUT_PARAM =>							'Doc without param',
-			self::E_T_PARAM_WITHOUT_DOC =>							'Param without doc',
+		static $types = array(
+			self::E_A_METHOD_MISSING =>									'Method missing',
+			self::E_A_ABSTRACT_CLASS_INSTANTIATION =>		'Abstract class instantiation',
+			self::E_A_STATIC_CALL => 										'Static call',
+			self::E_A_NONSTATIC_CALL =>									'Nonstatic call',
+			self::E_A_CLASS_MISSING =>									'Class missing',
+			self::E_A_CLASS_UNKNOWN =>									'Class unknown',
+			self::E_A_FUNCTION_MISSING =>								'Function missing',
+			self::E_A_WRONG_ARGUMENT_COUNT =>						'Wrong arg count',
+			self::E_A_WRONG_ARGUMENT_TYPE =>						'Wrong arg type',
+			self::E_A_FINAL_CLASS_INHERITANCE =>				'Final class inheritance',
+			self::E_A_CLASS_NOT_ABSTRACT =>							'Class not abstract',
+			self::E_A_INTERFACE_MISSING =>							'Interface missing',
+			self::E_A_IF_IS_NO_IF =>										'Implemented class',
+			self::E_A_CLASS_POT_USELESS_ABSTRACT =>			'Abstract class',
+			
 			self::E_S_MIXED_RET_AND_NO_RET =>						'Mixed return',
 			self::E_S_RETURNS_DIFFER_FROM_SPEC =>				'Returns differ from spec',
 			self::E_S_RET_SPEC_BUT_NO_RET =>						'Return spec but no return',
 			self::E_S_RET_BUT_NO_RET_SPEC =>						'Returns but no return spec',
+			self::E_S_UNDEFINED_VAR =>									'Variable undefined',
+			
 			self::E_T_MAGIC_METHOD_PARAMS_INVALID =>		'Magic params invalid',
 			self::E_T_MAGIC_METHOD_RET_INVALID =>				'Magic return invalid',
 			self::E_T_MAGIC_NOT_PUBLIC =>								'Magic not public',
 			self::E_T_MAGIC_NOT_STATIC =>								'Magic not static',
-			self::E_T_MAGIC_IS_STATIC =>								'Magic is static'
+			self::E_T_MAGIC_IS_STATIC =>								'Magic is static',
+			self::E_T_DOC_WITHOUT_PARAM =>							'Doc without param',
+			self::E_T_PARAM_WITHOUT_DOC =>							'Param without doc',
 		);
+		return $types;
+	}
+	
+	/**
+	 * Returns all types that are reported by $reporter
+	 * 
+	 * @param int $reporter the reporter (self::R_*)
+	 * @return array an array of the types
+	 */
+	public static function get_types_of($reporter)
+	{
+		static $rep2types = array(
+			self::R_TYPESCANNER => array(
+				self::E_T_DOC_WITHOUT_PARAM,
+				self::E_T_PARAM_WITHOUT_DOC,
+				self::E_T_MAGIC_METHOD_PARAMS_INVALID,
+				self::E_T_MAGIC_METHOD_RET_INVALID,
+				self::E_T_MAGIC_NOT_PUBLIC,
+				self::E_T_MAGIC_NOT_STATIC,
+				self::E_T_MAGIC_IS_STATIC,
+			),
+			self::R_STMTSCANNER => array(
+				self::E_S_MIXED_RET_AND_NO_RET,
+				self::E_S_RETURNS_DIFFER_FROM_SPEC,
+				self::E_S_RET_SPEC_BUT_NO_RET,
+				self::E_S_RET_BUT_NO_RET_SPEC,
+				self::E_S_UNDEFINED_VAR,
+			),
+			self::R_ANALYZER => array(
+				self::E_A_METHOD_MISSING,
+				self::E_A_ABSTRACT_CLASS_INSTANTIATION,
+				self::E_A_STATIC_CALL,
+				self::E_A_NONSTATIC_CALL,
+				self::E_A_CLASS_MISSING,
+				self::E_A_CLASS_UNKNOWN,
+				self::E_A_FUNCTION_MISSING,
+				self::E_A_WRONG_ARGUMENT_COUNT,
+				self::E_A_WRONG_ARGUMENT_TYPE,
+				self::E_A_FINAL_CLASS_INHERITANCE,
+				self::E_A_CLASS_NOT_ABSTRACT,
+				self::E_A_CLASS_MISSING,
+				self::E_A_INTERFACE_MISSING,
+				self::E_A_IF_IS_NO_IF,
+				self::E_A_CLASS_POT_USELESS_ABSTRACT,
+			)
+		);
+		return $rep2types[$reporter];
 	}
 	
 	/**

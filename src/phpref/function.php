@@ -50,9 +50,11 @@ final class PC_PHPRef_Function extends FWS_Object
 		$funcname = str_replace('-','_',$funcname);
 		
 		// check wether this function is just an alias or deprecated
+		$match = array();
 		if(preg_match('/<p class="refpurpose">(.*?)<\/p>/s',$content,$match))
 		{
 			$match = strip_tags($match[1]);
+			$alias = array();
 			$res = preg_match(
 				'/'.preg_quote($funcname,'/').'\s*&mdash;\s*Alias\s*of\s*'
 				.'(?:([a-zA-Z0-9_]+)(?:::|->))?([a-zA-Z0-9_]+)/s',
@@ -65,6 +67,7 @@ final class PC_PHPRef_Function extends FWS_Object
 		}
 		
 		// find method-description
+		$matches = array();
 		$res = preg_match_all(
 			'/<div class="(?:methodsynopsis|constructorsynopsis) dc-description">(.*?)<\/div>/s',
 			$content,$matches
@@ -74,6 +77,7 @@ final class PC_PHPRef_Function extends FWS_Object
 		
 		// find version-information
 		$version = '';
+		$vmatch = array();
 		if(preg_match('/<p class="verinfo">\s*\((.*?)\)\s*<\/p>/',$content,$vmatch))
 			$version = trim($vmatch[1]);
 		

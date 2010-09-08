@@ -45,6 +45,7 @@ final class PC_PHPRef_Class extends FWS_Object
 	 */
 	public function get_class()
 	{
+		$match = array();
 		$content = file_get_contents($this->file);
 		
 		if(!preg_match('/<b class="classname">(.*?)<\/b>/s',$content,$match))
@@ -64,6 +65,7 @@ final class PC_PHPRef_Class extends FWS_Object
 			$class->set_super_class($match[1]);
 		
 		// determine interfaces
+		$matches = array();
 		$res = preg_match_all(
 			'/<span class="interfacename"><a href=".*?" class=".*?">(.*?)<\/a><\/span>/s',
 			$content,

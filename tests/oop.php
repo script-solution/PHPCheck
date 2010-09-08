@@ -64,8 +64,15 @@ interface i extends i1,i2 {
 }
 final class x extends b implements i {
 	private static $var = 4;
+	public static $array1 = array(1,2,3);
+	public static $array2 = array(array(4,5,6));
 	public function doSomething() {
 		// nothing
+		dummy1(self::$array1[1]);
+		dummy2(x::$array1[2]);
+		dummy3(x::$array2[0][2]);
+		dummy4(x::$array2[0][4]);
+		dummy5(x::$array2[1][2]);
 	}
 	public static function mystatic() {}
 }
@@ -278,7 +285,7 @@ $r = $p[1]->test2($b);
 			(string)$global['n']->get_type()
 		);
 		self::assertEquals(
-			(string)PC_Obj_MultiType::create_int(74),
+			(string)PC_Obj_MultiType::create_int(81),
 			(string)$global['o']->get_type()
 		);
 		self::assertEquals(
@@ -292,20 +299,28 @@ $r = $p[1]->test2($b);
 		
 		// check calls
 		$calls = $typecon->get_calls();
-		$this->assertCall($calls[0],'b','get42',true);
-		$this->assertCall($calls[1],'a','test',false);
-		$this->assertCall($calls[2],'a','__construct',false);
-		$this->assertCall($calls[3],'a','test2',false);
-		$this->assertCall($calls[4],'x','__construct',false);
-		$this->assertCall($calls[5],'x','test2',false);
-		$this->assertCall($calls[6],'x','test2',false);
-		$this->assertCall($calls[7],'b','test2',false);
-		$this->assertCall($calls[8],'b','sdf',true);
-		$this->assertCall($calls[9],'x','partest',false);
-		$this->assertCall($calls[12],'a','test2',false);
-		$this->assertCall($calls[13],'b','test2',false);
+		$i = 0;
+		$this->assertCall($calls[$i++],'b','get42',true);
+		$this->assertCall($calls[$i++],'a','test',false);
+		$this->assertEquals((string)$calls[$i++]->get_call(false,false),'dummy1(integer=2)');
+		$this->assertEquals((string)$calls[$i++]->get_call(false,false),'dummy2(integer=3)');
+		$this->assertEquals((string)$calls[$i++]->get_call(false,false),'dummy3(integer=6)');
+		$this->assertEquals((string)$calls[$i++]->get_call(false,false),'dummy4(unknown)');
+		$this->assertEquals((string)$calls[$i++]->get_call(false,false),'dummy5(unknown)');
+		$this->assertCall($calls[$i++],'a','__construct',false);
+		$this->assertCall($calls[$i++],'a','test2',false);
+		$this->assertCall($calls[$i++],'x','__construct',false);
+		$this->assertCall($calls[$i++],'x','test2',false);
+		$this->assertCall($calls[$i++],'x','test2',false);
+		$this->assertCall($calls[$i++],'b','test2',false);
+		$this->assertCall($calls[$i++],'b','sdf',true);
+		$this->assertCall($calls[$i++],'x','partest',false);
+		$this->assertCall($calls[$i++],'a','__construct',false);
+		$this->assertCall($calls[$i++],'b','__construct',false);
+		$this->assertCall($calls[$i++],'a','test2',false);
+		$this->assertCall($calls[$i++],'b','test2',false);
 	}
-	
+
 	private function assertCall($call,$class,$method,$static)
 	{
 		self::assertEquals($class,$call->get_class());

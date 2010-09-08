@@ -12,7 +12,26 @@
 
 class PC_Tests_Funcs extends PHPUnit_Framework_Testcase
 {
-	private static $code = '<?php
+	private function do_analyze($code)
+	{
+		$tscanner = new PC_Engine_TypeScannerFrontend();
+		$tscanner->scan($code);
+		
+		$typecon = $tscanner->get_types();
+		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
+		$fin->finalize();
+		
+		// scan files for function-calls and variables
+		$ascanner = new PC_Engine_StmtScannerFrontend($typecon);
+		$ascanner->scan($code);
+		return array(
+			$typecon->get_functions(),$typecon->get_classes(),$typecon->get_calls(),$ascanner->get_vars()
+		);
+	}
+	
+	public function testFuncs()
+	{
+		$code = '<?php
 function a() {}
 /**
  * @param string $a
@@ -53,21 +72,7 @@ abstract class myc {
 }
 ?>';
 	
-	public function testFuncs()
-	{
-		$tscanner = new PC_Engine_TypeScannerFrontend();
-		$tscanner->scan(self::$code);
-		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
-		$fin->finalize();
-		
-		$functions = $typecon->get_functions();
-		$classes = $typecon->get_classes();
-		
-		// scan files for function-calls and variables
-		$ascanner = new PC_Engine_StmtScannerFrontend($typecon);
-		$ascanner->scan(self::$code);
+		list($functions,$classes,$calls) = $this->do_analyze($code);
 		
 		$func = $functions['a'];
 		/* @var $func PC_Obj_Method */
@@ -110,9 +115,57 @@ abstract class myc {
 		self::assertEquals('MyClass',(string)$func->get_param('$c'));
 		self::assertEquals('integer',(string)$func->get_param('$d'));
 		
-		$calls = $typecon->get_calls();
 		self::assertEquals('myc->doit()',(string)$calls[0]->get_call(false,false));
 		self::assertEquals('myc2::mystatic()',(string)$calls[1]->get_call(false,false));
+	}
+	
+	public function testNesting()
+	{
+		$code = '<?php
+class A {
+	function a() {
+		$a = 1;
+		function b() {
+			$b = 2;
+			function c() {
+				$c = 3;
+				function d() {
+					$d = 4;
+				}
+				f3($c);
+			}
+			f2($b);
+		}
+		f1($a);
+	}
+}
+
+function e() {
+	$e = 5;
+	function f() {
+		$f = 6;
+		class B {
+			function g() {
+				$g = 7;
+			}
+		}
+	}
+}
+?>';
+		
+		list(,,$calls,$vars) = $this->do_analyze($code);
+		
+		self::assertEquals('f3(integer=3)',(string)$calls[0]->get_call(false,false));
+		self::assertEquals('f2(integer=2)',(string)$calls[1]->get_call(false,false));
+		self::assertEquals('f1(integer=1)',(string)$calls[2]->get_call(false,false));
+		
+		self::assertEquals((string)PC_Obj_MultiType::create_int(1),(string)$vars['A::a']['a']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_int(2),(string)$vars['b']['b']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_int(3),(string)$vars['c']['c']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_int(4),(string)$vars['d']['d']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_int(5),(string)$vars['e']['e']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_int(6),(string)$vars['f']['f']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_int(7),(string)$vars['B::g']['g']->get_type());
 	}
 }
 ?>
