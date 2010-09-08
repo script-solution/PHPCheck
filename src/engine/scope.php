@@ -2,7 +2,7 @@
 /**
  * Contains the scope-class
  *
- * @version			$Id: basescanner.php 72 2010-09-06 20:16:22Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>

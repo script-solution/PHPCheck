@@ -2,7 +2,7 @@
 /**
  * Tests magic methods
  *
- * @version			$Id: exprs.php 65 2010-09-06 09:32:49Z nasmussen $
+ * @version			$Id$
  * @package			PHPCheck
  * @subpackage	tests
  * @author			Nils Asmussen <nils@script-solution.de>
