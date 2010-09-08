@@ -489,26 +489,6 @@ foobar("str",true);				// both wrong
 		);
 	}
 	
-	public function test_t_class_pot_useless_abstract()
-	{
-		$code = '<?php
-abstract class A {}						// no abstract method
-interface I {}								// ok
-abstract class B extends A {}	// no abstract method
-?>';
-		
-		$errors = $this->do_analyze($code);
-		self::assertEquals(2,count($errors));
-		
-		$error = $errors[0];
-		self::assertEquals(PC_Obj_Error::E_A_CLASS_POT_USELESS_ABSTRACT,$error->get_type());
-		self::assertRegExp('/The class "#A#" is abstract but has no abstract method! Intended?/',$error->get_msg());
-		
-		$error = $errors[1];
-		self::assertEquals(PC_Obj_Error::E_A_CLASS_POT_USELESS_ABSTRACT,$error->get_type());
-		self::assertRegExp('/The class "#B#" is abstract but has no abstract method! Intended?/',$error->get_msg());
-	}
-	
 	public function test_t_final_class_inheritance()
 	{
 		$code = '<?php

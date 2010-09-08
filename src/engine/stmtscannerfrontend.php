@@ -98,7 +98,7 @@ class PC_Engine_StmtScannerFrontend extends FWS_Object
 			$parser->doParse($this->lexer->get_token(),$this->lexer->get_value());
 		$parser->doParse(0,0);
 		
-		$this->vars = array_merge($this->vars,$this->lexer->get_vars());
+		$this->vars = array_merge($this->vars,$this->lexer->get_vars()->get_all());
 	}
 	
 	protected function get_dump_vars()

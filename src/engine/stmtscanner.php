@@ -62,28 +62,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * The current scope
 	 * 
-	 * @var string
+	 * @var PC_Obj_Scope
 	 */
 	private $scope;
-	/**
-	 * Will be > 0 if we're in a loop
-	 * 
-	 * @var int
-	 */
-	private $loopdepth = 0;
-	/**
-	 * Will be > 0 if we're in a condition
-	 * 
-	 * @var int
-	 */
-	private $conddepth = 0;
-	/**
-	 * For each condition and loop a list of variables we should mark as unknown as soon
-	 * as we leave the condition.
-	 * 
-	 * @var array
-	 */
-	private $layers = array();
 	
 	/**
 	 * The known types
@@ -94,11 +75,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * The variables
 	 * 
-	 * @var array
+	 * @var PC_Engine_VarContainer
 	 */
-	private $vars = array(
-		PC_Obj_Variable::SCOPE_GLOBAL => array()
-	);
+	private $vars;
 	/**
 	 * An array of all return-types of the current function/method
 	 * 
@@ -119,10 +98,11 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		
 		$this->types = $types;
 		$this->scope = new PC_Engine_Scope();
+		$this->vars = new PC_Engine_VarContainer();
 	}
 	
 	/**
-	 * @return array the found variables
+	 * @return PC_Engine_VarContainer the variable-container
 	 */
 	public function get_vars()
 	{
@@ -313,7 +293,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	private function check_known($var)
 	{
 		$name = $var->get_name();
-		if($name && !isset($this->vars[$this->scope->get_name()][$name]))
+		if($name && !$this->vars->exists($this->scope->get_name(),$name))
 		{
 			switch($name)
 			{
@@ -357,9 +337,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if($var == 'this')
 			return PC_Obj_Variable::create_object($this->scope->get_name_of(T_CLASS_C));
 		$scopename = $this->scope->get_name();
-		if(!isset($this->vars[$scopename][$var]))
+		if(!$this->vars->exists($scopename,$var))
 			return $this->get_unknown($var);
-		return $this->vars[$scopename][$var];
+		return $this->vars->get($scopename,$var);
 	}
 	
 	/**
@@ -375,27 +355,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$varname = $var->get_name();
 		$scopename = $this->scope->get_name();
 		assert($value !== null);
-		// if we're in a condition save a backup of the current var for later comparisons
-		if(count($this->layers) > 0)
-		{
-			if($varname)
-			{
-				$layer = &$this->layers[count($this->layers) - 1];
-				$blockno = $layer['blockno'];
-				if(!isset($layer['vars'][$blockno][$varname]))
-				{
-					// don't use null because isset() is false if the value is null
-					$clone = isset($this->vars[$scopename][$varname]) ? clone $var : 0;
-					$layer['vars'][$blockno][$varname] = $clone;
-				}
-			}
-			else
-			{
-				// if its an array-element, simply set it to unknown
-				$var->set_type(new PC_Obj_MultiType());
-				return $value;
-			}
-		}
+		$this->vars->backup($var,$this->scope);
 		if($isref)
 			$var->set_type($value->get_type());
 		else
@@ -404,7 +364,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		{
 			$var->set_function($this->scope->get_name_of(T_FUNC_C));
 			$var->set_class($this->scope->get_name_of(T_CLASS_C));
-			$this->vars[$scopename][$varname] = $var;
+			$this->vars->set($scopename,$var);
 		}
 		return $value;
 	}
@@ -583,8 +543,8 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	public function do_global($name)
 	{
-		if(isset($this->vars[PC_Obj_Variable::SCOPE_GLOBAL][$name]))
-			$val = $this->vars[PC_Obj_Variable::SCOPE_GLOBAL][$name];
+		if($this->vars->exists(PC_Obj_Variable::SCOPE_GLOBAL,$name))
+			$val = $this->vars->get(PC_Obj_Variable::SCOPE_GLOBAL,$name);
 		else
 			$val = $this->get_unknown();
 		$this->set_var($this->get_unknown($name),$val,true);
@@ -622,6 +582,41 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	{
 		$this->analyze_rettypes();
 		$this->scope->leave_function();
+	}
+	
+	/**
+	 * Starts a loop
+	 */
+	private function start_loop()
+	{
+		$this->vars->enter_loop();
+	}
+	
+	/**
+	 * Ends a loop
+	 */
+	public function end_loop()
+	{
+		$this->vars->leave_loop($this->scope);
+	}
+	
+	/**
+	 * Starts a condition
+	 * 
+	 * @param bool $newblock wether a new block is opened in the current layer
+	 * @param bool $is_else wether an T_ELSE opened this block
+	 */
+	private function start_cond($newblock = false,$is_else = false)
+	{
+		$this->vars->enter_cond($newblock,$is_else);
+	}
+	
+	/**
+	 * Ends a condition
+	 */
+	public function end_cond()
+	{
+		$this->vars->leave_cond($this->scope);
 	}
 	
 	/**
@@ -755,180 +750,6 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
-	 * Starts a loop
-	 */
-	private function start_loop()
-	{
-		array_push($this->layers,array(
-			'blockno' => 0,
-			'haseelse' => false,
-			'elseifs' => 0,
-			'vars' => array(array())
-		));
-		$this->loopdepth++;
-	}
-	
-	/**
-	 * Ends a loop
-	 */
-	public function end_loop()
-	{
-		assert($this->loopdepth > 0);
-		$this->loopdepth--;
-		$this->perform_pending_changes();
-	}
-	
-	/**
-	 * Starts a condition
-	 * 
-	 * @param bool $newblock wether a new block is opened in the current layer
-	 * @param bool $is_else wether an T_ELSE opened this block
-	 */
-	private function start_cond($newblock = false,$is_else = false)
-	{
-		if($newblock)
-		{
-			$layer = &$this->layers[count($this->layers) - 1];
-			$layer['haselse'] = $is_else;
-			$layer['blockno']++;
-			$layer['vars'][] = array();
-		}
-		else
-		{
-			array_push($this->layers,array(
-				'blockno' => 0,
-				'elseifs' => 0,
-				'haselse' => false,
-				'vars' => array(array())
-			));
-			$this->conddepth++;
-		}
-	}
-	
-	/**
-	 * Ends a condition
-	 */
-	public function end_cond()
-	{
-		assert($this->conddepth > 0);
-		if($this->layers[count($this->layers) - 1]['elseifs']-- == 0)
-		{
-			$this->conddepth--;
-			$this->perform_pending_changes();
-		}
-	}
-	
-	/**
-	 * Performs the required actions when leaving a loop/condition
-	 */
-	private function perform_pending_changes()
-	{
-		$layer = array_pop($this->layers);
-		// if there is only one block (loops, if without else)
-		if(count($layer['vars']) == 1)
-		{
-			// its never present in all blocks here since we never have an else-block
-			foreach($layer['vars'][0] as $name => $var)
-				$this->change_var($layer,$name,$var,false);
-		}
-		else
-		{
-			// otherwise there were multiple blocks (if-elseif-else, ...)
-			// we start with the variables in the first block; vars that are not present there, will
-			// be added later
-			$changed = array();
-			foreach($layer['vars'] as $blockno => $vars)
-			{
-				foreach($vars as $name => $var)
-				{
-					if(!isset($changed[$name]))
-					{
-						// check if the variable is present in all blocks. this is not the case if we have no
-						// else-block or if has not been assigned in at least one block
-						$present = false;
-						// we need to check this only in the first block, since if we're in the second block
-						// and don't have changed this var yet (see isset above), it is at least not present
-						// in the first block.
-						if($blockno == 0 && $layer['haselse'])
-						{
-							$present = true;
-							for($i = 1; $i <= $layer['blockno']; $i++)
-							{
-								if(!isset($layer['vars'][$i][$name]))
-								{
-									$present = false;
-									break;
-								}
-							}
-						}
-						$this->change_var($layer,$name,$var,$present);
-						$changed[$name] = true;
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Changes the variable with given name in the current scope
-	 * 
-	 * @param array $layer the current layer
-	 * @param string $name the var-name
-	 * @param PC_Obj_Variable $backup the backup (0 if not present before the layer)
-	 * @param bool $present wether its present in all blocks in this layer
-	 */
-	private function change_var($layer,$name,$backup,$present)
-	{
-		$scopename = $this->scope->get_name();
-		// if its present in all blocks, merge the types
-		if($present)
-		{
-			// start with the type in scope; thats the one from the last block
-			$mtype = $this->vars[$scopename][$name]->get_type();
-			// don't include the first block since thats the backup from the previous layer
-			for($i = 1; $i <= $layer['blockno']; $i++)
-				$mtype->merge($layer['vars'][$i][$name]->get_type());
-			// note that this may discard the old value, if the variable was present
-			$this->vars[$scopename][$name] = new PC_Obj_Variable(
-				$name,$mtype,$this->scope->get_name_of(T_FUNC_C),$this->scope->get_name_of(T_CLASS_C)
-			);
-		}
-		// if it was present before, we know that it is either the old or one of the new ones
-		else if($backup !== 0)
-		{
-			$mtype = $this->vars[$scopename][$name]->get_type();
-			for($i = 0; $i <= $layer['blockno']; $i++)
-			{
-				if(isset($layer['vars'][$i][$name]))
-					$mtype->merge($layer['vars'][$i][$name]->get_type());
-			}
-		}
-		// otherwise the type is unknown
-		else
-		{
-			if(!isset($this->vars[$scopename][$name]))
-			{
-				$this->vars[$scopename][$name] = new PC_Obj_Variable(
-					$name,new PC_Obj_MultiType(),$this->scope->get_name_of(T_FUNC_C),
-					$this->scope->get_name_of(T_CLASS_C)
-				);
-			}
-			else
-				$this->vars[$scopename][$name]->set_type(new PC_Obj_MultiType());
-		}
-		
-		// if there is a previous layer and the var is not known there in the last block, put
-		// the first backup from this block in it. because this is the previous value for the previous
-		// block, if it hasn't been assigned there
-		if(count($this->layers) > 0)
-		{
-			$prevlayer = &$this->layers[count($this->layers) - 1];
-			if(!isset($prevlayer['vars'][$prevlayer['blockno']][$name]))
-				$prevlayer['vars'][$prevlayer['blockno']][$name] = $backup;
-		}
-	}
-	
-	/**
 	 * Extracts the given part of the scope
 	 * 
 	 * @param int $part the part: T_METHOD_C, T_FUNCTION_C or T_CLASS_C
@@ -1030,7 +851,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	public function handle_unary_op($op,$e)
 	{
 		$this->check_known($e);
-		if($this->loopdepth > 0)
+		if($this->vars->is_in_loop())
 			return $this->get_type_from_op($op,$e->get_type());
 		return parent::handle_unary_op($op,$e);
 	}
@@ -1065,7 +886,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$t1 = $e1->get_type();
 		$t2 = $e2->get_type();
 		// if we're in a loop, don't try to provide the value since we don't know how often it is done
-		if($this->loopdepth > 0)
+		if($this->vars->is_in_loop())
 			return  $this->get_type_from_op($op,$t1,$t2);
 		// if we don't know one of the types or values, try to determine the type by the operator
 		if($t1->is_val_unknown() || $t2->is_val_unknown())
@@ -1104,7 +925,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$t2 = $e2->get_type();
 		$t3 = $e3->get_type();
 		// don't try to evalulate $e1 in loops or if its unknown
-		if($this->loopdepth > 0 || $t1->is_val_unknown())
+		if($this->vars->is_in_loop() || $t1->is_val_unknown())
 		{
 			// merge the types, because the result can be of both types
 			$res = clone $t2;
@@ -1135,7 +956,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$t2 = $e2->get_type();
 		// if we don't know one of the types or values, try to determine the type by the operator
 		// if we're in a loop, do that, too.
-		if($this->loopdepth > 0 || $t1->is_val_unknown() || $t2->is_val_unknown())
+		if($this->vars->is_in_loop() || $t1->is_val_unknown() || $t2->is_val_unknown())
 			return $this->get_type_from_op($op,$t1,$t2);
 		// if we have an array-operation, just return bool, because we would have to do it ourself
 		// and I think its not worth the effort.
@@ -1181,7 +1002,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$this->check_known($var);
 		$type = $var->get_type();
 		// in loops always by op
-		if($this->loopdepth > 0 || $type->is_val_unknown())
+		if($this->vars->is_in_loop() || $type->is_val_unknown())
 			$res = $this->get_type_from_op($op,$type);
 		else
 		{
@@ -1205,7 +1026,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$clone = clone $var;
 		$type = $var->get_type();
 		// in loops always by op
-		if($this->loopdepth > 0 || $type->is_val_unknown())
+		if($this->vars->is_in_loop() || $type->is_val_unknown())
 			$res = $this->get_type_from_op($op,$type);
 		else
 		{
@@ -1234,7 +1055,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		
 		$t = $e->get_type();
 		// if we don't know the type or value, just provide the type; in loops as well
-		if($this->loopdepth > 0 || $t->is_val_unknown())
+		if($this->vars->is_in_loop() || $t->is_val_unknown())
 			return new PC_Obj_Variable('',PC_Obj_MultiType::get_type_by_name($cast));
 		
 		// we know the value, so perform a cast
@@ -1255,7 +1076,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$this->check_known($e);
 		$name = $name->get_type()->get_string();
 		// if we're in a loop or the name is not a string, give up
-		if($this->loopdepth > 0 || $name === null)
+		if($this->vars->is_in_loop() || $name === null)
 			return PC_Obj_Variable::create_bool();
 		
 		// if we don't know the type or its class we can't say wether its a superclass
@@ -1355,8 +1176,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 					{
 						// count the number of "T_ELSE T_IF" because for each of those we get another call
 						// to end_cond()
-						$this->layers[count($this->layers) - 1]['elseifs']++;
-						$this->layers[count($this->layers) - 1]['haselse'] = false;
+						$this->vars->set_elseif();
 					}
 					break;
 				case T_ELSEIF:
@@ -1379,11 +1199,12 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			{
 				// do we know that variable?
 				$scopename = $this->scope->get_name();
-				if(isset($this->vars[$scopename][$matches[1]]))
+				if($this->vars->exists($scopename,$matches[1]))
 				{
 					// ok, determine type and set it
 					$type = PC_Obj_MultiType::get_type_by_name($matches[2]);
-					$this->vars[$scopename][$matches[1]]->set_type($type);
+					$var = $this->vars->get($scopename,$matches[1]);
+					$var->set_type($type);
 				}
 			}
 			$this->lastCheckComment = $this->lastComment;
