@@ -26,7 +26,7 @@
 	<b>Position:</b> {location}
 </div>
 <div style="float: right;" class="pc_padbottom">
-	<form method="post" action="index.php">
+	<form method="post" action="{gurl.build_mod_url('home')}">
 	<input type="hidden" name="aid" value="{chg_project_aid}" />
 	Project: {form.get_combobox('project',projects,project)}
 	<input type="submit" value="Go!" />
@@ -35,23 +35,23 @@
 <br style="clear: both;" />
 
 <div class="pc_padbottom">
-	<a class="pc_button" href="index.php?module=projects">Projects</a>
+	<a class="pc_button" href="{gurl.build_mod_url('projects')}">Projects</a>
 	<span style="float: right;">&nbsp;&middot;&nbsp;</span>
 	{if project != 0}
-	<a class="pc_button" href="index.php?module=errors">Errors</a>
-	<a class="pc_button" href="index.php?module=vars">Variables</a>
-	<a class="pc_button" href="index.php?module=calls">Calls</a>
+	<a class="pc_button" href="{gurl.build_mod_url('errors')}">Errors</a>
+	<a class="pc_button" href="{gurl.build_mod_url('vars')}">Variables</a>
+	<a class="pc_button" href="{gurl.build_mod_url('calls')}">Calls</a>
 	{endif}
-	<a class="pc_button" href="index.php?module=types&amp;sub=consts">Constants</a>
-	<a class="pc_button" href="index.php?module=types&amp;sub=funcs">Functions</a>
-	<a class="pc_button" href="index.php?module=types&amp;sub=classes">Classes</a>
+	<a class="pc_button" href="{gurl.build_submod_url('types','consts')}">Constants</a>
+	<a class="pc_button" href="{gurl.build_submod_url('types','funcs')}">Functions</a>
+	<a class="pc_button" href="{gurl.build_submod_url('types','classes')}">Classes</a>
 	<span style="float: right;">&nbsp;&middot;&nbsp;</span>
 	{if project != 0}
-	<a class="pc_button_big" href="index.php?module=analyze">Analyzer</a>
-	<a class="pc_button_big" href="index.php?module=stmtscan">Statement scanner</a>
-	<a class="pc_button_big" href="index.php?module=typescan">Type scanner</a>
+	<a class="pc_button_big" href="{gurl.build_mod_url('analyze')}">Analyzer</a>
+	<a class="pc_button_big" href="{gurl.build_mod_url('stmtscan')}">Statement scanner</a>
+	<a class="pc_button_big" href="{gurl.build_mod_url('typescan')}">Type scanner</a>
 	{else}
-	<a class="pc_button_big" href="index.php?module=phpref">PHPRef-scanner</a>
+	<a class="pc_button_big" href="{gurl.build_mod_url('phpref')}">PHPRef-scanner</a>
 	{endif}
 	<br style="clear: both;" />
 </div>

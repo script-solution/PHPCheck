@@ -29,7 +29,7 @@ FWS_Props::set_accessor($accessor);
 // TODO perhaps we could detect unused variables?
 // TODO we could check return-values. i.e. if the specified types are returned. or if there is no
 // value-return at all, etc.
-// TODO we could check thrown exceptions. i.e. check if @thrown is present and if it specifies
+// TODO we could check thrown exceptions. i.e. check if @throws is present and if it specifies
 // the thrown exceptions, etc.
 // TODO handle "void" special?
 // TODO detect calls of private/protected methods
@@ -39,7 +39,6 @@ FWS_Props::set_accessor($accessor);
 // TODO detect missing parent::__construct calls for classes that have a superclass
 // TODO detect if the liscovsche substitution law is violated?
 // TODO the errors in the parallel-version should be appended to the document, not replaced
-// TODO each phase has to clear its own errors
 // TODO why can't we find the front-action-base when searching for Action_Base??
 // TODO detecting return-values in nested functions does not work
 

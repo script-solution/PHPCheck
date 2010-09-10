@@ -62,8 +62,10 @@ That means, after the first step, <a href="{gurl.build_submod_url('types','class
 <a href="{gurl.build_submod_url('types','funcs')}">Functions</a> and
 <a href="{gurl.build_submod_url('types','consts')}">Constants</a> will be available. After the
 second step <a href="{gurl.build_mod_url('calls')}">Calls</a> and
-<a href="{gurl.build_mod_url('vars')}">Variables</a>. And the third step creates the information
-displayed at <a href="{gurl.build_mod_url('errors')}">Errors</a>.
+<a href="{gurl.build_mod_url('vars')}">Variables</a>. And the third step creates most of the
+information displayed at <a href="{gurl.build_mod_url('errors')}">Errors</a>. But note, that the
+first two phases raise errors as well. Simply because there are things where it does not make sense
+to store them for later analysis; instead we want to report the error right now.
 
 <h2>Important!</h2>
 
@@ -95,11 +97,22 @@ displayed at <a href="{gurl.build_mod_url('errors')}">Errors</a>.
 	not do things like defining a class twice and include sometimes the first and sometimes the
 	other (well, you shouldn't do that anyway ;)). Or more general: Take care, that all used
 	type-names in your code are unique in your whole project!</li>
+	<li>Note also, that some of the reported errors are no real errors for the PHP-interpreter, but
+	IMO its bad practice. For example, it will complain about unknown variables or class-fields.
+	Of course, you may use variables without defining them before. And you can also add class-fields
+	dynamically. The question is, if its a good idea to do so. I would say, no! Therefore this tool
+	detects this stuff.</li>
+	<li>Another thing that goes in that direction is the detection of illformed/missing PHPDoc-comments.
+	That means the tool will complain if you don't document parameter or return-values. Or if you
+	document things that are not present. Of course, no one forces you to write those comments. But
+	I think this is good coding-practice as well. Additionally, having correct and complete PHPDoc-
+	comments really helps this tool to tell you about errors. Without them its difficult in most
+	situations to figure out the types (at least in &quot;real&quot; applications, where most of the
+	stuff is <i>not</i> evaluable at compile-time).</li>
 </ul>
-So, most of it is good coding-practice anyway. I.e. if you create &quot;nice&quot; code, the tool
-will probably be helpful for you. At least it works well when I do it with Boardsolution,
-FrameWorkSolution or PHPCheck.<br />
-And to be honest, it unveiled a lot of problems I hadn't seen before :)
+I hope, this tool is helpful for you! At least it works well when I do it with Boardsolution,
+FrameWorkSolution or PHPCheck (yeah, this tool detects errors in itself! :D).<br />
+And to be honest, it unveiled a lot of bugs and problems I hadn't seen before :)
 
 {endif}
 
