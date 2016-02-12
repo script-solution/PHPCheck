@@ -13,7 +13,7 @@
 /**
  * Path to FrameWorkSolution with trailing slash
  */
-define('FWS_PATH','../FrameWorkSolution/');
+define('FWS_PATH','fws/');
 
 /**
  * The number of jobs you want to execute in parallel. Since our tasks can be easily
