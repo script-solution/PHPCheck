@@ -10,7 +10,7 @@
  * @link				http://www.script-solution.de
  */
 
-class PC_Tests_Analyzer extends PHPUnit_Framework_Testcase
+class PC_Tests_Analyzer extends PC_UnitTest
 {
 	private function do_analyze($code,$report_mixed = false,$report_unknown = false)
 	{

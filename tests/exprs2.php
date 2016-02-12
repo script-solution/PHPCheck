@@ -10,7 +10,7 @@
  * @link				http://www.script-solution.de
  */
 
-class PC_Tests_Exprs2 extends PHPUnit_Framework_Testcase
+class PC_Tests_Exprs2 extends PC_UnitTest
 {
 	private static $code = '<?php
 /** @return float */

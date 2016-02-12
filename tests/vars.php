@@ -10,7 +10,7 @@
  * @link				http://www.script-solution.de
  */
 
-class PC_Tests_Vars extends PHPUnit_Framework_Testcase
+class PC_Tests_Vars extends PC_UnitTest
 {
 	private static $code = '<?php
 define("MYCONST",123);

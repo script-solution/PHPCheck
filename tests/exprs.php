@@ -10,7 +10,7 @@
  * @link				http://www.script-solution.de
  */
 
-class PC_Tests_Exprs extends PHPUnit_Framework_Testcase
+class PC_Tests_Exprs extends PC_UnitTest
 {
 	private static $code = '<?php
 $a = 4;
