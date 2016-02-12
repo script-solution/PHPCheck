@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 3.3.2deb1
+-- version 4.5.4.1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Aug 30, 2010 at 01:02 AM
--- Server version: 5.1.41
--- PHP Version: 5.3.2-1ubuntu4.2
+-- Generation Time: Feb 12, 2016 at 09:02 PM
+-- Server version: 10.1.11-MariaDB-log
+-- PHP Version: 7.0.3
 
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 
 --
 -- Database: `phpcheck`
@@ -19,18 +20,17 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Table structure for table `pc_calls`
 --
 
-CREATE TABLE IF NOT EXISTS `pc_calls` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) unsigned NOT NULL,
+CREATE TABLE `pc_calls` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `project_id` int(11) UNSIGNED NOT NULL,
   `file` varchar(255) NOT NULL,
-  `line` int(11) unsigned NOT NULL,
+  `line` int(11) UNSIGNED NOT NULL,
   `function` varchar(255) NOT NULL,
   `class` varchar(255) DEFAULT NULL,
-  `static` tinyint(1) unsigned NOT NULL,
-  `objcreation` tinyint(1) unsigned NOT NULL,
-  `arguments` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11331 ;
+  `static` tinyint(1) UNSIGNED NOT NULL,
+  `objcreation` tinyint(1) UNSIGNED NOT NULL,
+  `arguments` text NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -38,8 +38,8 @@ CREATE TABLE IF NOT EXISTS `pc_calls` (
 -- Table structure for table `pc_classes`
 --
 
-CREATE TABLE IF NOT EXISTS `pc_classes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `pc_classes` (
+  `id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
   `file` varchar(255) NOT NULL,
   `line` int(11) NOT NULL,
@@ -48,9 +48,8 @@ CREATE TABLE IF NOT EXISTS `pc_classes` (
   `final` tinyint(1) NOT NULL,
   `interface` tinyint(1) NOT NULL,
   `superclass` varchar(255) DEFAULT NULL,
-  `interfaces` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=995 ;
+  `interfaces` text NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -58,19 +57,17 @@ CREATE TABLE IF NOT EXISTS `pc_classes` (
 -- Table structure for table `pc_class_fields`
 --
 
-CREATE TABLE IF NOT EXISTS `pc_class_fields` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `pc_class_fields` (
+  `id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
   `class` int(11) NOT NULL,
   `file` varchar(255) NOT NULL,
   `line` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `type` tinyint(1) NOT NULL,
-  `value` text,
+  `type` text NOT NULL,
   `visibility` varchar(20) NOT NULL,
-  `static` tinyint(1) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2526 ;
+  `static` tinyint(1) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -78,17 +75,15 @@ CREATE TABLE IF NOT EXISTS `pc_class_fields` (
 -- Table structure for table `pc_constants`
 --
 
-CREATE TABLE IF NOT EXISTS `pc_constants` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `pc_constants` (
+  `id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
   `class` int(11) NOT NULL,
   `file` varchar(255) NOT NULL,
   `line` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `type` tinyint(1) NOT NULL,
-  `value` text,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=711 ;
+  `type` text NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -96,15 +91,14 @@ CREATE TABLE IF NOT EXISTS `pc_constants` (
 -- Table structure for table `pc_errors`
 --
 
-CREATE TABLE IF NOT EXISTS `pc_errors` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `pc_errors` (
+  `id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
   `file` varchar(255) NOT NULL,
   `line` int(11) NOT NULL,
   `message` text NOT NULL,
-  `type` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3452 ;
+  `type` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -112,8 +106,8 @@ CREATE TABLE IF NOT EXISTS `pc_errors` (
 -- Table structure for table `pc_functions`
 --
 
-CREATE TABLE IF NOT EXISTS `pc_functions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `pc_functions` (
+  `id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
   `file` varchar(255) NOT NULL,
   `line` int(11) NOT NULL,
@@ -125,8 +119,8 @@ CREATE TABLE IF NOT EXISTS `pc_functions` (
   `visibility` varchar(15) NOT NULL,
   `return_type` text NOT NULL,
   `params` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10929 ;
+  `since` varchar(10) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -134,8 +128,8 @@ CREATE TABLE IF NOT EXISTS `pc_functions` (
 -- Table structure for table `pc_projects`
 --
 
-CREATE TABLE IF NOT EXISTS `pc_projects` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `pc_projects` (
+  `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `created` int(11) NOT NULL,
   `type_folders` text NOT NULL,
@@ -144,9 +138,8 @@ CREATE TABLE IF NOT EXISTS `pc_projects` (
   `stmt_exclude` text NOT NULL,
   `report_mixed` tinyint(1) NOT NULL,
   `report_unknown` tinyint(1) NOT NULL,
-  `current` tinyint(1) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+  `current` tinyint(1) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -154,13 +147,109 @@ CREATE TABLE IF NOT EXISTS `pc_projects` (
 -- Table structure for table `pc_vars`
 --
 
-CREATE TABLE IF NOT EXISTS `pc_vars` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `pc_vars` (
+  `id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `function` varchar(255) NOT NULL,
   `class` varchar(255) DEFAULT NULL,
-  `type` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4501 ;
+  `type` text NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `pc_calls`
+--
+ALTER TABLE `pc_calls`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `pc_classes`
+--
+ALTER TABLE `pc_classes`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `pc_class_fields`
+--
+ALTER TABLE `pc_class_fields`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `pc_constants`
+--
+ALTER TABLE `pc_constants`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `pc_errors`
+--
+ALTER TABLE `pc_errors`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `pc_functions`
+--
+ALTER TABLE `pc_functions`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `pc_projects`
+--
+ALTER TABLE `pc_projects`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `pc_vars`
+--
+ALTER TABLE `pc_vars`
+  ADD PRIMARY KEY (`id`);
+
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `pc_calls`
+--
+ALTER TABLE `pc_calls`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- AUTO_INCREMENT for table `pc_classes`
+--
+ALTER TABLE `pc_classes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- AUTO_INCREMENT for table `pc_class_fields`
+--
+ALTER TABLE `pc_class_fields`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- AUTO_INCREMENT for table `pc_constants`
+--
+ALTER TABLE `pc_constants`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- AUTO_INCREMENT for table `pc_errors`
+--
+ALTER TABLE `pc_errors`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- AUTO_INCREMENT for table `pc_functions`
+--
+ALTER TABLE `pc_functions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- AUTO_INCREMENT for table `pc_projects`
+--
+ALTER TABLE `pc_projects`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+--
+-- AUTO_INCREMENT for table `pc_vars`
+--
+ALTER TABLE `pc_vars`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
