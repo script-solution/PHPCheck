@@ -42,6 +42,10 @@ FWS_AutoLoader::register_loader('PC_autoloader');
 // set error-handling
 error_reporting((E_ALL | E_STRICT) & ~E_DEPRECATED);
 
+// CLI or webserver?
+define('LINE_WRAP',PHP_SAPI == 'cli' ? "\n" : '<br />');
+define('PC_UNITTESTS',1);
+
 // set our loader and accessor
 $accessor = new PC_PropAccessor();
 $accessor->set_loader(new PC_PropLoader());
@@ -64,7 +68,7 @@ $succ = 0;
 $fail = 0;
 foreach($tests as $test)
 {
-	echo "-- ".$test.":\n";
+	echo "-- ".$test.":".LINE_WRAP;
 	$t = new $test();
 	foreach(get_class_methods($t) as $m)
 	{
@@ -72,7 +76,7 @@ foreach($tests as $test)
 		{
 			try
 			{
-				echo "   - Testing method ".$m."...\n";
+				echo "   - Testing method ".$m."...".LINE_WRAP;
 				$t->$m();
 				$succ++;
 			}
@@ -85,8 +89,8 @@ foreach($tests as $test)
 	}
 }
 
-echo "\n";
-echo "------------------------\n";
-echo "Total: ".$succ." / ".($succ+$fail)." succeeded\n";
-echo "------------------------\n";
+echo LINE_WRAP;
+echo "------------------------".LINE_WRAP;
+echo "Total: ".$succ." / ".($succ+$fail)." succeeded".LINE_WRAP;
+echo "------------------------".LINE_WRAP;
 ?>
