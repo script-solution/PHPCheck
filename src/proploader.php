@@ -67,7 +67,7 @@ final class PC_PropLoader extends FWS_PropLoader
 	protected function db()
 	{
 		include_once(FWS_Path::server_app().'config/mysql.php');
-		$c = new FWS_DB_MySQL_Connection();
+		$c = new FWS_DB_MySQLi_Connection();
 		$c->connect(PC_MYSQL_HOST,PC_MYSQL_LOGIN,PC_MYSQL_PASSWORD);
 		$c->select_database(PC_MYSQL_DATABASE);
 		$c->set_save_queries(false);
