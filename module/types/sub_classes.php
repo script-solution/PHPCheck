@@ -58,9 +58,11 @@ final class PC_SubModule_types_classes extends PC_SubModule
 		foreach(PC_DAO::get_classes()->get_list($start,PC_ENTRIES_PER_PAGE,$class,$file) as $c)
 		{
 			$sig = $c->get_signature(true);
-			$sig = preg_replace(
-				'/#(.+?)#/e',
-				'"<a href=\"".PC_URL::get_mod_url(\'class\')->set(\'name\',\'\1\')->to_url()."\">\1</a>"',
+			$sig = preg_replace_callback(
+				'/#(.+?)#/',
+				function($match) {
+					return "<a href=\"".PC_URL::get_mod_url('class')->set('name',$match[1])->to_url()."\">".$match[1]."</a>";
+				},
 				$sig
 			);
 			$classes[] = array(

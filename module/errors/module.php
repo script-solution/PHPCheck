@@ -129,9 +129,11 @@ final class PC_Module_errors extends PC_Module
 	private function _get_msg($err)
 	{
 		$msg = $err->get_msg();
-		return preg_replace(
-			'/#([a-zA-Z0-9_]+?)#/e',
-			'"<a href=\"".PC_URL::get_mod_url(\'class\')->set(\'name\',\'\\1\')->to_url()."\">\\1</a>"',
+		return preg_replace_callback(
+			'/#([a-zA-Z0-9_]+?)#/',
+			function($match) {
+				return "<a href=\"".PC_URL::get_mod_url('class')->set('name',$match[1])->to_url()."\">".$match[1]."</a>";
+			},
 			$msg
 		);
 	}
