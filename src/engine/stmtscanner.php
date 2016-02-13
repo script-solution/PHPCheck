@@ -663,6 +663,13 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 					$hasother = true;
 			}
 			
+			$mtype = new PC_Obj_MultiType();
+			foreach($this->allrettypes as $t)
+			{
+				if($t !== null)
+					$mtype->merge($t->get_type(),false);
+			}
+			
 			$name = ($classname ? '#'.$classname.'#::' : '').$funcname;
 			// empty return-expression and non-empty?
 			if($hasnull && $hasother)
@@ -694,19 +701,16 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			}
 			else if($this->has_forbidden($this->allrettypes,$func->get_return_type()))
 			{
-				$merged = new PC_Obj_MultiType();
-				foreach($this->allrettypes as $t)
-				{
-					if($t !== null)
-						$merged->merge($t->get_type(),false);
-				}
 				$this->report_error(
 					$func,
 					'The return-specification (PHPDoc) of function/method "'.$name.'" does not match with '
-					.'the returned values (spec="'.$func->get_return_type().'", returns="'.$merged.'")',
+					.'the returned values (spec="'.$func->get_return_type().'", returns="'.$mtype.'")',
 					PC_Obj_Error::E_S_RETURNS_DIFFER_FROM_SPEC
 				);
 			}
+			
+			if($func->get_return_type()->is_unknown())
+				$func->set_return_type($mtype);
 		}
 	}
 	
