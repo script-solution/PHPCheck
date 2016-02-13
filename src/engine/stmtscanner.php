@@ -74,7 +74,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * The current scope
 	 * 
-	 * @var PC_Obj_Scope
+	 * @var PC_Engine_Scope
 	 */
 	private $scope;
 	
