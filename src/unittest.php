@@ -34,13 +34,13 @@ class PC_UnitTest extends FWS_Object
 	/**
 	 * Checks whether both strings are equal.
 	 *
-	 * @param string $exp the expected string
-	 * @param string $recv the received string
+	 * @param mixed $exp the expected value
+	 * @param mixed $recv the received value
 	 */
 	protected static function assertEquals($exp,$recv)
 	{
 		if($exp != $recv)
-			throw new Exception('Strings are not equal. Expected "'.$exp.'", got "'.$recv.'"');
+			throw new Exception('Values are not equal. Expected "'.$exp.'", got "'.$recv.'"');
 	}
 	
 	/**

@@ -312,28 +312,28 @@ $r = $p[1]->test2($b);
 		// check calls
 		$calls = $typecon->get_calls();
 		$i = 0;
-		$this->assertCall($calls[$i++],'b','get42',true);
-		$this->assertCall($calls[$i++],'a','test',false);
-		$this->assertEquals((string)$calls[$i++]->get_call(false,false),'dummy1(integer=2)');
-		$this->assertEquals((string)$calls[$i++]->get_call(false,false),'dummy2(integer=3)');
-		$this->assertEquals((string)$calls[$i++]->get_call(false,false),'dummy3(integer=6)');
-		$this->assertEquals((string)$calls[$i++]->get_call(false,false),'dummy4(unknown)');
-		$this->assertEquals((string)$calls[$i++]->get_call(false,false),'dummy5(unknown)');
-		$this->assertCall($calls[$i++],'a','__construct',false);
-		$this->assertCall($calls[$i++],'a','test2',false);
-		$this->assertCall($calls[$i++],'x','__construct',false);
-		$this->assertCall($calls[$i++],'x','test2',false);
-		$this->assertCall($calls[$i++],'x','test2',false);
-		$this->assertCall($calls[$i++],'b','test2',false);
-		$this->assertCall($calls[$i++],'b','sdf',true);
-		$this->assertCall($calls[$i++],'x','partest',false);
-		$this->assertCall($calls[$i++],'a','__construct',false);
-		$this->assertCall($calls[$i++],'b','__construct',false);
-		$this->assertCall($calls[$i++],'a','test2',false);
-		$this->assertCall($calls[$i++],'b','test2',false);
+		self::assertCall($calls[$i++],'b','get42',true);
+		self::assertCall($calls[$i++],'a','test',false);
+		self::assertEquals((string)$calls[$i++]->get_call(false,false),'dummy1(integer=2)');
+		self::assertEquals((string)$calls[$i++]->get_call(false,false),'dummy2(integer=3)');
+		self::assertEquals((string)$calls[$i++]->get_call(false,false),'dummy3(integer=6)');
+		self::assertEquals((string)$calls[$i++]->get_call(false,false),'dummy4(unknown)');
+		self::assertEquals((string)$calls[$i++]->get_call(false,false),'dummy5(unknown)');
+		self::assertCall($calls[$i++],'a','__construct',false);
+		self::assertCall($calls[$i++],'a','test2',false);
+		self::assertCall($calls[$i++],'x','__construct',false);
+		self::assertCall($calls[$i++],'x','test2',false);
+		self::assertCall($calls[$i++],'x','test2',false);
+		self::assertCall($calls[$i++],'b','test2',false);
+		self::assertCall($calls[$i++],'b','sdf',true);
+		self::assertCall($calls[$i++],'x','partest',false);
+		self::assertCall($calls[$i++],'a','__construct',false);
+		self::assertCall($calls[$i++],'b','__construct',false);
+		self::assertCall($calls[$i++],'a','test2',false);
+		self::assertCall($calls[$i++],'b','test2',false);
 	}
 
-	private function assertCall($call,$class,$method,$static)
+	private static function assertCall($call,$class,$method,$static)
 	{
 		self::assertEquals($class,$call->get_class());
 		self::assertEquals($method,$call->get_function());
