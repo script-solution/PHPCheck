@@ -156,9 +156,17 @@ final class PC_Engine_TypeContainer extends FWS_Object
 		if(empty($name))
 			return null;
 		if(!isset($this->_classes[$name]) && $this->_use_db)
-			$this->_classes[$name] = PC_DAO::get_classes()->get_by_name($name,$this->_pid);
+		{
+			$c = PC_DAO::get_classes()->get_by_name($name,$this->_pid);
+			if($c)
+				$this->_classes[$name] = $c;
+		}
 		if(!isset($this->_classes[$name]) && $this->_use_phpref)
-			$this->_classes[$name] = PC_DAO::get_classes()->get_by_name($name,PC_Project::PHPREF_ID);
+		{
+			$c = PC_DAO::get_classes()->get_by_name($name,PC_Project::PHPREF_ID);
+			if($c)
+				$this->_classes[$name] = $c;
+		}
 		if(isset($this->_classes[$name]))
 			return $this->_classes[$name];
 		return null;
@@ -186,9 +194,17 @@ final class PC_Engine_TypeContainer extends FWS_Object
 		if(empty($name))
 			return null;
 		if(!isset($this->_functions[$name]) && $this->_use_db)
-			$this->_functions[$name] = PC_DAO::get_functions()->get_by_name($name,$this->_pid);
+		{
+			$f = PC_DAO::get_functions()->get_by_name($name,$this->_pid);
+			if($f)
+				$this->_functions[$name] = $f;
+		}
 		if(!isset($this->_functions[$name]) && $this->_use_phpref)
-			$this->_functions[$name] = PC_DAO::get_functions()->get_by_name($name,PC_Project::PHPREF_ID);
+		{
+			$f = PC_DAO::get_functions()->get_by_name($name,PC_Project::PHPREF_ID);
+			if($f)
+				$this->_functions[$name] = $f;
+		}
 		if(isset($this->_functions[$name]))
 			return $this->_functions[$name];
 		return null;
@@ -224,9 +240,17 @@ final class PC_Engine_TypeContainer extends FWS_Object
 		if(empty($name))
 			return null;
 		if(!isset($this->_constants[$name]) && $this->_use_db)
-			$this->_constants[$name] = PC_DAO::get_constants()->get_by_name($name,$this->_pid);
+		{
+			$c = PC_DAO::get_constants()->get_by_name($name,$this->_pid);
+			if($c)
+				$this->_constants[$name] = $c;
+		}
 		if(!isset($this->_constants[$name]) && $this->_use_phpref)
-			$this->_constants[$name] = PC_DAO::get_constants()->get_by_name($name,PC_Project::PHPREF_ID);
+		{
+			$c = PC_DAO::get_constants()->get_by_name($name,PC_Project::PHPREF_ID);
+			if($c)
+				$this->_constants[$name] = $c;
+		}
 		if(isset($this->_constants[$name]))
 			return $this->_constants[$name];
 		return null;
