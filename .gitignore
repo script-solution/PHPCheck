@@ -1,4 +1,5 @@
 cache/
+phpman/
 config/mysql.php
 *.sublime-workspace
 *.sublime-project
