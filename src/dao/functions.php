@@ -227,6 +227,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			'abstract' => $function->is_abstract() ? 1 : 0,
 			'final' => $function->is_final() ? 1 : 0,
 			'static' => $function->is_static() ? 1 : 0,
+			'anonymous' => $function->is_anonymous() ? 1 : 0,
 			'visibility' => $function->get_visibility(),
 			'return_type' => serialize(array($function->has_return_doc(),$function->get_return_type())),
 			'params' => $params,
@@ -247,6 +248,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		$c->set_visibility($row['visibility']);
 		$c->set_abstract($row['abstract']);
 		$c->set_static($row['static']);
+		$c->set_anonymous($row['anonymous']);
 		$c->set_final($row['final']);
 		$c->set_since($row['since']);
 		foreach(unserialize($row['params']) as $param)

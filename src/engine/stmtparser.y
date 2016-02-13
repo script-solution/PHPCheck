@@ -446,6 +446,14 @@ expr_without_variable(A) ::= BACKQUOTE encaps_list BACKQUOTE. {
 	A = PC_Obj_Variable::create_string();
 }
 expr_without_variable(A) ::= T_PRINT expr. { A = null; }
+expr_without_variable(A) ::= T_FUNCTION LPAREN parameter_list RPAREN anon_func_inner. {
+	A = PC_Obj_Variable::create_callable();
+	$this->state->end_function();
+}
+
+anon_func_inner ::= LCURLY inner_statement_list RCURLY.
+anon_func_inner ::= T_USE LPAREN parameter_list RPAREN
+	LCURLY inner_statement_list RCURLY.
 
 exit_expr ::= LPAREN RPAREN.
 exit_expr ::= LPAREN expr RPAREN.

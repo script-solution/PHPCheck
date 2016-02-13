@@ -111,6 +111,16 @@ class PC_Obj_MultiType extends FWS_Object
 	}
 	
 	/**
+	 * Creates a multitype with type TCALLABLE
+	 * 
+	 * @return PC_Obj_MultiType the multitype
+	 */
+	public static function create_callable()
+	{
+		return new self(array(new PC_Obj_Type(PC_Obj_Type::TCALLABLE)));
+	}
+	
+	/**
 	 * Builds the MultiType-instance from the given name. '|' will be assumed as separator
 	 * of the types.
 	 *

@@ -90,6 +90,13 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	private $types;
 	
 	/**
+	 * The next id for anonymous functions
+	 *
+	 * @var int
+	 */
+	private $anon_id = 1;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param string $str the file or string
@@ -128,13 +135,19 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	/**
 	 * Declares a function
 	 * 
-	 * @param string $name the name
+	 * @param string $name the name (empty for anonymous functions)
 	 * @param array $params an array of PC_Obj_Parameter
 	 */
 	public function declare_function($name,$params)
 	{
 		$func = new PC_Obj_Method($this->get_file(),$this->get_last_function_line(),true);
-		$func->set_name($name);
+		if($name == '')
+		{
+			$func->set_anonymous(true);
+			$func->set_name(PC_Obj_Method::ANON_PREFIX.($this->anon_id++));
+		}
+		else
+			$func->set_name($name);
 		foreach($params as $param)
 			$func->put_param($param);
 		$this->parse_method_doc($func);

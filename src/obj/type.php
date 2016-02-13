@@ -39,6 +39,7 @@ final class PC_Obj_Type extends FWS_Object
 	const TARRAY		= 4;
 	const OBJECT		= 5;
 	const RESOURCE	= 6;
+	const TCALLABLE	= 7;
 	
 	/**
 	 * Determines the type-instance by the given type-name
@@ -83,6 +84,11 @@ final class PC_Obj_Type extends FWS_Object
 			case 'unknown type':	// return from gettype()
 			case 'unknown':
 				return null;
+			
+			case 'callable':
+			case 'function':
+			case 'func':
+				return new self(self::TCALLABLE);
 			
 			case 'object':
 				return new self(self::OBJECT,null,'');
@@ -477,6 +483,8 @@ final class PC_Obj_Type extends FWS_Object
 				return 'resource';
 			case self::OBJECT:
 				return 'object';
+			case self::TCALLABLE:
+				return 'callable';
 		}
 	}
 	

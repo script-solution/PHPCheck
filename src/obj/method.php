@@ -32,6 +32,13 @@
 class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 {
 	/**
+	 * The prefix for anonymous functions
+	 *
+	 * @var string
+	 */
+	const ANON_PREFIX = '#anon';
+	
+	/**
 	 * The id of this function
 	 *
 	 * @var int
@@ -51,6 +58,13 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	 * @var boolean
 	 */
 	private $static = false;
+	
+	/**
+	 * Whether it is an anonymous function.
+	 *
+	 * @var boolean
+	 */
+	private $anonymous = false;
 	
 	/**
 	 * Wether this is a free function (belongs to no class)
@@ -182,6 +196,24 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	public function set_static($static)
 	{
 		$this->static = (bool)$static;
+	}
+	
+	/**
+	 * @return boolean whether the function is anonymous
+	 */
+	public function is_anonymous()
+	{
+		return $this->anonymous;
+	}
+	
+	/**
+	 * Sets whether this an anonymous function
+	 * 
+	 * @param bool $anon the new value
+	 */
+	public function set_anonymous($anon)
+	{
+		$this->anonymous = $anon;
 	}
 	
 	/**
@@ -339,7 +371,10 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 			if($this->is_final())
 				$str .= 'final ';
 		}
-		$str .= 'function <b>'.$this->get_name().'</b>(';
+		$str .= 'function';
+		if(!$this->is_anonymous())
+			$str .= ' <b>'.$this->get_name().'</b>';
+		$str .= '(';
 		$str .= implode(', ',$this->get_params());
 		$str .= '): '.$this->get_return_type();
 		return $str;

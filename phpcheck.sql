@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 12, 2016 at 09:02 PM
+-- Generation Time: Feb 13, 2016 at 10:39 PM
 -- Server version: 10.1.11-MariaDB-log
 -- PHP Version: 7.0.3
 
@@ -116,6 +116,7 @@ CREATE TABLE `pc_functions` (
   `abstract` tinyint(1) NOT NULL,
   `final` tinyint(1) NOT NULL,
   `static` tinyint(1) NOT NULL,
+  `anonymous` tinyint(1) NOT NULL,
   `visibility` varchar(15) NOT NULL,
   `return_type` text NOT NULL,
   `params` text NOT NULL,
@@ -207,7 +208,6 @@ ALTER TABLE `pc_projects`
 --
 ALTER TABLE `pc_vars`
   ADD PRIMARY KEY (`id`);
-
 
 --
 -- AUTO_INCREMENT for dumped tables

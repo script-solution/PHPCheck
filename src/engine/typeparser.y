@@ -296,6 +296,13 @@ expr_without_variable(A) ::= scalar(sc). { A = sc; }
 expr_without_variable ::= T_ARRAY LPAREN array_pair_list RPAREN.
 expr_without_variable ::= BACKQUOTE encaps_list BACKQUOTE.
 expr_without_variable ::= T_PRINT expr.
+expr_without_variable ::= T_FUNCTION LPAREN parameter_list(mparams) RPAREN anon_func_inner. {
+	$this->state->declare_function('',mparams);
+}
+
+anon_func_inner ::= LCURLY inner_statement_list RCURLY.
+anon_func_inner ::= T_USE LPAREN parameter_list RPAREN
+	LCURLY inner_statement_list RCURLY.
 
 exit_expr ::= LPAREN RPAREN.
 exit_expr ::= LPAREN expr RPAREN.

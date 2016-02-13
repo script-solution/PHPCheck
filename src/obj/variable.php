@@ -121,6 +121,17 @@ class PC_Obj_Variable extends FWS_Object
 	}
 	
 	/**
+	 * Creates a variable with type TCALLABLE
+	 * 
+	 * @param string $varname optionally, the variable-name
+	 * @return PC_Obj_Variable the variable
+	 */
+	public static function create_callable($varname = '')
+	{
+		return new self($varname,PC_Obj_MultiType::create_callable());
+	}
+	
+	/**
 	 * For assigning values to array-elements: Store the reference to the array so that we can
 	 * put the value into the array as soon as we assign it to it. Before the array doesn't know
 	 * about this value (if it didn't exist before)

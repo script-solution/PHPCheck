@@ -98,6 +98,13 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	private $allrettypes = array();
 	
 	/**
+	 * The next id for anonymous functions
+	 *
+	 * @var int
+	 */
+	private $anon_id = 1;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param string $str the file or string
@@ -676,7 +683,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 					PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET
 				);
 			}
-			else if(!$func->has_return_doc() && $hasother)
+			else if(!$func->has_return_doc() && !$func->is_anonymous() && $hasother)
 			{
 				$this->report_error(
 					$func,
@@ -1249,6 +1256,8 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		{
 			if($this->tokens[$i][0] == T_STRING)
 				return $this->tokens[$i][1];
+			if($this->tokens[$i][1] == '(')
+				return PC_Obj_Method::ANON_PREFIX.($this->anon_id++);
 		}
 		return null;
 	}
