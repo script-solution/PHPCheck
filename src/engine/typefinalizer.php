@@ -438,9 +438,15 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 				}
 			}
 			
-			$this->_add_members($data,$cobj->get_super_class(),false);
+			// protect ourself from recursion here. in fact, Iterator implements itself, so that this is
+			// actually necessary.
+			if($class != $cobj->get_super_class())
+				$this->_add_members($data,$cobj->get_super_class(),false);
 			foreach($cobj->get_interfaces() as $interface)
-				$this->_add_members($data,$interface,false);
+			{
+				if($class != $interface)
+					$this->_add_members($data,$interface,false);
+			}
 		}
 	}
 	
