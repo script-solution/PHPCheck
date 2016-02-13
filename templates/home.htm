@@ -1,119 +1,107 @@
 {include "inc_header.htm"}
 
 {if module_error == false}
-<h2>Introduction</h2>
-<p>Welcome to PHPCheck!</p>
+<h1>PHPCheck</h1>
 
-<p>This tool is intended to help PHP-developers in finding errors in PHP-applications. It searches
-through all files and collects information about the types, function-calls and variables. Finally
-it analyzes this information and tries to find potential errors in it.</p>
-<p>It exists to overcome a problem of interpreted languages: There is no compile-time. Although
-this is no surprise, there are several issues:</p>
+<p>PHPCheck is a static analyzer for PHP to assist developers in finding errors in PHP applications
+before shipping them. It searches through all files and collects information about the types, function
+calls and variables. Finally it analyzes this information and tries to find potential errors in it.</p>
+
+<p>It exists to overcome a problem of interpreted languages: There is no compile time. Therefore, you
+will errors <em>only</em> until you run the application. Running it does always mean that exactly one code
+path is taken. For example, if you have an if-else statement, it will always execute either the if
+branch or the else branch, but never both. If the else branch is executed nearly never, the
+probability that errors in it are not found is quite high.</p>
+
+<p>Errors in this case mean for example:</p>
 <ul>
-	<li>You are not able to encounter errors until you run the application.</li>
-	<li>Running it does always mean that <b>only one</b> "code-path" is taken. By "code-path", I mean
-	the path the program takes through the code. For example, if you have an if-else-construct, it
-	will always execute <b>either</b> the if-part <b>or</b> the else-part. Never both of them.</li>
-	<li>Lets assume that the else-part will be executed nearly never. That would mean that, except
-	for syntax-errors, you will perhaps oversee errors in it, if you forget to do a test that
-	runs through the else-part.</li>
-	<li>By errors in this case, I mean things like:
-	<ul>
-		<li>Call of not-existing function</li>
-		<li>Instantiation of not-existing class</li>
-		<li>Wrong parameter-count</li>
-		<li>Wrong parameter-types</li>
-		<li>Method-call of an non-object</li>
-		<li>...</li>
-	</ul>
-	So all kind of stuff, that is no syntax-error, but an error, that PHP would only complain about,
-	if it executes the affected code-path.
-	</li>
+	<li>Call of not-existing function</li>
+	<li>Instantiation of not-existing class</li>
+	<li>Wrong parameter count</li>
+	<li>Wrong parameter types</li>
+	<li>Method call of an non object</li>
+	<li>...</li>
 </ul>
 
-<p>To give developers the chance to find potential errors in PHP-applications, I wrote this tool.
-Note that I'm always talking about "potential errors". Because at compile-time, we don't have all
-required information to be able to decide in all cases wether something is right or wrong. The obvious example
-is data from an external source (GET, POST, ...). PHP makes it a bit more difficult for us by
-providing things like variable variables, variable function-calls, variable class-instantiations
-and so on. And of course, PHP is a dynamic typed language, so that we simply don't know the type
-in most cases.</p>
-<p>To sum it up: Don't expect this tool to be perfect and always correct. It should give you
-<b>hints</b> to things that <b>might</b> by wrong. Nothing more. So, <b>you</b> have to check the
-potential problems pointed out by PHPCheck and verify if there really is a problem. And, of
-course, if PHPCheck does not find errors, it does <b>not</b> mean, that there are none ;)</p>
+<p>So, semantic errors, that PHP would complain about, if it executed the affected code path. To give
+developers the chance to find these semantic errors in PHP applications ahead of time, I wrote this
+tool. Note however, that there will be false positives and false negatives due to the lack of
+information at compile time. For example, if the value of a variable is read from an external source
+(GET, POST, ...). PHP makes it a bit more difficult for us by providing things like variable
+variables, variable function calls, variable class instantiations and so on. And of course, PHP is a
+dynamic typed language, so that we simply don't know the type in most cases.</p>
 
-<h2>How it works</h2>
+<p>In summary: Don't expect this tool to be perfect and always correct. It should give you <strong>hints</strong> to
+things that <strong>might</strong> by wrong. Nothing more. So, <strong>you</strong> have to check the potential problems
+pointed out by PHPCheck and verify whether there really is a problem. And, of course, if PHPCheck
+does not find errors, it does <strong>not</strong> mean, that there are none :)</p>
 
-To analyze code you should create a project first. The work of this script is divided in three parts:
+<h2>How to use it:</h2>
+
+<p>Before you start, choose the project "-PHP builtin-" and parse the PHP manual. Afterwards,
+PHPCheck knows the builtin functions and classes, so that it can tell you when you're using them in
+a wrong way.</p>
+
+<p>To analyze an application, use the following steps:</p>
 <ol>
-	<li>Before you start, you should choose the project &quot;-PHP builtin-&quot; and parse the
-	PHP-manual. This way, it knows the builtin functions and classes so that it can tell you when
-	you're using them in a wrong way</li>
-	<li>After that, create a project for your application</li>
-	<li>At first you have to collect the types, i.e. classes, contants, fields, methods and functions.
-	Obviously you do that with the <a href="{gurl.build_mod_url('typescan')}">Type scanner</a> ;)</li>
-	<li>The next step is to <a href="{gurl.build_mod_url('stmtscan')}">scan for statements</a>. I.e.
-	it goes through the code, tracks variable-assignments and collects function-calls</li>
-	<li>Finally you can <a href="{gurl.build_mod_url('analyze')}">analyze</a> this information
-	which searches for potential errors</li>
+	<li><a href="{gurl.build_mod_url('projects')}">Create a project</a> for your application.</li>
+	<li>Use the <a href="{gurl.build_mod_url('typescan')}">type scanner</a> to collect
+	<a href="{gurl.build_submod_url('types','classes')}">classes</a> with their constants, fields and methods,
+	<a href="{gurl.build_submod_url('types','funcs')}">functions</a> and
+	<a href="{gurl.build_submod_url('types','consts')}">global constants</a>.</li>
+	<li>Use the <a href="{gurl.build_mod_url('stmtscan')}">statement scanner</a> to walk through the code, track
+	<a href="{gurl.build_mod_url('vars')}">variable</a> assignments and collects
+	<a href="{gurl.build_mod_url('calls')}">function calls</a>.</li>
+	<li>Finally, use the <a href="{gurl.build_mod_url('analyze')}">analyzer</a> to search for potential errors within the collected data.</li>
 </ol>
-That means, after the first step, <a href="{gurl.build_submod_url('types','classes')}">Classes</a>,
-<a href="{gurl.build_submod_url('types','funcs')}">Functions</a> and
-<a href="{gurl.build_submod_url('types','consts')}">Constants</a> will be available. After the
-second step <a href="{gurl.build_mod_url('calls')}">Calls</a> and
-<a href="{gurl.build_mod_url('vars')}">Variables</a>. And the third step creates most of the
-information displayed at <a href="{gurl.build_mod_url('errors')}">Errors</a>. But note, that the
-first two phases raise errors as well. Simply because there are things where it does not make sense
-to store them for later analysis; instead we want to report the error right now.
 
-<h2>Important!</h2>
+<p>That means, after step 2, classes, functions and constants will be available. After the step 3,
+calls and variables. Although step 4 detects most of the potential errors, the previous two steps
+raise errors as well.</p>
+
+<h2>Important internals:</h2>
+
+<p>The type of a variable relies heavily on information from PHPDoc tags and type hinting. The used
+PHPDoc Tags are:</p>
 
 <ul>
-	<li>The type of a variable relies heavily on information from PHPDoc-Tags and type-hinting. The
-	used PHPDoc-Tags are:
-	<div><tt>@var &lt;type&gt; ...</tt></div>
-	<div><tt>@param &lt;type&gt; &lt;paramName&gt; ...</tt></div>
-	<div><tt>@return &lt;type&gt; ...</tt></div>
-	The supported types are:
-	<ul>
-		<li>Integer: <tt>integer</tt>, <tt>int</tt>, <tt>long</tt>, <tt>short</tt> or <tt>byte</tt></li>
-		<li>Boolean: <tt>bool</tt> or <tt>boolean</tt></li>
-		<li>Float: <tt>float</tt> or <tt>double</tt></li>
-		<li>String: <tt>string</tt>, <tt>str</tt> or <tt>char</tt></li>
-		<li>Array: <tt>array</tt></li>
-		<li>Object: <tt>object</tt></li>
-		<li>Resource: <tt>resource</tt> or <tt>res</tt></li>
-		<li><tt>&lt;yourClassName&gt;</tt></li>
-		<li>Various types: <tt>mixed</tt></li>
-	</ul>
-	Additionally you can specify multiple types by separating them with '|'.
-	</li>
-	<li>Of course, the more specific you are with this type-hinting, the better the analysis-results
-	will get. That means, you should prevent to specify multiple types (or better: prevent writing
-	code that works like that) and to use <tt>mixed</tt>.</li>
-	<li>It treats all files given for analyzing as included at all locations, i.e. it does not follow
-	includes but simply assumes that everything is present everywhere. That means you should
-	not do things like defining a class twice and include sometimes the first and sometimes the
-	other (well, you shouldn't do that anyway ;)). Or more general: Take care, that all used
-	type-names in your code are unique in your whole project!</li>
-	<li>Note also, that some of the reported errors are no real errors for the PHP-interpreter, but
-	IMO its bad practice. For example, it will complain about unknown variables or class-fields.
-	Of course, you may use variables without defining them before. And you can also add class-fields
-	dynamically. The question is, if its a good idea to do so. I would say, no! Therefore this tool
-	detects this stuff.</li>
-	<li>Another thing that goes in that direction is the detection of illformed/missing PHPDoc-comments.
-	That means the tool will complain if you don't document parameter or return-values. Or if you
-	document things that are not present. Of course, no one forces you to write those comments. But
-	I think this is good coding-practice as well. Additionally, having correct and complete PHPDoc-
-	comments really helps this tool to tell you about errors. Without them its difficult in most
-	situations to figure out the types (at least in &quot;real&quot; applications, where most of the
-	stuff is <i>not</i> evaluable at compile-time).</li>
+	<li><code>@var &lt;type&gt; ...</code></li>
+	<li><code>@param &lt;type&gt; &lt;paramName&gt; ...</code></li>
+	<li><code>@return &lt;type&gt; ...</code></li>
 </ul>
-I hope, this tool is helpful for you! At least it works well when I do it with Boardsolution,
-FrameWorkSolution or PHPCheck (yeah, this tool detects errors in itself! :D).<br />
-And to be honest, it unveiled a lot of bugs and problems I hadn't seen before :)
 
+<p>The supported types are:</p>
+<ul>
+	<li>Integer: <code>integer</code>, <code>int</code>, <code>long</code>, <code>short</code> or <code>byte</code></li>
+	<li>Boolean: <code>bool</code> or <code>boolean</code></li>
+	<li>Float: <code>float</code> or <code>double</code></li>
+	<li>String: <code>string</code>, <code>str</code> or <code>char</code></li>
+	<li>Array: <code>array</code></li>
+	<li>Generic object: <code>object</code></li>
+	<li>Specific object: <code>&lt;yourClassName&gt;</code></li>
+	<li>Resource: <code>resource</code> or <code>res</code></li>
+	<li>Various types: <code>mixed</code></li>
+</ul>
+
+<p>Multiple types can be specified by separating them with '|'.</p>
+
+<p>The more specific you describe your variables, the better the analysis results will get. That means,
+you should avoid mixed and multiple types (or better: don't write such code).</p>
+
+<p>PHPCheck treats all files given as included at all locations, i.e., it does not follow includes but
+simply assumes that everything is present everywhere. For example, you should not define a class
+twice and include sometimes the first and sometimes the second.</p>
+
+<p>Note also, that some of the reported errors are not reported as errors by the PHP interpreter, but
+is rather bad practice. For example, PHPCheck will complain about unknown variables or class fields,
+although PHP permits to use variables without defining them before and lets you also create class
+fields dynamically.</p>
+
+<p>Similarly, ill-formed or missing PHPDoc comments are detected. That means, the tool will complain if
+you don't document parameters or return values or if you document non-existent parameters. This
+serves also the purpose of improving the quality of PHPChecks analysis. Because without relying on
+PHPDoc comments, it is not possible in many cases (at least, in "real" applications) to determine
+the type of a variable at compile time.</p>
 {endif}
 
 {include "inc_footer.htm"}
