@@ -85,6 +85,7 @@ final class PC_PHPRef_Finalizer extends FWS_Object
 		foreach($this->aliases as $alias)
 		{
 			list($funcname,$aliasclass,$aliasfunc) = $alias;
+			$aliasf = null;
 			if($aliasclass)
 			{
 				$class = $typecon->get_class($aliasclass);
