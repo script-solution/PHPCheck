@@ -94,3 +94,9 @@ you don't document parameters or return values or if you document non-existent p
 serves also the purpose of improving the quality of PHPChecks analysis. Because without relying on
 PHPDoc comments, it is not possible in many cases (at least, in "real" applications) to determine
 the type of a variable at compile time.
+
+Limitations:
+------------
+
+Currently, most of the new language features (except anonymous functions) introduced since
+PHP 5.2.0 are not yet supported.
