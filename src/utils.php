@@ -88,7 +88,7 @@ class PC_Utils extends FWS_UtilBase
 	public static function highlight_string($source,$start_line = 0,$line = 0,$links = true)
 	{
 		$decorator = new FWS_Highlighting_Decorator_HTML();
-		$lang = new FWS_Highlighting_Language_XML('php.xml');
+		$lang = new FWS_Highlighting_Language_XML('src/php.xml');
 		$hl = new FWS_Highlighting_Processor($source,$lang,$decorator);
 		$res = $hl->highlight();
 		$lines = array();
