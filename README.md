@@ -34,6 +34,17 @@ things that **might** by wrong. Nothing more. So, **you** have to check the pote
 pointed out by PHPCheck and verify whether there really is a problem. And, of course, if PHPCheck
 does not find errors, it does **not** mean, that there are none ;)
 
+Installation:
+-------------
+
+Just perform the following steps:
+
+1. Retrieve FrameWorkSolution: `$ git submodule init && git submodule update`.
+2. Create a directory named `cache` in the root directory.
+3. Ensure that the webserver has write permissions for the `cache` directory.
+4. Create a MySQL database and import the `install/structure.sql`.
+5. Copy the config/mysql.php.sample to config/mysql.php and adjust it accordingly.
+
 How to use it:
 --------------
 
