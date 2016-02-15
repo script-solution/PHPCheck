@@ -59,7 +59,7 @@ final class PC_SubModule_stmtscan_cliscan extends PC_SubModule
 			$args = array();
 			for($j = 0, $count = min(count($files) - $i,PC_STMT_FILES_PER_CYCLE); $j < $count; $j++)
 				$args[] = escapeshellarg($files[$i + $j]);
-			$jobs[] = 'php cli.php stmtscan '.implode(' ',$args);
+			$jobs[] = PC_PHP_EXEC.' cli.php stmtscan '.implode(' ',$args);
 		}
 		
 		$user->delete_session_data('stmtscan_files');

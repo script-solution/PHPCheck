@@ -53,8 +53,8 @@ final class PC_SubModule_analyze_cliscan extends PC_SubModule
 		$tpl = FWS_Props::get()->tpl();
 		
 		$jobs = array(
-			'php cli.php analyzecalls',
-			'php cli.php analyzetypes'
+			PC_PHP_EXEC.' cli.php analyzecalls',
+			PC_PHP_EXEC.' cli.php analyzetypes'
 		);
 		$user->set_session_data('job_commands',$jobs);
 		

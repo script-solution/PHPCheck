@@ -59,12 +59,12 @@ final class PC_SubModule_phpref_cliscan extends PC_SubModule
 			$args = array();
 			for($j = 0, $count = min(count($files) - $i,PC_PHPREF_PAGES_PER_CYCLE); $j < $count; $j++)
 				$args[] = escapeshellarg($files[$i + $j]);
-			$jobs[] = 'php cli.php phpref '.implode(' ',$args);
+			$jobs[] = PC_PHP_EXEC.' cli.php phpref '.implode(' ',$args);
 		}
 		
 		$user->delete_session_data('phpref_files');
 		$user->set_session_data('job_commands',$jobs);
-		$user->set_session_data('job_finalizer','php cli.php phpreffin');
+		$user->set_session_data('job_finalizer',PC_PHP_EXEC.' cli.php phpreffin');
 		
 		// init shared data
 		$mutex = new FWS_MutexFile(PC_CLI_MUTEX_FILE);

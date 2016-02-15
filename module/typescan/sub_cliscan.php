@@ -59,12 +59,12 @@ final class PC_SubModule_typescan_cliscan extends PC_SubModule
 			$args = array();
 			for($j = 0, $count = min(count($files) - $i,PC_TYPE_FILES_PER_CYCLE); $j < $count; $j++)
 				$args[] = escapeshellarg($files[$i + $j]);
-			$jobs[] = 'php cli.php typescan '.implode(' ',$args);
+			$jobs[] = PC_PHP_EXEC.' cli.php typescan '.implode(' ',$args);
 		}
 		
 		$user->delete_session_data('typescan_files');
 		$user->set_session_data('job_commands',$jobs);
-		$user->set_session_data('job_finalizer','php cli.php typefin');
+		$user->set_session_data('job_finalizer',PC_PHP_EXEC.' cli.php typefin');
 		
 		// init shared data
 		$mutex = new FWS_MutexFile(PC_CLI_MUTEX_FILE);

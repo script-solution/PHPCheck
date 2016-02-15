@@ -28,6 +28,12 @@
 define('FWS_PATH','fws/');
 
 /**
+ * The php executable to use. If you are on windows, you might need to specify the path, e.g.,
+ * C:\xampp\php\php.exe.
+ */
+define('PC_PHP_EXEC','php');
+
+/**
  * The number of jobs you want to execute in parallel. Since our tasks can be easily
  * run in parallel, it makes sense to use separate processes (via proc_open()) for them. This way
  * we can take advantage of multiple cores/cpus.
