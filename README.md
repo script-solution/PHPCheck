@@ -44,7 +44,7 @@ Just perform the following steps:
 3. Ensure that the webserver has write permissions for the `cache` directory.
 4. Create a MySQL database and import the `install/structure.sql`.
 5. Copy the config/mysql.php.sample to config/mysql.php and adjust it accordingly.
-6. Check if PC_PHP_EXEC in config/userdef.php is defined correctly for your system.
+6. Check if `PC_PHP_EXEC` in `config/userdef.php` is defined correctly for your system.
 
 How to use it:
 --------------
