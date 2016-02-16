@@ -63,22 +63,7 @@ $accessor = new PC_PropAccessor();
 $accessor->set_loader(new PC_PropLoader());
 FWS_Props::set_accessor($accessor);
 
-$tests = array(
-	'PC_Tests_Vars',
-	'PC_Tests_Funcs',
-	'PC_Tests_OOP',
-	'PC_Tests_Arrays',
-	'PC_Tests_Exprs',
-	'PC_Tests_Exprs2',
-	'PC_Tests_Analyzer',
-	'PC_Tests_CondsNLoops',
-	'PC_Tests_Returns',
-	'PC_Tests_Magic',
-);
-
-$succ = 0;
-$fail = 0;
-foreach($tests as $test)
+function run_test($test,&$succ,&$fail)
 {
 	echo "-- ".$test.":".LINE_WRAP;
 	$t = new $test();
@@ -99,6 +84,32 @@ foreach($tests as $test)
 			}
 		}
 	}
+}
+
+$succ = 0;
+$fail = 0;
+if($argc > 1)
+{
+	for($i = 1; $i < $argc; $i++)
+		run_test($argv[$i],$succ,$fail);
+}
+else
+{
+	$tests = array(
+		'PC_Tests_Vars',
+		'PC_Tests_Funcs',
+		'PC_Tests_OOP',
+		'PC_Tests_Arrays',
+		'PC_Tests_Exprs',
+		'PC_Tests_Exprs2',
+		'PC_Tests_Analyzer',
+		'PC_Tests_CondsNLoops',
+		'PC_Tests_Returns',
+		'PC_Tests_Magic',
+	);
+
+	foreach($tests as $test)
+		run_test($test,$succ,$fail);
 }
 
 echo LINE_WRAP;
