@@ -267,8 +267,9 @@ final class PC_Obj_Type extends FWS_Object
 	 *
 	 * @param mixed $key the key
 	 * @param PC_Obj_MultiType $type the element-type
+	 * @param bool $append whether to append the value
 	 */
-	public function set_array_type($key,$type)
+	public function set_array_type($key,$type,$append = false)
 	{
 		if($key === null)
 		{
@@ -289,7 +290,12 @@ final class PC_Obj_Type extends FWS_Object
 			assert(!$key->is_unknown() && !$key->is_multiple());
 			$key = $key->get_first()->get_value_for_use();
 		}
-		$this->_value[$key] = $type === null ? new PC_Obj_MultiType() : $type;
+		
+		$val = $type === null ? new PC_Obj_MultiType() : $type;
+		if($append)
+			$this->_value[] = $val;
+		else
+			$this->_value[$key] = $val;
 	}
 	
 	/**

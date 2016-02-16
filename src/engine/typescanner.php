@@ -327,7 +327,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 			preg_match_all('/\@param\s+([^\s]+)\s+([^\s]+)/',$doc,$matches);
 			foreach($matches[1] as $k => $match)
 			{
-				$param = $matches[2][$k];
+				$param = substr($matches[2][$k],1);
 				// does the param exist?
 				if(($fp = $func->get_param($param)) !== null)
 				{
