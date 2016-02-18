@@ -49,7 +49,7 @@ final class PC_Module_Class extends FWS_Module
 		
 		$renderer = $doc->use_default_renderer();
 		
-		$name = $input->get_var('name','get',FWS_Input::IDENTIFIER);
+		$name = $input->get_var('name','get',FWS_Input::STRING);
 		$this->_class = PC_DAO::get_classes()->get_by_name($name);
 		
 		$renderer->add_breadcrumb('Types',PC_URL::build_submod_url('types'));
