@@ -67,9 +67,11 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		);
 		foreach($rows as $row)
 		{
-			$fields[] = new PC_Obj_Field(
+			$field = new PC_Obj_Field(
 				$row['file'],$row['line'],$row['name'],unserialize($row['type']),$row['visibility'],$row['class']
 			);
+			$field->set_static($row['static']);
+			$fields[] = $field;
 		}
 		return $fields;
 	}
