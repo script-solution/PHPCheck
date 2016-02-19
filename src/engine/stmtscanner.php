@@ -351,7 +351,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * exist, a new one is created (but not stored in scope).
 	 * 
 	 * @param PC_Obj_MultiType $var the variable-name
-	 * @param bool $parent_scope whether to search in the parent scope
+	 * @param bool $parent whether to search in the parent scope
 	 * @return PC_Obj_Variable the variable
 	 */
 	public function get_var($var,$parent = false)
@@ -373,7 +373,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * @param PC_Obj_Variable $var the variable to set
 	 * @param PC_Obj_MultiType $value the value
 	 * @param bool $isref wether to store a reference (default = false)
-	 * @return PC_Obj_MultiType the variable
+	 * @return PC_Obj_MultiType the value
 	 */
 	public function set_var($var,$value,$isref = false)
 	{
@@ -557,7 +557,6 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	public function add_throw($expr)
 	{
 		// TODO
-		echo FWS_Printer::to_string(array(__FUNCTION__,$expr));
 	}
 	
 	/**
