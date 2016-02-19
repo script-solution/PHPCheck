@@ -185,15 +185,15 @@ $r = $p[1]->test2($b);
 			(string)$a->get_field('p')
 		);
 		self::assertEquals(
-			'public function <b>__construct</b>(): unknown',
+			'public function __construct(): unknown',
 			(string)$a->get_method('__construct')
 		);
 		self::assertEquals(
-			'private function <b>test</b>(): unknown',
+			'private function test(): unknown',
 			(string)$a->get_method('test')
 		);
 		self::assertEquals(
-			'protected function <b>test2</b>(a): a',
+			'protected function test2(a): a',
 			(string)$a->get_method('test2')
 		);
 		
@@ -221,7 +221,7 @@ $r = $p[1]->test2($b);
 		self::assertEquals(false,$i->is_final());
 		self::assertEquals(array('i1','i2'),$i->get_interfaces());
 		self::assertEquals(
-			'public abstract function <b>doSomething</b>(): string',
+			'public abstract function doSomething(): string',
 			(string)$i->get_method('doSomething')
 		);
 		
@@ -233,15 +233,15 @@ $r = $p[1]->test2($b);
 		self::assertEquals('b',$x->get_super_class());
 		self::assertEquals(array('i'),$x->get_interfaces());
 		self::assertEquals(
-			'public function <b>doSomething</b>(): string',
+			'public function doSomething(): string',
 			(string)$x->get_method('doSomething')
 		);
 		self::assertEquals(
-			'protected function <b>test2</b>(b): b',
+			'protected function test2(b): b',
 			(string)$x->get_method('test2')
 		);
 		self::assertEquals(
-			'public static function <b>mystatic</b>(): unknown',
+			'public static function mystatic(): unknown',
 			(string)$x->get_method('mystatic')
 		);
 		$field = new PC_Obj_Field('',0,'var',PC_Obj_MultiType::create_int(4),PC_Obj_Field::V_PRIVATE);

@@ -312,7 +312,10 @@ class PC_Obj_Variable extends FWS_Object
 	{
 		$str = '';
 		$scope = $this->get_scope();
-		$str .= $scope == self::SCOPE_GLOBAL ? '<i>global</i>' : $scope;
+		if($scope == self::SCOPE_GLOBAL)
+			$str .= PHP_SAPI == 'cli' ? '#global' : '<i>global</i>';
+		else
+			$str .= $scope;
 		$str .= '['.$this->name.' = '.$this->type.']';
 		return $str;
 	}

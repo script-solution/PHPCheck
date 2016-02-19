@@ -373,7 +373,14 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 		}
 		$str .= 'function';
 		if(!$this->is_anonymous())
-			$str .= ' <b>'.$this->get_name().'</b>';
+		{
+			$str .= ' ';
+			if(PHP_SAPI != 'cli')
+				$str .= '<b>';
+			$str .= $this->get_name();
+			if(PHP_SAPI != 'cli')
+				$str .= '</b>';
+		}
 		$str .= '(';
 		$str .= implode(', ',$this->get_params());
 		$str .= '): '.$this->get_return_type();
