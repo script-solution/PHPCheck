@@ -845,7 +845,9 @@ scalar(A) ::= T_TRAIT_C|T_METHOD_C|T_FUNC_C|T_NS_C|T_CLASS_C(part). {
 scalar(A) ::= T_START_HEREDOC T_ENCAPSED_AND_WHITESPACE T_END_HEREDOC . {
 	A = PC_Obj_MultiType::create_string();
 }
-scalar(A) ::= T_START_HEREDOC T_END_HEREDOC .
+scalar(A) ::= T_START_HEREDOC T_END_HEREDOC . {
+	A = PC_Obj_MultiType::create_string();
+}
 scalar(A) ::= DOUBLEQUOTE encaps_list DOUBLEQUOTE . {
 	A = PC_Obj_MultiType::create_string();
 }
@@ -1018,11 +1020,26 @@ internal_functions_in_yacc(A) ::= T_ISSET LPAREN isset_variables RPAREN . {
 internal_functions_in_yacc(A) ::= T_EMPTY LPAREN expr RPAREN . {
 	A = PC_Obj_MultiType::create_bool();
 }
-internal_functions_in_yacc ::= T_INCLUDE expr .
-internal_functions_in_yacc ::= T_INCLUDE_ONCE expr .
-internal_functions_in_yacc ::= T_EVAL LPAREN expr RPAREN .
-internal_functions_in_yacc ::= T_REQUIRE expr .
-internal_functions_in_yacc ::= T_REQUIRE_ONCE expr .
+internal_functions_in_yacc(A) ::= T_INCLUDE expr . {
+	// TODO
+	A = new PC_Obj_MultiType();
+}
+internal_functions_in_yacc(A) ::= T_INCLUDE_ONCE expr . {
+	// TODO
+	A = new PC_Obj_MultiType();
+}
+internal_functions_in_yacc(A) ::= T_EVAL LPAREN expr RPAREN . {
+	// TODO
+	A = new PC_Obj_MultiType();
+}
+internal_functions_in_yacc(A) ::= T_REQUIRE expr . {
+	// TODO
+	A = new PC_Obj_MultiType();
+}
+internal_functions_in_yacc(A) ::= T_REQUIRE_ONCE expr . {
+	// TODO
+	A = new PC_Obj_MultiType();
+}
 
 isset_variables ::= isset_variable .
 isset_variables ::= isset_variables COMMA isset_variable .

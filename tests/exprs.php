@@ -133,6 +133,9 @@ $bh = (unset)1;
 
 $ca = isset($foo);
 $cb = empty($bar);
+$cc = <<<EOF
+foobar
+EOF;
 
 $bi = array(
 	array(
@@ -233,6 +236,7 @@ $bi = array(
 		
 		self::assertEquals((string)PC_Obj_MultiType::create_bool(),(string)$global['ca']->get_type());
 		self::assertEquals((string)PC_Obj_MultiType::create_bool(),(string)$global['cb']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_string(),(string)$global['cc']->get_type());
 		
 		self::assertEquals(
 			(string)PC_Obj_Type::get_type_by_value(array(array("a" => array(1),2 => 3),4 => 5)),
