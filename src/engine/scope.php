@@ -52,14 +52,17 @@ class PC_Engine_Scope extends FWS_Object
 	private $funcscope = array(PC_Obj_Variable::SCOPE_GLOBAL);
 	
 	/**
-	 * @return string the name of the current scope
+	 * @param bool $parent whether to use the parent scope
+	 * @return string the name of the current/parent scope
 	 */
-	public function get_name()
+	public function get_name($parent = false)
 	{
 		$name = '';
 		if(($class = $this->get_name_of(T_CLASS_C)))
 			$name .= $class.'::';
-		$name .= $this->funcscope[count($this->funcscope) - 1];
+		$off = $parent ? 2 : 1;
+		assert(count($this->funcscope) >= $off);
+		$name .= $this->funcscope[count($this->funcscope) - $off];
 		return $name;
 	}
 	
@@ -67,17 +70,19 @@ class PC_Engine_Scope extends FWS_Object
 	 * Extracts the given part of the scope
 	 * 
 	 * @param int $part the part: T_METHOD_C, T_FUNCTION_C or T_CLASS_C
+	 * @param bool $parent whether to use the parent scope
 	 * @return string the scope-part-name
 	 */
-	public function get_name_of($part)
+	public function get_name_of($part,$parent = false)
 	{
 		$str = '';
 		switch($part)
 		{
 			case T_METHOD_C:
 			case T_FUNC_C:
-				if(count($this->funcscope) > 1)
-					$str = $this->funcscope[count($this->funcscope) - 1];
+				$off = $parent ? 2 : 1;
+				if(count($this->funcscope) > $off)
+					$str = $this->funcscope[count($this->funcscope) - $off];
 				break;
 			case T_CLASS_C:
 				// if we define a function in a class-method, it is global

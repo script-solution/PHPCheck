@@ -59,7 +59,7 @@
 					for($i = $start; $i < self::YYERRORSYMBOL + $start; $i++)
 					{
 						$lt = token_name($i);
-      			$lt = ($lt == 'T_ML_COMMENT') ? 'T_COMMENT' : $lt;
+            $lt = ($lt == 'T_ML_COMMENT') ? 'T_COMMENT' : $lt;
 						$lt = ($lt == 'T_DOUBLE_COLON') ?  'T_PAAMAYIM_NEKUDOTAYIM' : $lt;
 						if(!isset($hash[$lt]))
 							continue;
@@ -71,945 +71,955 @@
     }
 }
 
-%left T_INCLUDE T_INCLUDE_ONCE T_EVAL T_REQUIRE T_REQUIRE_ONCE.
-%left COMMA.
-%left T_LOGICAL_OR.
-%left T_LOGICAL_XOR.
-%left T_LOGICAL_AND.
-%right T_PRINT.
-%left EQUALS T_PLUS_EQUAL T_MINUS_EQUAL T_MUL_EQUAL T_DIV_EQUAL T_CONCAT_EQUAL T_MOD_EQUAL T_AND_EQUAL T_OR_EQUAL T_XOR_EQUAL T_SL_EQUAL T_SR_EQUAL.
-%left QUESTION COLON.
-%left T_BOOLEAN_OR.
-%left T_BOOLEAN_AND.
-%left BAR.
-%left CARAT.
-%left AMPERSAND.
-%nonassoc T_IS_EQUAL T_IS_NOT_EQUAL T_IS_IDENTICAL T_IS_NOT_IDENTICAL.
-%nonassoc LESSTHAN T_IS_SMALLER_OR_EQUAL GREATERTHAN T_IS_GREATER_OR_EQUAL.
-%left T_SL T_SR.
-%left PLUS MINUS DOT.
-%left TIMES DIVIDE PERCENT.
-%right EXCLAM.
-%nonassoc T_INSTANCEOF.
-%right TILDE T_INC T_DEC T_INT_CAST T_DOUBLE_CAST T_STRING_CAST T_ARRAY_CAST T_OBJECT_CAST T_BOOL_CAST T_UNSET_CAST AT.
-%right LBRACKET.
-%nonassoc T_NEW T_CLONE.
-%left T_ELSEIF.
-%left T_ELSE.
-%left T_ENDIF.
-%right T_STATIC T_ABSTRACT T_FINAL T_PRIVATE T_PROTECTED T_PUBLIC.
+%left T_INCLUDE T_INCLUDE_ONCE T_EVAL T_REQUIRE T_REQUIRE_ONCE .
+%left COMMA .
+%left T_LOGICAL_OR .
+%left T_LOGICAL_XOR .
+%left T_LOGICAL_AND .
+%right T_PRINT .
+%right T_YIELD .
+%right T_DOUBLE_ARROW .
+%right T_YIELD_FROM .
+%left EQUALS T_PLUS_EQUAL T_MINUS_EQUAL T_MUL_EQUAL T_DIV_EQUAL T_CONCAT_EQUAL T_MOD_EQUAL T_AND_EQUAL T_OR_EQUAL T_XOR_EQUAL T_SL_EQUAL T_SR_EQUAL T_POW_EQUAL .
+%left QUESTION COLON .
+%right T_COALESCE .
+%left T_BOOLEAN_OR .
+%left T_BOOLEAN_AND .
+%left BAR .
+%left CARAT .
+%left AMPERSAND .
+%nonassoc T_IS_EQUAL T_IS_NOT_EQUAL T_IS_IDENTICAL T_IS_NOT_IDENTICAL T_SPACESHIP .
+%nonassoc LESSTHAN T_IS_SMALLER_OR_EQUAL GREATERTHAN T_IS_GREATER_OR_EQUAL .
+%left T_SL T_SR .
+%left PLUS MINUS DOT .
+%left TIMES DIVIDE PERCENT .
+%right EXCLAM .
+%nonassoc T_INSTANCEOF .
+%right TILDE T_INC T_DEC T_INT_CAST T_DOUBLE_CAST T_STRING_CAST T_ARRAY_CAST T_OBJECT_CAST T_BOOL_CAST T_UNSET_CAST AT .
+%right T_POW .
+%right LBRACKET .
+%nonassoc T_NEW T_CLONE .
+%left T_NOELSE .
+%left T_ELSEIF .
+%left T_ELSE .
+%left T_ENDIF .
+%right T_STATIC T_ABSTRACT T_FINAL T_PRIVATE T_PROTECTED T_PUBLIC .
+%nonassoc SINGLEQUOTE .
 
-start ::= top_statement_list.
+start ::= top_statement_list .
 
-top_statement_list ::= top_statement_list top_statement.
-top_statement_list ::= .
+reserved_non_modifiers ::= T_INCLUDE .
+reserved_non_modifiers ::= T_INCLUDE_ONCE .
+reserved_non_modifiers ::= T_EVAL .
+reserved_non_modifiers ::= T_REQUIRE .
+reserved_non_modifiers ::= T_REQUIRE_ONCE .
+reserved_non_modifiers ::= T_LOGICAL_OR .
+reserved_non_modifiers ::= T_LOGICAL_XOR .
+reserved_non_modifiers ::= T_LOGICAL_AND .
+reserved_non_modifiers ::= T_INSTANCEOF .
+reserved_non_modifiers ::= T_NEW .
+reserved_non_modifiers ::= T_CLONE .
+reserved_non_modifiers ::= T_EXIT .
+reserved_non_modifiers ::= T_IF .
+reserved_non_modifiers ::= T_ELSEIF .
+reserved_non_modifiers ::= T_ELSE .
+reserved_non_modifiers ::= T_ENDIF .
+reserved_non_modifiers ::= T_ECHO .
+reserved_non_modifiers ::= T_DO .
+reserved_non_modifiers ::= T_WHILE .
+reserved_non_modifiers ::= T_ENDWHILE .
+reserved_non_modifiers ::= T_FOR .
+reserved_non_modifiers ::= T_ENDFOR .
+reserved_non_modifiers ::= T_FOREACH .
+reserved_non_modifiers ::= T_ENDFOREACH .
+reserved_non_modifiers ::= T_DECLARE .
+reserved_non_modifiers ::= T_ENDDECLARE .
+reserved_non_modifiers ::= T_AS .
+reserved_non_modifiers ::= T_TRY .
+reserved_non_modifiers ::= T_CATCH .
+reserved_non_modifiers ::= T_FINALLY .
+reserved_non_modifiers ::= T_THROW .
+reserved_non_modifiers ::= T_USE .
+reserved_non_modifiers ::= T_INSTEADOF .
+reserved_non_modifiers ::= T_GLOBAL .
+reserved_non_modifiers ::= T_VAR .
+reserved_non_modifiers ::= T_UNSET .
+reserved_non_modifiers ::= T_ISSET .
+reserved_non_modifiers ::= T_EMPTY .
+reserved_non_modifiers ::= T_CONTINUE .
+reserved_non_modifiers ::= T_GOTO .
+reserved_non_modifiers ::= T_FUNCTION .
+reserved_non_modifiers ::= T_CONST .
+reserved_non_modifiers ::= T_RETURN .
+reserved_non_modifiers ::= T_PRINT .
+reserved_non_modifiers ::= T_YIELD .
+reserved_non_modifiers ::= T_LIST .
+reserved_non_modifiers ::= T_SWITCH .
+reserved_non_modifiers ::= T_ENDSWITCH .
+reserved_non_modifiers ::= T_CASE .
+reserved_non_modifiers ::= T_DEFAULT .
+reserved_non_modifiers ::= T_BREAK .
+reserved_non_modifiers ::= T_ARRAY .
+reserved_non_modifiers ::= T_CALLABLE .
+reserved_non_modifiers ::= T_EXTENDS .
+reserved_non_modifiers ::= T_IMPLEMENTS .
+reserved_non_modifiers ::= T_NAMESPACE .
+reserved_non_modifiers ::= T_TRAIT .
+reserved_non_modifiers ::= T_INTERFACE .
+reserved_non_modifiers ::= T_CLASS .
+reserved_non_modifiers ::= T_CLASS_C .
+reserved_non_modifiers ::= T_TRAIT_C .
+reserved_non_modifiers ::= T_FUNC_C .
+reserved_non_modifiers ::= T_METHOD_C .
+reserved_non_modifiers ::= T_LINE .
+reserved_non_modifiers ::= T_FILE .
+reserved_non_modifiers ::= T_DIR .
+reserved_non_modifiers ::= T_NS_C .
+reserved_non_modifiers ::= T_HALT_COMPILER .
 
-top_statement ::= statement.
-top_statement ::= function_declaration_statement.
-top_statement ::= class_declaration_statement.
-top_statement ::= T_HALT_COMPILER LPAREN RPAREN SEMI.
+semi_reserved ::= reserved_non_modifiers .
+semi_reserved ::= T_STATIC .
+semi_reserved ::= T_ABSTRACT .
+semi_reserved ::= T_FINAL .
+semi_reserved ::= T_PRIVATE .
+semi_reserved ::= T_PROTECTED .
+semi_reserved ::= T_PUBLIC .
 
-statement ::= unticked_statement.
+identifier(A) ::= T_STRING(n) . { A = n; }
+identifier ::= semi_reserved .
 
-unticked_statement ::= LCURLY inner_statement_list RCURLY.
-unticked_statement ::= T_IF LPAREN expr RPAREN statement elseif_list else_single. {
-	$this->state->end_cond();
-}
-unticked_statement ::= T_IF LPAREN expr RPAREN COLON inner_statement_list
-											 new_elseif_list new_else_single T_ENDIF COLON. {
-	$this->state->end_cond();
-}
-unticked_statement ::= T_WHILE LPAREN expr RPAREN while_statement. {
-	$this->state->end_loop();
-}
-unticked_statement ::= T_DO statement T_WHILE LPAREN expr RPAREN SEMI. {
-	$this->state->end_loop();
-}
-unticked_statement ::= T_FOR 
-			LPAREN
-				for_expr
-			SEMI 
-				for_expr
-			SEMI
-				for_expr
-			RPAREN
-			for_statement. {
-	$this->state->end_loop();
-}
-unticked_statement ::= T_SWITCH LPAREN expr RPAREN switch_case_list. {
-	$this->state->end_cond();
-}
-unticked_statement ::= T_BREAK SEMI.
-unticked_statement ::= T_BREAK expr SEMI.
-unticked_statement ::= T_CONTINUE SEMI.
-unticked_statement ::= T_CONTINUE expr SEMI.
-unticked_statement ::= T_RETURN SEMI. {
-	$this->state->add_return(null);
-}
-unticked_statement ::= T_RETURN expr_without_variable(e) SEMI. {
-	$this->state->add_return(e);
-}
-unticked_statement ::= T_RETURN variable(var) SEMI. {
-	$this->state->add_return(var);
-}
-unticked_statement ::= T_GLOBAL global_var_list SEMI.
-unticked_statement ::= T_STATIC static_var_list SEMI.
-unticked_statement ::= T_ECHO echo_expr_list SEMI.
-unticked_statement ::= T_INLINE_HTML.
-unticked_statement ::= expr SEMI.
-unticked_statement ::= T_USE use_filename SEMI.
-unticked_statement ::= T_UNSET LPAREN unset_variables RPAREN SEMI.
-unticked_statement ::= foreach_var_head RPAREN foreach_statement. {
-	$this->state->end_loop();
-}
-unticked_statement ::= foreach_novar_head RPAREN foreach_statement. {
-	$this->state->end_loop();
-}
-unticked_statement ::= T_DECLARE LPAREN declare_list RPAREN declare_statement.
-unticked_statement ::= SEMI.
-unticked_statement ::= T_TRY LCURLY inner_statement_list RCURLY
-		catch_head
-		LCURLY inner_statement_list RCURLY
-		additional_catches. {
-	$this->state->end_cond();
-}
-unticked_statement ::= T_THROW expr(e) SEMI. {
-	$this->state->add_throw(e);
-}
+top_statement_list ::= top_statement_list top_statement .
+top_statement_list ::= /* empty */ .
 
-foreach_var_head ::= T_FOREACH LPAREN variable(var)
-										 T_AS foreach_variable(first) foreach_optional_arg(sec). {
-	$this->state->set_foreach_var(var,first,sec);
-}
-foreach_novar_head ::= T_FOREACH LPAREN expr_without_variable(evar)
-											 T_AS w_variable(first) foreach_optional_arg(sec). {
-	$this->state->set_foreach_var(evar,first,sec);
-}
-
-additional_catches ::= non_empty_additional_catches.
-additional_catches ::= .
-
-non_empty_additional_catches ::= additional_catch.
-non_empty_additional_catches ::= non_empty_additional_catches additional_catch.
-
-catch_head ::= T_CATCH LPAREN fully_qualified_class_name(class) T_VARIABLE(var) RPAREN. {
-	$type = PC_Obj_Variable::create_object(class->get_type()->get_string());
-	$this->state->set_var(new PC_Obj_Variable(substr(var,1)),$type);
-}
-additional_catch ::= catch_head LCURLY inner_statement_list RCURLY.
-
-inner_statement_list ::= inner_statement_list inner_statement.
-inner_statement_list ::= .
-
-inner_statement ::= statement.
-inner_statement ::= function_declaration_statement.
-inner_statement ::= class_declaration_statement.
-inner_statement ::= T_HALT_COMPILER LPAREN RPAREN SEMI.
-
-function_declaration_statement ::= unticked_function_declaration_statement.
-
-class_declaration_statement ::= unticked_class_declaration_statement.
-
-unticked_function_declaration_statement ::=
-		T_FUNCTION is_reference T_STRING LPAREN parameter_list RPAREN
-		LCURLY inner_statement_list RCURLY. {
-	$this->state->end_function();
+namespace_name(A) ::= T_STRING(name) . { A = name; }
+namespace_name(A) ::= namespace_name T_NS_SEPARATOR T_STRING(name) . {
+	// TODO
+	A = name;
 }
 
-unticked_class_declaration_statement ::=
-		class_entry_type T_STRING extends_from
-			implements_list
-			LCURLY
-				class_statement_list
-			RCURLY. {
-	$this->state->end_class();
+name(A) ::= namespace_name(name) . { A = name; }
+name(A) ::= T_NAMESPACE T_NS_SEPARATOR namespace_name(name) . { A = name; }
+name(A) ::= T_NS_SEPARATOR namespace_name(name) . { A = name; }
+
+top_statement ::= statement .
+top_statement ::= function_declaration_statement .
+top_statement ::= class_declaration_statement .
+top_statement ::= trait_declaration_statement .
+top_statement ::= interface_declaration_statement .
+top_statement ::= T_HALT_COMPILER LPAREN RPAREN SEMI .
+top_statement ::= T_NAMESPACE namespace_name SEMI .
+top_statement ::= T_NAMESPACE namespace_name LCURLY top_statement_list RCURLY .
+top_statement ::= T_NAMESPACE LCURLY top_statement_list RCURLY .
+top_statement ::= T_USE mixed_group_use_declaration SEMI .
+top_statement ::= T_USE use_type group_use_declaration SEMI .
+top_statement ::= T_USE use_declarations SEMI .
+top_statement ::= T_USE use_type use_declarations SEMI .
+top_statement ::= T_CONST const_list SEMI .
+
+use_type ::= T_FUNCTION .
+use_type ::= T_CONST .
+
+group_use_declaration ::= namespace_name T_NS_SEPARATOR LCURLY unprefixed_use_declarations RCURLY .
+group_use_declaration ::= T_NS_SEPARATOR namespace_name T_NS_SEPARATOR LCURLY unprefixed_use_declarations RCURLY .
+
+mixed_group_use_declaration ::= namespace_name T_NS_SEPARATOR LCURLY inline_use_declarations RCURLY .
+mixed_group_use_declaration ::= T_NS_SEPARATOR namespace_name T_NS_SEPARATOR LCURLY inline_use_declarations RCURLY .
+
+inline_use_declarations ::= inline_use_declarations COMMA inline_use_declaration .
+inline_use_declarations ::= inline_use_declaration .
+
+unprefixed_use_declarations ::= unprefixed_use_declarations COMMA unprefixed_use_declaration .
+unprefixed_use_declarations ::= unprefixed_use_declaration .
+
+use_declarations ::= use_declarations COMMA use_declaration .
+use_declarations ::= use_declaration .
+
+inline_use_declaration ::= unprefixed_use_declaration .
+inline_use_declaration ::= use_type unprefixed_use_declaration .
+
+unprefixed_use_declaration ::= namespace_name .
+unprefixed_use_declaration ::= namespace_name T_AS T_STRING .
+
+use_declaration ::= unprefixed_use_declaration .
+use_declaration ::= T_NS_SEPARATOR unprefixed_use_declaration .
+
+const_list ::= const_list COMMA const_decl .
+const_list ::= const_decl .
+
+inner_statement_list ::= inner_statement_list inner_statement .
+inner_statement_list ::= /* empty */ .
+
+inner_statement ::= statement .
+inner_statement ::= function_declaration_statement .
+inner_statement ::= class_declaration_statement .
+inner_statement ::= trait_declaration_statement .
+inner_statement ::= interface_declaration_statement .
+inner_statement ::= T_HALT_COMPILER LPAREN RPAREN SEMI .
+
+statement ::= LCURLY inner_statement_list RCURLY .
+statement ::= if_stmt . {
+    $this->state->end_cond();
 }
-unticked_class_declaration_statement ::=
-		interface_entry T_STRING
-			interface_extends_list
-			LCURLY
-				class_statement_list
-			RCURLY. {
-	$this->state->end_class();
+statement ::= alt_if_stmt . {
+    $this->state->end_cond();
+}
+statement ::= T_WHILE LPAREN expr RPAREN while_statement . {
+    $this->state->end_loop();
+}
+statement ::= T_DO statement T_WHILE LPAREN expr RPAREN SEMI . {
+    $this->state->end_loop();
+}
+statement ::= T_FOR LPAREN for_exprs SEMI for_exprs SEMI for_exprs RPAREN for_statement . {
+    $this->state->end_loop();
+}
+statement ::= T_SWITCH LPAREN expr RPAREN switch_case_list . {
+    $this->state->end_cond();
+}
+statement ::= T_BREAK optional_expr SEMI .
+statement ::= T_CONTINUE optional_expr SEMI .
+statement ::= T_RETURN optional_expr(s) SEMI . {
+    $this->state->add_return(s);
+}
+statement ::= T_GLOBAL global_var_list SEMI .
+statement ::= T_STATIC static_var_list SEMI .
+statement ::= T_ECHO echo_expr_list SEMI .
+statement ::= T_INLINE_HTML .
+statement ::= expr SEMI .
+statement ::= T_UNSET LPAREN unset_variables RPAREN SEMI .
+statement ::= T_FOREACH LPAREN foreach_inner RPAREN foreach_statement . {
+    $this->state->end_loop();
+}
+statement ::= T_DECLARE LPAREN const_list RPAREN declare_statement .
+statement ::= SEMI /* empty statement */ .
+statement ::= T_TRY LCURLY inner_statement_list RCURLY catch_list finally_statement . {
+    $this->state->end_cond();
+}
+statement ::= T_THROW expr(e) SEMI . {
+    $this->state->add_throw(e);
+}
+statement ::= T_GOTO T_STRING SEMI .
+statement ::= T_STRING COLON .
+
+catch_list ::= /* empty */ .
+catch_list ::= catch_list T_CATCH LPAREN name(class) T_VARIABLE(var) RPAREN
+							 LCURLY inner_statement_list RCURLY . {
+		$value = PC_Obj_MultiType::create_object(class);
+		$this->state->set_var(new PC_Obj_Variable(substr(var,1)),$value);
 }
 
-class_entry_type ::= T_CLASS.
-class_entry_type ::= T_ABSTRACT T_CLASS.
-class_entry_type ::= T_FINAL T_CLASS.
+foreach_inner ::= expr(e) T_AS foreach_variable(first) . {
+		$this->state->set_foreach_var(e,first,null);
+}
+foreach_inner ::= expr(e) T_AS foreach_variable(first) T_DOUBLE_ARROW foreach_variable(second) . {
+		$this->state->set_foreach_var(e,first,second);
+}
 
-extends_from ::= T_EXTENDS fully_qualified_class_name.
-extends_from ::= .
+finally_statement ::= /* empty */ .
+finally_statement ::= T_FINALLY LCURLY inner_statement_list RCURLY .
 
-interface_entry ::= T_INTERFACE.
+unset_variables ::= unset_variable .
+unset_variables ::= unset_variables COMMA unset_variable .
 
-interface_extends_list ::= T_EXTENDS interface_list.
-interface_extends_list ::= .
+unset_variable ::= variable .
 
-implements_list ::= .
-implements_list ::= T_IMPLEMENTS interface_list.
+function_declaration_statement ::= function returns_ref T_STRING
+																	 LPAREN parameter_list RPAREN
+																	 return_type backup_doc_comment
+																	 LCURLY inner_statement_list RCURLY . {
+		$this->state->end_function();
+}
 
-interface_list ::= fully_qualified_class_name.
-interface_list ::= interface_list COMMA fully_qualified_class_name.
+is_reference ::= /* empty */ .
+is_reference ::= AMPERSAND .
 
-expr(A) ::= r_variable(var). { A = var; }
-expr(A) ::= expr_without_variable(e). { A = e; }
+is_variadic ::= /* empty */ .
+is_variadic ::= T_ELLIPSIS .
+
+class_declaration_statement ::= class_modifiers T_STRING extends_from
+																implements_list
+																backup_doc_comment LCURLY class_statement_list RCURLY . {
+  	$this->state->end_class();
+}
+
+class_modifiers ::= T_CLASS .
+class_modifiers ::= T_ABSTRACT T_CLASS .
+class_modifiers ::= T_FINAL T_CLASS .
+
+trait_declaration_statement ::= T_TRAIT T_STRING backup_doc_comment LCURLY class_statement_list RCURLY .
+
+interface_declaration_statement ::= T_INTERFACE T_STRING interface_extends_list
+																		backup_doc_comment LCURLY class_statement_list RCURLY . {
+  	$this->state->end_class();
+}
+
+extends_from ::= /* empty */ .
+extends_from ::= T_EXTENDS name(n) .
+
+interface_extends_list ::= /* empty */ .
+interface_extends_list ::= T_EXTENDS name_list(list) .
+
+implements_list ::= /* empty */ .
+implements_list ::= T_IMPLEMENTS name_list(list) .
+
+foreach_variable(A) ::= variable(v) . { A = v; }
+foreach_variable(A) ::= AMPERSAND variable(v) . { A = v; }
+foreach_variable ::= T_LIST LPAREN assignment_list RPAREN .
+
+for_statement ::= statement .
+for_statement ::= COLON inner_statement_list T_ENDFOR SEMI .
+
+foreach_statement ::= statement .
+foreach_statement ::= COLON inner_statement_list T_ENDFOREACH SEMI .
+
+declare_statement ::= statement .
+declare_statement ::= COLON inner_statement_list T_ENDDECLARE SEMI .
+
+switch_case_list ::= LCURLY case_list RCURLY .
+switch_case_list ::= LCURLY SEMI case_list RCURLY .
+switch_case_list ::= COLON case_list T_ENDSWITCH SEMI .
+switch_case_list ::= COLON SEMI case_list T_ENDSWITCH SEMI .
+
+case_list ::= /* empty */ .
+case_list ::= case_list T_CASE expr case_separator inner_statement_list .
+case_list ::= case_list T_DEFAULT case_separator inner_statement_list .
+
+case_separator ::= COLON .
+case_separator ::= SEMI .
+
+while_statement ::= statement .
+while_statement ::= COLON inner_statement_list T_ENDWHILE SEMI .
+
+if_stmt_without_else ::= T_IF LPAREN expr RPAREN statement .
+if_stmt_without_else ::= if_stmt_without_else T_ELSEIF LPAREN expr RPAREN statement .
+
+if_stmt ::= if_stmt_without_else .
+if_stmt ::= if_stmt_without_else T_ELSE statement .
+
+alt_if_stmt_without_else ::= T_IF LPAREN expr RPAREN COLON inner_statement_list .
+alt_if_stmt_without_else ::= alt_if_stmt_without_else T_ELSEIF LPAREN expr RPAREN COLON inner_statement_list .
+
+alt_if_stmt ::= alt_if_stmt_without_else T_ENDIF SEMI .
+alt_if_stmt ::= alt_if_stmt_without_else T_ELSE COLON inner_statement_list T_ENDIF SEMI .
+
+parameter_list(A) ::= non_empty_parameter_list(list) . { A = list; }
+parameter_list(A) ::= /* empty */ . { A = array(); }
+
+non_empty_parameter_list(A) ::= parameter(p) . {
+	A = array();
+	A[] = p;
+  $this->state->set_func_param(p);
+}
+non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA parameter(p) . {
+	A = list;
+	A[] = p;
+  $this->state->set_func_param(p);
+}
+
+parameter(A) ::= optional_type(vtype) is_reference is_variadic T_VARIABLE(vname) . {
+	A = new PC_Obj_Parameter(substr(vname,1));
+	A->set_mtype(vtype);
+}
+parameter(A) ::= optional_type(vtype) is_reference is_variadic T_VARIABLE(vname) EQUALS expr(vval) . {
+	A = new PC_Obj_Parameter(substr(vname,1));
+	if(vval)
+		vval->clear_values(); // value is not interesting here
+	if(vval && vtype->is_unknown())
+		A->set_mtype(vval);
+	else
+		A->set_mtype(vtype);
+	A->set_optional(true);
+}
+
+optional_type(A) ::= /* empty */ . { A = new PC_Obj_MultiType(); }
+optional_type(A) ::= type(t) . { A = t; }
+
+type(A) ::= T_ARRAY . { A = PC_Obj_MultiType::create_array(); }
+type(A) ::= T_CALLABLE . { A = PC_Obj_MultiType::create_callable(); }
+type(A) ::= name(vtype) . { A = PC_Obj_MultiType::create_object(vtype); }
+
+return_type ::= /* empty */ .
+return_type ::= COLON type .
+
+argument_list(A) ::= LPAREN RPAREN . { A = array(); }
+argument_list(A) ::= LPAREN non_empty_argument_list(list) RPAREN . { A = list; }
+
+non_empty_argument_list(A) ::= argument(arg) . { A = array(arg); }
+non_empty_argument_list(A) ::= non_empty_argument_list(list) COMMA argument(arg) . {
+	A = list;
+	A[] = arg;
+}
+
+argument(A) ::= expr(e) . { A = e; }
+argument ::= T_ELLIPSIS expr .
+
+global_var_list ::= global_var_list COMMA global_var .
+global_var_list ::= global_var .
+
+global_var ::= simple_variable(var) . {
+	$this->state->do_global(var);
+}
+
+static_var_list ::= static_var_list COMMA static_var .
+static_var_list ::= static_var .
+
+static_var ::= T_VARIABLE .
+static_var ::= T_VARIABLE EQUALS expr .
+
+class_statement_list ::= class_statement_list class_statement .
+class_statement_list ::= /* empty */ .
+
+class_statement ::= variable_modifiers property_list SEMI .
+class_statement ::= method_modifiers T_CONST class_const_list SEMI .
+class_statement ::= T_USE name_list trait_adaptations .
+class_statement ::= method_modifiers function returns_ref identifier
+										LPAREN parameter_list RPAREN
+										return_type backup_doc_comment method_body . {
+		$this->state->end_function();
+}
+
+name_list ::= name .
+name_list ::= name_list COMMA name .
+
+trait_adaptations ::= SEMI .
+trait_adaptations ::= LCURLY RCURLY .
+trait_adaptations ::= LCURLY trait_adaptation_list RCURLY .
+
+trait_adaptation_list ::= trait_adaptation .
+trait_adaptation_list ::= trait_adaptation_list trait_adaptation .
+
+trait_adaptation ::= trait_precedence SEMI .
+trait_adaptation ::= trait_alias SEMI .
+
+trait_precedence ::= absolute_trait_method_reference T_INSTEADOF name_list .
+
+trait_alias ::= trait_method_reference T_AS T_STRING .
+trait_alias ::= trait_method_reference T_AS reserved_non_modifiers .
+trait_alias ::= trait_method_reference T_AS member_modifier identifier .
+trait_alias ::= trait_method_reference T_AS member_modifier .
+
+trait_method_reference ::= identifier .
+trait_method_reference ::= absolute_trait_method_reference .
+
+absolute_trait_method_reference ::= name T_PAAMAYIM_NEKUDOTAYIM identifier .
+
+method_body ::= SEMI /* abstract method */ .
+method_body ::= LCURLY inner_statement_list RCURLY .
+
+variable_modifiers(A) ::= non_empty_member_modifiers(mods) . { A = mods; }
+variable_modifiers(A) ::= T_VAR . { A = array('public'); }
+
+method_modifiers(A) ::= /* empty */ . { A = array(); }
+method_modifiers(A) ::= non_empty_member_modifiers(mods) . { A = mods; }
+
+non_empty_member_modifiers(A) ::= member_modifier(mod) . { A = array(mod); }
+non_empty_member_modifiers(A) ::= non_empty_member_modifiers(mods) member_modifier(mod) . {
+	A = mods;
+	A[] = mod;
+}
+
+member_modifier(A) ::= T_PUBLIC|T_PROTECTED|T_PRIVATE|T_STATIC|T_ABSTRACT|T_FINAL(mod) . {
+	A = mod;
+}
+
+property_list(A) ::= property_list(list) COMMA property(p) . { A = list; A[] = p; }
+property_list(A) ::= property(p) . { A = array(p); }
+
+property(A) ::= T_VARIABLE(varname) backup_doc_comment . { A = array('name' => substr(varname,1)); }
+property(A) ::= T_VARIABLE(varname) EQUALS expr(varval) backup_doc_comment . {
+	A = array('name' => substr(varname,1),'val' => varval);
+}
+
+class_const_list(A) ::= class_const_list(list) COMMA class_const_decl(d) . { A = list; A[] = d; }
+class_const_list(A) ::= class_const_decl(d) . { A = array(d); }
+
+class_const_decl(A) ::= identifier(cname) EQUALS expr(cvalue) backup_doc_comment . {
+	A = array('name' => cname,'val' => cvalue);
+}
+
+const_decl ::= T_STRING EQUALS expr backup_doc_comment .
+
+echo_expr_list ::= echo_expr_list COMMA echo_expr .
+echo_expr_list ::= echo_expr .
+
+echo_expr ::= expr .
+
+for_exprs ::= /* empty */ .
+for_exprs ::= non_empty_for_exprs .
+
+non_empty_for_exprs ::= non_empty_for_exprs COMMA expr .
+non_empty_for_exprs ::= expr .
+
+anonymous_class ::= T_CLASS ctor_arguments extends_from implements_list backup_doc_comment LCURLY class_statement_list RCURLY . {
+    $this->state->end_class();
+}
+
+new_expr(A) ::= T_NEW class_name_reference(name) ctor_arguments(args) . {
+    A = $this->state->add_call((string)name,PC_Obj_MultiType::create_string('__construct'),args);
+}
+new_expr ::= T_NEW anonymous_class .
 
 expr_without_variable(A) ::= T_LIST LPAREN assignment_list(list) RPAREN EQUALS expr(e). {
-	A = $this->state->handle_list(list,e);
+    A = $this->state->handle_list(list,e);
 }
 expr_without_variable(A) ::= variable(var) EQUALS expr(e). {
-	A = $this->state->set_var(var,e);
+    A = $this->state->set_var(var,e);
 }
 expr_without_variable(A) ::= variable(var) EQUALS AMPERSAND variable(e). {
-	A = $this->state->set_var(var,e,true);
-}
-expr_without_variable(A) ::= variable(var) EQUALS AMPERSAND T_NEW
-														 class_name_reference(name) ctor_arguments(args). {
-	$func = PC_Obj_Variable::create_string('__construct');
-	$obj = $this->state->add_call(name,$func,args);
-	A = $this->state->set_var(var,$obj);
-}
-expr_without_variable(A) ::= T_NEW class_name_reference(name) ctor_arguments(args). {
-	$func = PC_Obj_Variable::create_string('__construct');
-	A = $this->state->add_call(name,$func,args);
+    A = $this->state->set_var(var,e->get_type(),true);
 }
 expr_without_variable(A) ::= T_CLONE expr(e). {
-	A = clone e;
+    A = clone e;
 }
 expr_without_variable(A) ::= variable(var) T_PLUS_EQUAL expr(e). {
-	A = $this->state->handle_bin_assign_op('+',var,e);
+    A = $this->state->handle_bin_assign_op('+',var,e);
 }
 expr_without_variable(A) ::= variable(var) T_MINUS_EQUAL expr(e). {
-	A = $this->state->handle_bin_assign_op('-',var,e);
+    A = $this->state->handle_bin_assign_op('-',var,e);
 }
 expr_without_variable(A) ::= variable(var) T_MUL_EQUAL expr(e). {
-	A = $this->state->handle_bin_assign_op('*',var,e);
+    A = $this->state->handle_bin_assign_op('*',var,e);
+}
+expr_without_variable(A) ::= variable(var) T_POW_EQUAL expr(e). {
+    A = $this->state->handle_bin_assign_op('**',var,e);
 }
 expr_without_variable(A) ::= variable(var) T_DIV_EQUAL expr(e). {
-	A = $this->state->handle_bin_assign_op('/',var,e);
+    A = $this->state->handle_bin_assign_op('/',var,e);
 }
 expr_without_variable(A) ::= variable(var) T_CONCAT_EQUAL expr(e). {
-	A = $this->state->handle_bin_assign_op('.',var,e);
+    A = $this->state->handle_bin_assign_op('.',var,e);
 }
 expr_without_variable(A) ::= variable(var) T_MOD_EQUAL expr(e). {
-	A = $this->state->handle_bin_assign_op('%',var,e);
+    A = $this->state->handle_bin_assign_op('%',var,e);
 }
 expr_without_variable(A) ::= variable(var) T_AND_EQUAL expr(e). {
-	A = $this->state->handle_bin_assign_op('&',var,e);
+    A = $this->state->handle_bin_assign_op('&',var,e);
 }
 expr_without_variable(A) ::= variable(var) T_OR_EQUAL expr(e). {
-	A = $this->state->handle_bin_assign_op('|',var,e);
+    A = $this->state->handle_bin_assign_op('|',var,e);
 }
 expr_without_variable(A) ::= variable(var) T_XOR_EQUAL expr(e). {
-	A = $this->state->handle_bin_assign_op('^',var,e);
+    A = $this->state->handle_bin_assign_op('^',var,e);
 }
 expr_without_variable(A) ::= variable(var) T_SL_EQUAL expr(e). {
-	A = $this->state->handle_bin_assign_op('<<',var,e);
+    A = $this->state->handle_bin_assign_op('<<',var,e);
 }
 expr_without_variable(A) ::= variable(var) T_SR_EQUAL expr(e). {
-	A = $this->state->handle_bin_assign_op('>>',var,e);
+    A = $this->state->handle_bin_assign_op('>>',var,e);
 }
-expr_without_variable(A) ::= rw_variable(var) T_INC. {
-	A = $this->state->handle_post_op('+',var);
+expr_without_variable(A) ::= variable(var) T_INC. {
+    A = $this->state->handle_post_op('+',var);
 }
-expr_without_variable(A) ::= T_INC rw_variable(var). {
-	A = $this->state->handle_pre_op('+',var);
+expr_without_variable(A) ::= T_INC variable(var). {
+    A = $this->state->handle_pre_op('+',var);
 }
-expr_without_variable(A) ::= rw_variable(var) T_DEC. {
-	A = $this->state->handle_post_op('-',var);
+expr_without_variable(A) ::= variable(var) T_DEC. {
+    A = $this->state->handle_post_op('-',var);
 }
-expr_without_variable(A) ::= T_DEC rw_variable(var). {
-	A = $this->state->handle_pre_op('-',var);
+expr_without_variable(A) ::= T_DEC variable(var). {
+    A = $this->state->handle_pre_op('-',var);
 }
 expr_without_variable(A) ::= expr(e1) T_BOOLEAN_OR expr(e2). {
-	A = $this->state->handle_bin_op('||',e1,e2);
+    A = $this->state->handle_bin_op('||',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_BOOLEAN_AND expr(e2). {
-	A = $this->state->handle_bin_op('&&',e1,e2);
+    A = $this->state->handle_bin_op('&&',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_LOGICAL_OR expr(e2). {
-	A = $this->state->handle_bin_op('||',e1,e2);
+    A = $this->state->handle_bin_op('||',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_LOGICAL_AND expr(e2). {
-	A = $this->state->handle_bin_op('&&',e1,e2);
+    A = $this->state->handle_bin_op('&&',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_LOGICAL_XOR expr(e2). {
-	A = $this->state->handle_bin_op('xor',e1,e2);
+    A = $this->state->handle_bin_op('xor',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) BAR expr(e2). {
-	A = $this->state->handle_bin_op('|',e1,e2);
+    A = $this->state->handle_bin_op('|',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) AMPERSAND expr(e2). {
-	A = $this->state->handle_bin_op('&',e1,e2);
+    A = $this->state->handle_bin_op('&',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) CARAT expr(e2). {
-	A = $this->state->handle_bin_op('^',e1,e2);
+    A = $this->state->handle_bin_op('^',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) DOT expr(e2). {
-	A = $this->state->handle_bin_op('.',e1,e2);
+    A = $this->state->handle_bin_op('.',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) PLUS expr(e2). {
-	A = $this->state->handle_bin_op('+',e1,e2);
+    A = $this->state->handle_bin_op('+',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) MINUS expr(e2). {
-	A = $this->state->handle_bin_op('-',e1,e2);
+    A = $this->state->handle_bin_op('-',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) TIMES expr(e2). {
-	A = $this->state->handle_bin_op('*',e1,e2);
+    A = $this->state->handle_bin_op('*',e1,e2);
+}
+expr_without_variable(A) ::= expr(e1) T_POW expr(e2). {
+    A = $this->state->handle_bin_op('**',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) DIVIDE expr(e2). {
-	A = $this->state->handle_bin_op('/',e1,e2);
+    A = $this->state->handle_bin_op('/',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) PERCENT expr(e2). {
-	A = $this->state->handle_bin_op('%',e1,e2);
+    A = $this->state->handle_bin_op('%',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_SL expr(e2). {
-	A = $this->state->handle_bin_op('<<',e1,e2);
+    A = $this->state->handle_bin_op('<<',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_SR expr(e2). {
-	A = $this->state->handle_bin_op('>>',e1,e2);
+    A = $this->state->handle_bin_op('>>',e1,e2);
 }
 expr_without_variable(A) ::= PLUS expr(e). {
-	A = $this->state->handle_unary_op('+',e);
+    A = $this->state->handle_unary_op('+',e);
 }
+expr_without_variable ::= PLUS expr T_INC . [T_INC]
 expr_without_variable(A) ::= MINUS expr(e). {
-	A = $this->state->handle_unary_op('-',e);
+    A = $this->state->handle_unary_op('-',e);
 }
+expr_without_variable ::= MINUS expr T_INC . [T_INC]
 expr_without_variable(A) ::= EXCLAM expr(e). {
-	A = $this->state->handle_unary_op('!',e);
+    A = $this->state->handle_unary_op('!',e);
 }
 expr_without_variable(A) ::= TILDE expr(e). {
-	A = $this->state->handle_unary_op('~',e);
+    A = $this->state->handle_unary_op('~',e);
 }
 expr_without_variable(A) ::= expr(e1) T_IS_IDENTICAL expr(e2). {
-	A = $this->state->handle_cmp('===',e1,e2);
+    A = $this->state->handle_cmp('===',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_IS_NOT_IDENTICAL expr(e2). {
-	A = $this->state->handle_cmp('!==',e1,e2);
+    A = $this->state->handle_cmp('!==',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_IS_EQUAL expr(e2). {
-	A = $this->state->handle_cmp('==',e1,e2);
+    A = $this->state->handle_cmp('==',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_IS_NOT_EQUAL expr(e2). {
-	A = $this->state->handle_cmp('!=',e1,e2);
+    A = $this->state->handle_cmp('!=',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) LESSTHAN expr(e2). {
-	A = $this->state->handle_cmp('<',e1,e2);
+    A = $this->state->handle_cmp('<',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_IS_SMALLER_OR_EQUAL expr(e2). {
-	A = $this->state->handle_cmp('<=',e1,e2);
+    A = $this->state->handle_cmp('<=',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) GREATERTHAN expr(e2). {
-	A = $this->state->handle_cmp('>',e1,e2);
+    A = $this->state->handle_cmp('>',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_IS_GREATER_OR_EQUAL expr(e2). {
-	A = $this->state->handle_cmp('>=',e1,e2);
+    A = $this->state->handle_cmp('>=',e1,e2);
+}
+expr_without_variable(A) ::= expr(e1) T_SPACESHIP expr(e2). {
+    A = $this->state->handle_cmp('<>',e1,e2);
 }
 expr_without_variable(A) ::= expr(e1) T_INSTANCEOF class_name_reference(name). {
-	A = $this->state->handle_instanceof(e1,name);
+    A = $this->state->handle_instanceof(e1,name);
 }
 expr_without_variable(A) ::= LPAREN expr(e) RPAREN. {
-	A = e;
+    A = e;
 }
+expr_without_variable(A) ::= new_expr(e) . { A = e; }
 expr_without_variable(A) ::= expr(e1) QUESTION expr(e2) COLON expr(e3). {
-	A = $this->state->handle_tri_op(e1,e2,e3);
+    A = $this->state->handle_tri_op(e1,e2,e3);
 }
+expr_without_variable ::= expr QUESTION COLON expr .
+expr_without_variable ::= expr T_COALESCE expr .
 expr_without_variable(A) ::= internal_functions_in_yacc(e). {
-	A = e;
+    A = e;
 }
 expr_without_variable(A) ::= T_INT_CAST expr(e). {
-	A = $this->state->handle_cast('int',e);
+    A = $this->state->handle_cast('int',e);
 }
 expr_without_variable(A) ::= T_DOUBLE_CAST expr(e). {
-	A = $this->state->handle_cast('float',e);
+    A = $this->state->handle_cast('float',e);
 }
 expr_without_variable(A) ::= T_STRING_CAST expr(e). {
-	A = $this->state->handle_cast('string',e);
+    A = $this->state->handle_cast('string',e);
 }
 expr_without_variable(A) ::= T_ARRAY_CAST expr(e). {
-	A = $this->state->handle_cast('array',e);
+    A = $this->state->handle_cast('array',e);
 }
 expr_without_variable(A) ::= T_OBJECT_CAST expr(e). {
-	A = $this->state->handle_cast('object',e);
+    A = $this->state->handle_cast('object',e);
 }
 expr_without_variable(A) ::= T_BOOL_CAST expr(e). {
-	A = $this->state->handle_cast('bool',e);
+    A = $this->state->handle_cast('bool',e);
 }
 expr_without_variable(A) ::= T_UNSET_CAST expr(e). {
-	A = $this->state->handle_cast('unset',e);
+    A = $this->state->handle_cast('unset',e);
 }
 expr_without_variable(A) ::= T_EXIT exit_expr. { A = null; }
 expr_without_variable(A) ::= AT expr(e). { A = e; }
 expr_without_variable(A) ::= scalar(sc). { A = sc; }
-expr_without_variable(A) ::= T_ARRAY LPAREN array_pair_list(list) RPAREN. { A = list; }
-expr_without_variable(A) ::= BACKQUOTE encaps_list BACKQUOTE. {
-	A = PC_Obj_Variable::create_string();
+expr_without_variable(A) ::= BACKQUOTE backticks_expr BACKQUOTE . {
+    A = PC_Obj_MultiType::create_string();
 }
 expr_without_variable(A) ::= T_PRINT expr. { A = null; }
-expr_without_variable(A) ::= T_FUNCTION LPAREN parameter_list RPAREN anon_func_inner. {
-	A = PC_Obj_Variable::create_callable();
-	$this->state->end_function();
+expr_without_variable ::= T_YIELD .
+expr_without_variable ::= T_YIELD expr .
+expr_without_variable ::= T_YIELD expr T_DOUBLE_ARROW expr .
+expr_without_variable ::= T_YIELD_FROM expr .
+expr_without_variable(A) ::= function returns_ref LPAREN parameter_list RPAREN
+													lexical_vars return_type backup_doc_comment
+													LCURLY inner_statement_list RCURLY . {
+    A = PC_Obj_MultiType::create_callable();
+    $this->state->end_function();
+}
+expr_without_variable(A) ::= T_STATIC function returns_ref LPAREN parameter_list RPAREN
+													lexical_vars return_type backup_doc_comment
+													LCURLY inner_statement_list RCURLY . {
+    A = PC_Obj_MultiType::create_callable();
+    $this->state->end_function();
 }
 
-anon_func_inner ::= LCURLY inner_statement_list RCURLY.
-anon_func_inner ::= T_USE LPAREN parameter_list RPAREN
-	LCURLY inner_statement_list RCURLY.
+function ::= T_FUNCTION .
 
-exit_expr ::= LPAREN RPAREN.
-exit_expr ::= LPAREN expr RPAREN.
-exit_expr ::= .
+backup_doc_comment ::= /* empty */ .
 
-common_scalar(A) ::= T_LNUMBER(sval). {
-	A = PC_Obj_Variable::create_int(sval);
+returns_ref ::= /* empty */ .
+returns_ref ::= AMPERSAND .
+
+lexical_vars ::= /* empty */ .
+lexical_vars ::= T_USE LPAREN lexical_var_list RPAREN .
+
+lexical_var_list ::= lexical_var_list COMMA lexical_var(var) . {
+	$this->state->set_func_param(new PC_Obj_Parameter(var->get_name(),var->get_type()));
 }
-common_scalar(A) ::= T_DNUMBER(sval). {
-	A = PC_Obj_Variable::create_float(sval);
-}
-common_scalar(A) ::= T_CONSTANT_ENCAPSED_STRING(sval). {
-	A = PC_Obj_Variable::create_string(substr(sval,1,-1));
-}
-common_scalar(A) ::= T_LINE. {
-	A = PC_Obj_Variable::create_int($this->state->get_line());
-}
-common_scalar(A) ::= T_FILE. {
-	A = PC_Obj_Variable::create_string($this->state->get_file());
-}
-common_scalar(A) ::= T_CLASS_C|T_METHOD_C|T_FUNC_C(part). {
-	A = $this->state->get_scope_part(part);
+lexical_var_list ::= lexical_var(var) . {
+	$this->state->set_func_param(new PC_Obj_Parameter(var->get_name(),var->get_type()));
 }
 
-/* compile-time evaluated scalars */
-static_scalar(A) ::= common_scalar(sval). { A = sval; }
-static_scalar(A) ::= T_STRING(sval). {
-	if(strcasecmp(sval,"true") == 0)
-		A = PC_Obj_Variable::create_bool(true);
-	else if(strcasecmp(sval,"false") == 0)
-		A = PC_Obj_Variable::create_bool(false);
-	else
-		A = $this->state->get_constant_type(sval);
+lexical_var(A) ::= T_VARIABLE(name) . {
+    A = $this->state->get_var(PC_Obj_MultiType::create_string(substr(name,1)),true);
 }
-static_scalar(A) ::= PLUS static_scalar(sval). { A = $this->state->handle_unary_op('+',sval); }
-static_scalar(A) ::= MINUS static_scalar(sval). { A = $this->state->handle_unary_op('-',sval); }
-static_scalar(A) ::= T_ARRAY LPAREN static_array_pair_list(list) RPAREN. { A = list; }
-static_scalar(A) ::= static_class_constant(const). { A = const; }
-
-static_array_pair_list(A) ::= non_empty_static_array_pair_list(list). { A = list; }
-static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA. { A = list; }
-static_array_pair_list(A) ::= . {
-	A = PC_Obj_Variable::create_array();
+lexical_var(A) ::= AMPERSAND T_VARIABLE(name) . {
+    A = $this->state->get_var(PC_Obj_MultiType::create_string(substr(name,1)),true);
 }
 
-non_empty_static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA
-																				static_scalar(skey) T_DOUBLE_ARROW static_scalar(sval). {
+function_call(A) ::= name(name) argument_list(args) . {
+    $fname = PC_Obj_MultiType::create_string(name);
+    A = $this->state->add_call(null,$fname,args);
+}
+function_call(A) ::= class_name(classname) T_PAAMAYIM_NEKUDOTAYIM member_name(funcname) argument_list(args) . {
+    A = $this->state->add_call((string)classname,funcname,args,true);
+}
+function_call(A) ::= variable_class_name(classname) T_PAAMAYIM_NEKUDOTAYIM member_name(funcname) argument_list(args) . {
+    A = $this->state->add_call((string)classname,funcname,args,true);
+}
+function_call(A) ::= callable_expr(expr) argument_list(args) . {
+	  A = $this->state->add_call(null,expr,args);
+}
+
+class_name(A) ::= T_STATIC . { A = 'static'; }
+class_name(A) ::= name(n) . { A = n; }
+
+class_name_reference(A) ::= class_name(n) . { A = n; }
+class_name_reference(A) ::= new_variable .
+
+exit_expr ::= /* empty */ .
+exit_expr ::= LPAREN optional_expr RPAREN .
+
+backticks_expr ::= /* empty */ .
+backticks_expr ::= T_ENCAPSED_AND_WHITESPACE .
+backticks_expr ::= encaps_list .
+
+ctor_arguments(A) ::= /* empty */ . { A = array(); }
+ctor_arguments(A) ::= argument_list(list) . { A = list; }
+
+dereferencable_scalar(A) ::= T_ARRAY LPAREN array_pair_list(list) RPAREN . { A = list; }
+dereferencable_scalar(A) ::= LBRACKET array_pair_list(list) RBRACKET . { A = list; }
+dereferencable_scalar(A) ::= T_CONSTANT_ENCAPSED_STRING(sval) . {
+	A = PC_Obj_MultiType::create_string(substr(sval,1,-1));
+}
+
+scalar(A) ::= T_LNUMBER(sval) . { A = PC_Obj_MultiType::create_int(sval); }
+scalar(A) ::= T_DNUMBER(sval) . { A = PC_Obj_MultiType::create_float(sval); }
+scalar(A) ::= T_LINE . { A = PC_Obj_MultiType::create_int($this->state->get_line()); }
+scalar(A) ::= T_FILE . { A = PC_Obj_MultiType::create_string($this->state->get_file()); }
+scalar(A) ::= T_DIR . {
+	// TODO value
+	A = PC_Obj_MultiType::create_string();
+}
+scalar(A) ::= T_TRAIT_C|T_METHOD_C|T_FUNC_C|T_NS_C|T_CLASS_C(part). {
+  A = $this->state->get_scope_part(part);
+}
+scalar(A) ::= T_START_HEREDOC T_ENCAPSED_AND_WHITESPACE T_END_HEREDOC . {
+	A = PC_Obj_MultiType::create_string();
+}
+scalar(A) ::= T_START_HEREDOC T_END_HEREDOC .
+scalar(A) ::= DOUBLEQUOTE encaps_list DOUBLEQUOTE . {
+	A = PC_Obj_MultiType::create_string();
+}
+scalar(A) ::= T_START_HEREDOC encaps_list T_END_HEREDOC . {
+	A = PC_Obj_MultiType::create_string();
+}
+scalar(A) ::= dereferencable_scalar(s) . { A = s; }
+scalar(A) ::= constant(c) . { A = c; }
+
+constant(A) ::= name(str) . {
+    if(strcasecmp(str,"true") == 0)
+        A = PC_Obj_MultiType::create_bool(true);
+    else if(strcasecmp(str,"false") == 0)
+        A = PC_Obj_MultiType::create_bool(false);
+    else
+        A = $this->state->get_constant_type(str);
+}
+constant(A) ::= class_name(class) T_PAAMAYIM_NEKUDOTAYIM identifier(const) . {
+		A = $this->state->handle_classconst_access(PC_Obj_MultiType::create_string(class),const);
+}
+constant(A) ::= variable_class_name(class) T_PAAMAYIM_NEKUDOTAYIM identifier(const) . {
+		A = $this->state->handle_classconst_access(class,const);
+}
+
+possible_comma ::= /* empty */ .
+possible_comma ::= COMMA .
+
+expr(A) ::= variable(var) . { A = var->get_type(); }
+expr(A) ::= expr_without_variable(e) . { A = e; }
+
+optional_expr(A) ::= /* empty */ . { A = null; }
+optional_expr(A) ::= expr(e) . { A = e; }
+
+variable_class_name ::= dereferencable .
+
+dereferencable(A) ::= variable(v) . { A = v; }
+dereferencable(A) ::= LPAREN expr(e) RPAREN . { A = e; }
+dereferencable(A) ::= dereferencable_scalar(s) . { A = s; }
+
+callable_expr(A) ::= callable_variable(v) . { A = v->get_type(); }
+callable_expr(A) ::= LPAREN expr(e) RPAREN . { A = e; }
+callable_expr(A) ::= dereferencable_scalar(e) . { A = e; }
+
+callable_variable(A) ::= simple_variable(v) . { A = v; }
+callable_variable(A) ::= dereferencable(v) LBRACKET optional_expr(off) RBRACKET . {
+    A = $this->state->handle_array_access(v,off);
+}
+callable_variable ::= constant LBRACKET optional_expr RBRACKET .
+callable_variable ::= dereferencable LCURLY expr RCURLY .
+callable_variable(A) ::= dereferencable(obj) T_OBJECT_OPERATOR property_name(vprop) argument_list(a) . {
+    $chain = array();
+    $chain[] = array(
+        'prop' => vprop,
+        'args' => a
+    );
+    A = $this->state->handle_object_prop_chain(obj,$chain);
+}
+callable_variable(A) ::= function_call(call) . { A = new PC_Obj_Variable('',call); }
+
+variable(A) ::= callable_variable(v) . { A = v; }
+variable(A) ::= static_member(m) . { A = m; }
+variable(A) ::= dereferencable(obj) T_OBJECT_OPERATOR property_name(vprop) . {
+    $chain = array();
+    $chain[] = array(
+        'prop' => vprop,
+        'args' => null
+    );
+    A = $this->state->handle_object_prop_chain(obj,$chain);
+}
+
+simple_variable(A) ::= T_VARIABLE(name). {
+    A = $this->state->get_var(PC_Obj_MultiType::create_string(substr(name,1)));
+}
+simple_variable(A) ::= DOLLAR LCURLY expr(e) RCURLY . {
+    A = $this->state->get_var(e);
+}
+simple_variable(A) ::= DOLLAR simple_variable(var) . {
+    A = $this->state->get_var(var->get_type());
+}
+
+static_member(A) ::= class_name(name) T_PAAMAYIM_NEKUDOTAYIM simple_variable(var) . {
+    A = $this->state->handle_field_access(name,var->get_name());
+}
+static_member(A) ::= variable_class_name(name) T_PAAMAYIM_NEKUDOTAYIM simple_variable(var) . {
+    A = $this->state->handle_field_access(name,var->get_name());
+}
+
+new_variable ::= simple_variable .
+new_variable ::= new_variable LBRACKET optional_expr RBRACKET .
+new_variable ::= new_variable LCURLY expr RCURLY .
+new_variable ::= new_variable T_OBJECT_OPERATOR property_name .
+new_variable ::= class_name T_PAAMAYIM_NEKUDOTAYIM simple_variable .
+new_variable ::= new_variable T_PAAMAYIM_NEKUDOTAYIM simple_variable .
+
+member_name(A) ::= identifier(i) . { A = PC_Obj_MultiType::create_string(i); }
+member_name(A) ::= LCURLY expr(e) RCURLY . { A = e; }
+member_name(A) ::= simple_variable(v) . { A = v->get_type(); }
+
+property_name(A) ::= T_STRING(s) . {
+    A = array(array('type' => 'name','data' => PC_Obj_MultiType::create_string(s)));
+}
+property_name(A) ::= LCURLY expr(e) RCURLY . {
+		A = array(array('type' => 'name','data' => e));
+}
+property_name(A) ::= simple_variable(var) . {
+    A = array(array('type' => 'name','data' => var->get_type()));
+}
+
+assignment_list(A) ::= assignment_list(list) COMMA assignment_list_element(el) . {
+    A = list;
+    A[] = el;
+}
+assignment_list(A) ::= assignment_list_element(el) . {
+	A = array(el);
+}
+
+assignment_list_element(A) ::= variable(v) . { A = v; }
+assignment_list_element(A) ::= T_LIST LPAREN assignment_list(list) RPAREN . { A = list; }
+assignment_list_element(A) ::= /* empty */ . { A = null; }
+
+array_pair_list(A) ::= /* empty */ . { A = PC_Obj_MultiType::create_array(); }
+array_pair_list(A) ::= non_empty_array_pair_list(list) possible_comma . { A = list; }
+
+non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA array_pair(p) . {
 	A = list;
-	A->get_type()->array_insert(skey->get_type(),sval->get_type());
+	A->get_first()->set_array_type(p['key'],p['val'],p['append']);
 }
-non_empty_static_array_pair_list(A) ::= non_empty_static_array_pair_list(list) COMMA
-																				static_scalar(sval). {
-	A = list;
-	A->get_type()->array_insert(null,sval->get_type());
-}
-non_empty_static_array_pair_list(A) ::= static_scalar(skey) T_DOUBLE_ARROW static_scalar(sval). {
-	A = PC_Obj_Variable::create_array();
-	A->get_type()->array_insert(skey->get_type(),sval->get_type());
-}
-non_empty_static_array_pair_list(A) ::= static_scalar(sval). {
-	A = PC_Obj_Variable::create_array();
-	A->get_type()->array_insert(PC_Obj_MultiType::create_int(0),sval->get_type());
+non_empty_array_pair_list(A) ::= array_pair(p) . {
+	A = PC_Obj_MultiType::create_array();
+	A->get_first()->set_array_type(p['key'],p['val'],p['append']);
 }
 
-static_class_constant(A) ::= T_STRING(class) T_PAAMAYIM_NEKUDOTAYIM T_STRING(const). {
-	$cname = PC_Obj_Variable::create_string(class);
-	A = $this->state->handle_classconst_access($cname,const);
-}
-
-foreach_optional_arg(A) ::= T_DOUBLE_ARROW foreach_variable(var). { A = var; }
-foreach_optional_arg(A) ::= . { A = null; }
-
-foreach_variable(A) ::= w_variable(wvar). { A = wvar; }
-foreach_variable(A) ::= AMPERSAND w_variable(wvar). { A = wvar; }
-
-for_statement ::= statement.
-for_statement ::= COLON inner_statement_list T_ENDFOR SEMI.
-
-foreach_statement ::= statement.
-foreach_statement ::= COLON inner_statement_list T_ENDFOREACH SEMI.
-
-
-declare_statement ::= statement.
-declare_statement ::= COLON inner_statement_list T_ENDDECLARE SEMI.
-
-declare_list ::= T_STRING EQUALS static_scalar.
-declare_list ::= declare_list COMMA T_STRING EQUALS static_scalar.
-
-switch_case_list ::= LCURLY case_list RCURLY.
-switch_case_list ::= LCURLY SEMI case_list RCURLY.
-switch_case_list ::= COLON case_list T_ENDSWITCH SEMI.
-switch_case_list ::= COLON SEMI case_list T_ENDSWITCH SEMI.
-
-case_list ::= case_list T_CASE expr case_separator inner_statement_list.
-case_list ::= case_list T_DEFAULT case_separator inner_statement_list.
-case_list ::= .
-
-case_separator ::= COLON|SEMI.
-
-while_statement ::= statement.
-while_statement ::= COLON inner_statement_list T_ENDWHILE SEMI.
-
-elseif_list ::= elseif_list T_ELSEIF LPAREN expr RPAREN statement.
-elseif_list ::= .
-
-new_elseif_list ::= new_elseif_list T_ELSEIF LPAREN expr RPAREN COLON inner_statement_list .
-new_elseif_list ::= .
-
-else_single ::= T_ELSE statement.
-else_single ::= .
-
-new_else_single ::= T_ELSE COLON inner_statement_list.
-new_else_single ::= .
-
-parameter_list ::= non_empty_parameter_list.
-parameter_list ::= .
-
-non_empty_parameter_list ::= optional_class_type(hint) T_VARIABLE(var). {
-  $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_func_param($varname,hint,null);
-}
-non_empty_parameter_list ::= optional_class_type(hint) AMPERSAND T_VARIABLE(var). {
-  $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_func_param($varname,hint,null);
-}
-non_empty_parameter_list ::= optional_class_type(hint) AMPERSAND T_VARIABLE(var) EQUALS static_scalar(def). {
-  $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_func_param($varname,hint,def);
-}
-non_empty_parameter_list ::= optional_class_type(hint) T_VARIABLE(var) EQUALS static_scalar(def). {
-  $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_func_param($varname,hint,def);
-}
-non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type(hint) T_VARIABLE(var). {
-  $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_func_param($varname,hint,null);
-}
-non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type(hint) AMPERSAND
-														T_VARIABLE(var). {
-  $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_func_param($varname,hint,null);
-}
-non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type(hint) AMPERSAND
-														T_VARIABLE(var) EQUALS static_scalar(def). {
-  $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_func_param($varname,hint,def);
-}
-non_empty_parameter_list ::= non_empty_parameter_list COMMA optional_class_type(hint)
-														T_VARIABLE(var) EQUALS static_scalar(def). {
-  $varname = new PC_Obj_Variable(substr(var,1));
-	$this->state->set_func_param($varname,hint,def);
-}
-
-
-optional_class_type(A) ::= T_STRING(str). {
-	A = PC_Obj_Variable::create_object(str);
-}
-optional_class_type(A) ::= T_ARRAY. {
-	A = PC_Obj_Variable::create_array();
-}
-optional_class_type(A) ::= . { A = null; }
-
-function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list). { A = list; }
-function_call_parameter_list(A) ::= . { A = array(); }
-
-non_empty_function_call_parameter_list(A) ::= expr_without_variable(var). { A = array(var); }
-non_empty_function_call_parameter_list(A) ::= variable(var). { A = array(var); }
-non_empty_function_call_parameter_list(A) ::= AMPERSAND w_variable(var). { A = array(var); }
-non_empty_function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list)
-																							COMMA expr_without_variable(var). {
-	A = list;
-	A[] = var;
-}
-non_empty_function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list)
-																							COMMA variable(var). {
-	A = list;
-	A[] = var;
-}
-non_empty_function_call_parameter_list(A) ::= non_empty_function_call_parameter_list(list)
-																							COMMA AMPERSAND w_variable(var). {
-	A = list;
-	A[] = var;
-}
-
-global_var_list ::= global_var_list COMMA global_var.
-global_var_list ::= global_var.
-
-global_var ::= T_VARIABLE(name). { $this->state->do_global(substr(name,1)); }
-global_var ::= DOLLAR r_variable.
-global_var ::= DOLLAR LCURLY expr RCURLY.
-
-
-static_var_list ::= static_var_list COMMA T_VARIABLE(name). {
-	$var = new PC_Obj_Variable(substr(name,1));
-	$this->state->set_var($var,new PC_Obj_Variable(''));
-}
-static_var_list ::= static_var_list COMMA T_VARIABLE(name) EQUALS static_scalar(val). {
-	$var = new PC_Obj_Variable(substr(name,1));
-	$this->state->set_var($var,val);
-}
-static_var_list ::= T_VARIABLE(name). {
-	$var = new PC_Obj_Variable(substr(name,1));
-	$this->state->set_var($var,new PC_Obj_Variable(''));
-}
-static_var_list ::= T_VARIABLE(name) EQUALS static_scalar(val). {
-	$var = new PC_Obj_Variable(substr(name,1));
-	$this->state->set_var($var,val);
-}
-
-class_statement_list ::= class_statement_list class_statement.
-class_statement_list ::= .
-
-class_statement ::= variable_modifiers class_variable_declaration SEMI.
-class_statement ::= class_constant_declaration SEMI.
-class_statement ::= method_modifiers T_FUNCTION is_reference T_STRING
-										LPAREN parameter_list RPAREN method_body. {
-	$this->state->end_function();
-}
-
-
-method_body ::= SEMI. /* abstract method */
-method_body ::= LCURLY inner_statement_list RCURLY.
-
-variable_modifiers ::= non_empty_member_modifiers.
-variable_modifiers ::= T_VAR.
-
-method_modifiers ::= non_empty_member_modifiers.
-method_modifiers ::= .
-
-non_empty_member_modifiers ::= member_modifier.
-non_empty_member_modifiers ::= non_empty_member_modifiers member_modifier.
-
-member_modifier ::= T_PUBLIC|T_PROTECTED|T_PRIVATE|T_STATIC|T_ABSTRACT|T_FINAL.
-
-class_variable_declaration ::= class_variable_declaration COMMA T_VARIABLE.
-class_variable_declaration ::= class_variable_declaration COMMA T_VARIABLE EQUALS static_scalar.
-class_variable_declaration ::= T_VARIABLE.
-class_variable_declaration ::= T_VARIABLE EQUALS static_scalar.
-
-class_constant_declaration ::= class_constant_declaration COMMA T_STRING EQUALS static_scalar.
-class_constant_declaration ::= T_CONST T_STRING EQUALS static_scalar.
-
-echo_expr_list ::= echo_expr_list COMMA expr.
-echo_expr_list ::= expr.
-
-unset_variables ::= unset_variable.
-unset_variables ::= unset_variables COMMA unset_variable.
-
-unset_variable ::= variable.
-
-use_filename ::= T_CONSTANT_ENCAPSED_STRING.
-use_filename ::= LCURLY T_CONSTANT_ENCAPSED_STRING RCURLY.
-
-r_variable(A) ::= variable(v). { A = v; }
-
-w_variable(A) ::= variable(v). { A = v; }
-
-rw_variable(A) ::= variable(v). { A = v; }
-
-variable(A) ::= base_variable_with_function_calls(obj) T_OBJECT_OPERATOR object_property(vprop)
-								method_or_not(margs) variable_properties(vprops). {
-	$chain = array();
-	$chain[] = array(
-		'prop' => vprop,
-		'args' => margs
-	);
-	A = $this->state->handle_object_prop_chain(obj,array_merge($chain,vprops));
-}
-variable(A) ::= base_variable_with_function_calls(v). {
-	A = v;
-}
-
-variable_properties(A) ::= variable_properties(list) variable_property(prop). {
-	A = list;
-	A[] = prop;
-}
-variable_properties(A) ::= . { A = array(); }
-
-variable_property(A) ::= T_OBJECT_OPERATOR object_property(vprop) method_or_not(margs). {
+array_pair(A) ::= expr(skey) T_DOUBLE_ARROW expr(sval) . {
 	A = array(
-		'prop' => vprop,
-		'args' => margs
+		'key' => skey,
+		'val' => sval,
+		'append' => false,
 	);
 }
+array_pair(A) ::= expr(sval) . {
+	A = array(
+		'key' => 0,
+		'val' => sval,
+		'append' => true,
+	);
+}
+array_pair ::= expr T_DOUBLE_ARROW AMPERSAND variable .
+array_pair(A) ::= AMPERSAND variable .
 
-method_or_not(A) ::= LPAREN function_call_parameter_list(list) RPAREN. { A = list; }
-method_or_not(A) ::= . { A = null; }
+encaps_list ::= encaps_list encaps_var .
+encaps_list ::= encaps_list T_ENCAPSED_AND_WHITESPACE .
+encaps_list ::= encaps_var .
+encaps_list ::= T_ENCAPSED_AND_WHITESPACE encaps_var .
 
-variable_without_objects(A) ::= reference_variable(var). { A = var; }
-variable_without_objects(A) ::= simple_indirect_reference reference_variable. {
-	A = new PC_Obj_Variable('');
-}
+encaps_var ::= T_VARIABLE .
+encaps_var ::= T_VARIABLE LBRACKET encaps_var_offset RBRACKET .
+encaps_var ::= T_VARIABLE T_OBJECT_OPERATOR T_STRING .
+encaps_var ::= T_DOLLAR_OPEN_CURLY_BRACES expr RCURLY .
+encaps_var ::= T_DOLLAR_OPEN_CURLY_BRACES T_STRING_VARNAME RCURLY .
+encaps_var ::= T_DOLLAR_OPEN_CURLY_BRACES T_STRING_VARNAME LBRACKET expr RBRACKET RCURLY .
+encaps_var ::= T_CURLY_OPEN variable RCURLY .
 
-static_member(A) ::= fully_qualified_class_name(name) T_PAAMAYIM_NEKUDOTAYIM
-										 static_variable_without_objects(list). {
-	A = $this->state->handle_field_access(name,list);
-}
+encaps_var_offset ::= T_STRING .
+encaps_var_offset ::= T_NUM_STRING .
+encaps_var_offset ::= T_VARIABLE .
 
-static_variable_without_objects(A) ::= static_reference_variable(list). { A = list; }
-static_variable_without_objects(A) ::= simple_indirect_reference static_reference_variable. {
-	A = array();
-}
+internal_functions_in_yacc ::= T_ISSET LPAREN isset_variables RPAREN .
+internal_functions_in_yacc ::= T_EMPTY LPAREN expr RPAREN .
+internal_functions_in_yacc ::= T_INCLUDE expr .
+internal_functions_in_yacc ::= T_INCLUDE_ONCE expr .
+internal_functions_in_yacc ::= T_EVAL LPAREN expr RPAREN .
+internal_functions_in_yacc ::= T_REQUIRE expr .
+internal_functions_in_yacc ::= T_REQUIRE_ONCE expr .
 
-static_reference_variable(A) ::= static_reference_variable(list) LBRACKET dim_offset(off) RBRACKET. {
-	A = list;
-	A[] = array('array',off);
-}
-static_reference_variable(A) ::= static_reference_variable(list) LCURLY expr(e) RCURLY. {
-	A = list;
-	A[] = array('simple',e);
-}
-static_reference_variable(A) ::= static_compound_variable(v). {
-	A = array(array('simple',v));
-}
+isset_variables ::= isset_variable .
+isset_variables ::= isset_variables COMMA isset_variable .
 
-static_compound_variable(A) ::= T_VARIABLE(name). {
-	A = new PC_Obj_Variable('',PC_Obj_MultiType::create_string(substr(name,1)));
-}
-static_compound_variable(A) ::= DOLLAR LCURLY expr(e) RCURLY. {
-	A = e;
-}
-
-base_variable_with_function_calls(A) ::= base_variable(v). { A = v; }
-base_variable_with_function_calls(A) ::= function_call(call). { A = call; }
-
-base_variable(A) ::= reference_variable(v). { A = v; }
-base_variable(A) ::= simple_indirect_reference reference_variable. { /* TODO */ A = null; }
-base_variable(A) ::= static_member(mem). { A = mem; }
-	
-reference_variable(A) ::= reference_variable(v) LBRACKET dim_offset(off) RBRACKET. {
-	A = $this->state->handle_array_access(v,off);
-}
-reference_variable(A) ::= reference_variable LCURLY expr RCURLY. {
-	// TODO
-	A = new PC_Obj_Variable('');
-}
-reference_variable(A) ::= compound_variable(v). {
-	A = v;
-}
-
-compound_variable(A) ::= T_VARIABLE(name). {
-	A = $this->state->get_var(substr(name,1));
-}
-compound_variable(A) ::= DOLLAR LCURLY expr(e) RCURLY. {
-	if(($str = e->get_type()->get_string()) !== null)
-		A = $this->state->get_var($str);
-	else
-		A = new PC_Obj_Variable('');
-}
-
-dim_offset(A) ::= expr(e). { A = e; }
-dim_offset(A) ::= . { A = null; }
-
-object_property(A) ::= object_dim_list(list). { A = list; }
-object_property(A) ::= variable_without_objects(var). {
-	A = array(array('type' => 'name','data' => var));
-}
-
-object_dim_list(A) ::= object_dim_list(list) LBRACKET dim_offset(off) RBRACKET. {
-	A = list;
-	A[] = array('type' => 'array','data' => off);
-}
-object_dim_list(A) ::= object_dim_list(list) LCURLY expr(e) RCURLY. {
-	A = list;
-	A[] = array('type' => 'array','data' => e);
-}
-object_dim_list(A) ::= variable_name(v) . {
-	A = array(array('type' => 'name','data' => v));
-}
-
-variable_name(A) ::= T_STRING(str). {
-	A = PC_Obj_Variable::create_string(str);
-}
-variable_name(A) ::= LCURLY expr(e) RCURLY. { A = e; }
-
-simple_indirect_reference ::= DOLLAR.
-simple_indirect_reference ::= simple_indirect_reference DOLLAR.
-
-assignment_list(A) ::= assignment_list(list) COMMA assignment_list_element(el). {
-	A = list;
-	A[] = el;
-}
-assignment_list(A) ::= assignment_list_element(el). { A = array(el); }
-
-assignment_list_element(A) ::= variable(var). { A = var; }
-assignment_list_element(A) ::= T_LIST LPAREN assignment_list(list) RPAREN. { A = list; }
-assignment_list_element(A) ::= . { A = null; }
-
-array_pair_list(A) ::= non_empty_array_pair_list(list) possible_comma. { A = list; }
-array_pair_list(A) ::= . { A = PC_Obj_Variable::create_array(); }
-
-non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA expr(key) T_DOUBLE_ARROW expr(val). {
-	A = list;
-	A->get_type()->array_insert(key->get_type(),val->get_type());
-}
-non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA expr(val). {
-	A = list;
-	A->get_type()->array_insert(null,val->get_type());
-}
-non_empty_array_pair_list(A) ::= expr(key) T_DOUBLE_ARROW expr(val). {
-	A = PC_Obj_Variable::create_array();
-	A->get_type()->array_insert(key->get_type(),val->get_type());
-}
-non_empty_array_pair_list(A) ::= expr(val). {
-	A = PC_Obj_Variable::create_array();
-	A->get_type()->array_insert(PC_Obj_MultiType::create_int(0),val->get_type());
-}
-non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA
-								expr(key) T_DOUBLE_ARROW AMPERSAND w_variable(val). {
-	A = list;
-	A->get_type()->array_insert(key->get_type(),val->get_type());
-}
-non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA AMPERSAND w_variable(val). {
-	A = list;
-	A->get_type()->array_insert(null,val->get_type());
-}
-non_empty_array_pair_list(A) ::= expr(key) T_DOUBLE_ARROW AMPERSAND w_variable(val). {
-	A = PC_Obj_Variable::create_array();
-	A->get_type()->array_insert(key->get_type(),val->get_type());
-}
-non_empty_array_pair_list(A) ::= AMPERSAND w_variable(val). {
-	A = PC_Obj_Variable::create_array();
-	A->get_type()->array_insert(PC_Obj_MultiType::create_int(0),val->get_type());
-}
-
-encaps_list ::= encaps_list encaps_var.
-encaps_list ::= encaps_list T_STRING.
-encaps_list ::= encaps_list T_NUM_STRING.
-encaps_list ::= encaps_list T_ENCAPSED_AND_WHITESPACE.
-encaps_list ::= encaps_list T_CHARACTER.
-encaps_list ::= encaps_list T_BAD_CHARACTER.
-encaps_list ::= encaps_list LBRACKET.
-encaps_list ::= encaps_list RBRACKET.
-encaps_list ::= encaps_list LCURLY.
-encaps_list ::= encaps_list RCURLY.
-encaps_list ::= encaps_list T_OBJECT_OPERATOR.
-encaps_list ::= .
-
-
-
-encaps_var ::= T_VARIABLE.
-encaps_var ::= T_VARIABLE LBRACKET encaps_var_offset RBRACKET.
-encaps_var ::= T_VARIABLE T_OBJECT_OPERATOR T_STRING.
-encaps_var ::= T_DOLLAR_OPEN_CURLY_BRACES expr RCURLY.
-encaps_var ::= T_DOLLAR_OPEN_CURLY_BRACES T_STRING_VARNAME LBRACKET expr RBRACKET RCURLY.
-encaps_var ::= T_CURLY_OPEN variable RCURLY.
-
-encaps_var_offset ::= T_STRING|T_NUM_STRING|T_VARIABLE.
-
-internal_functions_in_yacc(A) ::= T_ISSET LPAREN isset_variables RPAREN. {
-	// TODO evaluate?
-	A = PC_Obj_Variable::create_bool();
-}
-internal_functions_in_yacc(A) ::= T_EMPTY LPAREN variable RPAREN. {
-	// TODO evaluate?
-	A = PC_Obj_Variable::create_bool();
-}
-internal_functions_in_yacc(A) ::= T_INCLUDE expr. {
-	A = new PC_Obj_Variable('',new PC_Obj_MultiType());
-}
-internal_functions_in_yacc(A) ::= T_INCLUDE_ONCE expr. {
-	A = new PC_Obj_Variable('',new PC_Obj_MultiType());
-}
-internal_functions_in_yacc(A) ::= T_EVAL LPAREN expr RPAREN. {
-	A = new PC_Obj_Variable('',new PC_Obj_MultiType());
-}
-internal_functions_in_yacc(A) ::= T_REQUIRE expr. {
-	A = new PC_Obj_Variable('',new PC_Obj_MultiType());
-}
-internal_functions_in_yacc(A) ::= T_REQUIRE_ONCE expr. {
-	A = new PC_Obj_Variable('',new PC_Obj_MultiType());
-}
-
-isset_variables ::= variable.
-isset_variables ::= isset_variables COMMA variable.
-
-class_constant(A) ::= fully_qualified_class_name(class) T_PAAMAYIM_NEKUDOTAYIM T_STRING(const). {
-	A = $this->state->handle_classconst_access(class,const);
-}
-
-fully_qualified_class_name(A) ::= T_STRING(str). {
-	A = PC_Obj_Variable::create_string(str);
-}
-
-function_call(A) ::= T_STRING(name) LPAREN function_call_parameter_list(args) RPAREN. {
-	$fname = PC_Obj_Variable::create_string(name);
-	A = $this->state->add_call(null,$fname,args);
-}
-function_call(A) ::= fully_qualified_class_name(classname) T_PAAMAYIM_NEKUDOTAYIM T_STRING(funcname)
-										 LPAREN function_call_parameter_list(args) RPAREN. {
-	$fname = PC_Obj_Variable::create_string(funcname);
-	A = $this->state->add_call(classname,$fname,args,true);
-}
-function_call(A) ::= fully_qualified_class_name(classname) T_PAAMAYIM_NEKUDOTAYIM
-										 variable_without_objects(funcname) LPAREN function_call_parameter_list(args) RPAREN. {
-	A = $this->state->add_call(classname,funcname,args,true);
-}
-function_call(A) ::= variable_without_objects(funcname) LPAREN function_call_parameter_list(args) RPAREN. {
-	A = $this->state->add_call(null,funcname,args);
-}
-
-scalar(A) ::= T_STRING(str). {
-	if(strcasecmp(str,"true") == 0)
-		A = PC_Obj_Variable::create_bool(true);
-	else if(strcasecmp(str,"false") == 0)
-		A = PC_Obj_Variable::create_bool(false);
-	else
-		A = $this->state->get_constant_type(str);
-}
-scalar(A) ::= T_STRING_VARNAME. {
-	A = PC_Obj_Variable::create_string();
-}
-scalar(A) ::= class_constant(const). { A = const; }
-scalar(A) ::= common_scalar(sc). { A = sc; }
-scalar(A) ::= DOUBLEQUOTE encaps_list DOUBLEQUOTE. {
-	A = PC_Obj_Variable::create_string();
-}
-scalar(A) ::= SINGLEQUOTE encaps_list SINGLEQUOTE. {
-	A = PC_Obj_Variable::create_string();
-}
-scalar(A) ::= T_START_HEREDOC encaps_list T_END_HEREDOC. {
-	A = PC_Obj_Variable::create_string();
-}
-
-class_name_reference(A) ::= T_STRING(str). {
-	A = PC_Obj_Variable::create_string(str);
-}
-class_name_reference(A) ::= dynamic_class_name_reference(name). {
-	A = name;
-}
-
-dynamic_class_name_reference(A) ::= base_variable T_OBJECT_OPERATOR object_property
-																		dynamic_class_name_variable_properties. {
-	// TODO
-	A = new PC_Obj_Variable('');
-}
-dynamic_class_name_reference(A) ::= base_variable(var). {
-	A = var;
-}
-
-dynamic_class_name_variable_properties ::= dynamic_class_name_variable_properties dynamic_class_name_variable_property.
-dynamic_class_name_variable_properties ::= .
-
-dynamic_class_name_variable_property ::= T_OBJECT_OPERATOR object_property.
-
-ctor_arguments(A) ::= LPAREN function_call_parameter_list(list) RPAREN. { A = list; }
-ctor_arguments(A) ::= . { A = array(); }
-
-possible_comma ::= COMMA.
-possible_comma ::= .
-
-for_expr ::= non_empty_for_expr.
-for_expr ::= .
-
-non_empty_for_expr ::= non_empty_for_expr COMMA expr.
-non_empty_for_expr ::= expr.
-
-is_reference ::= AMPERSAND.
-is_reference ::= .
+isset_variable ::= expr .

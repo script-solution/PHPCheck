@@ -131,17 +131,17 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * Adds a function-call
 	 * 
-	 * @param PC_Obj_Variable $class the class-name
-	 * @param PC_Obj_Variable $func the function-name
+	 * @param string $class the class-name
+	 * @param PC_Obj_MultiType $func the function-name
 	 * @param array $args the function-arguments
 	 * @param bool $static wether its a static call
-	 * @return PC_Obj_Variable the result
+	 * @return PC_Obj_MultiType the result
 	 */
 	public function add_call($class,$func,$args,$static = false)
 	{
 		// if we don't know the function- or class-name, we can't do anything here
-		$cname = $class !== null ? $class->get_type()->get_string() : null;
-		$fname = $func->get_type()->get_string();
+		$cname = $class !== null ? $class : null;
+		$fname = $func->get_string();
 		if($fname === null || ($class !== null && $cname === null))
 			return $this->get_unknown();
 		
@@ -194,22 +194,19 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		
 		// clone because it might be a variable
 		foreach($args as $arg)
-		{
-			$this->check_known($arg);
-			$call->add_argument(clone $arg->get_type());
-		}
+			$call->add_argument(clone $arg);
 		$call->set_static($static);
 		$this->types->add_call($call);
 		
 		// if its a constructor we know the type directly
 		if(strcasecmp($fname,'__construct') == 0 || strcasecmp($fname,$cname) == 0)
-			return PC_Obj_Variable::create_object($cname);
+			return PC_Obj_MultiType::create_object($cname);
 		
 		// get function-object and determine return-type
 		$funcobj = $this->get_method_object($cname,$fname);
 		if($funcobj === null)
 			return $this->get_unknown();
-		return new PC_Obj_Variable('',clone $funcobj->get_return_type());
+		return clone $funcobj->get_return_type();
 	}
 	
 	/**
@@ -238,11 +235,11 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			// if we don't know the class-name or its no object, stop here
 			$classname = $objt !== null ? $objt->get_classname() : null;
 			if($classname === null)
-				return $this->get_unknown();
+				return new PC_Obj_Variable('',$this->get_unknown());
 			// if we don't know the class, give up, as well
 			$class = $this->types->get_class($classname);
 			if($class === null)
-				return $this->get_unknown();
+				return new PC_Obj_Variable('',$this->get_unknown());
 			
 			$prop = $access['prop'];
 			$args = $access['args'];
@@ -250,9 +247,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			if(count($prop) > 1 || $args === null)
 			{
 				$fieldvar = $prop[0]['data'];
-				$fieldname = $fieldvar->get_type()->get_string();
+				$fieldname = $fieldvar->get_string();
 				if($fieldname === null)
-					return $this->get_unknown();
+					return new PC_Obj_Variable('',$this->get_unknown());
 				$field = $class->get_field($fieldname);
 				if($field === null)
 				{
@@ -261,7 +258,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 						'Access of not-existing field "'.$fieldname.'" of class "#'.$classname.'#"',
 						PC_Obj_Error::E_S_NOT_EXISTING_FIELD
 					);
-					return $this->get_unknown();
+					return new PC_Obj_Variable('',$this->get_unknown());
 				}
 				$res = $field->get_type();
 				for($i = 1; $i < count($prop); $i++)
@@ -271,29 +268,29 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 					// if the offset is null it means that we should append to the array. this is not supported
 					// for class-fields. therefore stop here and return unknown
 					if($offset === null || $res === null || $res->get_array() === null)
-						return $this->get_unknown();
-					$off = $offset->get_type()->get_scalar();
+						return new PC_Obj_Variable('',$this->get_unknown());
+					$off = $offset->get_scalar();
 					if($off === null)
-						return $this->get_unknown();
+						return new PC_Obj_Variable('',$this->get_unknown());
 					$res = $res->get_first()->get_array_type($off);
 				}
 			}
 			else
 			{
 				$mnamevar = $prop[0]['data'];
-				$mname = $mnamevar->get_type()->get_string();
+				$mname = $mnamevar->get_string();
 				if($mname === null)
-					return $this->get_unknown();
-				$this->add_call(PC_Obj_Variable::create_string($class->get_name()),$mnamevar,$args,false);
+					return new PC_Obj_Variable('',$this->get_unknown());
+				$this->add_call($class->get_name(),$mnamevar,$args,false);
 				$method = $class->get_method($mname);
 				if($method === null)
-					return $this->get_unknown();
+					return new PC_Obj_Variable('',$this->get_unknown());
 				$res = clone $method->get_return_type();
 			}
 			$objt = $res;
 		}
 		if($res === null)
-			return $this->get_unknown();
+			return new PC_Obj_Variable('',$this->get_unknown());
 		return new PC_Obj_Variable('',$res);
 	}
 	
@@ -301,14 +298,14 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * Returns the value of the given constant
 	 * 
 	 * @param string $name the constant-name
-	 * @return PC_Obj_Variable the type
+	 * @return PC_Obj_MultiType the type
 	 */
 	public function get_constant_type($name)
 	{
 		$const = $this->types->get_constant($name);
 		if($const === null)
 			return $this->get_unknown();
-		return new PC_Obj_Variable('',$const->get_type());
+		return $const->get_type();
 	}
 	
 	/**
@@ -350,29 +347,33 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
-	 * Returns the value of the variable with given name in current scope. If it does not exist,
-	 * a new one is created (but not stored in scope).
+	 * Returns the value of the variable with given name in current/parent scope. If it does not
+	 * exist, a new one is created (but not stored in scope).
 	 * 
-	 * @param string $var the variable-name
+	 * @param PC_Obj_MultiType $var the variable-name
+	 * @param bool $parent_scope whether to search in the parent scope
 	 * @return PC_Obj_Variable the variable
 	 */
-	public function get_var($var)
+	public function get_var($var,$parent = false)
 	{
-		if($var == 'this')
-			return PC_Obj_Variable::create_object($this->scope->get_name_of(T_CLASS_C));
-		$scopename = $this->scope->get_name();
-		if(!$this->vars->exists($scopename,$var))
-			return $this->get_unknown($var);
-		return $this->vars->get($scopename,$var);
+		$name = $var->get_string();
+		if($name == null)
+			return $this->get_unknown();
+		if($name == 'this')
+			return PC_Obj_Variable::create_object($this->scope->get_name_of(T_CLASS_C,$parent));
+		$scopename = $this->scope->get_name($parent);
+		if(!$this->vars->exists($scopename,$name))
+			return new PC_Obj_Variable($name,$this->get_unknown());
+		return $this->vars->get($scopename,$name);
 	}
 	
 	/**
 	 * Sets the given variable in the current scope to given value
 	 * 
 	 * @param PC_Obj_Variable $var the variable to set
-	 * @param PC_Obj_Variable $value the value
+	 * @param PC_Obj_MultiType $value the value
 	 * @param bool $isref wether to store a reference (default = false)
-	 * @return PC_Obj_Variable the variable
+	 * @return PC_Obj_MultiType the variable
 	 */
 	public function set_var($var,$value,$isref = false)
 	{
@@ -381,9 +382,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		assert($value !== null);
 		$this->vars->backup($var,$this->scope);
 		if($isref)
-			$var->set_type($value->get_type());
+			$var->set_type($value);
 		else
-			$var->set_type(clone $value->get_type());
+			$var->set_type(clone $value);
 		if($varname)
 		{
 			$var->set_function($this->scope->get_name_of(T_FUNC_C));
@@ -396,16 +397,16 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * Sets the given function-parameter for the current scope
 	 * 
-	 * @param PC_Obj_Variable $var the variable
-	 * @param PC_Obj_Variable $hint the type from type-hinting (may be null)
-	 * @param PC_Obj_Variable $def the type from the default-value (may be null)
+	 * @param PC_Obj_Parameter $p the parameter
 	 */
-	public function set_func_param($var,$hint,$def)
+	public function set_func_param($p)
 	{
+		$var = $this->get_var(PC_Obj_MultiType::create_string($p->get_name()));
+		
 		// give type-hinting the highest prio, because I think its the most trustable type
-		if($hint !== null)
+		if(!$p->get_mtype()->is_unknown())
 		{
-			$this->set_var($var,$hint);
+			$this->set_var($var,$p->get_mtype());
 			return;
 		}
 		
@@ -415,11 +416,11 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			$this->scope->get_name_of(T_CLASS_C),$this->scope->get_name_of(T_FUNC_C)
 		);
 		// if we have a doc, use it. otherwise use the default-value
-		$doc = $this->get_funcparam_type($func,$var->get_name());
+		$doc = $this->get_funcparam_type($func,$p->get_name());
 		if($doc !== null)
 			$this->set_var($var,$doc);
 		else
-			$this->set_var($var,$def ? $def : new PC_Obj_Variable(''));
+			$this->set_var($var,$p->get_mtype());
 	}
 	
 	/**
@@ -427,32 +428,31 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * 
 	 * @param PC_Obj_Method $func the function/method
 	 * @param string $varname the variable-name
-	 * @return PC_Obj_Variable the type
+	 * @return PC_Obj_MultiType the type
 	 */
 	private function get_funcparam_type($func,$varname)
 	{
 		if($func === null)
 			return null;
-		// TODO remove the '$' in the type-scanner
-		$param = $func->get_param('$'.$varname);
+		$param = $func->get_param($varname);
 		if($param === null)
 			return null;
-		return new PC_Obj_Variable('',$param->get_mtype());
+		return $param->get_mtype();
 	}
 	
 	/**
 	 * Sets $first and $sec for the current foreach-loop
 	 * 
-	 * @param PC_Obj_Variable $array the array over which we loop
+	 * @param PC_Obj_MultiType $array the array over which we loop
 	 * @param PC_Obj_Variable $first the first variable (key or value)
 	 * @param PC_Obj_Variable $sec the second variable (value, if not null)
 	 */
 	public function set_foreach_var($array,$first,$sec)
 	{
-		$arrval = $array->get_type()->get_array();
+		$arrval = $array->get_array();
 		// if we don't know the array-values, it is no array or there are no elements, we don't
 		// know the types of $first and $sec
-		if($arrval === null || $array->get_type()->is_array_unknown() || count($arrval) == 0)
+		if($arrval === null || $array->is_array_unknown() || count($arrval) == 0)
 		{
 			$this->set_var($first,$this->get_unknown());
 			if($sec !== null)
@@ -495,9 +495,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			}
 			
 			// set vars; no clone here since we have a fresh object
-			$this->set_var($first,new PC_Obj_Variable('',$firsttype),false);
+			$this->set_var($first,$firsttype,false);
 			if($sectype !== null)
-				$this->set_var($sec,new PC_Obj_Variable('',$sectype),false);
+				$this->set_var($sec,$sectype,false);
 		}
 	}
 	
@@ -506,8 +506,8 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * 
 	 * @param array $list an array of PC_Variables to assign; may contain sub-arrays; contains null
 	 * 	if an element should be ignored
-	 * @param PC_Obj_Variable $expr the array to take the elements from
-	 * @return PC_Obj_Variable the result ($expr)
+	 * @param PC_Obj_MultiType $expr the array to take the elements from
+	 * @return PC_Obj_MultiType the result ($expr)
 	 */
 	public function handle_list($list,$expr)
 	{
@@ -520,18 +520,18 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * 
 	 * @param array $list an array of PC_Variables to assign; may contain sub-arrays; contains null
 	 * 	if an element should be ignored
-	 * @param PC_Obj_Variable $expr the array to take the elements from
+	 * @param PC_Obj_MultiType $expr the array to take the elements from
 	 */
 	private function handle_list_rek($list,$expr)
 	{
-		$array = $expr->get_type()->get_array();
+		$array = $expr->get_array();
 		$lcount = count($list);
 		$ecount = $array === null ? 0 : count($array);
 		for($i = 0; $i < $lcount; $i++)
 		{
 			if($list[$i] === null)
 				continue;
-			$el = isset($array[$i]) ? new PC_Obj_Variable('',$array[$i]) : new PC_Obj_Variable('');
+			$el = isset($array[$i]) ? $array[$i] : $this->get_unknown();
 			if(is_array($list[$i]))
 				$this->handle_list_rek($list[$i],$el);
 			else
@@ -561,17 +561,17 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
-	 * Puts the variable with given name from global scope into the current one
+	 * Puts the variable from global scope into the current one
 	 * 
-	 * @param string $name the variable-name
+	 * @param PC_Obj_Variable $var the variable
 	 */
-	public function do_global($name)
+	public function do_global($var)
 	{
-		if($this->vars->exists(PC_Obj_Variable::SCOPE_GLOBAL,$name))
-			$val = $this->vars->get(PC_Obj_Variable::SCOPE_GLOBAL,$name);
+		if($this->vars->exists(PC_Obj_Variable::SCOPE_GLOBAL,$var->get_name()))
+			$val = $this->vars->get(PC_Obj_Variable::SCOPE_GLOBAL,$var->get_name())->get_type();
 		else
 			$val = $this->get_unknown();
-		$this->set_var($this->get_unknown($name),$val,true);
+		$this->set_var(new PC_Obj_Variable($var->get_name(),$this->get_unknown()),$val,true);
 	}
 	
 	/**
@@ -667,7 +667,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			foreach($this->allrettypes as $t)
 			{
 				if($t !== null)
-					$mtype->merge($t->get_type(),false);
+					$mtype->merge($t,false);
 			}
 			
 			$name = ($classname ? '#'.$classname.'#::' : '').$funcname;
@@ -715,24 +715,24 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
-	 * Checks wether $vars contains a variable, that may have a type that is not contained in $mtype.
+	 * Checks wether $types contains a type, that is not contained in $mtype.
 	 * 
-	 * @param array $vars the variables
+	 * @param array $types the types
 	 * @param PC_Obj_MultiType $mtype the multitype
 	 * @return bool true if so
 	 */
-	private function has_forbidden($vars,$mtype)
+	private function has_forbidden($types,$mtype)
 	{
 		// if the type is unknown (mixed), its always ok
 		if($mtype->is_unknown())
 			return false;
-		foreach($vars as $v)
+		foreach($types as $t)
 		{
-			if($v !== null)
+			if($t !== null)
 			{
-				foreach($v->get_type()->get_types() as $t)
+				foreach($t->get_types() as $t1)
 				{
-					if(!$mtype->contains($t))
+					if(!$mtype->contains($t1))
 						return true;
 				}
 			}
@@ -793,13 +793,13 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * Handles a class-constant
 	 * 
-	 * @param PC_Obj_Variable $classname the variable with the class-name
+	 * @param PC_Obj_MultiType $classname the class-name
 	 * @param string $constname the const-name
-	 * @return PC_Obj_Variable the type
+	 * @return PC_Obj_MultiType the type
 	 */
 	public function handle_classconst_access($classname,$constname)
 	{
-		$cname = $classname->get_type()->get_string();
+		$cname = $classname->get_string();
 		if($cname === null)
 			return $this->get_unknown();
 		
@@ -809,50 +809,34 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$const = $class->get_constant($constname);
 		if($const === null)
 			return $this->get_unknown();
-		return new PC_Obj_Variable('',$const->get_type());
+		return $const->get_type();
 	}
 	
 	/**
 	 * Static access the given field of given class
 	 * 
-	 * @param PC_Obj_Variable $class the variable with the class-name
-	 * @param array $accesslist an array of the field and array-accesses
+	 * @param string $class the class-name
+	 * @param string $field the field-name
 	 * @return PC_Obj_Variable the result
 	 */
-	public function handle_field_access($class,$accesslist)
+	public function handle_field_access($class,$field)
 	{
-		assert(count($accesslist) > 0 && $accesslist[0][0] == 'simple');
-		$cname = $class->get_type()->get_string();
-		if($cname === null)
-			return $this->get_unknown();
-		if($cname == 'self')
-			$cname = $this->scope->get_name_of(T_CLASS_C);
-		$classobj = $this->types->get_class($cname);
+		if($class == 'self')
+			$class = $this->scope->get_name_of(T_CLASS_C);
+		$classobj = $this->types->get_class($class);
 		if($classobj === null)
-			return $this->get_unknown();
-		$fname = $accesslist[0][1]->get_type()->get_string();
-		if($fname === null)
-			return $this->get_unknown();
-		$fieldobj = $classobj->get_field($fname);
+			return new PC_Obj_Variable('',$this->get_unknown());
+		$fieldobj = $classobj->get_field($field);
 		if($fieldobj === null)
-			return $this->get_unknown();
-		$type = $fieldobj->get_type();
-		for($i = 1; $i  < count($accesslist); $i++)
-		{
-			assert($accesslist[$i][0] == 'array');
-			if($type === null || $type->get_array() === null || $type->is_array_unknown())
-				return $this->get_unknown();
-			$key = $accesslist[$i][1]->get_type()->get_scalar();
-			$type = $type->get_first()->get_array_type($key);
-		}
-		return new PC_Obj_Variable('',$type);
+			return new PC_Obj_Variable('',$this->get_unknown());
+		return new PC_Obj_Variable('',$fieldobj->get_type());
 	}
 	
 	/**
 	 * Fetches the element from $var at given offset
 	 * 
 	 * @param PC_Obj_Variable $var the variable
-	 * @param PC_Obj_Variable $offset the offset
+	 * @param PC_Obj_MultiType $offset the offset
 	 * @return PC_Obj_Variable the result
 	 */
 	public function handle_array_access($var,$offset)
@@ -862,27 +846,26 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		// if its no array.
 		// note that null as value is okay because it might be an empty array
 		if($var->get_type()->get_array() === null)
-			return $this->get_unknown();
+			return new PC_Obj_Variable('',$this->get_unknown());
 		// if we don't know the offset, we can't do anything, either
-		if($offset !== null && $offset->get_type()->is_val_unknown())
-			return $this->get_unknown();
+		if($offset !== null && $offset->is_val_unknown())
+			return new PC_Obj_Variable('',$this->get_unknown());
 		
 		// PC_Obj_Variable will do the rest for us; simply access the offset
-		return $var->array_offset($offset !== null ? $offset->get_type()->get_first()->get_value() : null);
+		return $var->array_offset($offset !== null ? $offset->get_first()->get_value() : null);
 	}
 	
 	/**
 	 * Handles the given unary-operator
 	 * 
 	 * @param string $op the operator (+,-,...)
-	 * @param PC_Obj_Variable $e the expression
-	 * @return PC_Obj_Variable the result
+	 * @param PC_Obj_MultiType $e the expression
+	 * @return PC_Obj_MultiType the result
 	 */
 	public function handle_unary_op($op,$e)
 	{
-		$this->check_known($e);
 		if($this->vars->is_in_loop())
-			return $this->get_type_from_op($op,$e->get_type());
+			return $this->get_type_from_op($op,$e);
 		return parent::handle_unary_op($op,$e);
 	}
 	
@@ -891,12 +874,12 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * 
 	 * @param string $op the operator (+,-,...)
 	 * @param PC_Obj_Variable $var the variable
-	 * @param PC_Obj_Variable $e the expression
-	 * @return PC_Obj_Variable the result
+	 * @param PC_Obj_MultiType $e the expression
+	 * @return PC_Obj_MultiType the result
 	 */
 	public function handle_bin_assign_op($op,$var,$e)
 	{
-		$res = $this->handle_bin_op($op,$var,$e);
+		$res = $this->handle_bin_op($op,$var->get_type(),$e);
 		$this->set_var($var,$res,true);
 		return $res;
 	}
@@ -905,99 +888,85 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * Handles the given binary-operator
 	 * 
 	 * @param string $op the operator (+,-,...)
-	 * @param PC_Obj_Variable $e1 the left expression
-	 * @param PC_Obj_Variable $e2 the right expression
-	 * @return PC_Obj_Variable the result
+	 * @param PC_Obj_MultiType $e1 the left expression
+	 * @param PC_Obj_MultiType $e2 the right expression
+	 * @return PC_Obj_MultiType the result
 	 */
 	public function handle_bin_op($op,$e1,$e2)
 	{
-		$this->check_known($e1);
-		$this->check_known($e2);
-		$t1 = $e1->get_type();
-		$t2 = $e2->get_type();
 		// if we're in a loop, don't try to provide the value since we don't know how often it is done
 		if($this->vars->is_in_loop())
-			return  $this->get_type_from_op($op,$t1,$t2);
+			return  $this->get_type_from_op($op,$e1,$e2);
 		// if we don't know one of the types or values, try to determine the type by the operator
-		if($t1->is_val_unknown() || $t2->is_val_unknown())
-			return $this->get_type_from_op($op,$t1,$t2);
+		if($e1->is_val_unknown() || $e2->is_val_unknown())
+			return $this->get_type_from_op($op,$e1,$e2);
 		// if we have an array-operation, check if we know all elements
-		if($t1->get_array() !== null && $t2->get_array() !== null)
+		if($e1->get_array() !== null && $e2->get_array() !== null)
 		{
 			// if not, we know at least, that its an array
-			if($t1->is_array_unknown() || $t2->is_array_unknown())
-				return PC_Obj_Variable::create_array();
+			if($e1->is_array_unknown() || $e2->is_array_unknown())
+				return PC_Obj_MultiType::create_array();
 		}
 		// type and value is known, therefore calculate the result
 		$res = 0;
-		$rval = $t2->get_first()->get_value_for_eval();
+		$rval = $e2->get_first()->get_value_for_eval();
 		// prevent division-by-zero error
 		if($op == '/' && $rval == 0)
-			return PC_Obj_Variable::create_int();
-		eval('$res = '.$t1->get_first()->get_value_for_eval().' '.$op.' '.$rval.';');
+			return PC_Obj_MultiType::create_int();
+		eval('$res = '.$e1->get_first()->get_value_for_eval().' '.$op.' '.$rval.';');
 		return $this->get_type_from_php($res);
 	}
 	
 	/**
 	 * Handles the ternary operator ?:
 	 * 
-	 * @param PC_Obj_Variable $e1 the first expression
-	 * @param PC_Obj_Variable $e2 the second expression
-	 * @param PC_Obj_Variable $e3 the third expression
-	 * @return PC_Obj_Variable the result
+	 * @param PC_Obj_MultiType $e1 the first expression
+	 * @param PC_Obj_MultiType $e2 the second expression
+	 * @param PC_Obj_MultiType $e3 the third expression
+	 * @return PC_Obj_MultiType the result
 	 */
 	public function handle_tri_op($e1,$e2,$e3)
 	{
-		$this->check_known($e1);
-		$this->check_known($e2);
-		$this->check_known($e3);
-		$t1 = $e1->get_type();
-		$t2 = $e2->get_type();
-		$t3 = $e3->get_type();
 		// don't try to evalulate $e1 in loops or if its unknown
-		if($this->vars->is_in_loop() || $t1->is_val_unknown())
+		if($this->vars->is_in_loop() || $e1->is_val_unknown())
 		{
 			// merge the types, because the result can be of both types
-			$res = clone $t2;
-			$res->merge($t3);
-			return new PC_Obj_Variable('',$res);
+			$res = clone $e2;
+			$res->merge($e3);
+			return $res;
 		}
 		// type and value is known, so we can evalulate the result
 		$res = false;
-		eval('$res = '.$t1->get_first()->get_value_for_eval().';');
+		eval('$res = '.$e1->get_first()->get_value_for_eval().';');
 		if($res)
-			return new PC_Obj_Variable('',clone $t2);
-		return new PC_Obj_Variable('',clone $t3);
+			return clone $e2;
+		return clone $e3;
 	}
 	
 	/**
 	 * Handles the given compare-operator
 	 * 
 	 * @param string $op the operator (==, !=, ===, ...)
-	 * @param PC_Obj_Variable $e1 the first operand
-	 * @param PC_Obj_Variable $e2 the second operand
-	 * @return PC_Obj_Variable the result
+	 * @param PC_Obj_MultiType $e1 the first operand
+	 * @param PC_Obj_MultiType $e2 the second operand
+	 * @return PC_Obj_MultiType the result
 	 */
 	public function handle_cmp($op,$e1,$e2)
 	{
-		$this->check_known($e1);
-		$this->check_known($e2);
-		$t1 = $e1->get_type();
-		$t2 = $e2->get_type();
 		// if we don't know one of the types or values, try to determine the type by the operator
 		// if we're in a loop, do that, too.
-		if($this->vars->is_in_loop() || $t1->is_val_unknown() || $t2->is_val_unknown())
-			return $this->get_type_from_op($op,$t1,$t2);
+		if($this->vars->is_in_loop() || $e1->is_val_unknown() || $e2->is_val_unknown())
+			return $this->get_type_from_op($op,$e1,$e2);
 		// if we have an array-operation, just return bool, because we would have to do it ourself
 		// and I think its not worth the effort.
-		$t1arr = $t1->get_first()->get_type() == PC_Obj_Type::TARRAY;
-		$t2arr = $t2->get_first()->get_type() == PC_Obj_Type::TARRAY;
-		if(($t1arr && $t2arr) || ($t1arr && $t1->is_array_unknown()) || ($t2arr && $t2->is_array_unknown()))
-			return PC_Obj_Variable::create_bool();
+		$e1arr = $e1->get_first()->get_type() == PC_Obj_Type::TARRAY;
+		$e2arr = $e2->get_first()->get_type() == PC_Obj_Type::TARRAY;
+		if(($e1arr && $e2arr) || ($e1arr && $e1->is_array_unknown()) || ($e2arr && $e2->is_array_unknown()))
+			return PC_Obj_MultiType::create_bool();
 		
 		$val = false;
-		$f1 = $t1->get_first();
-		$f2 = $t2->get_first();
+		$f1 = $e1->get_first();
+		$f2 = $e2->get_first();
 		switch($op)
 		{
 			// its not a good idea to use eval in this case because it might change the type
@@ -1017,7 +986,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				eval('$val = '.$f1->get_value_for_eval().' '.$op.' '.$f2->get_value_for_eval().';');
 				break;
 		}
-		return PC_Obj_Variable::create_bool($val);
+		return PC_Obj_MultiType::create_bool($val);
 	}
 	
 	/**
@@ -1025,7 +994,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * 
 	 * @param string $op the operator (+,-)expression
 	 * @param PC_Obj_Variable $var the variable
-	 * @return PC_Obj_Variable the variable
+	 * @return PC_Obj_MultiType the variable
 	 */
 	public function handle_pre_op($op,$var)
 	{
@@ -1048,13 +1017,13 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * 
 	 * @param string $op the operator (+,-)expression
 	 * @param PC_Obj_Variable $var the variable
-	 * @return PC_Obj_Variable the variable
+	 * @return PC_Obj_MultiType the variable
 	 */
 	public function handle_post_op($op,$var)
 	{
 		$this->check_known($var);
-		$clone = clone $var;
 		$type = $var->get_type();
+		$clone = clone $type;
 		// in loops always by op
 		if($this->vars->is_in_loop() || $type->is_val_unknown())
 			$res = $this->get_type_from_op($op,$type);
@@ -1072,63 +1041,59 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * Handles a cast
 	 * 
 	 * @param string $cast the cast-type: 'int','float','string','array','object','bool' or 'unset'
-	 * @param PC_Obj_Variable $e the expression
-	 * @return PC_Obj_Variable the result
+	 * @param PC_Obj_MultiType $e the expression
+	 * @return PC_Obj_MultiType the result
 	 */
 	public function handle_cast($cast,$e)
 	{
-		$this->check_known($e);
 		// unset casts to null. in this case we don't really know the value
 		// object-cast make no sense here, I think
 		if($cast == 'unset' || $cast == 'object')
 			return $this->get_unknown();
 		
-		$t = $e->get_type();
 		// if we don't know the type or value, just provide the type; in loops as well
-		if($this->vars->is_in_loop() || $t->is_val_unknown())
-			return new PC_Obj_Variable('',PC_Obj_MultiType::get_type_by_name($cast));
+		if($this->vars->is_in_loop() || $e->is_val_unknown())
+			return PC_Obj_MultiType::get_type_by_name($cast);
 		
 		// we know the value, so perform a cast
 		$res = 0;
-		eval('$res = ('.$cast.')'.$t->get_first()->get_value_for_eval().';');
+		eval('$res = ('.$cast.')'.$e->get_first()->get_value_for_eval().';');
 		return $this->get_type_from_php($res);
 	}
 	
 	/**
 	 * Handles the instanceof-operator
 	 * 
-	 * @param PC_Obj_Variable $e the expression
-	 * @param PC_Obj_Variable $name the name of the class
-	 * @return PC_Obj_Variable the result
+	 * @param PC_Obj_MultiType $e the expression
+	 * @param string $name the name of the class
+	 * @return PC_Obj_MultiType the result
 	 */
 	public function handle_instanceof($e,$name)
 	{
-		$this->check_known($e);
-		$name = $name->get_type()->get_string();
 		// if we're in a loop or the name is not a string, give up
 		if($this->vars->is_in_loop() || $name === null)
-			return PC_Obj_Variable::create_bool();
+			return PC_Obj_MultiType::create_bool();
 		
 		// if we don't know the type or its class we can't say wether its a superclass
-		$classname = $e->get_type()->get_classname();
+		$classname = $e->get_classname();
 		if($classname === null)
-			return PC_Obj_Variable::create_bool();
+			return PC_Obj_MultiType::create_bool();
 		
 		// class-name equal?
 		if(strcasecmp($classname,$name) == 0)
-			return PC_Obj_Variable::create_bool(true);
+			return PC_Obj_MultiType::create_bool(true);
 		
 		// if the class is unknown we can't say more
 		$class = $this->types->get_class($classname);
 		if($class === null)
-			return PC_Obj_Variable::create_bool();
+			return PC_Obj_MultiType::create_bool();
 		
 		// check super-classes
 		$super = $class->get_super_class();
 		while($super != '')
 		{
 			if(strcasecmp($super,$name) == 0)
-				return PC_Obj_Variable::create_bool(true);
+				return PC_Obj_MultiType::create_bool(true);
 			$superobj = $this->types->get_class($super);
 			if($superobj === null)
 				break;
@@ -1137,8 +1102,8 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		
 		// check interfaces
 		if($this->is_instof_interface($class->get_interfaces(),$name))
-			return PC_Obj_Variable::create_bool(true);
-		return PC_Obj_Variable::create_bool(false);
+			return PC_Obj_MultiType::create_bool(true);
+		return PC_Obj_MultiType::create_bool(false);
 	}
 	
 	/**
@@ -1243,12 +1208,11 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
-	 * @param string $name the var-name
-	 * @return PC_Obj_Variable a variable with given name and unknown type
+	 * @return PC_Obj_MultiType an unknown type
 	 */
-	private function get_unknown($name = '')
+	private function get_unknown()
 	{
-		return new PC_Obj_Variable($name,new PC_Obj_MultiType());
+		return new PC_Obj_MultiType();
 	}
 	
 	/**

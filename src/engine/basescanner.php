@@ -176,12 +176,11 @@ class PC_Engine_BaseScanner
 	 * which is the reason why its here.
 	 * 
 	 * @param string $op the operator (+,-,...)
-	 * @param PC_Obj_Variable $e the expression
-	 * @return PC_Obj_Variable the result
+	 * @param PC_Obj_MultiType $type the expression
+	 * @return PC_Obj_MultiType the result
 	 */
-	public function handle_unary_op($op,$e)
+	public function handle_unary_op($op,$type)
 	{
-		$type = $e->get_type();
 		if($type->is_val_unknown())
 			return $this->get_type_from_op($op,$type);
 		$res = 0;
@@ -191,16 +190,16 @@ class PC_Engine_BaseScanner
 	
 	/**
 	 * @param mixed $val the value
-	 * @return PC_Obj_Variable the type
+	 * @return PC_Obj_MultiType the type
 	 */
 	protected function get_type_from_php($val)
 	{
 		if(is_array($val))
-			return new PC_Obj_Variable('',new PC_Obj_MultiType(PC_Obj_Type::get_type_by_value($val)));
+			return new PC_Obj_MultiType(PC_Obj_Type::get_type_by_value($val));
 		else
 		{
 			$type = PC_Obj_Type::get_type_by_name(gettype($val));
-			return new PC_Obj_Variable('',new PC_Obj_MultiType(new PC_Obj_Type($type->get_type(),$val)));
+			return new PC_Obj_MultiType(new PC_Obj_Type($type->get_type(),$val));
 		}
 	}
 	
@@ -210,7 +209,7 @@ class PC_Engine_BaseScanner
 	 * @param string $op the operator
 	 * @param PC_Obj_MultiType $t1 the type of the first operand
 	 * @param PC_Obj_MultiType $t2 the type of the second operand (may be null for unary ops)
-	 * @return PC_Obj_Variable the variable
+	 * @return PC_Obj_MultiType the variable
 	 */
 	protected function get_type_from_op($op,$t1,$t2 = null)
 	{
@@ -223,11 +222,11 @@ class PC_Engine_BaseScanner
 			case '>>':
 			case '<<':
 			case '~':
-				return PC_Obj_Variable::create_int();
+				return PC_Obj_MultiType::create_int();
 			
 			// concatenation leads always to string
 			case '.':
-				return PC_Obj_Variable::create_string();
+				return PC_Obj_MultiType::create_string();
 			
 			case '+':
 			case '-':
@@ -237,17 +236,17 @@ class PC_Engine_BaseScanner
 				// if one of them is unknown we don't know wether we would get a float or int
 				if($t1->is_unknown() || $t1->is_multiple() ||
 						($t2 !== null && ($t2->is_unknown() || $t2->is_multiple())))
-					return new PC_Obj_Variable('');
+					return new PC_Obj_MultiType('');
 				$ti1 = $t1->get_first()->get_type();
 				$ti2 = $t2 === null ? -1 : $t2->get_first()->get_type();
 				// if both are arrays, the result is an array
 				if($ti1 == PC_Obj_Type::TARRAY && $ti2 == PC_Obj_Type::TARRAY)
-					return PC_Obj_Variable::create_array();
+					return PC_Obj_MultiType::create_array();
 				// if one of them is float, the result is float
 				if($ti1 == PC_Obj_Type::FLOAT || $ti2 == PC_Obj_Type::FLOAT)
-					return PC_Obj_Variable::create_float();
+					return PC_Obj_MultiType::create_float();
 				// otherwise its always int
-				return PC_Obj_Variable::create_int();
+				return PC_Obj_MultiType::create_int();
 			
 			case '==':
 			case '!=':
@@ -262,7 +261,7 @@ class PC_Engine_BaseScanner
 			case 'xor':
 			case '!':
 				// always bool
-				return PC_Obj_Variable::create_bool();
+				return PC_Obj_MultiType::create_bool();
 			
 			default:
 				FWS_Helper::error('Unknown operator "'.$op.'"');

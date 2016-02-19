@@ -98,7 +98,7 @@ abstract class myc {
 		self::assertEquals(1,$func->get_param_count());
 		self::assertEquals(1,$func->get_required_param_count());
 		self::assertEquals((string)new PC_Obj_MultiType(),(string)$func->get_return_type());
-		self::assertEquals('string',(string)$func->get_param('$a'));
+		self::assertEquals('string',(string)$func->get_param('a'));
 		
 		$class = $classes['myc2'];
 		
@@ -107,25 +107,25 @@ abstract class myc {
 		self::assertEquals(2,$func->get_param_count());
 		self::assertEquals(1,$func->get_required_param_count());
 		self::assertEquals((string)new PC_Obj_MultiType(),(string)$func->get_return_type());
-		self::assertEquals('array',(string)$func->get_param('$a'));
-		self::assertEquals('integer?',(string)$func->get_param('$b'));
+		self::assertEquals('array',(string)$func->get_param('a'));
+		self::assertEquals('integer?',(string)$func->get_param('b'));
 		
 		$func = $class->get_method('d');
 		self::assertEquals('d',$func->get_name());
 		self::assertEquals(3,$func->get_param_count());
 		self::assertEquals(0,$func->get_required_param_count());
 		self::assertEquals((string)PC_Obj_MultiType::create_int(),(string)$func->get_return_type());
-		self::assertEquals('integer?',(string)$func->get_param('$a'));
-		self::assertEquals('string?',(string)$func->get_param('$b'));
-		self::assertEquals('bool?',(string)$func->get_param('$c'));
+		self::assertEquals('integer?',(string)$func->get_param('a'));
+		self::assertEquals('string?',(string)$func->get_param('b'));
+		self::assertEquals('bool?',(string)$func->get_param('c'));
 		
 		$func = $class->get_method('doit');
 		self::assertEquals('doit',$func->get_name());
 		self::assertEquals(2,$func->get_param_count());
 		self::assertEquals(2,$func->get_required_param_count());
 		self::assertEquals((string)new PC_Obj_MultiType(),(string)$func->get_return_type());
-		self::assertEquals('MyClass',(string)$func->get_param('$c'));
-		self::assertEquals('integer',(string)$func->get_param('$d'));
+		self::assertEquals('MyClass',(string)$func->get_param('c'));
+		self::assertEquals('integer',(string)$func->get_param('d'));
 		
 		self::assertEquals('myc->doit()',(string)$calls[0]->get_call(false,false));
 		self::assertEquals('myc2::mystatic()',(string)$calls[1]->get_call(false,false));
@@ -214,7 +214,7 @@ $b(function() {
 		self::assertEquals(true,$func->is_anonymous());
 		self::assertEquals(1,$func->get_param_count());
 		self::assertEquals(1,$func->get_required_param_count());
-		self::assertEquals('unknown',(string)$func->get_param('$arg1'));
+		self::assertEquals('unknown',(string)$func->get_param('arg1'));
 		
 		$x = $vars['#anon2'];
 		// TODO actually, we could get the type from the outer scope
@@ -226,8 +226,8 @@ $b(function() {
 		self::assertEquals(true,$func->is_anonymous());
 		self::assertEquals(2,$func->get_param_count());
 		self::assertEquals(2,$func->get_required_param_count());
-		self::assertEquals('int',(string)$func->get_param('$arg1'));
-		self::assertEquals('float',(string)$func->get_param('$arg2'));
+		self::assertEquals('int',(string)$func->get_param('arg1'));
+		self::assertEquals('float',(string)$func->get_param('arg2'));
 		
 		$x = $vars['#anon3'];
 		self::assertEquals('int',(string)$x['arg1']->get_type());
@@ -246,8 +246,8 @@ $b(function() {
 		self::assertEquals(true,$func->is_anonymous());
 		self::assertEquals(2,$func->get_param_count());
 		self::assertEquals(2,$func->get_required_param_count());
-		self::assertEquals('unknown',(string)$func->get_param('$arg1'));
-		self::assertEquals('unknown',(string)$func->get_param('$arg2'));
+		self::assertEquals('unknown',(string)$func->get_param('arg1'));
+		self::assertEquals('unknown',(string)$func->get_param('arg2'));
 		self::assertEquals('integer=1',(string)$func->get_return_type());
 		
 		$x = $vars['#anon5'];
@@ -260,9 +260,11 @@ $b(function() {
 		self::assertEquals(true,$func->is_anonymous());
 		self::assertEquals(0,$func->get_param_count());
 		self::assertEquals(0,$func->get_required_param_count());
-		self::assertEquals('unknown',(string)$func->get_return_type());
+		self::assertEquals('callable',(string)$func->get_return_type());
 		
 		$x = $vars['#anon6'];
+		self::assertEquals('callable',(string)$x['a']->get_type());
+		self::assertEquals('callable',(string)$x['c']->get_type());
 		self::assertEquals('integer=2',(string)$x['x']->get_type());
 		
 		$func = $functions['#anon7'];
@@ -271,10 +273,10 @@ $b(function() {
 		self::assertEquals(true,$func->is_anonymous());
 		self::assertEquals(0,$func->get_param_count());
 		self::assertEquals(0,$func->get_required_param_count());
-		self::assertEquals('unknown',(string)$func->get_return_type());
+		self::assertEquals('callable',(string)$func->get_return_type());
 		
 		$x = $vars['#anon7'];
-		self::assertEquals('unknown',(string)$x['b']->get_type());
+		self::assertEquals('callable',(string)$x['b']->get_type());
 		
 		$func = $functions['#anon8'];
 		/* @var $func PC_Obj_Method */
