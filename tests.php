@@ -106,6 +106,7 @@ else
 		'PC_Tests_CondsNLoops',
 		'PC_Tests_Returns',
 		'PC_Tests_Magic',
+		'PC_Tests_TryCatch',
 	);
 
 	foreach($tests as $test)

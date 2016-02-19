@@ -301,8 +301,9 @@ statement ::= T_GOTO T_STRING SEMI .
 statement ::= T_STRING COLON .
 
 catch_list ::= /* empty */ .
-catch_list ::= catch_list T_CATCH LPAREN name(class) T_VARIABLE(var) RPAREN
-							 LCURLY inner_statement_list RCURLY . {
+catch_list ::= catch_head LCURLY inner_statement_list RCURLY .
+
+catch_head ::= catch_list T_CATCH LPAREN name(class) T_VARIABLE(var) RPAREN . {
 		$value = PC_Obj_MultiType::create_object(class);
 		$this->state->set_var(new PC_Obj_Variable(substr(var,1)),$value);
 }
