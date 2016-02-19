@@ -6041,6 +6041,8 @@ static public $yy_action = array(
         448 => 448,
         449 => 449,
         450 => 450,
+        467 => 467,
+        468 => 467,
     );
     /* Beginning here are the reduction cases.  A typical example
     ** follows:
@@ -6050,82 +6052,82 @@ static public $yy_action = array(
     */
 #line 188 "src/engine/stmtparser.y"
     function yy_r76(){ $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;     }
-#line 6058 "src/engine/stmtparser.php"
+#line 6060 "src/engine/stmtparser.php"
 #line 195 "src/engine/stmtparser.y"
     function yy_r81(){
 	// TODO
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 6064 "src/engine/stmtparser.php"
+#line 6066 "src/engine/stmtparser.php"
 #line 260 "src/engine/stmtparser.y"
     function yy_r128(){
     $this->state->end_cond();
     }
-#line 6069 "src/engine/stmtparser.php"
+#line 6071 "src/engine/stmtparser.php"
 #line 266 "src/engine/stmtparser.y"
     function yy_r130(){
     $this->state->end_loop();
     }
-#line 6074 "src/engine/stmtparser.php"
+#line 6076 "src/engine/stmtparser.php"
 #line 280 "src/engine/stmtparser.y"
     function yy_r136(){
     $this->state->add_return($this->yystack[$this->yyidx + -1]->minor);
     }
-#line 6079 "src/engine/stmtparser.php"
+#line 6081 "src/engine/stmtparser.php"
 #line 297 "src/engine/stmtparser.y"
     function yy_r147(){
     $this->state->add_throw($this->yystack[$this->yyidx + -1]->minor);
     }
-#line 6084 "src/engine/stmtparser.php"
+#line 6086 "src/engine/stmtparser.php"
 #line 306 "src/engine/stmtparser.y"
     function yy_r152(){
 		$value = PC_Obj_MultiType::create_object($this->yystack[$this->yyidx + -2]->minor);
 		$this->state->set_var(new PC_Obj_Variable(substr($this->yystack[$this->yyidx + -1]->minor,1)),$value);
     }
-#line 6090 "src/engine/stmtparser.php"
+#line 6092 "src/engine/stmtparser.php"
 #line 311 "src/engine/stmtparser.y"
     function yy_r153(){
 		$this->state->set_foreach_var($this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor,null);
     }
-#line 6095 "src/engine/stmtparser.php"
+#line 6097 "src/engine/stmtparser.php"
 #line 314 "src/engine/stmtparser.y"
     function yy_r154(){
 		$this->state->set_foreach_var($this->yystack[$this->yyidx + -4]->minor,$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6100 "src/engine/stmtparser.php"
+#line 6102 "src/engine/stmtparser.php"
 #line 329 "src/engine/stmtparser.y"
     function yy_r160(){
 		$this->state->end_function();
     }
-#line 6105 "src/engine/stmtparser.php"
+#line 6107 "src/engine/stmtparser.php"
 #line 341 "src/engine/stmtparser.y"
     function yy_r165(){
   	$this->state->end_class();
     }
-#line 6110 "src/engine/stmtparser.php"
+#line 6112 "src/engine/stmtparser.php"
 #line 406 "src/engine/stmtparser.y"
     function yy_r206(){ $this->_retvalue = array();     }
-#line 6113 "src/engine/stmtparser.php"
+#line 6115 "src/engine/stmtparser.php"
 #line 408 "src/engine/stmtparser.y"
     function yy_r207(){
 	$this->_retvalue = array();
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
   $this->state->set_func_param($this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6120 "src/engine/stmtparser.php"
+#line 6122 "src/engine/stmtparser.php"
 #line 413 "src/engine/stmtparser.y"
     function yy_r208(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
   $this->state->set_func_param($this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6127 "src/engine/stmtparser.php"
+#line 6129 "src/engine/stmtparser.php"
 #line 419 "src/engine/stmtparser.y"
     function yy_r209(){
 	$this->_retvalue = new PC_Obj_Parameter(substr($this->yystack[$this->yyidx + 0]->minor,1));
 	$this->_retvalue->set_mtype($this->yystack[$this->yyidx + -3]->minor);
     }
-#line 6133 "src/engine/stmtparser.php"
+#line 6135 "src/engine/stmtparser.php"
 #line 423 "src/engine/stmtparser.y"
     function yy_r210(){
 	$this->_retvalue = new PC_Obj_Parameter(substr($this->yystack[$this->yyidx + -2]->minor,1));
@@ -6137,447 +6139,447 @@ static public $yy_action = array(
 		$this->_retvalue->set_mtype($this->yystack[$this->yyidx + -5]->minor);
 	$this->_retvalue->set_optional(true);
     }
-#line 6145 "src/engine/stmtparser.php"
+#line 6147 "src/engine/stmtparser.php"
 #line 434 "src/engine/stmtparser.y"
     function yy_r211(){ $this->_retvalue = new PC_Obj_MultiType();     }
-#line 6148 "src/engine/stmtparser.php"
+#line 6150 "src/engine/stmtparser.php"
 #line 437 "src/engine/stmtparser.y"
     function yy_r213(){ $this->_retvalue = PC_Obj_MultiType::create_array();     }
-#line 6151 "src/engine/stmtparser.php"
+#line 6153 "src/engine/stmtparser.php"
 #line 438 "src/engine/stmtparser.y"
     function yy_r214(){ $this->_retvalue = PC_Obj_MultiType::create_callable();     }
-#line 6154 "src/engine/stmtparser.php"
+#line 6156 "src/engine/stmtparser.php"
 #line 439 "src/engine/stmtparser.y"
     function yy_r215(){ $this->_retvalue = PC_Obj_MultiType::create_object($this->yystack[$this->yyidx + 0]->minor);     }
-#line 6157 "src/engine/stmtparser.php"
+#line 6159 "src/engine/stmtparser.php"
 #line 445 "src/engine/stmtparser.y"
     function yy_r219(){ $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;     }
-#line 6160 "src/engine/stmtparser.php"
+#line 6162 "src/engine/stmtparser.php"
 #line 447 "src/engine/stmtparser.y"
     function yy_r220(){ $this->_retvalue = array($this->yystack[$this->yyidx + 0]->minor);     }
-#line 6163 "src/engine/stmtparser.php"
+#line 6165 "src/engine/stmtparser.php"
 #line 448 "src/engine/stmtparser.y"
     function yy_r221(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 6169 "src/engine/stmtparser.php"
+#line 6171 "src/engine/stmtparser.php"
 #line 459 "src/engine/stmtparser.y"
     function yy_r226(){
 	$this->state->do_global($this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6174 "src/engine/stmtparser.php"
+#line 6176 "src/engine/stmtparser.php"
 #line 510 "src/engine/stmtparser.y"
     function yy_r257(){ $this->_retvalue = array('public');     }
-#line 6177 "src/engine/stmtparser.php"
+#line 6179 "src/engine/stmtparser.php"
 #line 516 "src/engine/stmtparser.y"
     function yy_r261(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
 	$this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 6183 "src/engine/stmtparser.php"
+#line 6185 "src/engine/stmtparser.php"
 #line 521 "src/engine/stmtparser.y"
     function yy_r262(){
 	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 6188 "src/engine/stmtparser.php"
+#line 6190 "src/engine/stmtparser.php"
 #line 525 "src/engine/stmtparser.y"
     function yy_r263(){ $this->_retvalue = $this->yystack[$this->yyidx + -2]->minor; $this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;     }
-#line 6191 "src/engine/stmtparser.php"
+#line 6193 "src/engine/stmtparser.php"
 #line 528 "src/engine/stmtparser.y"
     function yy_r265(){ $this->_retvalue = array('name' => substr($this->yystack[$this->yyidx + -1]->minor,1));     }
-#line 6194 "src/engine/stmtparser.php"
+#line 6196 "src/engine/stmtparser.php"
 #line 529 "src/engine/stmtparser.y"
     function yy_r266(){
 	$this->_retvalue = array('name' => substr($this->yystack[$this->yyidx + -3]->minor,1),'val' => $this->yystack[$this->yyidx + -1]->minor);
     }
-#line 6199 "src/engine/stmtparser.php"
+#line 6201 "src/engine/stmtparser.php"
 #line 536 "src/engine/stmtparser.y"
     function yy_r269(){
 	$this->_retvalue = array('name' => $this->yystack[$this->yyidx + -3]->minor,'val' => $this->yystack[$this->yyidx + -1]->minor);
     }
-#line 6204 "src/engine/stmtparser.php"
+#line 6206 "src/engine/stmtparser.php"
 #line 553 "src/engine/stmtparser.y"
     function yy_r278(){
     $this->state->end_class();
     }
-#line 6209 "src/engine/stmtparser.php"
+#line 6211 "src/engine/stmtparser.php"
 #line 557 "src/engine/stmtparser.y"
     function yy_r279(){
     $this->_retvalue = $this->state->add_call((string)$this->yystack[$this->yyidx + -1]->minor,PC_Obj_MultiType::create_string('__construct'),$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6214 "src/engine/stmtparser.php"
+#line 6216 "src/engine/stmtparser.php"
 #line 562 "src/engine/stmtparser.y"
     function yy_r281(){
     $this->_retvalue = $this->state->handle_list($this->yystack[$this->yyidx + -3]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6219 "src/engine/stmtparser.php"
+#line 6221 "src/engine/stmtparser.php"
 #line 565 "src/engine/stmtparser.y"
     function yy_r282(){
     $this->_retvalue = $this->state->set_var($this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6224 "src/engine/stmtparser.php"
+#line 6226 "src/engine/stmtparser.php"
 #line 568 "src/engine/stmtparser.y"
     function yy_r283(){
     $this->_retvalue = $this->state->set_var($this->yystack[$this->yyidx + -3]->minor,$this->yystack[$this->yyidx + 0]->minor->get_type(),true);
     }
-#line 6229 "src/engine/stmtparser.php"
+#line 6231 "src/engine/stmtparser.php"
 #line 571 "src/engine/stmtparser.y"
     function yy_r284(){
     $this->_retvalue = clone $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 6234 "src/engine/stmtparser.php"
+#line 6236 "src/engine/stmtparser.php"
 #line 574 "src/engine/stmtparser.y"
     function yy_r285(){
     $this->_retvalue = $this->state->handle_bin_assign_op('+',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6239 "src/engine/stmtparser.php"
+#line 6241 "src/engine/stmtparser.php"
 #line 577 "src/engine/stmtparser.y"
     function yy_r286(){
     $this->_retvalue = $this->state->handle_bin_assign_op('-',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6244 "src/engine/stmtparser.php"
+#line 6246 "src/engine/stmtparser.php"
 #line 580 "src/engine/stmtparser.y"
     function yy_r287(){
     $this->_retvalue = $this->state->handle_bin_assign_op('*',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6249 "src/engine/stmtparser.php"
+#line 6251 "src/engine/stmtparser.php"
 #line 583 "src/engine/stmtparser.y"
     function yy_r288(){
     $this->_retvalue = $this->state->handle_bin_assign_op('**',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6254 "src/engine/stmtparser.php"
+#line 6256 "src/engine/stmtparser.php"
 #line 586 "src/engine/stmtparser.y"
     function yy_r289(){
     $this->_retvalue = $this->state->handle_bin_assign_op('/',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6259 "src/engine/stmtparser.php"
+#line 6261 "src/engine/stmtparser.php"
 #line 589 "src/engine/stmtparser.y"
     function yy_r290(){
     $this->_retvalue = $this->state->handle_bin_assign_op('.',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6264 "src/engine/stmtparser.php"
+#line 6266 "src/engine/stmtparser.php"
 #line 592 "src/engine/stmtparser.y"
     function yy_r291(){
     $this->_retvalue = $this->state->handle_bin_assign_op('%',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6269 "src/engine/stmtparser.php"
+#line 6271 "src/engine/stmtparser.php"
 #line 595 "src/engine/stmtparser.y"
     function yy_r292(){
     $this->_retvalue = $this->state->handle_bin_assign_op('&',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6274 "src/engine/stmtparser.php"
+#line 6276 "src/engine/stmtparser.php"
 #line 598 "src/engine/stmtparser.y"
     function yy_r293(){
     $this->_retvalue = $this->state->handle_bin_assign_op('|',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6279 "src/engine/stmtparser.php"
+#line 6281 "src/engine/stmtparser.php"
 #line 601 "src/engine/stmtparser.y"
     function yy_r294(){
     $this->_retvalue = $this->state->handle_bin_assign_op('^',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6284 "src/engine/stmtparser.php"
+#line 6286 "src/engine/stmtparser.php"
 #line 604 "src/engine/stmtparser.y"
     function yy_r295(){
     $this->_retvalue = $this->state->handle_bin_assign_op('<<',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6289 "src/engine/stmtparser.php"
+#line 6291 "src/engine/stmtparser.php"
 #line 607 "src/engine/stmtparser.y"
     function yy_r296(){
     $this->_retvalue = $this->state->handle_bin_assign_op('>>',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6294 "src/engine/stmtparser.php"
+#line 6296 "src/engine/stmtparser.php"
 #line 610 "src/engine/stmtparser.y"
     function yy_r297(){
     $this->_retvalue = $this->state->handle_post_op('+',$this->yystack[$this->yyidx + -1]->minor);
     }
-#line 6299 "src/engine/stmtparser.php"
+#line 6301 "src/engine/stmtparser.php"
 #line 613 "src/engine/stmtparser.y"
     function yy_r298(){
     $this->_retvalue = $this->state->handle_pre_op('+',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6304 "src/engine/stmtparser.php"
+#line 6306 "src/engine/stmtparser.php"
 #line 616 "src/engine/stmtparser.y"
     function yy_r299(){
     $this->_retvalue = $this->state->handle_post_op('-',$this->yystack[$this->yyidx + -1]->minor);
     }
-#line 6309 "src/engine/stmtparser.php"
+#line 6311 "src/engine/stmtparser.php"
 #line 619 "src/engine/stmtparser.y"
     function yy_r300(){
     $this->_retvalue = $this->state->handle_pre_op('-',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6314 "src/engine/stmtparser.php"
+#line 6316 "src/engine/stmtparser.php"
 #line 622 "src/engine/stmtparser.y"
     function yy_r301(){
     $this->_retvalue = $this->state->handle_bin_op('||',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6319 "src/engine/stmtparser.php"
+#line 6321 "src/engine/stmtparser.php"
 #line 625 "src/engine/stmtparser.y"
     function yy_r302(){
     $this->_retvalue = $this->state->handle_bin_op('&&',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6324 "src/engine/stmtparser.php"
+#line 6326 "src/engine/stmtparser.php"
 #line 634 "src/engine/stmtparser.y"
     function yy_r305(){
     $this->_retvalue = $this->state->handle_bin_op('xor',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6329 "src/engine/stmtparser.php"
+#line 6331 "src/engine/stmtparser.php"
 #line 637 "src/engine/stmtparser.y"
     function yy_r306(){
     $this->_retvalue = $this->state->handle_bin_op('|',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6334 "src/engine/stmtparser.php"
+#line 6336 "src/engine/stmtparser.php"
 #line 640 "src/engine/stmtparser.y"
     function yy_r307(){
     $this->_retvalue = $this->state->handle_bin_op('&',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6339 "src/engine/stmtparser.php"
+#line 6341 "src/engine/stmtparser.php"
 #line 643 "src/engine/stmtparser.y"
     function yy_r308(){
     $this->_retvalue = $this->state->handle_bin_op('^',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6344 "src/engine/stmtparser.php"
+#line 6346 "src/engine/stmtparser.php"
 #line 646 "src/engine/stmtparser.y"
     function yy_r309(){
     $this->_retvalue = $this->state->handle_bin_op('.',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6349 "src/engine/stmtparser.php"
+#line 6351 "src/engine/stmtparser.php"
 #line 649 "src/engine/stmtparser.y"
     function yy_r310(){
     $this->_retvalue = $this->state->handle_bin_op('+',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6354 "src/engine/stmtparser.php"
+#line 6356 "src/engine/stmtparser.php"
 #line 652 "src/engine/stmtparser.y"
     function yy_r311(){
     $this->_retvalue = $this->state->handle_bin_op('-',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6359 "src/engine/stmtparser.php"
+#line 6361 "src/engine/stmtparser.php"
 #line 655 "src/engine/stmtparser.y"
     function yy_r312(){
     $this->_retvalue = $this->state->handle_bin_op('*',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6364 "src/engine/stmtparser.php"
+#line 6366 "src/engine/stmtparser.php"
 #line 658 "src/engine/stmtparser.y"
     function yy_r313(){
     $this->_retvalue = $this->state->handle_bin_op('**',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6369 "src/engine/stmtparser.php"
+#line 6371 "src/engine/stmtparser.php"
 #line 661 "src/engine/stmtparser.y"
     function yy_r314(){
     $this->_retvalue = $this->state->handle_bin_op('/',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6374 "src/engine/stmtparser.php"
+#line 6376 "src/engine/stmtparser.php"
 #line 664 "src/engine/stmtparser.y"
     function yy_r315(){
     $this->_retvalue = $this->state->handle_bin_op('%',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6379 "src/engine/stmtparser.php"
+#line 6381 "src/engine/stmtparser.php"
 #line 667 "src/engine/stmtparser.y"
     function yy_r316(){
     $this->_retvalue = $this->state->handle_bin_op('<<',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6384 "src/engine/stmtparser.php"
+#line 6386 "src/engine/stmtparser.php"
 #line 670 "src/engine/stmtparser.y"
     function yy_r317(){
     $this->_retvalue = $this->state->handle_bin_op('>>',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6389 "src/engine/stmtparser.php"
+#line 6391 "src/engine/stmtparser.php"
 #line 673 "src/engine/stmtparser.y"
     function yy_r318(){
     $this->_retvalue = $this->state->handle_unary_op('+',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6394 "src/engine/stmtparser.php"
+#line 6396 "src/engine/stmtparser.php"
 #line 677 "src/engine/stmtparser.y"
     function yy_r320(){
     $this->_retvalue = $this->state->handle_unary_op('-',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6399 "src/engine/stmtparser.php"
+#line 6401 "src/engine/stmtparser.php"
 #line 681 "src/engine/stmtparser.y"
     function yy_r322(){
     $this->_retvalue = $this->state->handle_unary_op('!',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6404 "src/engine/stmtparser.php"
+#line 6406 "src/engine/stmtparser.php"
 #line 684 "src/engine/stmtparser.y"
     function yy_r323(){
     $this->_retvalue = $this->state->handle_unary_op('~',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6409 "src/engine/stmtparser.php"
+#line 6411 "src/engine/stmtparser.php"
 #line 687 "src/engine/stmtparser.y"
     function yy_r324(){
     $this->_retvalue = $this->state->handle_cmp('===',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6414 "src/engine/stmtparser.php"
+#line 6416 "src/engine/stmtparser.php"
 #line 690 "src/engine/stmtparser.y"
     function yy_r325(){
     $this->_retvalue = $this->state->handle_cmp('!==',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6419 "src/engine/stmtparser.php"
+#line 6421 "src/engine/stmtparser.php"
 #line 693 "src/engine/stmtparser.y"
     function yy_r326(){
     $this->_retvalue = $this->state->handle_cmp('==',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6424 "src/engine/stmtparser.php"
+#line 6426 "src/engine/stmtparser.php"
 #line 696 "src/engine/stmtparser.y"
     function yy_r327(){
     $this->_retvalue = $this->state->handle_cmp('!=',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6429 "src/engine/stmtparser.php"
+#line 6431 "src/engine/stmtparser.php"
 #line 699 "src/engine/stmtparser.y"
     function yy_r328(){
     $this->_retvalue = $this->state->handle_cmp('<',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6434 "src/engine/stmtparser.php"
+#line 6436 "src/engine/stmtparser.php"
 #line 702 "src/engine/stmtparser.y"
     function yy_r329(){
     $this->_retvalue = $this->state->handle_cmp('<=',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6439 "src/engine/stmtparser.php"
+#line 6441 "src/engine/stmtparser.php"
 #line 705 "src/engine/stmtparser.y"
     function yy_r330(){
     $this->_retvalue = $this->state->handle_cmp('>',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6444 "src/engine/stmtparser.php"
+#line 6446 "src/engine/stmtparser.php"
 #line 708 "src/engine/stmtparser.y"
     function yy_r331(){
     $this->_retvalue = $this->state->handle_cmp('>=',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6449 "src/engine/stmtparser.php"
+#line 6451 "src/engine/stmtparser.php"
 #line 711 "src/engine/stmtparser.y"
     function yy_r332(){
     $this->_retvalue = $this->state->handle_cmp('<>',$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6454 "src/engine/stmtparser.php"
+#line 6456 "src/engine/stmtparser.php"
 #line 714 "src/engine/stmtparser.y"
     function yy_r333(){
     $this->_retvalue = $this->state->handle_instanceof($this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6459 "src/engine/stmtparser.php"
+#line 6461 "src/engine/stmtparser.php"
 #line 717 "src/engine/stmtparser.y"
     function yy_r334(){
     $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 6464 "src/engine/stmtparser.php"
+#line 6466 "src/engine/stmtparser.php"
 #line 721 "src/engine/stmtparser.y"
     function yy_r336(){
     $this->_retvalue = $this->state->handle_tri_op($this->yystack[$this->yyidx + -4]->minor,$this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6469 "src/engine/stmtparser.php"
+#line 6471 "src/engine/stmtparser.php"
 #line 726 "src/engine/stmtparser.y"
     function yy_r339(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 6474 "src/engine/stmtparser.php"
+#line 6476 "src/engine/stmtparser.php"
 #line 729 "src/engine/stmtparser.y"
     function yy_r340(){
     $this->_retvalue = $this->state->handle_cast('int',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6479 "src/engine/stmtparser.php"
+#line 6481 "src/engine/stmtparser.php"
 #line 732 "src/engine/stmtparser.y"
     function yy_r341(){
     $this->_retvalue = $this->state->handle_cast('float',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6484 "src/engine/stmtparser.php"
+#line 6486 "src/engine/stmtparser.php"
 #line 735 "src/engine/stmtparser.y"
     function yy_r342(){
     $this->_retvalue = $this->state->handle_cast('string',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6489 "src/engine/stmtparser.php"
+#line 6491 "src/engine/stmtparser.php"
 #line 738 "src/engine/stmtparser.y"
     function yy_r343(){
     $this->_retvalue = $this->state->handle_cast('array',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6494 "src/engine/stmtparser.php"
+#line 6496 "src/engine/stmtparser.php"
 #line 741 "src/engine/stmtparser.y"
     function yy_r344(){
     $this->_retvalue = $this->state->handle_cast('object',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6499 "src/engine/stmtparser.php"
+#line 6501 "src/engine/stmtparser.php"
 #line 744 "src/engine/stmtparser.y"
     function yy_r345(){
     $this->_retvalue = $this->state->handle_cast('bool',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6504 "src/engine/stmtparser.php"
+#line 6506 "src/engine/stmtparser.php"
 #line 747 "src/engine/stmtparser.y"
     function yy_r346(){
     $this->_retvalue = $this->state->handle_cast('unset',$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6509 "src/engine/stmtparser.php"
+#line 6511 "src/engine/stmtparser.php"
 #line 750 "src/engine/stmtparser.y"
     function yy_r347(){ $this->_retvalue = null;     }
-#line 6512 "src/engine/stmtparser.php"
+#line 6514 "src/engine/stmtparser.php"
 #line 753 "src/engine/stmtparser.y"
     function yy_r350(){
     $this->_retvalue = PC_Obj_MultiType::create_string();
     }
-#line 6517 "src/engine/stmtparser.php"
+#line 6519 "src/engine/stmtparser.php"
 #line 763 "src/engine/stmtparser.y"
     function yy_r356(){
     $this->_retvalue = PC_Obj_MultiType::create_callable();
     $this->state->end_function();
     }
-#line 6523 "src/engine/stmtparser.php"
+#line 6525 "src/engine/stmtparser.php"
 #line 784 "src/engine/stmtparser.y"
     function yy_r364(){
 	$this->state->set_func_param(new PC_Obj_Parameter($this->yystack[$this->yyidx + 0]->minor->get_name(),$this->yystack[$this->yyidx + 0]->minor->get_type()));
     }
-#line 6528 "src/engine/stmtparser.php"
+#line 6530 "src/engine/stmtparser.php"
 #line 791 "src/engine/stmtparser.y"
     function yy_r366(){
     $this->_retvalue = $this->state->get_var(PC_Obj_MultiType::create_string(substr($this->yystack[$this->yyidx + 0]->minor,1)),true);
     }
-#line 6533 "src/engine/stmtparser.php"
+#line 6535 "src/engine/stmtparser.php"
 #line 798 "src/engine/stmtparser.y"
     function yy_r368(){
     $fname = PC_Obj_MultiType::create_string($this->yystack[$this->yyidx + -1]->minor);
     $this->_retvalue = $this->state->add_call(null,$fname,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6539 "src/engine/stmtparser.php"
+#line 6541 "src/engine/stmtparser.php"
 #line 802 "src/engine/stmtparser.y"
     function yy_r369(){
     $this->_retvalue = $this->state->add_call((string)$this->yystack[$this->yyidx + -3]->minor,$this->yystack[$this->yyidx + -1]->minor,$this->yystack[$this->yyidx + 0]->minor,true);
     }
-#line 6544 "src/engine/stmtparser.php"
+#line 6546 "src/engine/stmtparser.php"
 #line 808 "src/engine/stmtparser.y"
     function yy_r371(){
 	  $this->_retvalue = $this->state->add_call(null,$this->yystack[$this->yyidx + -1]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6549 "src/engine/stmtparser.php"
+#line 6551 "src/engine/stmtparser.php"
 #line 812 "src/engine/stmtparser.y"
     function yy_r372(){ $this->_retvalue = 'static';     }
-#line 6552 "src/engine/stmtparser.php"
+#line 6554 "src/engine/stmtparser.php"
 #line 830 "src/engine/stmtparser.y"
     function yy_r385(){
 	$this->_retvalue = PC_Obj_MultiType::create_string(substr($this->yystack[$this->yyidx + 0]->minor,1,-1));
     }
-#line 6557 "src/engine/stmtparser.php"
+#line 6559 "src/engine/stmtparser.php"
 #line 834 "src/engine/stmtparser.y"
     function yy_r386(){ $this->_retvalue = PC_Obj_MultiType::create_int($this->yystack[$this->yyidx + 0]->minor);     }
-#line 6560 "src/engine/stmtparser.php"
+#line 6562 "src/engine/stmtparser.php"
 #line 835 "src/engine/stmtparser.y"
     function yy_r387(){ $this->_retvalue = PC_Obj_MultiType::create_float($this->yystack[$this->yyidx + 0]->minor);     }
-#line 6563 "src/engine/stmtparser.php"
+#line 6565 "src/engine/stmtparser.php"
 #line 836 "src/engine/stmtparser.y"
     function yy_r388(){ $this->_retvalue = PC_Obj_MultiType::create_int($this->state->get_line());     }
-#line 6566 "src/engine/stmtparser.php"
+#line 6568 "src/engine/stmtparser.php"
 #line 837 "src/engine/stmtparser.y"
     function yy_r389(){ $this->_retvalue = PC_Obj_MultiType::create_string($this->state->get_file());     }
-#line 6569 "src/engine/stmtparser.php"
+#line 6571 "src/engine/stmtparser.php"
 #line 838 "src/engine/stmtparser.y"
     function yy_r390(){
 	// TODO value
 	$this->_retvalue = PC_Obj_MultiType::create_string();
     }
-#line 6575 "src/engine/stmtparser.php"
+#line 6577 "src/engine/stmtparser.php"
 #line 842 "src/engine/stmtparser.y"
     function yy_r391(){
   $this->_retvalue = $this->state->get_scope_part($this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6580 "src/engine/stmtparser.php"
+#line 6582 "src/engine/stmtparser.php"
 #line 845 "src/engine/stmtparser.y"
     function yy_r392(){
 	$this->_retvalue = PC_Obj_MultiType::create_string();
     }
-#line 6585 "src/engine/stmtparser.php"
+#line 6587 "src/engine/stmtparser.php"
 #line 858 "src/engine/stmtparser.y"
     function yy_r398(){
     if(strcasecmp($this->yystack[$this->yyidx + 0]->minor,"true") == 0)
@@ -6587,25 +6589,25 @@ static public $yy_action = array(
     else
         $this->_retvalue = $this->state->get_constant_type($this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6595 "src/engine/stmtparser.php"
+#line 6597 "src/engine/stmtparser.php"
 #line 866 "src/engine/stmtparser.y"
     function yy_r399(){
 		$this->_retvalue = $this->state->handle_classconst_access(PC_Obj_MultiType::create_string($this->yystack[$this->yyidx + -2]->minor),$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6600 "src/engine/stmtparser.php"
+#line 6602 "src/engine/stmtparser.php"
 #line 869 "src/engine/stmtparser.y"
     function yy_r400(){
 		$this->_retvalue = $this->state->handle_classconst_access($this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6605 "src/engine/stmtparser.php"
+#line 6607 "src/engine/stmtparser.php"
 #line 876 "src/engine/stmtparser.y"
     function yy_r403(){ $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor->get_type();     }
-#line 6608 "src/engine/stmtparser.php"
+#line 6610 "src/engine/stmtparser.php"
 #line 893 "src/engine/stmtparser.y"
     function yy_r415(){
     $this->_retvalue = $this->state->handle_array_access($this->yystack[$this->yyidx + -3]->minor,$this->yystack[$this->yyidx + -1]->minor);
     }
-#line 6613 "src/engine/stmtparser.php"
+#line 6615 "src/engine/stmtparser.php"
 #line 898 "src/engine/stmtparser.y"
     function yy_r418(){
     $chain = array();
@@ -6615,10 +6617,10 @@ static public $yy_action = array(
     );
     $this->_retvalue = $this->state->handle_object_prop_chain($this->yystack[$this->yyidx + -3]->minor,$chain);
     }
-#line 6623 "src/engine/stmtparser.php"
+#line 6625 "src/engine/stmtparser.php"
 #line 906 "src/engine/stmtparser.y"
     function yy_r419(){ $this->_retvalue = new PC_Obj_Variable('',$this->yystack[$this->yyidx + 0]->minor);     }
-#line 6626 "src/engine/stmtparser.php"
+#line 6628 "src/engine/stmtparser.php"
 #line 910 "src/engine/stmtparser.y"
     function yy_r422(){
     $chain = array();
@@ -6628,68 +6630,68 @@ static public $yy_action = array(
     );
     $this->_retvalue = $this->state->handle_object_prop_chain($this->yystack[$this->yyidx + -2]->minor,$chain);
     }
-#line 6636 "src/engine/stmtparser.php"
+#line 6638 "src/engine/stmtparser.php"
 #line 919 "src/engine/stmtparser.y"
     function yy_r423(){
     $this->_retvalue = $this->state->get_var(PC_Obj_MultiType::create_string(substr($this->yystack[$this->yyidx + 0]->minor,1)));
     }
-#line 6641 "src/engine/stmtparser.php"
+#line 6643 "src/engine/stmtparser.php"
 #line 922 "src/engine/stmtparser.y"
     function yy_r424(){
     $this->_retvalue = $this->state->get_var($this->yystack[$this->yyidx + -1]->minor);
     }
-#line 6646 "src/engine/stmtparser.php"
+#line 6648 "src/engine/stmtparser.php"
 #line 925 "src/engine/stmtparser.y"
     function yy_r425(){
     $this->_retvalue = $this->state->get_var($this->yystack[$this->yyidx + 0]->minor->get_type());
     }
-#line 6651 "src/engine/stmtparser.php"
+#line 6653 "src/engine/stmtparser.php"
 #line 929 "src/engine/stmtparser.y"
     function yy_r426(){
     $this->_retvalue = $this->state->handle_field_access($this->yystack[$this->yyidx + -2]->minor,$this->yystack[$this->yyidx + 0]->minor->get_name());
     }
-#line 6656 "src/engine/stmtparser.php"
+#line 6658 "src/engine/stmtparser.php"
 #line 943 "src/engine/stmtparser.y"
     function yy_r434(){ $this->_retvalue = PC_Obj_MultiType::create_string($this->yystack[$this->yyidx + 0]->minor);     }
-#line 6659 "src/engine/stmtparser.php"
+#line 6661 "src/engine/stmtparser.php"
 #line 947 "src/engine/stmtparser.y"
     function yy_r437(){
     $this->_retvalue = array(array('type' => 'name','data' => PC_Obj_MultiType::create_string($this->yystack[$this->yyidx + 0]->minor)));
     }
-#line 6664 "src/engine/stmtparser.php"
+#line 6666 "src/engine/stmtparser.php"
 #line 950 "src/engine/stmtparser.y"
     function yy_r438(){
 		$this->_retvalue = array(array('type' => 'name','data' => $this->yystack[$this->yyidx + -1]->minor));
     }
-#line 6669 "src/engine/stmtparser.php"
+#line 6671 "src/engine/stmtparser.php"
 #line 953 "src/engine/stmtparser.y"
     function yy_r439(){
     $this->_retvalue = array(array('type' => 'name','data' => $this->yystack[$this->yyidx + 0]->minor->get_type()));
     }
-#line 6674 "src/engine/stmtparser.php"
+#line 6676 "src/engine/stmtparser.php"
 #line 957 "src/engine/stmtparser.y"
     function yy_r440(){
     $this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
     $this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 6680 "src/engine/stmtparser.php"
+#line 6682 "src/engine/stmtparser.php"
 #line 961 "src/engine/stmtparser.y"
     function yy_r441(){
 	$this->_retvalue = array($this->yystack[$this->yyidx + 0]->minor);
     }
-#line 6685 "src/engine/stmtparser.php"
+#line 6687 "src/engine/stmtparser.php"
 #line 972 "src/engine/stmtparser.y"
     function yy_r447(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
 	$this->_retvalue->get_first()->set_array_type($this->yystack[$this->yyidx + 0]->minor['key'],$this->yystack[$this->yyidx + 0]->minor['val'],$this->yystack[$this->yyidx + 0]->minor['append']);
     }
-#line 6691 "src/engine/stmtparser.php"
+#line 6693 "src/engine/stmtparser.php"
 #line 976 "src/engine/stmtparser.y"
     function yy_r448(){
 	$this->_retvalue = PC_Obj_MultiType::create_array();
 	$this->_retvalue->get_first()->set_array_type($this->yystack[$this->yyidx + 0]->minor['key'],$this->yystack[$this->yyidx + 0]->minor['val'],$this->yystack[$this->yyidx + 0]->minor['append']);
     }
-#line 6697 "src/engine/stmtparser.php"
+#line 6699 "src/engine/stmtparser.php"
 #line 981 "src/engine/stmtparser.y"
     function yy_r449(){
 	$this->_retvalue = array(
@@ -6698,7 +6700,7 @@ static public $yy_action = array(
 		'append' => false,
 	);
     }
-#line 6706 "src/engine/stmtparser.php"
+#line 6708 "src/engine/stmtparser.php"
 #line 988 "src/engine/stmtparser.y"
     function yy_r450(){
 	$this->_retvalue = array(
@@ -6707,7 +6709,12 @@ static public $yy_action = array(
 		'append' => true,
 	);
     }
-#line 6715 "src/engine/stmtparser.php"
+#line 6717 "src/engine/stmtparser.php"
+#line 1015 "src/engine/stmtparser.y"
+    function yy_r467(){
+	$this->_retvalue = PC_Obj_MultiType::create_bool();
+    }
+#line 6722 "src/engine/stmtparser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -6827,7 +6834,7 @@ static public $yy_action = array(
 		throw new PC_Engine_Exception(
 			$this->state->get_file(),$this->state->get_line(),$this->tokenName($yymajor),$TOKEN,$expect
 		);
-#line 6836 "src/engine/stmtparser.php"
+#line 6843 "src/engine/stmtparser.php"
     }
 
     /**

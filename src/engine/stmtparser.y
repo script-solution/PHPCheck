@@ -1012,8 +1012,12 @@ encaps_var_offset ::= T_STRING .
 encaps_var_offset ::= T_NUM_STRING .
 encaps_var_offset ::= T_VARIABLE .
 
-internal_functions_in_yacc ::= T_ISSET LPAREN isset_variables RPAREN .
-internal_functions_in_yacc ::= T_EMPTY LPAREN expr RPAREN .
+internal_functions_in_yacc(A) ::= T_ISSET LPAREN isset_variables RPAREN . {
+	A = PC_Obj_MultiType::create_bool();
+}
+internal_functions_in_yacc(A) ::= T_EMPTY LPAREN expr RPAREN . {
+	A = PC_Obj_MultiType::create_bool();
+}
 internal_functions_in_yacc ::= T_INCLUDE expr .
 internal_functions_in_yacc ::= T_INCLUDE_ONCE expr .
 internal_functions_in_yacc ::= T_EVAL LPAREN expr RPAREN .

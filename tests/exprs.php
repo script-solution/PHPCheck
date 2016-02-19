@@ -131,6 +131,9 @@ $bf = (object)5;
 $bg = (bool)1234;
 $bh = (unset)1;
 
+$ca = isset($foo);
+$cb = empty($bar);
+
 $bi = array(
 	array(
 		"a" => array(1),
@@ -227,6 +230,9 @@ $bi = array(
 		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['bf']->get_type());
 		self::assertEquals((string)PC_Obj_MultiType::create_bool(true),(string)$global['bg']->get_type());
 		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['bh']->get_type());
+		
+		self::assertEquals((string)PC_Obj_MultiType::create_bool(),(string)$global['ca']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_bool(),(string)$global['cb']->get_type());
 		
 		self::assertEquals(
 			(string)PC_Obj_Type::get_type_by_value(array(array("a" => array(1),2 => 3),4 => 5)),
