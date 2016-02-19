@@ -65,6 +65,15 @@ $a[] = 5;
 $a["Abc"] = "me";
 $d = array(0,array(1),2,3);
 $d[1][0] = 2;
+
+class foo {
+	public function bar() {
+		$a = array(
+			0 => 4,
+			self::R_TYPESCANNER => array(),
+		);
+	}
+}
 ?>';
 		
 		list($vars,$calls) = $this->do_analyze($code);
@@ -109,6 +118,9 @@ $d[1][0] = 2;
 		$type->get_first()->set_array_type(2,PC_Obj_MultiType::create_int(2));
 		$type->get_first()->set_array_type(3,PC_Obj_MultiType::create_int(3));
 		self::assertEquals((string)$type,(string)$global['d']->get_type());
+		
+		$bar = $vars['foo::bar'];
+		self::assertEquals('array',(string)$bar['a']->get_type());
 	}
 	
 	public function testList()

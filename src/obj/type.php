@@ -287,7 +287,13 @@ final class PC_Obj_Type extends FWS_Object
 			$this->_value = array();
 		if($key instanceof PC_Obj_MultiType)
 		{
-			assert(!$key->is_unknown() && !$key->is_multiple());
+			// if we don't know what to set, we don't know the content of the whole array anymore
+			if($key->is_unknown() || $key->is_multiple())
+			{
+				$this->_value = null;
+				return;
+			}
+			
 			$key = $key->get_first()->get_value_for_use();
 		}
 		
