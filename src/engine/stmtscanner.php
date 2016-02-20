@@ -386,7 +386,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		
 		$name = $var->get_string();
 		if($name == null)
-			return $this->get_unknown();
+			return new PC_Obj_Variable('',$this->get_unknown());
 		if($name == 'this')
 			return PC_Obj_Variable::create_object($this->scope->get_name_of(T_CLASS_C,$parent));
 		$scopename = $this->scope->get_name($parent);
