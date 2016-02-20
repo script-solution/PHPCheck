@@ -743,7 +743,10 @@ expr_without_variable(A) ::= T_BOOL_CAST expr(e). {
 expr_without_variable(A) ::= T_UNSET_CAST expr(e). {
     A = $this->state->handle_cast('unset',e);
 }
-expr_without_variable(A) ::= T_EXIT exit_expr. { A = null; }
+expr_without_variable(A) ::= T_EXIT exit_expr. {
+		// to support things like <expr> or die
+		A = new PC_Obj_MultiType();
+}
 expr_without_variable(A) ::= AT expr(e). { A = e; }
 expr_without_variable(A) ::= scalar(sc). { A = sc; }
 expr_without_variable(A) ::= BACKQUOTE backticks_expr BACKQUOTE . {

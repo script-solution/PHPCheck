@@ -137,6 +137,10 @@ $cc = <<<EOF
 foobar
 EOF;
 
+$da = 1 or die();
+$db = 2 or exit;
+$dc = 0 or die;
+
 $bi = array(
 	array(
 		"a" => array(1),
