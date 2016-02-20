@@ -80,6 +80,7 @@ $E->foobar();		// not ok, because there is no class that implements that method
 ?>';
 		
 		$errors = $this->do_analyze($code);
+		
 		self::assertEquals(4,count($errors));
 		
 		$error = $errors[0];
@@ -597,5 +598,84 @@ class F implements I,FakeI {}
 		$error = $errors[1];
 		self::assertEquals(PC_Obj_Error::E_A_IF_IS_NO_IF,$error->get_type());
 		self::assertRegExp('/"#FakeI#" is no interface, but implemented by class #F#!/',$error->get_msg());
+	}
+	
+	public function test_callable()
+	{
+		$code = '<?php
+function my_func() {}
+class A {
+	public function test() {}
+}
+
+/**
+ * @param callable $func
+ */
+function call($func) {
+	$func();
+}
+
+call("my_func"); 								// ok
+call("my_func2"); 							// function missing
+call("a".$_);										// unknown
+
+call(array(new A(),"test"));		// ok
+call(array());									// invalid
+$a = array();
+$a[$_] = 1;
+call($a);												// unknown
+call(array($_,1));							// invalid
+call(array($_,"foo"));					// unknown
+call(array(new A,$_));					// unknown
+call(array(1,2));								// invalid
+call(array(new A(),1));					// invalid
+call(array(new A(),"foo"));			// method missing
+call(array(new B(),"test"));		// class missing
+
+call(function() {});						// ok
+
+call(1);												// invalid
+?>';
+		
+		$errors = $this->do_analyze($code);
+		
+		self::assertEquals(9,count($errors));
+		
+		$error = $errors[0];
+		self::assertEquals(PC_Obj_Error::E_A_FUNCTION_MISSING,$error->get_type());
+		self::assertRegExp('/The function "my_func2" does not exist!/',$error->get_msg());
+		
+		$error = $errors[1];
+		self::assertEquals(PC_Obj_Error::E_A_CALLABLE_INVALID,$error->get_type());
+		self::assertRegExp('/Invalid callable: array={}!/',$error->get_msg());
+		
+		$error = $errors[2];
+		self::assertEquals(PC_Obj_Error::E_A_CALLABLE_INVALID,$error->get_type());
+		self::assertRegExp('/Invalid callable: array={0 = unknown;1 = integer=1;}!/',$error->get_msg());
+		
+		$error = $errors[3];
+		self::assertEquals(PC_Obj_Error::E_A_CALLABLE_INVALID,$error->get_type());
+		self::assertRegExp('/Invalid callable: array={0 = integer=1;1 = integer=2;}!/',$error->get_msg());
+		
+		$error = $errors[4];
+		self::assertEquals(PC_Obj_Error::E_A_CALLABLE_INVALID,$error->get_type());
+		self::assertRegExp('/Invalid callable: array={0 = A;1 = integer=1;}!/',$error->get_msg());
+		
+		$error = $errors[5];
+		self::assertEquals(PC_Obj_Error::E_A_METHOD_MISSING,$error->get_type());
+		self::assertRegExp('/The method "foo" does not exist in the class "#A#"!/',$error->get_msg());
+		
+		$error = $errors[6];
+		self::assertEquals(PC_Obj_Error::E_A_CLASS_MISSING,$error->get_type());
+		self::assertRegExp('/The class "#B#" does not exist!/',$error->get_msg());
+		
+		// twice because it is instantiated first and then we try to call a method on it
+		$error = $errors[7];
+		self::assertEquals(PC_Obj_Error::E_A_CLASS_MISSING,$error->get_type());
+		self::assertRegExp('/The class "#B#" does not exist!/',$error->get_msg());
+		
+		$error = $errors[8];
+		self::assertEquals(PC_Obj_Error::E_A_CALLABLE_INVALID,$error->get_type());
+		self::assertRegExp('/Invalid callable: integer=1!/',$error->get_msg());
 	}
 }

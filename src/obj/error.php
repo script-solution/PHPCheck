@@ -48,6 +48,7 @@ final class PC_Obj_Error extends FWS_Object
 	const E_A_CLASS_NOT_ABSTRACT								= 10;
 	const E_A_INTERFACE_MISSING									= 11;
 	const E_A_IF_IS_NO_IF												= 12;
+	const E_A_CALLABLE_INVALID									= 13;
 	
 	const E_S_MIXED_RET_AND_NO_RET							= 30;
 	const E_S_RETURNS_DIFFER_FROM_SPEC					= 31;
@@ -157,6 +158,7 @@ final class PC_Obj_Error extends FWS_Object
 				self::E_A_CLASS_MISSING,
 				self::E_A_INTERFACE_MISSING,
 				self::E_A_IF_IS_NO_IF,
+				self::E_A_CALLABLE_INVALID,
 			)
 		);
 		return $rep2types[$reporter];

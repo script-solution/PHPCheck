@@ -172,7 +172,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 					);
 				}
 				
-				$this->_check_params($call,$m);
+				$this->_check_params($types,$call,$m);
 			}
 		}
 		else if($this->report_unknown && $classname == PC_Obj_Class::UNKNOWN)
@@ -212,7 +212,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 			);
 		}
 		else
-			$this->_check_params($call,$func);
+			$this->_check_params($types,$call,$func);
 	}
 	
 	/**
@@ -299,10 +299,11 @@ final class PC_Engine_Analyzer extends FWS_Object
 	/**
 	 * Checks the parameters of the call against the given ones
 	 *
+	 * @param PC_Engine_TypeContainer $types the types
 	 * @param PC_Obj_Call $call the call
 	 * @param PC_Obj_Method $method the method
 	 */
-	private function _check_params($call,$method)
+	private function _check_params($types,$call,$method)
 	{
 		$arguments = $call->get_arguments();
 		$nparams = $method->get_required_param_count();
@@ -335,7 +336,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 					continue;
 				}
 				
-				if(!$this->_is_argument_ok($arg,$param))
+				if(!$this->_is_argument_ok($types,$call,$arg,$param))
 				{
 					$trequired = $param->get_mtype();
 					$tactual = $arg;
@@ -353,13 +354,15 @@ final class PC_Engine_Analyzer extends FWS_Object
 	}
 	
 	/**
-	 * Checks wether $arg is ok for $param
+	 * Checks whether $arg is ok for $param
 	 *
+	 * @param PC_Engine_TypeContainer $types the types
+	 * @param PC_Obj_Location $loc the location
 	 * @param PC_Obj_MultiType $arg the argument
 	 * @param PC_Obj_Parameter $param the parameter
 	 * @return boolean true if so
 	 */
-	private function _is_argument_ok($arg,$param)
+	private function _is_argument_ok($types,$loc,$arg,$param)
 	{
 		// not present but required?
 		if($arg === null && !$param->is_optional() && !$param->is_first_vararg())
@@ -368,6 +371,16 @@ final class PC_Engine_Analyzer extends FWS_Object
 		// unknown / not present
 		if($arg === null)
 			return true;
+		
+		// callables are special
+		if($param->get_mtype()->get_first()->get_type() == PC_Obj_Type::TCALLABLE)
+		{
+			if(!$arg->is_unknown())
+			{
+				$this->_check_callable($types,$loc,$arg,$param);
+				return true;
+			}
+		}
 		
 		// arg in the allowed types?
 		foreach($arg->get_types() as $type)
@@ -380,6 +393,86 @@ final class PC_Engine_Analyzer extends FWS_Object
 				return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Checks whether $arg is ok for $param, assumes that $param is a callable and $arg is known.
+	 *
+	 * @param PC_Engine_TypeContainer $types the types
+	 * @param PC_Obj_Location $loc the location
+	 * @param PC_Obj_MultiType $arg the argument
+	 * @param PC_Obj_Parameter $param the parameter
+	 */
+	private function _check_callable($types,$loc,$arg,$param)
+	{
+		$first = $arg->get_first();
+		if($first->get_type() == PC_Obj_Type::STRING)
+		{
+			if(!$this->report_unknown && $first->is_val_unknown())
+				return;
+			
+			$func = $types->get_function($first->get_value());
+			if($func === null)
+			{
+				$this->_report(
+					$loc,
+					'The function "'.$first->get_value().'" does not exist!',
+					PC_Obj_Error::E_A_FUNCTION_MISSING
+				);
+			}
+		}
+		else if($first->get_type() == PC_Obj_Type::TARRAY)
+		{
+			if(!$this->report_unknown && $first->is_val_unknown())
+				return;
+			
+			$callable = $first->get_value();
+			if(count($callable) != 2 ||
+				(!$callable[0]->is_unknown() && $callable[0]->get_first()->get_type() != PC_Obj_Type::OBJECT) ||
+				(!$callable[1]->is_unknown() && $callable[1]->get_first()->get_type() != PC_Obj_Type::STRING))
+			{
+				$this->_report(
+					$loc,
+					'Invalid callable: '.FWS_Printer::to_string($first).'!',
+					PC_Obj_Error::E_A_CALLABLE_INVALID
+				);
+			}
+			else
+			{
+				if(!$this->report_unknown && ($callable[0]->is_unknown() || $callable[1]->is_unknown()))
+					return;
+				
+				$obj = $callable[0]->get_first();
+				$name = $callable[1]->get_first();
+				
+				$classname = $obj->get_class();
+				$class = $types->get_class($classname);
+				if(!$class)
+				{
+					$this->_report(
+						$loc,
+						'The class "#'.$classname.'#" does not exist!',
+						PC_Obj_Error::E_A_CLASS_MISSING
+					);
+				}
+				else if(!$class->contains_method($name->get_value()))
+				{
+					$this->_report(
+						$loc,
+						'The method "'.$name->get_value().'" does not exist in the class "#'.$classname.'#"!',
+						PC_Obj_Error::E_A_METHOD_MISSING
+					);
+				}
+			}
+		}
+		else if($first->get_type() != PC_Obj_Type::TCALLABLE)
+		{
+			$this->_report(
+				$loc,
+				'Invalid callable: '.FWS_Printer::to_string($first).'!',
+				PC_Obj_Error::E_A_CALLABLE_INVALID
+			);
+		}
 	}
 	
 	/**
