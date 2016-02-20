@@ -376,7 +376,10 @@ alt_if_stmt ::= alt_if_stmt_without_else T_ELSE COLON inner_statement_list T_END
 parameter_list(A) ::= non_empty_parameter_list(list) . { A = list; }
 parameter_list(A) ::= /* empty */ . { A = array(); }
 
-non_empty_parameter_list(A) ::= parameter(p) . { A = array(); A[] = p; }
+non_empty_parameter_list(A) ::= parameter(p) . {
+	A = array();
+	A[] = p;
+}
 non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA parameter(p) . {
 	A = list;
 	A[] = p;
@@ -402,7 +405,7 @@ optional_type(A) ::= type(t) . { A = t; }
 
 type(A) ::= T_ARRAY . { A = PC_Obj_MultiType::create_array(); }
 type(A) ::= T_CALLABLE . { A = PC_Obj_MultiType::create_callable(); }
-type(A) ::= name(vtype) . { A = PC_Obj_MultiType::create_object((string)vtype); }
+type(A) ::= name(vtype) . { A = PC_Obj_MultiType::create_object(vtype); }
 
 return_type ::= /* empty */ .
 return_type ::= COLON type .
@@ -723,10 +726,18 @@ scalar(A) ::= T_TRAIT_C|T_METHOD_C|T_FUNC_C|T_NS_C|T_CLASS_C . {
 	// TODO value
 	A = PC_Obj_MultiType::create_string();
 }
-scalar(A) ::= T_START_HEREDOC T_ENCAPSED_AND_WHITESPACE T_END_HEREDOC .
-scalar(A) ::= T_START_HEREDOC T_END_HEREDOC .
-scalar(A) ::= DOUBLEQUOTE encaps_list DOUBLEQUOTE .
-scalar(A) ::= T_START_HEREDOC encaps_list T_END_HEREDOC .
+scalar(A) ::= T_START_HEREDOC T_ENCAPSED_AND_WHITESPACE T_END_HEREDOC . {
+	A = PC_Obj_MultiType::create_string();
+}
+scalar(A) ::= T_START_HEREDOC T_END_HEREDOC . {
+	A = PC_Obj_MultiType::create_string();
+}
+scalar(A) ::= DOUBLEQUOTE encaps_list DOUBLEQUOTE . {
+	A = PC_Obj_MultiType::create_string();
+}
+scalar(A) ::= T_START_HEREDOC encaps_list T_END_HEREDOC . {
+	A = PC_Obj_MultiType::create_string();
+}
 scalar(A) ::= dereferencable_scalar(s) . { A = s; }
 scalar(A) ::= constant .
 
