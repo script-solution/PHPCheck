@@ -234,7 +234,15 @@ class PC_DAO_Calls extends FWS_Singleton
 	{
 		$args = serialize($call->get_arguments());
 		if(strlen($args) > self::MAX_ARGS_LEN)
-			$args = '';
+		{
+			$arglist = array();
+			foreach($call->get_arguments() as $arg)
+			{
+				$arg->clear_values();
+				$arglist[] = $arg;
+			}
+			$args = serialize($arglist);
+		}
 		return array(
 			'project_id' => $project !== null ? $project->get_id() : 0,
 			'file' => $call->get_file(),
