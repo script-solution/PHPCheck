@@ -959,12 +959,22 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				$val = $f1->get_value_for_use() !== $f2->get_value_for_use();
 				break;
 			
+			case '?:':
+				if($f1->get_value_for_use() < $f2->get_value_for_use())
+					$val = -1;
+				else if($f1->get_value_for_use() > $f2->get_value_for_use())
+					$val = 1;
+				else
+					$val = 0;
+				return PC_Obj_MultiType::create_int($val);
+			
 			case '==':
 			case '!=':
 			case '<':
 			case '>':
 			case '<=':
 			case '>=':
+			case '?:':
 				eval('$val = '.$f1->get_value_for_eval().' '.$op.' '.$f2->get_value_for_eval().';');
 				break;
 		}

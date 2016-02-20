@@ -717,7 +717,9 @@ expr_without_variable(A) ::= new_expr(e) . { A = e; }
 expr_without_variable(A) ::= expr(e1) QUESTION expr(e2) COLON expr(e3). {
     A = $this->state->handle_tri_op(e1,e2,e3);
 }
-expr_without_variable ::= expr QUESTION COLON expr .
+expr_without_variable(A) ::= expr(e1) QUESTION COLON expr(e2) . {
+    A = $this->state->handle_cmp('?:',e1,e2);
+}
 expr_without_variable ::= expr T_COALESCE expr .
 expr_without_variable(A) ::= internal_functions_in_yacc(e). {
     A = e;

@@ -109,6 +109,14 @@ $aa = array(array($_,1)) + array(2);
 $ab = array(1) === array(1);
 $ac = array(1,"2") == array(1,2);
 $ad = array(1) <> array($_);
+
+$ba = 1 ? 0 : 2;
+$bb = 4 ? "bla" : "blub";
+$bc = $_ ? 1 : 2;
+$bd = $_ ? "foo" : 1;
+$be = (1) ? ((2) ? "a" : "b") : "c";
+$bf = 1 ?: -1;
+$bg = "f" ?: "g";
 ?>';
 	
 	public function testExprs2()
@@ -161,5 +169,19 @@ $ad = array(1) <> array($_);
 		self::assertEquals((string)PC_Obj_MultiType::create_bool(),(string)$global['ab']->get_type());
 		self::assertEquals((string)PC_Obj_MultiType::create_bool(),(string)$global['ac']->get_type());
 		self::assertEquals((string)PC_Obj_MultiType::create_bool(),(string)$global['ad']->get_type());
+		
+		self::assertEquals((string)PC_Obj_MultiType::create_int(0),(string)$global['ba']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_string("bla"),(string)$global['bb']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_int(),(string)$global['bc']->get_type());
+		self::assertEquals(
+			(string)new PC_Obj_MultiType(array(
+				new PC_Obj_Type(PC_Obj_Type::STRING,"foo"),
+				new PC_Obj_Type(PC_Obj_Type::INT,1),
+			)),
+			(string)$global['bd']->get_type()
+		);
+		self::assertEquals((string)PC_Obj_MultiType::create_string("a"),(string)$global['be']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_int(1),(string)$global['bf']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_int(-1),(string)$global['bg']->get_type());
 	}
 }

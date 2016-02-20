@@ -244,6 +244,7 @@ class PC_Engine_BaseScanner
 			case '>>':
 			case '<<':
 			case '~':
+			case '?:':
 				return PC_Obj_MultiType::create_int();
 			
 			// concatenation leads always to string

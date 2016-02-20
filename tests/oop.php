@@ -100,9 +100,6 @@ $h = $b->pubobj->pubint;
 $i = $d->test2($b)->test2(1);
 $j = b::sdf();
 $k = $d->partest();
-$l = (1 + 2) * 4;
-$m = (1 < 2) ? 1 : 2;
-$m2 = (1 < $_) ? "str" : true;
 $n = __FILE__;
 $o = __LINE__;
 $p = array(new a(),new b());
@@ -278,26 +275,11 @@ $r = $p[1]->test2($b);
 			(string)$global['j']->get_type()
 		);
 		self::assertEquals(
-			(string)PC_Obj_MultiType::create_int(12),
-			(string)$global['l']->get_type()
-		);
-		self::assertEquals(
-			(string)PC_Obj_MultiType::create_int(1),
-			(string)$global['m']->get_type()
-		);
-		self::assertEquals(
-			(string)new PC_Obj_MultiType(array(
-				new PC_Obj_Type(PC_Obj_Type::STRING,'str'),
-				new PC_Obj_Type(PC_Obj_Type::BOOL,true)
-			)),
-			(string)$global['m2']->get_type()
-		);
-		self::assertEquals(
 			(string)PC_Obj_MultiType::create_string(),
 			(string)$global['n']->get_type()
 		);
 		self::assertEquals(
-			(string)PC_Obj_MultiType::create_int(81),
+			(string)PC_Obj_MultiType::create_int(78),
 			(string)$global['o']->get_type()
 		);
 		self::assertEquals(
