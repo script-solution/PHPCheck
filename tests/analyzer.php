@@ -24,7 +24,7 @@
 
 class PC_Tests_Analyzer extends PC_UnitTest
 {
-	private function do_analyze($code,$report_mixed = false,$report_unknown = false)
+	private function do_analyze($code,$report_mixed = false,$report_unknown = false,$type_errors = false)
 	{
 		$tscanner = new PC_Engine_TypeScannerFrontend();
 		$tscanner->scan($code);
@@ -39,7 +39,11 @@ class PC_Tests_Analyzer extends PC_UnitTest
 		$an = new PC_Engine_Analyzer($report_mixed,$report_unknown);
 		$an->analyze_classes($typecon,$typecon->get_classes());
 		$an->analyze_calls($typecon,$typecon->get_calls());
-		return $an->get_errors();
+		
+		$errors = $an->get_errors();
+		if($type_errors)
+			$errors = array_merge($errors,$typecon->get_errors());
+		return $errors;
 	}
 	
 	public function test_s_method_missing()
@@ -98,6 +102,45 @@ $E->foobar();		// not ok, because there is no class that implements that method
 		$error = $errors[3];
 		self::assertEquals(PC_Obj_Error::E_A_METHOD_MISSING,$error->get_type());
 		self::assertRegExp('/The method "foobar" does not exist in the class "#I#"!/',$error->get_msg());
+	}
+	
+	public function test_s_return_spec()
+	{
+		$code = '<?php
+class C {}
+
+/** @return C */
+function a() {
+	return new C;
+}
+
+/** @return I */
+function b() {
+	
+}
+
+/** @return int */
+function c() {
+	return "foo";
+}
+
+/** @return void */
+function d() {
+	return;
+}
+?>';
+		
+		$errors = $this->do_analyze($code,false,false,true);
+		
+		self::assertEquals(2,count($errors));
+		
+		$error = $errors[0];
+		self::assertEquals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
+		self::assertRegExp('/The function\/method "b" has a return-specification in PHPDoc, but does not return a value/',$error->get_msg());
+		
+		$error = $errors[1];
+		self::assertEquals(PC_Obj_Error::E_S_RETURNS_DIFFER_FROM_SPEC,$error->get_type());
+		self::assertRegExp('/The return-specification \(PHPDoc\) of function\/method "c" does not match with the returned values \(spec="integer", returns="string=foo"\)/',$error->get_msg());
 	}
 	
 	public function test_s_abstract_class_inst()

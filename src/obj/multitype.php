@@ -128,9 +128,10 @@ class PC_Obj_MultiType extends FWS_Object
 	 * of the types.
 	 *
 	 * @param string $name the name
+	 * @param bool $is_return whether the type is for a return value
 	 * @return PC_Obj_MultiType the instance
 	 */
-	public static function get_type_by_name($name)
+	public static function get_type_by_name($name,$is_return = false)
 	{
 		$types = explode('|',$name);
 		$ts = array();
@@ -140,6 +141,10 @@ class PC_Obj_MultiType extends FWS_Object
 			$typeobj = PC_Obj_Type::get_type_by_name($type);
 			if($typeobj !== null)
 				$ts[] = $typeobj;
+			// for void, return "no type"
+			// TODO maybe we should report an error if there are other return types specified?
+			else if($is_return && FWS_String::strtolower($type) == 'void')
+				return null;
 		}
 		return new PC_Obj_MultiType($ts);
 	}
