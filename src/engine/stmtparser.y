@@ -892,7 +892,9 @@ callable_variable(A) ::= dereferencable(v) LBRACKET optional_expr(off) RBRACKET 
     A = $this->state->handle_array_access(v,off);
 }
 callable_variable ::= constant LBRACKET optional_expr RBRACKET .
-callable_variable ::= dereferencable LCURLY expr RCURLY .
+callable_variable(A) ::= dereferencable(v) LCURLY expr(off) RCURLY . {
+    A = $this->state->handle_array_access(v,off);
+}
 callable_variable(A) ::= dereferencable(obj) T_OBJECT_OPERATOR property_name(vprop) argument_list(a) . {
     $chain = array();
     $chain[] = array(

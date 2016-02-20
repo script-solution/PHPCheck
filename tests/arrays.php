@@ -65,6 +65,9 @@ $a[] = 5;
 $a["Abc"] = "me";
 $d = array(0,array(1),2,3);
 $d[1][0] = 2;
+$e = array();
+$e{1} = 4;
+$e{"foo"} = 5;
 
 class foo {
 	public function bar() {
@@ -121,6 +124,11 @@ class foo {
 		
 		$bar = $vars['foo::bar'];
 		self::assertEquals('array',(string)$bar['a']->get_type());
+		
+		$type = PC_Obj_MultiType::create_array();
+		$type->get_first()->set_array_type(1,PC_Obj_MultiType::create_int(4));
+		$type->get_first()->set_array_type("foo",PC_Obj_MultiType::create_int(5));
+		self::assertEquals((string)$type,(string)$global['e']->get_type());
 	}
 	
 	public function testList()
