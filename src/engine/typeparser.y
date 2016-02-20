@@ -191,12 +191,10 @@ identifier ::= semi_reserved .
 top_statement_list ::= top_statement_list top_statement .
 top_statement_list ::= /* empty */ .
 
-namespace_name(A) ::= T_STRING(name) . {
-	A = new PC_Type_yyToken(name);
-}
+namespace_name(A) ::= T_STRING(name) . { A = name; }
 namespace_name(A) ::= namespace_name T_NS_SEPARATOR T_STRING(name) . {
 	// TODO
-	A = new PC_Type_yyToken(name);
+	A = name;
 }
 
 name(A) ::= namespace_name(name) . { A = name; }
@@ -311,29 +309,29 @@ class_declaration_statement ::= class_modifiers(modifier) T_STRING(name) extends
 																implements_list(implements)
 																backup_doc_comment LCURLY class_statement_list(stmts) RCURLY . {
 	$this->state->declare_class(
-		name,modifier->metadata,extends,implements->metadata,stmts
+		name,modifier,extends,implements,stmts
 	);
 }
 
-class_modifiers(A) ::= T_CLASS . { A = new PC_Type_yyToken(''); }
-class_modifiers(A) ::= T_ABSTRACT T_CLASS . { A = new PC_Type_yyToken('',array('abstract' => true)); }
-class_modifiers(A) ::= T_FINAL T_CLASS . { A = new PC_Type_yyToken('',array('final' => true)); }
+class_modifiers(A) ::= T_CLASS . { A = array(); }
+class_modifiers(A) ::= T_ABSTRACT T_CLASS . { A = array('abstract' => true); }
+class_modifiers(A) ::= T_FINAL T_CLASS . { A = array('final' => true); }
 
 trait_declaration_statement ::= T_TRAIT T_STRING backup_doc_comment LCURLY class_statement_list RCURLY .
 
 interface_declaration_statement ::= T_INTERFACE T_STRING(name) interface_extends_list(extends)
 																		backup_doc_comment LCURLY class_statement_list(stmts) RCURLY . {
-	$this->state->declare_interface(name,extends->metadata,stmts);
+	$this->state->declare_interface(name,extends,stmts);
 }
 
 extends_from(A) ::= /* empty */ . { A = null; }
-extends_from(A) ::= T_EXTENDS name(n) . { A = n->string; }
+extends_from(A) ::= T_EXTENDS name(n) . { A = n; }
 
-interface_extends_list(A) ::= /* empty */ . { A = new PC_Type_yyToken('',array()); }
-interface_extends_list(A) ::= T_EXTENDS name_list(list) . { A = new PC_Type_yyToken(list); }
+interface_extends_list(A) ::= /* empty */ . { A = array(); }
+interface_extends_list(A) ::= T_EXTENDS name_list(list) . { A = list; }
 
-implements_list(A) ::= /* empty */ . { A = new PC_Type_yyToken('',array()); }
-implements_list(A) ::= T_IMPLEMENTS name_list(list) . { A = new PC_Type_yyToken(list); }
+implements_list(A) ::= /* empty */ . { A = array(); }
+implements_list(A) ::= T_IMPLEMENTS name_list(list) . { A = list; }
 
 foreach_variable ::= variable .
 foreach_variable ::= AMPERSAND variable .
@@ -444,10 +442,10 @@ class_statement(A) ::= variable_modifiers(mmodifiers) property_list(var) SEMI . 
 	$base = new PC_Obj_Field(
 		$this->state->get_file(),$this->state->get_line(),var[0]['name']
 	);
-	$base->set_static(in_array('static',mmodifiers->metadata));
-	if(in_array('private',mmodifiers->metadata))
+	$base->set_static(in_array('static',mmodifiers));
+	if(in_array('private',mmodifiers))
 		$base->set_visibility(PC_Obj_Visible::V_PRIVATE);
-	else if(in_array('protected',mmodifiers->metadata))
+	else if(in_array('protected',mmodifiers))
 		$base->set_visibility(PC_Obj_Visible::V_PROTECTED);
 	else
 		$base->set_visibility(PC_Obj_Visible::V_PUBLIC);
@@ -484,12 +482,12 @@ class_statement(A) ::= method_modifiers(mmodifiers) function returns_ref identif
 	A = array();
 	$m = new PC_Obj_Method($this->state->get_file(),$this->state->get_last_function_line(),false);
 	$m->set_name(mname);
-	$m->set_static(in_array('static',mmodifiers->metadata));
-	$m->set_abstract(in_array('abstract',mmodifiers->metadata));
-	$m->set_final(in_array('final',mmodifiers->metadata));
-	if(in_array('private',mmodifiers->metadata))
+	$m->set_static(in_array('static',mmodifiers));
+	$m->set_abstract(in_array('abstract',mmodifiers));
+	$m->set_final(in_array('final',mmodifiers));
+	if(in_array('private',mmodifiers))
 		$m->set_visibility(PC_Obj_Visible::V_PRIVATE);
-	else if(in_array('protected',mmodifiers->metadata))
+	else if(in_array('protected',mmodifiers))
 		$m->set_visibility(PC_Obj_Visible::V_PROTECTED);
 	else
 		$m->set_visibility(PC_Obj_Visible::V_PUBLIC);
@@ -500,12 +498,11 @@ class_statement(A) ::= method_modifiers(mmodifiers) function returns_ref identif
 }
 
 name_list(A) ::= name(n) . {
-	A = new PC_Type_yyToken('');
-	A[] = array(n->string);
+	A = array(n);
 }
 name_list(A) ::= name_list(list) COMMA name(n) . {
-	A = new PC_Type_yyToken(list);
-	A[] = array(n->string);
+	A = list;
+	A[] = n;
 }
 
 trait_adaptations ::= SEMI .
@@ -533,20 +530,20 @@ absolute_trait_method_reference ::= name T_PAAMAYIM_NEKUDOTAYIM identifier .
 method_body ::= SEMI /* abstract method */ .
 method_body ::= LCURLY inner_statement_list RCURLY .
 
-variable_modifiers(A) ::= non_empty_member_modifiers(mods) . { A = new PC_Type_yyToken(mods); }
-variable_modifiers(A) ::= T_VAR . { A = new PC_Type_yyToken('',array('public')); }
+variable_modifiers(A) ::= non_empty_member_modifiers(mods) . { A = mods; }
+variable_modifiers(A) ::= T_VAR . { A = array('public'); }
 
-method_modifiers(A) ::= /* empty */ . { A = new PC_Type_yyToken(''); }
-method_modifiers(A) ::= non_empty_member_modifiers(mods) . { A = new PC_Type_yyToken(mods); }
+method_modifiers(A) ::= /* empty */ . { A = array(); }
+method_modifiers(A) ::= non_empty_member_modifiers(mods) . { A = mods; }
 
-non_empty_member_modifiers(A) ::= member_modifier(mod) . { A = new PC_Type_yyToken(mod); }
+non_empty_member_modifiers(A) ::= member_modifier(mod) . { A = array(mod); }
 non_empty_member_modifiers(A) ::= non_empty_member_modifiers(mods) member_modifier(mod) . {
-	A = new PC_Type_yyToken(mods);
+	A = mods;
 	A[] = mod;
 }
 
 member_modifier(A) ::= T_PUBLIC|T_PROTECTED|T_PRIVATE|T_STATIC|T_ABSTRACT|T_FINAL(mod) . {
-	A = new PC_Type_yyToken('',array(mod));
+	A = mod;
 }
 
 property_list(A) ::= property_list(list) COMMA property(p) . { A = list; A[] = p; }
