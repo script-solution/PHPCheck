@@ -455,8 +455,14 @@ global_var ::= simple_variable(var) . {
 static_var_list ::= static_var_list COMMA static_var .
 static_var_list ::= static_var .
 
-static_var ::= T_VARIABLE .
-static_var ::= T_VARIABLE EQUALS expr .
+static_var ::= T_VARIABLE(name) . {
+  $var = $this->state->get_var(PC_Obj_MultiType::create_string(substr(name,1)));
+	$this->state->set_var($var,new PC_Obj_MultiType());
+}
+static_var ::= T_VARIABLE(name) EQUALS expr(e) . {
+  $var = $this->state->get_var(PC_Obj_MultiType::create_string(substr(name,1)));
+	$this->state->set_var($var,e);
+}
 
 class_statement_list ::= class_statement_list class_statement .
 class_statement_list ::= /* empty */ .

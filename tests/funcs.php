@@ -158,6 +158,7 @@ function e() {
 		$f = 6;
 		class B {
 			function g() {
+				static $h = 4;
 				$g = 7;
 			}
 		}
@@ -178,6 +179,7 @@ function e() {
 		self::assertEquals((string)PC_Obj_MultiType::create_int(5),(string)$vars['e']['e']->get_type());
 		self::assertEquals((string)PC_Obj_MultiType::create_int(6),(string)$vars['f']['f']->get_type());
 		self::assertEquals((string)PC_Obj_MultiType::create_int(7),(string)$vars['B::g']['g']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_int(4),(string)$vars['B::g']['h']->get_type());
 	}
 	
 	public function testAnon()
