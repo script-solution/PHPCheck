@@ -98,6 +98,7 @@ final class PC_Obj_Error extends FWS_Object
 			self::E_A_CLASS_NOT_ABSTRACT =>							'Class not abstract',
 			self::E_A_INTERFACE_MISSING =>							'Interface missing',
 			self::E_A_IF_IS_NO_IF =>										'Implemented class',
+			self::E_A_CALLABLE_INVALID =>								'Callable is invalid',
 			
 			self::E_S_MIXED_RET_AND_NO_RET =>						'Mixed return',
 			self::E_S_RETURNS_DIFFER_FROM_SPEC =>				'Returns differ from spec',
