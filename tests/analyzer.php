@@ -261,13 +261,13 @@ $A = new ${$_ . "foo"}();
 		$error = $errors[0];
 		self::assertEquals(PC_Obj_Error::E_A_CLASS_MISSING,$error->get_type());
 		self::assertRegExp(
-			'/The class "#A#" does not exist!/',$error->get_msg()
+			'/The class "##" does not exist!/',$error->get_msg()
 		);
 		
 		$error = $errors[1];
 		self::assertEquals(PC_Obj_Error::E_A_CLASS_MISSING,$error->get_type());
 		self::assertRegExp(
-			'/The class "#A#" does not exist!/',$error->get_msg()
+			'/The class "##" does not exist!/',$error->get_msg()
 		);
 	}
 	
