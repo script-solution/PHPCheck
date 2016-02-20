@@ -238,7 +238,7 @@ class PC_Obj_Variable extends FWS_Object
 	 * Returns a variable pointing to the array-element with given key. If it does not exist, it
 	 * will be created as soon as the type is assigned.
 	 *
-	 * @param mixed $key the key (null = append)
+	 * @param PC_Obj_MultiType $key the key (null = append)
 	 * @return PC_Obj_Variable the type of the element
 	 */
 	public function array_offset($key)
@@ -246,17 +246,20 @@ class PC_Obj_Variable extends FWS_Object
 		assert(!$this->type->is_multiple() && !$this->type->is_unknown());
 		$first = $this->type->get_first();
 		assert($first->get_type() == PC_Obj_Type::TARRAY);
-		if($key === null)
-			$key = $first->get_next_array_key();
-		
+
 		// fetch element or create it
-		$el = $first->get_array_type($key);
-		if($el === null)
-			$el = new PC_Obj_MultiType();
-		$var = new self('',$el);
+		$akey = $key;
+		if($key === null)
+			$akey = $key = $first->get_next_array_key();
+		else if(!$key->is_unknown())
+		{
+			$akey = $key;
+			$key = $first->get_array_type($key->get_first()->get_value());
+		}
+		$var = new self('',$key);
 		// connect the var to us
 		$var->arrayref = $first;
-		$var->arrayoff = $key;
+		$var->arrayoff = $akey;
 		return $var;
 	}
 	

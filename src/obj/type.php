@@ -109,7 +109,7 @@ final class PC_Obj_Type extends FWS_Object
 	{
 		if(is_array($value))
 		{
-			$array = new self(self::TARRAY);
+			$array = new self(self::TARRAY,array());
 			foreach($value as $k => $v)
 				$array->set_array_type($k,new PC_Obj_MultiType(self::get_type_by_value($v)));
 			return $array;
@@ -234,26 +234,26 @@ final class PC_Obj_Type extends FWS_Object
 	/**
 	 * Determines the next array-key to use
 	 * 
-	 * @return int the key
+	 * @return PC_Obj_MultiType the key
 	 */
 	public function get_next_array_key()
 	{
 		if($this->_type != self::TARRAY || $this->_value === null)
-			return 0;
+			return PC_Obj_MultiType::create_int(0);
 		$max = -1;
 		foreach($this->_value as $k => $v)
 		{
 			if(FWS_Helper::is_integer($k) && $k > $max)
 				$max = $k;
 		}
-		return $max + 1;
+		return PC_Obj_MultiType::create_int($max + 1);
 	}
 	
 	/**
 	 * Returns the type of the array-element with given key
 	 *
 	 * @param mixed $key the key
-	 * @return PC_Obj_Type the type of the element or null if it does not exist
+	 * @return PC_Obj_MultiType the type of the element or null if it does not exist
 	 */
 	public function get_array_type($key)
 	{
@@ -288,7 +288,7 @@ final class PC_Obj_Type extends FWS_Object
 		if($key instanceof PC_Obj_MultiType)
 		{
 			// if we don't know what to set, we don't know the content of the whole array anymore
-			if($key->is_unknown() || $key->is_multiple())
+			if($key->is_unknown() || $key->is_val_unknown() || $key->is_multiple())
 			{
 				$this->_value = null;
 				return;

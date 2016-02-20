@@ -108,7 +108,7 @@ else
 			new PC_Obj_Type(PC_Obj_Type::BOOL,true),
 			new PC_Obj_Type(PC_Obj_Type::STRING,"str"),
 			new PC_Obj_Type(PC_Obj_Type::FLOAT,12.3),
-			new PC_Obj_Type(PC_Obj_Type::TARRAY)
+			new PC_Obj_Type(PC_Obj_Type::TARRAY,array())
 		));
 		self::assertEquals((string)$type,(string)$global['b']->get_type());
 		$type = new PC_Obj_MultiType(array(

@@ -862,12 +862,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		// note that null as value is okay because it might be an empty array
 		if($var->get_type()->get_array() === null)
 			return new PC_Obj_Variable('',$this->get_unknown());
-		// if we don't know the offset, we can't do anything, either
-		if($offset !== null && $offset->is_val_unknown())
-			return new PC_Obj_Variable('',$this->get_unknown());
 		
 		// PC_Obj_Variable will do the rest for us; simply access the offset
-		return $var->array_offset($offset !== null ? $offset->get_first()->get_value() : null);
+		return $var->array_offset($offset);
 	}
 	
 	/**

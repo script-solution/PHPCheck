@@ -5902,7 +5902,6 @@ static public $yy_action = array(
         210 => 210,
         211 => 211,
         213 => 213,
-        445 => 213,
         214 => 214,
         215 => 215,
         219 => 219,
@@ -6038,6 +6037,7 @@ static public $yy_action = array(
         439 => 439,
         440 => 440,
         441 => 441,
+        445 => 445,
         447 => 447,
         448 => 448,
         449 => 449,
@@ -6673,18 +6673,21 @@ static public $yy_action = array(
 	$this->_retvalue = array($this->yystack[$this->yyidx + 0]->minor);
     }
 #line 6680 "src/engine/stmtparser.php"
+#line 958 "src/engine/stmtparser.y"
+    function yy_r445(){ $this->_retvalue = PC_Obj_MultiType::create_array(array());     }
+#line 6683 "src/engine/stmtparser.php"
 #line 961 "src/engine/stmtparser.y"
     function yy_r447(){
 	$this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
 	$this->_retvalue->get_first()->set_array_type($this->yystack[$this->yyidx + 0]->minor['key'],$this->yystack[$this->yyidx + 0]->minor['val'],$this->yystack[$this->yyidx + 0]->minor['append']);
     }
-#line 6686 "src/engine/stmtparser.php"
+#line 6689 "src/engine/stmtparser.php"
 #line 965 "src/engine/stmtparser.y"
     function yy_r448(){
 	$this->_retvalue = PC_Obj_MultiType::create_array();
 	$this->_retvalue->get_first()->set_array_type($this->yystack[$this->yyidx + 0]->minor['key'],$this->yystack[$this->yyidx + 0]->minor['val'],$this->yystack[$this->yyidx + 0]->minor['append']);
     }
-#line 6692 "src/engine/stmtparser.php"
+#line 6695 "src/engine/stmtparser.php"
 #line 970 "src/engine/stmtparser.y"
     function yy_r449(){
 	$this->_retvalue = array(
@@ -6693,7 +6696,7 @@ static public $yy_action = array(
 		'append' => false,
 	);
     }
-#line 6701 "src/engine/stmtparser.php"
+#line 6704 "src/engine/stmtparser.php"
 #line 977 "src/engine/stmtparser.y"
     function yy_r450(){
 	$this->_retvalue = array(
@@ -6702,18 +6705,18 @@ static public $yy_action = array(
 		'append' => true,
 	);
     }
-#line 6710 "src/engine/stmtparser.php"
+#line 6713 "src/engine/stmtparser.php"
 #line 1004 "src/engine/stmtparser.y"
     function yy_r467(){
 	$this->_retvalue = PC_Obj_MultiType::create_bool();
     }
-#line 6715 "src/engine/stmtparser.php"
+#line 6718 "src/engine/stmtparser.php"
 #line 1010 "src/engine/stmtparser.y"
     function yy_r469(){
 	// TODO
 	$this->_retvalue = new PC_Obj_MultiType();
     }
-#line 6721 "src/engine/stmtparser.php"
+#line 6724 "src/engine/stmtparser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -6833,7 +6836,7 @@ static public $yy_action = array(
 		throw new PC_Engine_Exception(
 			$this->state->get_file(),$this->state->get_line(),$this->tokenName($yymajor),$TOKEN,$expect
 		);
-#line 6842 "src/engine/stmtparser.php"
+#line 6845 "src/engine/stmtparser.php"
     }
 
     /**

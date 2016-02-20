@@ -955,7 +955,7 @@ assignment_list_element(A) ::= variable(v) . { A = v; }
 assignment_list_element(A) ::= T_LIST LPAREN assignment_list(list) RPAREN . { A = list; }
 assignment_list_element(A) ::= /* empty */ . { A = null; }
 
-array_pair_list(A) ::= /* empty */ . { A = PC_Obj_MultiType::create_array(); }
+array_pair_list(A) ::= /* empty */ . { A = PC_Obj_MultiType::create_array(array()); }
 array_pair_list(A) ::= non_empty_array_pair_list(list) possible_comma . { A = list; }
 
 non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA array_pair(p) . {

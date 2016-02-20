@@ -73,8 +73,11 @@ class PC_Obj_MultiType extends FWS_Object
 	 */
 	public static function create_array($value = null)
 	{
-		$val = $value !== null ? PC_Obj_Type::get_type_by_value($value) : null;
-		return new self(array(new PC_Obj_Type(PC_Obj_Type::TARRAY,$val)));
+		if($value !== null)
+			$val = PC_Obj_Type::get_type_by_value($value);
+		else
+			$val = new PC_Obj_Type(PC_Obj_Type::TARRAY);
+		return new self(array($val));
 	}
 	
 	/**
@@ -242,22 +245,6 @@ class PC_Obj_MultiType extends FWS_Object
 	{
 		foreach($this->types as $t)
 			$t->set_value(null);
-	}
-	
-	/**
-	 * If this multitype is an array and not multiple, it tries to insert $value at offset $key.
-	 * 
-	 * @param PC_Obj_MultiType $key the key; null = next array key
-	 * @param PC_Obj_MultiType $value the value to set
-	 */
-	public function array_insert($key,$value)
-	{
-		if($this->get_array() === null || ($key !== null && ($skey = $key->get_scalar()) === null))
-			return;
-		$first = $this->get_first();
-		if($key === null)
-			$skey = $first->get_next_array_key();
-		$first->set_array_type($skey,$value);
 	}
 	
 	/**

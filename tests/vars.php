@@ -90,7 +90,7 @@ function x($a,MyClass $b) {
 		self::assertEquals((string)PC_Obj_MultiType::create_string('ab c\'a\\\\\"bla'),(string)$global['s4']->get_type());
 		self::assertEquals((string)PC_Obj_MultiType::create_bool(true),(string)$global['b1']->get_type());
 		self::assertEquals((string)PC_Obj_MultiType::create_bool(false),(string)$global['b2']->get_type());
-		self::assertEquals((string)PC_Obj_MultiType::create_array(),(string)$global['a1']->get_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_array(array()),(string)$global['a1']->get_type());
 		$array = new PC_Obj_MultiType(PC_Obj_Type::get_type_by_value(array(1)));
 		self::assertEquals((string)$array,(string)$global['a2']->get_type());
 		$array = new PC_Obj_MultiType(PC_Obj_Type::get_type_by_value(array(1,2,3)));

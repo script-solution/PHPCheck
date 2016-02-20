@@ -433,21 +433,21 @@ foobar("str",true);				// both wrong
 		$error = $errors[0];
 		self::assertEquals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assertRegExp(
-			'/argument 1 in "foo\(string=str, float=12.3, array\)" requires an "integer" .*? "string=str"/',
+			'/argument 1 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "string=str"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[1];
 		self::assertEquals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assertRegExp(
-			'/argument 2 in "foo\(string=str, float=12.3, array\)" requires an "integer" .*? "float=12.3"/',
+			'/argument 2 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "float=12.3"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[2];
 		self::assertEquals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assertRegExp(
-			'/argument 3 in "foo\(string=str, float=12.3, array\)" requires an "integer" .*? "array"/',
+			'/argument 3 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "array={}"/',
 			$error->get_msg()
 		);
 		
