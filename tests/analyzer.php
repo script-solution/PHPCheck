@@ -256,19 +256,7 @@ $A = new ${$_ . "foo"}();
 ?>';
 		
 		$errors = $this->do_analyze($code,false,true);
-		self::assertEquals(2,count($errors));
-		
-		$error = $errors[0];
-		self::assertEquals(PC_Obj_Error::E_A_CLASS_MISSING,$error->get_type());
-		self::assertRegExp(
-			'/The class "##" does not exist!/',$error->get_msg()
-		);
-		
-		$error = $errors[1];
-		self::assertEquals(PC_Obj_Error::E_A_CLASS_MISSING,$error->get_type());
-		self::assertRegExp(
-			'/The class "##" does not exist!/',$error->get_msg()
-		);
+		self::assertEquals(0,count($errors));
 	}
 	
 	public function test_s_function_missing()

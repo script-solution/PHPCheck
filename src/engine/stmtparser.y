@@ -547,7 +547,11 @@ anonymous_class ::= T_CLASS ctor_arguments extends_from implements_list backup_d
 }
 
 new_expr(A) ::= T_NEW class_name_reference(name) ctor_arguments(args) . {
-    A = $this->state->add_call((string)name,PC_Obj_MultiType::create_string('__construct'),args);
+    A = $this->state->add_call(
+    	PC_Obj_MultiType::create_string(name),
+    	PC_Obj_MultiType::create_string('__construct'),
+    	args
+    );
 }
 new_expr ::= T_NEW anonymous_class .
 
@@ -792,10 +796,10 @@ function_call(A) ::= name(name) argument_list(args) . {
     A = $this->state->add_call(null,$fname,args);
 }
 function_call(A) ::= class_name(classname) T_PAAMAYIM_NEKUDOTAYIM member_name(funcname) argument_list(args) . {
-    A = $this->state->add_call((string)classname,funcname,args,true);
+    A = $this->state->add_call(PC_Obj_MultiType::create_string(classname),funcname,args,true);
 }
 function_call(A) ::= variable_class_name(classname) T_PAAMAYIM_NEKUDOTAYIM member_name(funcname) argument_list(args) . {
-    A = $this->state->add_call((string)classname,funcname,args,true);
+    A = $this->state->add_call(classname,funcname,args,true);
 }
 function_call(A) ::= callable_expr(expr) argument_list(args) . {
 	  A = $this->state->add_call(null,expr,args);
@@ -868,7 +872,7 @@ expr(A) ::= expr_without_variable(e) . { A = e; }
 optional_expr(A) ::= /* empty */ . { A = null; }
 optional_expr(A) ::= expr(e) . { A = e; }
 
-variable_class_name ::= dereferencable .
+variable_class_name(A) ::= dereferencable(d) . { A = d->get_type(); }
 
 dereferencable(A) ::= variable(v) . { A = v; }
 dereferencable(A) ::= LPAREN expr(e) RPAREN . { A = e; }
@@ -916,7 +920,7 @@ simple_variable(A) ::= DOLLAR simple_variable(var) . {
 }
 
 static_member(A) ::= class_name(name) T_PAAMAYIM_NEKUDOTAYIM simple_variable(var) . {
-    A = $this->state->handle_field_access(name,var->get_name());
+    A = $this->state->handle_field_access(PC_Obj_MultiType::create_string(name),var->get_name());
 }
 static_member(A) ::= variable_class_name(name) T_PAAMAYIM_NEKUDOTAYIM simple_variable(var) . {
     A = $this->state->handle_field_access(name,var->get_name());

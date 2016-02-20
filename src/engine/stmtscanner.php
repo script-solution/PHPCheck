@@ -131,7 +131,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * Adds a function-call
 	 * 
-	 * @param string $class the class-name
+	 * @param PC_Obj_MultiType $class the class-name
 	 * @param PC_Obj_MultiType $func the function-name
 	 * @param array $args the function-arguments
 	 * @param bool $static wether its a static call
@@ -140,7 +140,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	public function add_call($class,$func,$args,$static = false)
 	{
 		// if we don't know the function- or class-name, we can't do anything here
-		$cname = $class !== null ? $class : null;
+		$cname = $class !== null ? $class->get_string() : null;
 		$fname = $func->get_string();
 		if($fname === null || ($class !== null && $cname === null))
 			return $this->get_unknown();
@@ -281,7 +281,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				$mname = $mnamevar->get_string();
 				if($mname === null)
 					return new PC_Obj_Variable('',$this->get_unknown());
-				$this->add_call($class->get_name(),$mnamevar,$args,false);
+				$this->add_call(PC_Obj_MultiType::create_string($class->get_name()),$mnamevar,$args,false);
 				$method = $class->get_method($mname);
 				if($method === null)
 					return new PC_Obj_Variable('',$this->get_unknown());
@@ -830,15 +830,16 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * Static access the given field of given class
 	 * 
-	 * @param string $class the class-name
+	 * @param PC_Obj_MultiType $class the class-name
 	 * @param string $field the field-name
 	 * @return PC_Obj_Variable the result
 	 */
 	public function handle_field_access($class,$field)
 	{
-		if($class == 'self')
-			$class = $this->scope->get_name_of(T_CLASS_C);
-		$classobj = $this->types->get_class($class);
+		$cname = $class->get_string();
+		if($cname == 'self')
+			$cname = $this->scope->get_name_of(T_CLASS_C);
+		$classobj = $this->types->get_class($cname);
 		if($classobj === null)
 			return new PC_Obj_Variable('',$this->get_unknown());
 		$fieldobj = $classobj->get_field($field);
