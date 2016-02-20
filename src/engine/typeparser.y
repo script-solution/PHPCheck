@@ -438,7 +438,10 @@ class_statement(A) ::= variable_modifiers(mmodifiers) property_list(vars) SEMI .
 class_statement(A) ::= method_modifiers T_CONST class_const_list(consts) SEMI . {
 	A = $this->state->create_consts(consts);
 }
-class_statement ::= T_USE name_list trait_adaptations .
+class_statement(A) ::= T_USE name_list trait_adaptations . {
+	// TODO
+	A = array();
+}
 class_statement(A) ::= method_modifiers(mmodifiers) function returns_ref identifier(mname)
 										LPAREN parameter_list(mparams) RPAREN
 										return_type backup_doc_comment method_body . {
