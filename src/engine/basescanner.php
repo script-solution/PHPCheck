@@ -203,7 +203,7 @@ class PC_Engine_BaseScanner
 	 */
 	public function handle_unary_op($op,$type)
 	{
-		if($type->is_val_unknown())
+		if($type->is_array_unknown())
 			return $this->get_type_from_op($op,$type);
 		$res = 0;
 		eval('$res = '.$op.$type->get_first()->get_value_for_eval().';');

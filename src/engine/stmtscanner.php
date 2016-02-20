@@ -905,7 +905,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			return $this->handle_error('$e3 is invalid');
 		
 		// don't try to evalulate $e1 in loops or if its unknown
-		if($this->vars->is_in_loop() || $e1->is_val_unknown())
+		if($this->vars->is_in_loop() || $e1->is_array_unknown())
 		{
 			// merge the types, because the result can be of both types
 			$res = clone $e2;
@@ -996,7 +996,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$this->check_known($var);
 		$type = $var->get_type();
 		// in loops always by op
-		if($this->vars->is_in_loop() || $type->is_val_unknown())
+		if($this->vars->is_in_loop() || $type->is_array_unknown())
 			$res = $this->get_type_from_op($op,$type);
 		else
 		{
@@ -1023,7 +1023,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$type = $var->get_type();
 		$clone = clone $type;
 		// in loops always by op
-		if($this->vars->is_in_loop() || $type->is_val_unknown())
+		if($this->vars->is_in_loop() || $type->is_array_unknown())
 			$res = $this->get_type_from_op($op,$type);
 		else
 		{
@@ -1053,7 +1053,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			return $this->get_unknown();
 		
 		// if we don't know the type or value, just provide the type; in loops as well
-		if($this->vars->is_in_loop() || $e->is_val_unknown())
+		if($this->vars->is_in_loop() || $e->is_array_unknown())
 			return PC_Obj_MultiType::get_type_by_name($cast);
 		
 		// we know the value, so perform a cast
