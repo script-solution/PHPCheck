@@ -731,11 +731,11 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * Extracts the given part of the scope
 	 * 
 	 * @param int $part the part: T_METHOD_C, T_FUNCTION_C or T_CLASS_C
-	 * @return PC_Obj_Variable the scope-part as variable
+	 * @return PC_Obj_MultiType the scope-part as variable
 	 */
 	public function get_scope_part($part)
 	{
-		return PC_Obj_Variable::create_string($this->scope->get_name_of($part));
+		return PC_Obj_MultiType::create_string($this->scope->get_name_of($part));
 	}
 	
 	/**
