@@ -407,7 +407,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 			$doc = $this->funcComments[$func->get_name()];
 			// look for params
 			$matches = array();
-			preg_match_all('/\@param\s+([^\s]+)\s+([^\s]+)/',$doc,$matches);
+			preg_match_all('/\@param\s+([^\s]+)\s+&?\s*([^\s]+)/',$doc,$matches);
 			foreach($matches[1] as $k => $match)
 			{
 				$param = substr($matches[2][$k],1);
@@ -429,7 +429,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 			}
 			
 			// look for return-type
-			if(preg_match('/\@return\s+([^\s]+)/',$doc,$matches))
+			if(preg_match('/\@return\s+&?\s*([^\s]+)/',$doc,$matches))
 			{
 				$mtype = PC_Obj_MultiType::get_type_by_name($matches[1],true);
 				if($mtype !== null)
