@@ -108,96 +108,111 @@ final class PC_Engine_Analyzer extends FWS_Object
 	{
 		foreach($calls as $call)
 		{
-			/* @var $call PC_Obj_Call */
-			$name = $call->get_function();
-			$classname = $call->get_class();
-			if($classname !== null)
-			{
-				if($classname)
-				{
-					$c = $types->get_class($classname);
-					if($c !== null)
-					{
-						if(!$c->contains_method($name))
-						{
-							// no obj-creation here because the constructor can be named '__construct' or
-							// '<classname>'. the call uses always '__construct'.
-							if(!$call->is_object_creation() && !$this->is_method_of_sub($types,$c,$name))
-							{
-								$this->_report(
-									$call,
-									'The method "'.$name.'" does not exist in the class "#'.$classname.'#"!',
-									PC_Obj_Error::E_A_METHOD_MISSING
-								);
-							}
-						}
-						else if($call->is_object_creation() && $c->is_abstract())
-						{
-							$this->_report(
-								$call,
-								'You can\'t instantiate the abstract class "#'.$c->get_name().'#"!',
-								PC_Obj_Error::E_A_ABSTRACT_CLASS_INSTANTIATION
-							);
-						}
-						else
-						{
-							// check for static / not static
-							$m = $c->get_method($name);
-							if($call->is_static() && !$m->is_static())
-							{
-								$this->_report(
-									$call,
-									'Your call "'.$this->_get_call_link($call).'" calls "'.$m->get_name()
-										.'" statically, but the method is not static!',
-									PC_Obj_Error::E_A_STATIC_CALL
-								);
-							}
-							else if(!$call->is_static() && $m->is_static())
-							{
-								$this->_report(
-									$call,
-									'Your call "'.$this->_get_call_link($call).'" calls "'.$m->get_name()
-										.'" not statically, but the method is static!',
-									PC_Obj_Error::E_A_NONSTATIC_CALL
-								);
-							}
-							
-							$this->_check_params($call,$m);
-						}
-					}
-					else if($this->report_unknown && $classname == PC_Obj_Class::UNKNOWN)
-					{
-						$this->_report(
-							$call,
-							'The class of the object in the call "'.$this->_get_call_link($call).'" is unknown!',
-							PC_Obj_Error::E_A_CLASS_UNKNOWN
-						);
-					}
-					else
-					{
-						$this->_report(
-							$call,
-							'The class "#'.$classname.'#" does not exist!',
-							PC_Obj_Error::E_A_CLASS_MISSING
-						);
-					}
-				}
-			}
+			if($call->get_class() !== null)
+				$this->analyze_method_call($types,$call);
 			else
+				$this->analyze_func_call($types,$call);
+		}
+	}
+	
+	/**
+	 * Analyzes the given method call
+	 *
+	 * @param PC_Engine_TypeContainer $types the types
+	 * @param PC_Obj_Call $call the call
+	 */
+	private function analyze_method_call($types,$call)
+	{
+		$name = $call->get_function();
+		$classname = $call->get_class();
+		$c = $types->get_class($classname);
+		if($c !== null)
+		{
+			if(!$c->contains_method($name))
 			{
-				$func = $types->get_function($name);
-				if($func === null)
+				// no obj-creation here because the constructor can be named '__construct' or
+				// '<classname>'. the call uses always '__construct'.
+				if(!$call->is_object_creation() && !$this->is_method_of_sub($types,$c,$name))
 				{
 					$this->_report(
 						$call,
-						'The function "'.$name.'" does not exist!',
-						PC_Obj_Error::E_A_FUNCTION_MISSING
+						'The method "'.$name.'" does not exist in the class "#'.$classname.'#"!',
+						PC_Obj_Error::E_A_METHOD_MISSING
 					);
 				}
-				else
-					$this->_check_params($call,$func);
+			}
+			else if($call->is_object_creation() && $c->is_abstract())
+			{
+				$this->_report(
+					$call,
+					'You can\'t instantiate the abstract class "#'.$c->get_name().'#"!',
+					PC_Obj_Error::E_A_ABSTRACT_CLASS_INSTANTIATION
+				);
+			}
+			else
+			{
+				// check for static / not static
+				$m = $c->get_method($name);
+				if($call->is_static() && !$m->is_static())
+				{
+					$this->_report(
+						$call,
+						'Your call "'.$this->_get_call_link($call).'" calls "'.$m->get_name()
+							.'" statically, but the method is not static!',
+						PC_Obj_Error::E_A_STATIC_CALL
+					);
+				}
+				else if(!$call->is_static() && $m->is_static())
+				{
+					$this->_report(
+						$call,
+						'Your call "'.$this->_get_call_link($call).'" calls "'.$m->get_name()
+							.'" not statically, but the method is static!',
+						PC_Obj_Error::E_A_NONSTATIC_CALL
+					);
+				}
+				
+				$this->_check_params($call,$m);
 			}
 		}
+		else if($this->report_unknown && $classname == PC_Obj_Class::UNKNOWN)
+		{
+			$this->_report(
+				$call,
+				'The class of the object in the call "'.$this->_get_call_link($call).'" is unknown!',
+				PC_Obj_Error::E_A_CLASS_UNKNOWN
+			);
+		}
+		else
+		{
+			$this->_report(
+				$call,
+				'The class "#'.$classname.'#" does not exist!',
+				PC_Obj_Error::E_A_CLASS_MISSING
+			);
+		}
+	}
+	
+	/**
+	 * Analyzes the given function call
+	 *
+	 * @param PC_Engine_TypeContainer $types the types
+	 * @param PC_Obj_Call $call the call
+	 */
+	private function analyze_func_call($types,$call)
+	{
+		$name = $call->get_function();
+		$func = $types->get_function($name);
+		if($func === null)
+		{
+			$this->_report(
+				$call,
+				'The function "'.$name.'" does not exist!',
+				PC_Obj_Error::E_A_FUNCTION_MISSING
+			);
+		}
+		else
+			$this->_check_params($call,$func);
 	}
 	
 	/**
