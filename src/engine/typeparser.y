@@ -386,18 +386,10 @@ non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA parameter(p
 }
 
 parameter(A) ::= optional_type(vtype) is_reference is_variadic T_VARIABLE(vname) . {
-	A = new PC_Obj_Parameter(substr(vname,1));
-	A->set_mtype(vtype);
+	A = $this->state->create_parameter(substr(vname,1),vtype,null,false);
 }
 parameter(A) ::= optional_type(vtype) is_reference is_variadic T_VARIABLE(vname) EQUALS expr(vval) . {
-	A = new PC_Obj_Parameter(substr(vname,1));
-	if(vval)
-		vval->clear_values(); // value is not interesting here
-	if(vval && vtype->is_unknown())
-		A->set_mtype(vval);
-	else
-		A->set_mtype(vtype);
-	A->set_optional(true);
+	A = $this->state->create_parameter(substr(vname,1),vtype,vval,true);
 }
 
 optional_type(A) ::= /* empty */ . { A = new PC_Obj_MultiType(); }
@@ -440,42 +432,11 @@ class_statement_list(A) ::= class_statement_list(list) class_statement(stmt) . {
 }
 class_statement_list(A) ::= /* empty */ . { A = array(); }
 
-class_statement(A) ::= variable_modifiers(mmodifiers) property_list(var) SEMI . {
-	A = array();
-	$base = new PC_Obj_Field(
-		$this->state->get_file(),$this->state->get_line(),var[0]['name']
-	);
-	$base->set_static(in_array('static',mmodifiers));
-	if(in_array('private',mmodifiers))
-		$base->set_visibility(PC_Obj_Visible::V_PRIVATE);
-	else if(in_array('protected',mmodifiers))
-		$base->set_visibility(PC_Obj_Visible::V_PROTECTED);
-	else
-		$base->set_visibility(PC_Obj_Visible::V_PUBLIC);
-	$this->state->parse_field_doc($base);
-	
-	foreach(var as $v)
-	{
-		$field = clone $base;
-		$field->set_name($v['name']);
-		if(!$field->get_type()->is_multiple() && isset($v['val']))
-			$field->set_type($v['val']);
-		A[] = $field;
-	}
+class_statement(A) ::= variable_modifiers(mmodifiers) property_list(vars) SEMI . {
+	A = $this->state->create_fields(vars,mmodifiers);
 }
 class_statement(A) ::= method_modifiers T_CONST class_const_list(consts) SEMI . {
-	A = array();
-	$base = new PC_Obj_Constant($this->state->get_file(),$this->state->get_line(),'dummy');
-	$this->state->parse_const_doc($base);
-	
-	foreach(consts as $c)
-	{
-		$const = clone $base;
-		$const->set_name($c['name']);
-		if(isset($c['val']))
-			$const->set_type($c['val']);
-		A[] = $const;
-	}
+	A = $this->state->create_consts(consts);
 }
 class_statement ::= T_USE name_list trait_adaptations .
 class_statement(A) ::= method_modifiers(mmodifiers) function returns_ref identifier(mname)
@@ -483,21 +444,7 @@ class_statement(A) ::= method_modifiers(mmodifiers) function returns_ref identif
 										return_type backup_doc_comment method_body . {
 	// TODO use return_type
 	A = array();
-	$m = new PC_Obj_Method($this->state->get_file(),$this->state->get_last_function_line(),false);
-	$m->set_name(mname);
-	$m->set_static(in_array('static',mmodifiers));
-	$m->set_abstract(in_array('abstract',mmodifiers));
-	$m->set_final(in_array('final',mmodifiers));
-	if(in_array('private',mmodifiers))
-		$m->set_visibility(PC_Obj_Visible::V_PRIVATE);
-	else if(in_array('protected',mmodifiers))
-		$m->set_visibility(PC_Obj_Visible::V_PROTECTED);
-	else
-		$m->set_visibility(PC_Obj_Visible::V_PUBLIC);
-	foreach(mparams as $param)
-		$m->put_param($param);
-	$this->state->parse_method_doc($m);
-	A[] = $m;
+	A[] = $this->state->create_method(mname,mmodifiers,mparams);
 }
 
 name_list(A) ::= name(n) . {

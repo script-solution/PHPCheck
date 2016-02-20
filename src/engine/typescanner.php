@@ -196,6 +196,111 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
+	 * Creates class fields.
+	 *
+	 * @param array $vars an array of PC_Obj_Variable's
+	 * @param array $modifiers an array with modifiers
+	 * @return array an array of PC_Obj_Field
+	 */
+	public function create_fields($vars,$modifiers)
+	{
+		$res = array();
+		$base = new PC_Obj_Field(
+			$this->get_file(),$this->get_line(),$vars[0]['name']
+		);
+		$base->set_static(in_array('static',$modifiers));
+		if(in_array('private',$modifiers))
+			$base->set_visibility(PC_Obj_Visible::V_PRIVATE);
+		else if(in_array('protected',$modifiers))
+			$base->set_visibility(PC_Obj_Visible::V_PROTECTED);
+		else
+			$base->set_visibility(PC_Obj_Visible::V_PUBLIC);
+		$this->parse_field_doc($base);
+		
+		foreach($vars as $v)
+		{
+			$field = clone $base;
+			$field->set_name($v['name']);
+			if(!$field->get_type()->is_multiple() && isset($v['val']))
+				$field->set_type($v['val']);
+			$res[] = $field;
+		}
+		return $res;
+	}
+	
+	/**
+	 * Creates class constants.
+	 *
+	 * @param array $consts an array with the constants
+	 * @return array an array of PC_Obj_Constant
+	 */
+	public function create_consts($consts)
+	{
+		$res = array();
+		$base = new PC_Obj_Constant($this->get_file(),$this->get_line(),'dummy');
+		$this->parse_const_doc($base);
+		
+		foreach($consts as $c)
+		{
+			$const = clone $base;
+			$const->set_name($c['name']);
+			if(isset($c['val']))
+				$const->set_type($c['val']);
+			$res[] = $const;
+		}
+		return $res;
+	}
+	
+	/**
+	 * Creates a method.
+	 *
+	 * @param string $name the name
+	 * @param array $modifiers the modifiers
+	 * @param array $params an array of PC_Obj_Parameter's
+	 * @return PC_Obj_Method the method
+	 */
+	public function create_method($name,$modifiers,$params)
+	{
+		$m = new PC_Obj_Method($this->get_file(),$this->get_last_function_line(),false);
+		$m->set_name($name);
+		$m->set_static(in_array('static',$modifiers));
+		$m->set_abstract(in_array('abstract',$modifiers));
+		$m->set_final(in_array('final',$modifiers));
+		if(in_array('private',$modifiers))
+			$m->set_visibility(PC_Obj_Visible::V_PRIVATE);
+		else if(in_array('protected',$modifiers))
+			$m->set_visibility(PC_Obj_Visible::V_PROTECTED);
+		else
+			$m->set_visibility(PC_Obj_Visible::V_PUBLIC);
+		foreach($params as $param)
+			$m->put_param($param);
+		$this->parse_method_doc($m);
+		return $m;
+	}
+	
+	/**
+	 * Creates a parameter with given attributes.
+	 *
+	 * @param string $name the name
+	 * @param PC_Obj_MultiType $type the type from type hinting (or null)
+	 * @param PC_Obj_MultiType $val the default value (or null)
+	 * @param bool $optional whether it's optional
+	 * @return PC_Obj_Parameter the parameter
+	 */
+	public function create_parameter($name,$type,$val,$optional)
+	{
+		$p = new PC_Obj_Parameter($name);
+		if($val)
+			$val->clear_values(); // value is not interesting here
+		if($type && !$type->is_unknown())
+			$p->set_mtype($type);
+		else if($val)
+			$p->set_mtype($val);
+		$p->set_optional($optional);
+		return $p;
+	}
+	
+	/**
 	 * Handles a define
 	 * 
 	 * @param array $args an array of arguments (PC_Obj_MultiType)
