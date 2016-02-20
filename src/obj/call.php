@@ -240,6 +240,6 @@ class PC_Obj_Call extends PC_Obj_Location
 	
 	public function __ToString()
 	{
-		return $this->get_call(false).' in "'.$this->get_file().'", line '.$this->get_line();
+		return $this->get_call(false,false).' in "'.$this->get_file().'", line '.$this->get_line();
 	}
 }
