@@ -291,6 +291,26 @@ class PC_Engine_BaseScanner
 	}
 	
 	/**
+	 * Reports the given error for the current location.
+	 *
+	 * @param string $msg the error message
+	 * @return PC_Obj_MultiType an unknown type
+	 */
+	protected function handle_error($msg)
+	{
+		trigger_error('Error in '.$this->file.', line '.$this->line.': '.$msg,E_USER_ERROR);
+		return $this->get_unknown();
+	}
+	
+	/**
+	 * @return PC_Obj_MultiType an unknown type
+	 */
+	protected function get_unknown()
+	{
+		return new PC_Obj_MultiType();
+	}
+	
+	/**
 	 * Moves to the next token
 	 * 
 	 * @param object $parser the parser
