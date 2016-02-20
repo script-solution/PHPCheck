@@ -408,7 +408,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if(!($var instanceof PC_Obj_Variable))
 			return $this->handle_error('$var is invalid');
 		if(!($value instanceof PC_Obj_MultiType))
-			return $this->handle_error('$value is NULL');
+			return $this->handle_error('$value is invalid');
 		
 		$varname = $var->get_name();
 		$scopename = $this->scope->get_name();
