@@ -24,11 +24,11 @@
 
 $in = fopen('php://stdin','r');
 if(!$in)
-	error("Unable to open stdin");
+	exit("Unable to open stdin");
 
 $out = fopen('php://stdout','w');
 if(!$out)
-	error("Unable to open stdout");
+	exit("Unable to open stdout");
 
 $map = array(
 	',' => 'COMMA',
