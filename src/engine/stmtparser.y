@@ -417,18 +417,10 @@ non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA parameter(p
 }
 
 parameter(A) ::= optional_type(vtype) is_reference is_variadic T_VARIABLE(vname) . {
-	A = new PC_Obj_Parameter(substr(vname,1));
-	A->set_mtype(vtype);
+	A = $this->state->create_parameter(substr(vname,1),vtype,null,false);
 }
 parameter(A) ::= optional_type(vtype) is_reference is_variadic T_VARIABLE(vname) EQUALS expr(vval) . {
-	A = new PC_Obj_Parameter(substr(vname,1));
-	if(vval)
-		vval->clear_values(); // value is not interesting here
-	if(vval && vtype->is_unknown())
-		A->set_mtype(vval);
-	else
-		A->set_mtype(vtype);
-	A->set_optional(true);
+	A = $this->state->create_parameter(substr(vname,1),vtype,vval,true);
 }
 
 optional_type(A) ::= /* empty */ . { A = new PC_Obj_MultiType(); }
@@ -858,12 +850,7 @@ scalar(A) ::= dereferencable_scalar(s) . { A = s; }
 scalar(A) ::= constant(c) . { A = c; }
 
 constant(A) ::= name(str) . {
-    if(strcasecmp(str,"true") == 0)
-        A = PC_Obj_MultiType::create_bool(true);
-    else if(strcasecmp(str,"false") == 0)
-        A = PC_Obj_MultiType::create_bool(false);
-    else
-        A = $this->state->get_constant_type(str);
+		A = $this->state->handle_constant(str);
 }
 constant(A) ::= class_name(class) T_PAAMAYIM_NEKUDOTAYIM identifier(const) . {
 		A = $this->state->handle_classconst_access(PC_Obj_MultiType::create_string(class),const);

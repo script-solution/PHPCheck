@@ -172,6 +172,28 @@ class PC_Engine_BaseScanner
 	}
 	
 	/**
+	 * Creates a parameter with given attributes.
+	 *
+	 * @param string $name the name
+	 * @param PC_Obj_MultiType $type the type from type hinting (or null)
+	 * @param PC_Obj_MultiType $val the default value (or null)
+	 * @param bool $optional whether it's optional
+	 * @return PC_Obj_Parameter the parameter
+	 */
+	public function create_parameter($name,$type,$val,$optional)
+	{
+		$p = new PC_Obj_Parameter($name);
+		if($val)
+			$val->clear_values(); // value is not interesting here
+		if($type && !$type->is_unknown())
+			$p->set_mtype($type);
+		else if($val)
+			$p->set_mtype($val);
+		$p->set_optional($optional);
+		return $p;
+	}
+	
+	/**
 	 * Handles the given unary-operator. Note that its needed for static-scalars in the type-scanner,
 	 * which is the reason why its here.
 	 * 

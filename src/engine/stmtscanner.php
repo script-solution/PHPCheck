@@ -502,6 +502,22 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
+	 * Creates the type for given constant (true, false, defines).
+	 *
+	 * @param string $name the name
+	 * @return PC_Obj_MultiType the type
+	 */
+	public function handle_constant($name)
+	{
+    if(strcasecmp($name,"true") == 0)
+        return PC_Obj_MultiType::create_bool(true);
+    else if(strcasecmp($name,"false") == 0)
+        return PC_Obj_MultiType::create_bool(false);
+    else
+        return $this->get_constant_type($name);
+	}
+	
+	/**
 	 * Handles the list()-construct
 	 * 
 	 * @param array $list an array of PC_Variables to assign; may contain sub-arrays; contains null
