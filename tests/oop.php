@@ -109,19 +109,7 @@ $r = $p[1]->test2($b);
 	
 	public function testOOP()
 	{
-		$tscanner = new PC_Engine_TypeScannerFrontend();
-		$tscanner->scan(self::$code);
-		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
-		$fin->finalize();
-			
-		$classes = $typecon->get_classes();
-		
-		// scan files for function-calls and variables
-		$ascanner = new PC_Engine_StmtScannerFrontend($typecon);
-		$ascanner->scan(self::$code);
-		$vars = $ascanner->get_vars();
+		list(,$classes,$vars,$calls,,) = $this->analyze(self::$code);
 		
 		$a = $classes['a'];
 		/* @var $a PC_Obj_Class */
@@ -292,7 +280,6 @@ $r = $p[1]->test2($b);
 		);
 		
 		// check calls
-		$calls = $typecon->get_calls();
 		$i = 0;
 		self::assertCall($calls[$i++],'b','get42',true);
 		self::assertCall($calls[$i++],'a','test',false);
@@ -336,19 +323,9 @@ $a = new A();
 $a->asd = 4;
 $b = $a->foo;
 ?>';
+
+		list(,,,,$errors,) = $this->analyze($code);
 		
-		$tscanner = new PC_Engine_TypeScannerFrontend();
-		$tscanner->scan($code);
-		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
-		$fin->finalize();
-		
-		// scan files for function-calls and variables
-		$ascanner = new PC_Engine_StmtScannerFrontend($typecon);
-		$ascanner->scan($code);
-		
-		$errors = $typecon->get_errors();
 		self::assertEquals(5,count($errors));
 		
 		$error = $errors[0];

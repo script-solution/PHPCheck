@@ -32,6 +32,47 @@
 class PC_UnitTest extends FWS_Object
 {
 	/**
+	 * Performs an analysis of the given code.
+	 * 
+	 * @param string $code the code to analyze
+	 * @param boolean $report_mixed whether to report errors on mixed types
+	 * @param boolean $report_unknown whether to report errors on unknown types
+	 * @return array the following array: array(
+	 *  0 => <functions>,
+	 *  1 => <classes>,
+	 *  2 => <vars>,
+	 *  3 => <calls>,
+	 *  4 => <type errors>,
+	 *  5 => <analyzer errors>
+	 * )
+	 */
+	protected function analyze($code,$report_mixed = false,$report_unknown = false)
+	{
+		$tscanner = new PC_Engine_TypeScannerFrontend();
+		$tscanner->scan($code);
+		
+		$typecon = $tscanner->get_types();
+		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
+		$fin->finalize();
+		
+		$stmt = new PC_Engine_StmtScannerFrontend($typecon);
+		$stmt->scan($code);
+		
+		$an = new PC_Engine_Analyzer($report_mixed,$report_unknown);
+		$an->analyze_classes($typecon,$typecon->get_classes());
+		$an->analyze_calls($typecon,$typecon->get_calls());
+		
+		return array(
+			$typecon->get_functions(),
+			$typecon->get_classes(),
+			$stmt->get_vars(),
+			$typecon->get_calls(),
+			$typecon->get_errors(),
+			$an->get_errors(),
+		);
+	}
+	
+	/**
 	 * Checks whether both strings are equal.
 	 *
 	 * @param mixed $exp the expected value

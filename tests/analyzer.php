@@ -24,28 +24,6 @@
 
 class PC_Tests_Analyzer extends PC_UnitTest
 {
-	private function do_analyze($code,$report_mixed = false,$report_unknown = false,$type_errors = false)
-	{
-		$tscanner = new PC_Engine_TypeScannerFrontend();
-		$tscanner->scan($code);
-		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
-		$fin->finalize();
-		
-		$stmt = new PC_Engine_StmtScannerFrontend($typecon);
-		$stmt->scan($code);
-		
-		$an = new PC_Engine_Analyzer($report_mixed,$report_unknown);
-		$an->analyze_classes($typecon,$typecon->get_classes());
-		$an->analyze_calls($typecon,$typecon->get_calls());
-		
-		$errors = $an->get_errors();
-		if($type_errors)
-			$errors = array_merge($errors,$typecon->get_errors());
-		return $errors;
-	}
-	
 	public function test_s_method_missing()
 	{
 		$code = '<?php
@@ -83,7 +61,7 @@ $E->bar();			// ok, because there is a class that implements that interface. so 
 $E->foobar();		// not ok, because there is no class that implements that method
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		
 		self::assertEquals(4,count($errors));
 		
@@ -130,7 +108,8 @@ function d() {
 }
 ?>';
 		
-		$errors = $this->do_analyze($code,false,false,true);
+		list(,,,,$terrors,$aerrors) = $this->analyze($code);
+		$errors = array_merge($terrors,$aerrors);
 		
 		self::assertEquals(2,count($errors));
 		
@@ -168,7 +147,7 @@ interface I {
 $I = new I();
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(2,count($errors));
 		
 		$error = $errors[0];
@@ -203,7 +182,7 @@ class B extends A {
 }
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(2,count($errors));
 		
 		$error = $errors[0];
@@ -244,7 +223,7 @@ class B extends A {
 }
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(3,count($errors));
 		
 		$error = $errors[0];
@@ -275,7 +254,7 @@ $C = A::bar();
 $D = A::$a->b();	// TODO same problem
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(2,count($errors));
 		
 		$error = $errors[0];
@@ -299,7 +278,7 @@ $A = new $x();
 $A = new ${$_ . "foo"}();
 ?>';
 		
-		$errors = $this->do_analyze($code,false,true);
+		list(,,,,,$errors) = $this->analyze($code,false,true);
 		self::assertEquals(0,count($errors));
 	}
 	
@@ -311,7 +290,7 @@ $name = "bar";
 $bar();					// TODO not yet detectable
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(1,count($errors));
 		
 		$error = $errors[0];
@@ -356,7 +335,7 @@ $A->bar("test");
 $A->bar("test","test2");
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(11,count($errors));
 		
 		$error = $errors[0];
@@ -459,7 +438,7 @@ foobar(null,12);					// first unknown -> ok, second wrong
 foobar("str",true);				// both wrong
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(10,count($errors));
 		
 		$error = $errors[0];
@@ -540,7 +519,7 @@ final class A {}
 class B extends A {}
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(1,count($errors));
 		
 		$error = $errors[0];
@@ -563,7 +542,7 @@ interface I {
 class C implements I {}
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(3,count($errors));
 		
 		$error = $errors[0];
@@ -588,7 +567,7 @@ class B extends A {}
 class C extends UnknownClass {}
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(1,count($errors));
 		
 		$error = $errors[0];
@@ -605,7 +584,7 @@ class E implements UnknownInterface {}
 class F implements I,UnknownInterface,Unknown2 {}
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(3,count($errors));
 		
 		$error = $errors[0];
@@ -631,7 +610,7 @@ class E implements FakeI {}
 class F implements I,FakeI {}
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		self::assertEquals(2,count($errors));
 		
 		$error = $errors[0];
@@ -680,7 +659,7 @@ call(function() {});						// ok
 call(1);												// invalid
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,,$errors) = $this->analyze($code);
 		
 		self::assertEquals(9,count($errors));
 		

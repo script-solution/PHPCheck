@@ -24,20 +24,6 @@
 
 class PC_Tests_TryCatch extends PC_UnitTest
 {
-	private function do_analyze($code)
-	{
-		$tscanner = new PC_Engine_TypeScannerFrontend();
-		$tscanner->scan($code);
-		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
-		$fin->finalize();
-		
-		$stmt = new PC_Engine_StmtScannerFrontend($typecon);
-		$stmt->scan($code);
-		return array($typecon->get_calls(),$stmt->get_vars());
-	}
-	
 	public function testTryCatch()
 	{
 		$code = '<?php
@@ -50,7 +36,7 @@ catch(Exception $e) {
 }
 ?>';
 		
-		list($calls,$vars) = $this->do_analyze($code);
+		list(,,$vars,$calls,,) = $this->analyze($code);
 		
 		self::assertEquals('myfunc(Exception)',(string)$calls[0]->get_call(false,false));
 		

@@ -121,17 +121,7 @@ $bg = "f" ?: "g";
 	
 	public function testExprs2()
 	{
-		$tscanner = new PC_Engine_TypeScannerFrontend();
-		$tscanner->scan(self::$code);
-		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
-		$fin->finalize();
-		
-		// scan files for function-calls and variables
-		$ascanner = new PC_Engine_StmtScannerFrontend($typecon);
-		$ascanner->scan(self::$code);
-		$vars = $ascanner->get_vars();
+		list(,,$vars,,,) = $this->analyze(self::$code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['a']->get_type());

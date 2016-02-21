@@ -24,20 +24,6 @@
 
 class PC_Tests_Returns extends PC_UnitTest
 {
-	private function do_analyze($code)
-	{
-		$tscanner = new PC_Engine_TypeScannerFrontend();
-		$tscanner->scan($code);
-		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
-		$fin->finalize();
-		
-		$stmt = new PC_Engine_StmtScannerFrontend($typecon);
-		$stmt->scan($code);
-		return $typecon->get_errors();
-	}
-	
 	public function testReturns()
 	{
 		$code = '<?php
@@ -76,7 +62,7 @@ function good() {
 }
 ?>';
 		
-		$errors = $this->do_analyze($code);
+		list(,,,,$errors,) = $this->analyze($code);
 		self::assertEquals(5,count($errors));
 		
 		$error = $errors[0];

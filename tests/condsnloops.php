@@ -23,21 +23,7 @@
  */
 
 class PC_Tests_CondsNLoops extends PC_UnitTest
-{
-	private function do_analyze($code)
-	{
-		$tscanner = new PC_Engine_TypeScannerFrontend();
-		$tscanner->scan($code);
-		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
-		$fin->finalize();
-		
-		$stmt = new PC_Engine_StmtScannerFrontend($typecon);
-		$stmt->scan($code);
-		return array($stmt->get_vars(),$typecon->get_calls());
-	}
-	
+{	
 	public function testConditions()
 	{
 		$code = '<?php
@@ -100,7 +86,7 @@ else
 // that its still an integer with value 1
 ?>';
 		
-		list($vars,$calls) = $this->do_analyze($code);
+		list(,,$vars,$calls,,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assertEquals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
@@ -165,7 +151,7 @@ while(1);
 // $f wasnt known before, therefore unknown.
 ?>';
 		
-		list($vars,$calls) = $this->do_analyze($code);
+		list(,,$vars,$calls,,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assertEquals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
@@ -276,7 +262,7 @@ if($_)
 // here we dont know that anymore since it didnt exist before
 ?>';
 		
-		list($vars,$calls) = $this->do_analyze($code);
+		list(,,$vars,$calls,,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assertEquals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
@@ -356,7 +342,7 @@ foreach($_ as $k => $v)
 	f7($k,$v);
 ?>';
 		
-		list($vars,$calls) = $this->do_analyze($code);
+		list(,,$vars,$calls,,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		

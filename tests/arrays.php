@@ -24,21 +24,6 @@
 
 class PC_Tests_Arrays extends PC_UnitTest
 {
-	private function do_analyze($code)
-	{
-		$tscanner = new PC_Engine_TypeScannerFrontend();
-		$tscanner->scan($code);
-		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
-		$fin->finalize();
-		
-		// scan files for function-calls and variables
-		$ascanner = new PC_Engine_StmtScannerFrontend($typecon);
-		$ascanner->scan($code);
-		return array($ascanner->get_vars(),$typecon->get_calls());
-	}
-	
 	public function testArrays()
 	{
 		$code = '<?php
@@ -79,7 +64,7 @@ class foo {
 }
 ?>';
 		
-		list($vars,$calls) = $this->do_analyze($code);
+		list(,,$vars,$calls,,) = $this->analyze($code);
 		
 		$args = $calls[0]->get_arguments();
 		self::assertEquals((string)PC_Obj_MultiType::create_int(1),(string)$args[0]);
@@ -143,7 +128,7 @@ $c = list($c1,$c2,list($c3,$c4,list($c5)),$c6) = array(
 );
 ?>';
 		
-		list($vars,) = $this->do_analyze($code);
+		list(,,$vars,$calls,,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assertEquals(

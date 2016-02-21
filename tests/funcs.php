@@ -24,23 +24,6 @@
 
 class PC_Tests_Funcs extends PC_UnitTest
 {
-	private function do_analyze($code)
-	{
-		$tscanner = new PC_Engine_TypeScannerFrontend();
-		$tscanner->scan($code);
-		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
-		$fin->finalize();
-		
-		// scan files for function-calls and variables
-		$ascanner = new PC_Engine_StmtScannerFrontend($typecon);
-		$ascanner->scan($code);
-		return array(
-			$typecon->get_functions(),$typecon->get_classes(),$typecon->get_calls(),$ascanner->get_vars()
-		);
-	}
-	
 	public function testFuncs()
 	{
 		$code = '<?php
@@ -84,7 +67,7 @@ abstract class myc {
 }
 ?>';
 	
-		list($functions,$classes,$calls) = $this->do_analyze($code);
+		list($functions,$classes,,$calls,,) = $this->analyze($code);
 		
 		$func = $functions['a'];
 		/* @var $func PC_Obj_Method */
@@ -166,7 +149,7 @@ function e() {
 }
 ?>';
 		
-		list(,,$calls,$vars) = $this->do_analyze($code);
+		list(,,$vars,$calls,,) = $this->analyze($code);
 		
 		self::assertEquals('f3(integer=3)',(string)$calls[0]->get_call(false,false));
 		self::assertEquals('f2(integer=2)',(string)$calls[1]->get_call(false,false));
@@ -201,7 +184,7 @@ $b(function() {
 });
 ?>';
 		
-		list($functions,$classes,$calls,$vars) = $this->do_analyze($code);
+		list($functions,$classes,$vars,$calls,,) = $this->analyze($code);
 		
 		$func = $functions['#anon1'];
 		/* @var $func PC_Obj_Method */
