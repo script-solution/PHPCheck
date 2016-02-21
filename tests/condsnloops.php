@@ -340,6 +340,14 @@ foreach(array(0 => 1,2 => "2",12 => 3) as $k => $v)
 
 foreach($_ as $k => $v)
 	f7($k,$v);
+
+$b = array(
+	array(1,2,3),
+	array(2,3,4),
+	array(3,4,5),
+);
+foreach($b as list($x,$y,$z))
+	f8($x,$y,$z);
 ?>';
 		
 		list(,,$vars,$calls,,) = $this->analyze($code);
@@ -377,6 +385,10 @@ foreach($_ as $k => $v)
 		self::assertEquals(
 			'f7(unknown, unknown)',
 			(string)$calls[6]->get_call(false,false)
+		);
+		self::assertEquals(
+			'f8(unknown, unknown, unknown)',
+			(string)$calls[7]->get_call(false,false)
 		);
 	}
 }

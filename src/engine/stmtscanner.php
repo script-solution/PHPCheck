@@ -499,26 +499,39 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * Sets $first and $sec for the current foreach-loop
 	 * 
 	 * @param PC_Obj_MultiType $array the array over which we loop
-	 * @param PC_Obj_Variable $first the first variable (key or value)
-	 * @param PC_Obj_Variable $sec the second variable (value, if not null)
+	 * @param array $first an array of variables (key or value)
+	 * @param array $sec an array of variables (value, if not null)
 	 */
 	public function set_foreach_var($array,$first,$sec)
 	{
 		if(!($array instanceof PC_Obj_MultiType))
-			return new PC_Obj_Variable('',$this->handle_error('$array is invalid'));
-		if(!($first instanceof PC_Obj_Variable))
-			return new PC_Obj_Variable('',$this->handle_error('$first is invalid'));
-		if($sec !== null && !($sec instanceof PC_Obj_Variable))
-			return new PC_Obj_Variable('',$this->handle_error('$sec is invalid'));
+		{
+			$this->handle_error('$array is invalid');
+			return;
+		}
+		if(!is_array($first))
+		{
+			$this->handle_error('$first is invalid');
+			return;
+		}
+		if($sec !== null && !is_array($sec))
+		{
+			$this->handle_error('$sec is invalid');
+			return;
+		}
 		
 		$arrval = $array->get_array();
 		// if we don't know the array-values, it is no array or there are no elements, we don't
 		// know the types of $first and $sec
 		if($arrval === null || $array->is_array_unknown() || count($arrval) == 0)
 		{
-			$this->set_var($first,$this->get_unknown());
+			foreach($first as $f)
+				$this->set_var($f,$this->get_unknown());
 			if($sec !== null)
-				$this->set_var($sec,$this->get_unknown());
+			{
+				foreach($sec as $s)
+					$this->set_var($s,$this->get_unknown());
+			}
 		}
 		else
 		{
@@ -557,9 +570,26 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			}
 			
 			// set vars; no clone here since we have a fresh object
-			$this->set_var($first,$firsttype,false);
+			if(count($first) > 1)
+			{
+				// don't look at the array elements; just pretend we don't know
+				foreach($first as $f)
+					$this->set_var($f,new PC_Obj_MultiType(),false);
+			}
+			else
+				$this->set_var($first[0],$firsttype,false);
+			
 			if($sectype !== null)
-				$this->set_var($sec,$sectype,false);
+			{
+				if(count($sec) > 1)
+				{
+					// don't look at the array elements; just pretend we don't know
+					foreach($sec as $s)
+						$this->set_var($s,new PC_Obj_MultiType(),false);
+				}
+				else
+					$this->set_var($sec[0],$sectype,false);
+			}
 		}
 	}
 	

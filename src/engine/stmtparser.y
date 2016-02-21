@@ -362,9 +362,9 @@ interface_extends_list ::= T_EXTENDS name_list(list) .
 implements_list ::= /* empty */ .
 implements_list ::= T_IMPLEMENTS name_list(list) .
 
-foreach_variable(A) ::= variable(v) . { A = v; }
-foreach_variable(A) ::= AMPERSAND variable(v) . { A = v; }
-foreach_variable ::= T_LIST LPAREN assignment_list RPAREN .
+foreach_variable(A) ::= variable(v) . { A = array(v); }
+foreach_variable(A) ::= AMPERSAND variable(v) . { A = array(v); }
+foreach_variable(A) ::= T_LIST LPAREN assignment_list(list) RPAREN . { A = list; }
 
 for_statement ::= statement .
 for_statement ::= COLON inner_statement_list T_ENDFOR SEMI .
