@@ -85,7 +85,6 @@ function h(): float {
 		list($functions,,,,$errors,) = $this->analyze($code);
 		self::assertEquals(5,count($errors));
 		
-		$func = $functions['b'];
 		self::assertEquals("function b(): integer=0",$functions['b']);
 		self::assertEquals("function c(): integer or string",$functions['c']);
 		self::assertEquals("function d(): integer=1",$functions['d']);
