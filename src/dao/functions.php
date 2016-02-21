@@ -230,6 +230,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			'anonymous' => $function->is_anonymous() ? 1 : 0,
 			'visibility' => $function->get_visibility(),
 			'return_type' => serialize(array($function->has_return_doc(),$function->get_return_type())),
+			'throws' => serialize($function->get_throws()),
 			'params' => $params,
 			'since' => $function->get_since()
 		);
@@ -254,6 +255,12 @@ class PC_DAO_Functions extends FWS_Singleton
 		foreach(unserialize($row['params']) as $param)
 			$c->put_param($param);
 		list($hasretdoc,$rettype) = unserialize($row['return_type']);
+		$throws = unserialize($row['throws']);
+		if(is_array($throws))
+		{
+			foreach($throws as $class => $type)
+				$c->add_throw($class,$type);
+		}
 		$c->set_has_return_doc($hasretdoc);
 		$c->set_return_type($rettype);
 		return $c;

@@ -119,6 +119,7 @@ CREATE TABLE `pc_functions` (
   `anonymous` tinyint(1) NOT NULL,
   `visibility` varchar(15) NOT NULL,
   `return_type` text NOT NULL,
+  `throws` text NOT NULL,
   `params` text NOT NULL,
   `since` varchar(10) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;

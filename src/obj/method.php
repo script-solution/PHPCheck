@@ -36,7 +36,26 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	 *
 	 * @var string
 	 */
-	const ANON_PREFIX = '#anon';
+	const ANON_PREFIX 	= '#anon';
+	
+	/**
+	 * Indicates that a function has a throw statement itself.
+	 *
+	 * @var string
+	 */
+	const THROW_SELF		= 'self';
+	/**
+	 * Indicates that a parent method has a throw specification.
+	 *
+	 * @var string
+	 */
+	const THROW_PARENT	= 'parent';
+	/**
+	 * Indicates that a function calls a function with a throw specification.
+	 *
+	 * @var string
+	 */
+	const THROW_FUNC		= 'func';
 	
 	/**
 	 * The id of this function
@@ -95,6 +114,13 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	private $params;
 	
 	/**
+	 * An array of class names
+	 *
+	 * @var array
+	 */
+	private $throws;
+	
+	/**
 	 * The version since when this method exists
 	 * 
 	 * @var string
@@ -123,6 +149,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 		
 		$this->id = $id;
 		$this->params = array();
+		$this->throws = array();
 		$this->return = new PC_Obj_MultiType();
 		$this->free = $free;
 		$this->class = $classid;
@@ -336,6 +363,35 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	}
 	
 	/**
+	 * @return array all throw class names
+	 */
+	public function get_throws()
+	{
+		return $this->throws;
+	}
+	
+	/**
+	 * @param string $name the class name
+	 * @return bool if the function throws an object of given class
+	 */
+	public function contains_throw($name)
+	{
+		return isset($this->throws[$name]);
+	}
+	
+	/**
+	 * Adds the given class name to the list of throws.
+	 *
+	 * @param string $name the class name
+	 * @param string $type the type (THROW_*)
+	 */
+	public function add_throw($name,$type)
+	{
+		if(!isset($this->throws[$name]))
+			$this->throws[$name] = $type;
+	}
+	
+	/**
 	 * @return string the version in which the method exists
 	 */
 	public function get_since()
@@ -384,6 +440,8 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 		$str .= '(';
 		$str .= implode(', ',$this->get_params());
 		$str .= '): '.$this->get_return_type();
+		if(count($this->throws) > 0)
+			$str .= ' throws '.implode(', ',array_keys($this->throws));
 		return $str;
 	}
 }

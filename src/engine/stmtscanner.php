@@ -96,6 +96,12 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * @var array
 	 */
 	private $allrettypes = array();
+	/**
+	 * An array of all throw types of the current function/method
+	 *
+	 * @var array
+	 */
+	private $allthrows = array();
 	
 	/**
 	 * The next id for anonymous functions
@@ -220,6 +226,16 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$funcobj = $this->get_method_object($cname,$fname);
 		if($funcobj === null)
 			return $this->get_unknown();
+		
+		// add the throws of the method to our throws
+		foreach($funcobj->get_throws() as $tclass => $ttype)
+		{
+			$this->allthrows[] = array(
+				PC_Obj_Method::THROW_FUNC,
+				PC_Obj_MultiType::create_object($tclass)
+			);
+		}
+		
 		return clone $funcobj->get_return_type();
 	}
 	
@@ -635,7 +651,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			return;
 		}
 		
-		// TODO
+		// don't even collect unknown types here
+		if(!$expr->is_unknown())
+			$this->allthrows[] = array(PC_Obj_Method::THROW_SELF,$expr);
 	}
 	
 	/**
@@ -680,6 +698,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	private function start_function($name)
 	{
 		$this->allrettypes = array();
+		$this->allthrows = array();
 		$this->scope->enter_function($name);
 	}
 	
@@ -689,6 +708,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	public function end_function()
 	{
 		$this->analyze_rettypes();
+		$this->analyze_throws();
 		$this->scope->leave_function();
 	}
 	
@@ -1199,6 +1219,81 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			
 			if($func->get_return_type()->is_unknown())
 				$func->set_return_type($mtype);
+		}
+	}
+	
+	/**
+	 * Analyzes all throw statements that have been found in the current function and checks their
+	 * validity against the PHPDoc throw specifications.
+	 */
+	private function analyze_throws()
+	{
+		$funcname = $this->scope->get_name_of(T_FUNC_C);
+		$classname = $this->scope->get_name_of(T_CLASS_C);
+		$func = $this->get_method_object($classname,$funcname);
+		if($func && !$func->is_abstract())
+		{
+			$name = ($classname ? '#'.$classname.'#::' : '').$funcname;
+			foreach($func->get_throws() as $tclass => $ttype)
+			{
+				// if only the parent function specifies it, we are not forced to throw it
+				if($ttype == PC_Obj_Method::THROW_PARENT)
+					continue;
+				
+				$found = false;
+				foreach($this->allthrows as list($origin,$mtype))
+				{
+					foreach($mtype->get_types() as $type)
+					{
+						if($type->get_class() == $tclass)
+						{
+							$found = true;
+							break;
+						}
+					}
+				}
+				
+				if(!$found)
+				{
+					$this->report_error(
+						$func,
+						'The function/method "'.$name.'" throws "'.$tclass.'" according to PHPDoc'
+						.', but does not throw it',
+						PC_Obj_Error::E_S_DOC_WITHOUT_THROW
+					);
+				}
+			}
+			
+			foreach($this->allthrows as list($origin,$mtype))
+			{
+				// ignore missing throws specifications that are only thrown by called functions
+				if($origin == PC_Obj_Method::THROW_FUNC)
+					continue;
+				
+				foreach($mtype->get_types() as $type)
+				{
+					if($type->get_type() == PC_Obj_Type::OBJECT)
+					{
+						if(!$func->contains_throw($type->get_class()))
+						{
+							$this->report_error(
+								$func,
+								'The function/method "'.$name.'" does not throw "'.$type.'" according to PHPDoc'
+								.', but throws it',
+								PC_Obj_Error::E_S_THROW_NOT_IN_DOC
+							);
+						}
+					}
+					else
+					{
+						$this->report_error(
+							$func,
+							'The function/method "'.$name.'" throws a non-object ('.$type.')',
+							PC_Obj_Error::E_S_THROW_INVALID
+						);
+					}
+				}
+			}
 		}
 	}
 	

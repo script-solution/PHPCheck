@@ -427,6 +427,11 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 					);
 				}
 			}
+
+			// look for throws			
+			preg_match_all('/\@throws\s+([^\s]+)/',$doc,$matches);
+			foreach($matches[1] as $k => $match)
+				$func->add_throw($match,PC_Obj_Method::THROW_SELF);
 			
 			// look for return-type
 			if(preg_match('/\@return\s+&?\s*([^\s]+)/',$doc,$matches))

@@ -392,6 +392,17 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 								$f->set_has_return_doc($function->has_return_doc());
 								$changed = true;
 							}
+							
+							// add missing throws
+							foreach($function->get_throws() as $tclass => $ttype)
+							{
+								if(!$f->contains_throw($tclass))
+								{
+									$f->add_throw($tclass,PC_Obj_Method::THROW_PARENT);
+									$changed = true;
+								}
+							}
+							
 							foreach($function->get_params() as $param)
 							{
 								$fparam = $f->get_param($param->get_name());
