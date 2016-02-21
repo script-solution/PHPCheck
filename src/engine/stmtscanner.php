@@ -671,7 +671,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * Adds the given expression as thrown
 	 * 
-	 * @param PC_Obj_Variable $expr the expression
+	 * @param PC_Obj_MultiType $expr the expression
 	 */
 	public function add_throw($expr)
 	{
