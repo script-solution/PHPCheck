@@ -101,7 +101,9 @@ final class PC_Module_errors extends PC_Module
 		$typecbs = array();
 		$row = -1;
 		$i = 0;
-		foreach(PC_Obj_Error::get_types() as $type => $name)
+		$error_types = PC_Obj_Error::get_types();
+		asort($error_types);
+		foreach($error_types as $type => $name)
 		{
 			if($i % 4 == 0)
 				$typecbs[++$row] = array();
