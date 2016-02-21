@@ -321,7 +321,9 @@ finally_statement ::= T_FINALLY LCURLY inner_statement_list RCURLY .
 unset_variables ::= unset_variable .
 unset_variables ::= unset_variables COMMA unset_variable .
 
-unset_variable ::= variable .
+unset_variable ::= variable(var) . {
+	$this->state->unset_var(var);
+}
 
 function_declaration_statement ::= function returns_ref T_STRING
 																	 LPAREN parameter_list RPAREN

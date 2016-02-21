@@ -105,6 +105,17 @@ class PC_Engine_VarContainer extends FWS_Object
 	}
 	
 	/**
+	 * Unsets the given variable in given scope
+	 * 
+	 * @param string $scope the scope-name
+	 * @param PC_Obj_Variable $var the variable
+	 */
+	public function unset($scope,$var)
+	{
+		unset($this->vars[$scope][$var->get_name()]);
+	}
+	
+	/**
 	 * @return bool if we're in a loop
 	 */
 	public function is_in_loop()

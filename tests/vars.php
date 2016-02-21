@@ -48,6 +48,11 @@ $a4 = array(1 => 2,3 => 4,5 => 6);
 $a5 = array(\'a\' => 1,2,3,\'4\');
 $a6 = array(array(array(1,2,3),4),5);
 $a7 = (array)1;
+$a8 = 4;
+unset($a8);
+$a9 = "foo";
+$a10 = 123;
+unset($a9,$a10);
 
 /**
  * @param array $a
@@ -63,7 +68,7 @@ function x($a,MyClass $b) {
 	
 	public function testVars()
 	{
-		list(,,$vars,,,) = $this->analyze(self::$code);
+		list(,,$vars,,$errors,) = $this->analyze(self::$code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assertEquals((string)PC_Obj_MultiType::create_int(1),(string)$global['i1']->get_type());
@@ -93,6 +98,9 @@ function x($a,MyClass $b) {
 		self::assertEquals((string)$array,(string)$global['a6']->get_type());
 		$array = new PC_Obj_MultiType(PC_Obj_Type::get_type_by_value((array)1));
 		self::assertEquals((string)$array,(string)$global['a7']->get_type());
+		self::assertEquals(false,isset($global['a8']));
+		self::assertEquals(false,isset($global['a9']));
+		self::assertEquals(false,isset($global['a10']));
 		
 		$x = $vars['x'];
 		self::assertEquals((string)PC_Obj_MultiType::create_array(),(string)$x['a']->get_type());

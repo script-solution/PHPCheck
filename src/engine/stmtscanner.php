@@ -444,6 +444,17 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
+	 * Unsets the given variable
+	 *
+	 * @param PC_Obj_Variable $var the variable
+	 */
+	public function unset_var($var)
+	{
+		$scopename = $this->scope->get_name();
+		$this->vars->unset($scopename,$var);
+	}
+	
+	/**
 	 * Sets the given function-parameter for the current scope
 	 * 
 	 * @param PC_Obj_Parameter $p the parameter
