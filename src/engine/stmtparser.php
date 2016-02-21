@@ -6160,7 +6160,7 @@ static public $yy_action = array(
     function yy_r214(){ $this->_retvalue = PC_Obj_MultiType::create_callable();     }
 #line 6166 "src/engine/stmtparser.php"
 #line 431 "src/engine/stmtparser.y"
-    function yy_r215(){ $this->_retvalue = PC_Obj_MultiType::create_object($this->yystack[$this->yyidx + 0]->minor);     }
+    function yy_r215(){ $this->_retvalue = $this->state->get_type_by_name($this->yystack[$this->yyidx + 0]->minor);     }
 #line 6169 "src/engine/stmtparser.php"
 #line 440 "src/engine/stmtparser.y"
     function yy_r221(){

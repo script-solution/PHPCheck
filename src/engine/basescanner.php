@@ -292,6 +292,38 @@ class PC_Engine_BaseScanner
 	}
 	
 	/**
+	 * Determines the type for the given type name, which is used, e.g., for return specifications.
+	 *
+	 * @param string $name the name
+	 * @return PC_Obj_MultiType the type
+	 */
+	public function get_type_by_name($name)
+	{
+		switch($name)
+		{
+			case 'array':
+				return PC_Obj_MultiType::create_array();
+			case 'callable':
+				return PC_Obj_MultiType::create_callable();
+			case 'bool':
+				return PC_Obj_MultiType::create_bool();
+			case 'float':
+				return PC_Obj_MultiType::create_float();
+			case 'int':
+				return PC_Obj_MultiType::create_int();
+			case 'string':
+				return PC_Obj_MultiType::create_string();
+			
+			case 'self':
+				// TODO get class name
+				return PC_Obj_MultiType::create_object();
+			
+			default:
+				return PC_Obj_MultiType::create_object($name);
+		}
+	}
+	
+	/**
 	 * Reports the given error for the current location.
 	 *
 	 * @param string $msg the error message

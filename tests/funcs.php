@@ -211,11 +211,11 @@ $b(function() {
 		self::assertEquals(true,$func->is_anonymous());
 		self::assertEquals(2,$func->get_param_count());
 		self::assertEquals(2,$func->get_required_param_count());
-		self::assertEquals('int',(string)$func->get_param('arg1'));
+		self::assertEquals('integer',(string)$func->get_param('arg1'));
 		self::assertEquals('float',(string)$func->get_param('arg2'));
 		
 		$x = $vars['#anon3'];
-		self::assertEquals('int',(string)$x['arg1']->get_type());
+		self::assertEquals('integer',(string)$x['arg1']->get_type());
 		self::assertEquals('float',(string)$x['arg2']->get_type());
 		
 		$func = $functions['#anon4'];

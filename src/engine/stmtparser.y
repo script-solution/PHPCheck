@@ -428,7 +428,7 @@ optional_type(A) ::= type(t) . { A = t; }
 
 type(A) ::= T_ARRAY . { A = PC_Obj_MultiType::create_array(); }
 type(A) ::= T_CALLABLE . { A = PC_Obj_MultiType::create_callable(); }
-type(A) ::= name(vtype) . { A = PC_Obj_MultiType::create_object(vtype); }
+type(A) ::= name(vtype) . { A = $this->state->get_type_by_name(vtype); }
 
 return_type ::= /* empty */ .
 return_type ::= COLON type .

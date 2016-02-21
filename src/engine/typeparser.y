@@ -294,9 +294,9 @@ unset_variable ::= variable .
 
 function_declaration_statement ::= function returns_ref T_STRING(name)
 																	 LPAREN parameter_list(params) RPAREN
-																	 return_type backup_doc_comment
+																	 return_type(ret) backup_doc_comment
 																	 LCURLY inner_statement_list RCURLY . {
-	$this->state->declare_function(name,params);
+	$this->state->declare_function(name,params,ret);
 }
 
 is_reference ::= /* empty */ .
@@ -397,10 +397,10 @@ optional_type(A) ::= type(t) . { A = t; }
 
 type(A) ::= T_ARRAY . { A = PC_Obj_MultiType::create_array(); }
 type(A) ::= T_CALLABLE . { A = PC_Obj_MultiType::create_callable(); }
-type(A) ::= name(vtype) . { A = PC_Obj_MultiType::create_object(vtype); }
+type(A) ::= name(vtype) . { A = $this->state->get_type_by_name(vtype); }
 
-return_type ::= /* empty */ .
-return_type ::= COLON type .
+return_type(A) ::= /* empty */ . { A = null; }
+return_type(A) ::= COLON type(t) . { A = t; }
 
 argument_list(A) ::= LPAREN RPAREN . { A = array(); }
 argument_list(A) ::= LPAREN non_empty_argument_list(list) RPAREN . { A = list; }
@@ -444,10 +444,9 @@ class_statement(A) ::= T_USE name_list trait_adaptations . {
 }
 class_statement(A) ::= method_modifiers(mmodifiers) function returns_ref identifier(mname)
 										LPAREN parameter_list(mparams) RPAREN
-										return_type backup_doc_comment method_body . {
-	// TODO use return_type
+										return_type(mret) backup_doc_comment method_body . {
 	A = array();
-	A[] = $this->state->create_method(mname,mmodifiers,mparams);
+	A[] = $this->state->create_method(mname,mmodifiers,mparams,mret);
 }
 
 name_list(A) ::= name(n) . {
@@ -608,14 +607,14 @@ expr_without_variable ::= T_YIELD expr .
 expr_without_variable ::= T_YIELD expr T_DOUBLE_ARROW expr .
 expr_without_variable ::= T_YIELD_FROM expr .
 expr_without_variable ::= function returns_ref LPAREN parameter_list(mparams) RPAREN
-													lexical_vars return_type backup_doc_comment
+													lexical_vars return_type(mret) backup_doc_comment
 													LCURLY inner_statement_list RCURLY . {
-	$this->state->declare_function('',mparams);
+	$this->state->declare_function('',mparams,mret);
 }
 expr_without_variable ::= T_STATIC function returns_ref LPAREN parameter_list(mparams) RPAREN
-													lexical_vars return_type backup_doc_comment
+													lexical_vars return_type(mret) backup_doc_comment
 													LCURLY inner_statement_list RCURLY . {
-	$this->state->declare_function('',mparams);
+	$this->state->declare_function('',mparams,mret);
 }
 
 function ::= T_FUNCTION .

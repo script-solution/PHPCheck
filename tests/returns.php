@@ -60,10 +60,39 @@ function good() {
 		return 2+3;
 	return 1;
 }
+
+/** @return foo */
+function e(): foo {
+	return new foo();
+}
+
+/** @return int */
+function f() : int {
+	return 1 + 1;
+}
+
+/** @return array */
+function g(): array {
+	return array();
+}
+
+/** @return float */
+function h(): float {
+	return 1.1;
+}
 ?>';
 		
-		list(,,,,$errors,) = $this->analyze($code);
+		list($functions,,,,$errors,) = $this->analyze($code);
 		self::assertEquals(5,count($errors));
+		
+		$func = $functions['b'];
+		self::assertEquals("function b(): integer=0",$functions['b']);
+		self::assertEquals("function c(): integer or string",$functions['c']);
+		self::assertEquals("function d(): integer=1",$functions['d']);
+		self::assertEquals("function e(): foo",$functions['e']);
+		self::assertEquals("function f(): integer",$functions['f']);
+		self::assertEquals("function g(): array",$functions['g']);
+		self::assertEquals("function h(): float",$functions['h']);
 		
 		$error = $errors[0];
 		self::assertEquals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());

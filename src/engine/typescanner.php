@@ -137,8 +137,9 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	 * 
 	 * @param string $name the name (empty for anonymous functions)
 	 * @param array $params an array of PC_Obj_Parameter
+	 * @param PC_Obj_MultiType $return the return type
 	 */
-	public function declare_function($name,$params)
+	public function declare_function($name,$params,$return)
 	{
 		$func = new PC_Obj_Method($this->get_file(),$this->get_last_function_line(),true);
 		if($name == '')
@@ -150,6 +151,8 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 			$func->set_name($name);
 		foreach($params as $param)
 			$func->put_param($param);
+		if($return !== null)
+			$func->set_return_type($return);
 		$this->parse_method_doc($func);
 		$this->types->add_functions(array($func));
 	}
@@ -257,9 +260,10 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	 * @param string $name the name
 	 * @param array $modifiers the modifiers
 	 * @param array $params an array of PC_Obj_Parameter's
+	 * @param PC_Obj_MultiType $return the return type
 	 * @return PC_Obj_Method the method
 	 */
-	public function create_method($name,$modifiers,$params)
+	public function create_method($name,$modifiers,$params,$return)
 	{
 		$m = new PC_Obj_Method($this->get_file(),$this->get_last_function_line(),false);
 		$m->set_name($name);
@@ -274,6 +278,8 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 			$m->set_visibility(PC_Obj_Visible::V_PUBLIC);
 		foreach($params as $param)
 			$m->put_param($param);
+		if($return !== null)
+			$this->set_return_type($return);
 		$this->parse_method_doc($m);
 		return $m;
 	}
