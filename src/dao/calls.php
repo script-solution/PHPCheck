@@ -206,6 +206,7 @@ class PC_DAO_Calls extends FWS_Singleton
 	 *
 	 * @param array $row the row from the db
 	 * @return PC_Obj_Call the call
+	 * @throws Exception if the arguments can't be serialized
 	 */
 	private function _build_call($row)
 	{

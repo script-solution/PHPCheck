@@ -77,6 +77,7 @@ class PC_UnitTest extends FWS_Object
 	 *
 	 * @param mixed $exp the expected value
 	 * @param mixed $recv the received value
+	 * @throws Exception if the values are not equal
 	 */
 	protected static function assertEquals($exp,$recv)
 	{
@@ -89,6 +90,7 @@ class PC_UnitTest extends FWS_Object
 	 *
 	 * @param string $pattern the regular expression
 	 * @param string $string the received string
+	 * @throws Exception if the string does not match the pattern
 	 */
 	protected static function assertRegExp($pattern,$string)
 	{
