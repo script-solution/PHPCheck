@@ -259,7 +259,7 @@ class PC_Engine_BaseScanner
 				// if one of them is unknown we don't know wether we would get a float or int
 				if($t1->is_unknown() || $t1->is_multiple() ||
 						($t2 !== null && ($t2->is_unknown() || $t2->is_multiple())))
-					return new PC_Obj_MultiType('');
+					return new PC_Obj_MultiType();
 				$ti1 = $t1->get_first()->get_type();
 				$ti2 = $t2 === null ? -1 : $t2->get_first()->get_type();
 				// if both are arrays, the result is an array
