@@ -39,6 +39,17 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	private $_pid;
 	
 	/**
+	 * An array of already tried names, that did not exist
+	 *
+	 * @var array
+	 */
+	private $_missing = array(
+		'classes' => array(),
+		'funcs' => array(),
+		'consts' => array(),
+	);
+	
+	/**
 	 * All currently known classes
 	 *
 	 * @var array
@@ -155,17 +166,24 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if(!isset($this->_classes[$name]) && $this->_use_db)
+		if(!isset($this->_missing['classes'][$name]))
 		{
-			$c = PC_DAO::get_classes()->get_by_name($name,$this->_pid);
-			if($c)
-				$this->_classes[$name] = $c;
-		}
-		if(!isset($this->_classes[$name]) && $this->_use_phpref)
-		{
-			$c = PC_DAO::get_classes()->get_by_name($name,PC_Project::PHPREF_ID);
-			if($c)
-				$this->_classes[$name] = $c;
+			if(!isset($this->_classes[$name]) && $this->_use_db)
+			{
+				$c = PC_DAO::get_classes()->get_by_name($name,$this->_pid);
+				if($c)
+					$this->_classes[$name] = $c;
+				else
+					$this->_missing['classes'][$name] = true;
+			}
+			if(!isset($this->_classes[$name]) && $this->_use_phpref)
+			{
+				$c = PC_DAO::get_classes()->get_by_name($name,PC_Project::PHPREF_ID);
+				if($c)
+					$this->_classes[$name] = $c;
+				else
+					$this->_missing['classes'][$name] = true;
+			}
 		}
 		if(isset($this->_classes[$name]))
 			return $this->_classes[$name];
@@ -193,17 +211,24 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if(!isset($this->_functions[$name]) && $this->_use_db)
+		if(!isset($this->_missing['funcs'][$name]))
 		{
-			$f = PC_DAO::get_functions()->get_by_name($name,$this->_pid);
-			if($f)
-				$this->_functions[$name] = $f;
-		}
-		if(!isset($this->_functions[$name]) && $this->_use_phpref)
-		{
-			$f = PC_DAO::get_functions()->get_by_name($name,PC_Project::PHPREF_ID);
-			if($f)
-				$this->_functions[$name] = $f;
+			if(!isset($this->_functions[$name]) && $this->_use_db)
+			{
+				$f = PC_DAO::get_functions()->get_by_name($name,$this->_pid);
+				if($f)
+					$this->_functions[$name] = $f;
+				else
+					$this->_missing['funcs'][$name] = true;
+			}
+			if(!isset($this->_functions[$name]) && $this->_use_phpref)
+			{
+				$f = PC_DAO::get_functions()->get_by_name($name,PC_Project::PHPREF_ID);
+				if($f)
+					$this->_functions[$name] = $f;
+				else
+					$this->_missing['funcs'][$name] = true;
+			}
 		}
 		if(isset($this->_functions[$name]))
 			return $this->_functions[$name];
@@ -239,17 +264,24 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if(!isset($this->_constants[$name]) && $this->_use_db)
+		if(!isset($this->_missing['consts'][$name]))
 		{
-			$c = PC_DAO::get_constants()->get_by_name($name,$this->_pid);
-			if($c)
-				$this->_constants[$name] = $c;
-		}
-		if(!isset($this->_constants[$name]) && $this->_use_phpref)
-		{
-			$c = PC_DAO::get_constants()->get_by_name($name,PC_Project::PHPREF_ID);
-			if($c)
-				$this->_constants[$name] = $c;
+			if(!isset($this->_constants[$name]) && $this->_use_db)
+			{
+				$c = PC_DAO::get_constants()->get_by_name($name,$this->_pid);
+				if($c)
+					$this->_constants[$name] = $c;
+				else
+					$this->_missing['consts'][$name] = true;
+			}
+			if(!isset($this->_constants[$name]) && $this->_use_phpref)
+			{
+				$c = PC_DAO::get_constants()->get_by_name($name,PC_Project::PHPREF_ID);
+				if($c)
+					$this->_constants[$name] = $c;
+				else
+					$this->_missing['consts'][$name] = true;
+			}
 		}
 		if(isset($this->_constants[$name]))
 			return $this->_constants[$name];
