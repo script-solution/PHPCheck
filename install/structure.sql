@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 22, 2016 at 01:34 PM
+-- Generation Time: Feb 22, 2016 at 07:19 PM
 -- Server version: 10.1.11-MariaDB-log
 -- PHP Version: 7.0.3
 
@@ -175,7 +175,8 @@ ALTER TABLE `pc_calls`
 -- Indexes for table `pc_classes`
 --
 ALTER TABLE `pc_classes`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `name` (`name`);
 
 --
 -- Indexes for table `pc_class_fields`
@@ -187,7 +188,9 @@ ALTER TABLE `pc_class_fields`
 -- Indexes for table `pc_constants`
 --
 ALTER TABLE `pc_constants`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `class` (`class`),
+  ADD KEY `name` (`name`);
 
 --
 -- Indexes for table `pc_errors`
@@ -199,7 +202,9 @@ ALTER TABLE `pc_errors`
 -- Indexes for table `pc_functions`
 --
 ALTER TABLE `pc_functions`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `class` (`class`),
+  ADD KEY `name` (`name`);
 
 --
 -- Indexes for table `pc_projects`
@@ -221,39 +226,39 @@ ALTER TABLE `pc_vars`
 -- AUTO_INCREMENT for table `pc_calls`
 --
 ALTER TABLE `pc_calls`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `pc_classes`
 --
 ALTER TABLE `pc_classes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `pc_class_fields`
 --
 ALTER TABLE `pc_class_fields`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `pc_constants`
 --
 ALTER TABLE `pc_constants`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `pc_errors`
 --
 ALTER TABLE `pc_errors`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `pc_functions`
 --
 ALTER TABLE `pc_functions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `pc_projects`
 --
 ALTER TABLE `pc_projects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `pc_vars`
 --
 ALTER TABLE `pc_vars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
