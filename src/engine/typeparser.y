@@ -108,85 +108,85 @@
 
 start ::= top_statement_list .
 
-reserved_non_modifiers ::= T_INCLUDE .
-reserved_non_modifiers ::= T_INCLUDE_ONCE .
-reserved_non_modifiers ::= T_EVAL .
-reserved_non_modifiers ::= T_REQUIRE .
-reserved_non_modifiers ::= T_REQUIRE_ONCE .
-reserved_non_modifiers ::= T_LOGICAL_OR .
-reserved_non_modifiers ::= T_LOGICAL_XOR .
-reserved_non_modifiers ::= T_LOGICAL_AND .
-reserved_non_modifiers ::= T_INSTANCEOF .
-reserved_non_modifiers ::= T_NEW .
-reserved_non_modifiers ::= T_CLONE .
-reserved_non_modifiers ::= T_EXIT .
-reserved_non_modifiers ::= T_IF .
-reserved_non_modifiers ::= T_ELSEIF .
-reserved_non_modifiers ::= T_ELSE .
-reserved_non_modifiers ::= T_ENDIF .
-reserved_non_modifiers ::= T_ECHO .
-reserved_non_modifiers ::= T_DO .
-reserved_non_modifiers ::= T_WHILE .
-reserved_non_modifiers ::= T_ENDWHILE .
-reserved_non_modifiers ::= T_FOR .
-reserved_non_modifiers ::= T_ENDFOR .
-reserved_non_modifiers ::= T_FOREACH .
-reserved_non_modifiers ::= T_ENDFOREACH .
-reserved_non_modifiers ::= T_DECLARE .
-reserved_non_modifiers ::= T_ENDDECLARE .
-reserved_non_modifiers ::= T_AS .
-reserved_non_modifiers ::= T_TRY .
-reserved_non_modifiers ::= T_CATCH .
-reserved_non_modifiers ::= T_FINALLY .
-reserved_non_modifiers ::= T_THROW .
-reserved_non_modifiers ::= T_USE .
-reserved_non_modifiers ::= T_INSTEADOF .
-reserved_non_modifiers ::= T_GLOBAL .
-reserved_non_modifiers ::= T_VAR .
-reserved_non_modifiers ::= T_UNSET .
-reserved_non_modifiers ::= T_ISSET .
-reserved_non_modifiers ::= T_EMPTY .
-reserved_non_modifiers ::= T_CONTINUE .
-reserved_non_modifiers ::= T_GOTO .
-reserved_non_modifiers ::= T_FUNCTION .
-reserved_non_modifiers ::= T_CONST .
-reserved_non_modifiers ::= T_RETURN .
-reserved_non_modifiers ::= T_PRINT .
-reserved_non_modifiers ::= T_YIELD .
-reserved_non_modifiers ::= T_LIST .
-reserved_non_modifiers ::= T_SWITCH .
-reserved_non_modifiers ::= T_ENDSWITCH .
-reserved_non_modifiers ::= T_CASE .
-reserved_non_modifiers ::= T_DEFAULT .
-reserved_non_modifiers ::= T_BREAK .
-reserved_non_modifiers ::= T_ARRAY .
-reserved_non_modifiers ::= T_CALLABLE .
-reserved_non_modifiers ::= T_EXTENDS .
-reserved_non_modifiers ::= T_IMPLEMENTS .
-reserved_non_modifiers ::= T_NAMESPACE .
-reserved_non_modifiers ::= T_TRAIT .
-reserved_non_modifiers ::= T_INTERFACE .
-reserved_non_modifiers ::= T_CLASS .
-reserved_non_modifiers ::= T_CLASS_C .
-reserved_non_modifiers ::= T_TRAIT_C .
-reserved_non_modifiers ::= T_FUNC_C .
-reserved_non_modifiers ::= T_METHOD_C .
-reserved_non_modifiers ::= T_LINE .
-reserved_non_modifiers ::= T_FILE .
-reserved_non_modifiers ::= T_DIR .
-reserved_non_modifiers ::= T_NS_C .
-reserved_non_modifiers ::= T_HALT_COMPILER .
+reserved_non_modifiers(A) ::= T_INCLUDE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_INCLUDE_ONCE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_EVAL(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_REQUIRE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_REQUIRE_ONCE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_LOGICAL_OR(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_LOGICAL_XOR(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_LOGICAL_AND(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_INSTANCEOF(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_NEW(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_CLONE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_EXIT(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_IF(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_ELSEIF(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_ELSE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_ENDIF(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_ECHO(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_DO(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_WHILE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_ENDWHILE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_FOR(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_ENDFOR(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_FOREACH(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_ENDFOREACH(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_DECLARE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_ENDDECLARE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_AS(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_TRY(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_CATCH(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_FINALLY(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_THROW(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_USE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_INSTEADOF(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_GLOBAL(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_VAR(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_UNSET(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_ISSET(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_EMPTY(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_CONTINUE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_GOTO(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_FUNCTION(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_CONST(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_RETURN(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_PRINT(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_YIELD(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_LIST(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_SWITCH(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_ENDSWITCH(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_CASE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_DEFAULT(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_BREAK(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_ARRAY(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_CALLABLE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_EXTENDS(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_IMPLEMENTS(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_NAMESPACE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_TRAIT(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_INTERFACE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_CLASS(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_CLASS_C(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_TRAIT_C(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_FUNC_C(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_METHOD_C(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_LINE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_FILE(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_DIR(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_NS_C(t) . { A = t; }
+reserved_non_modifiers(A) ::= T_HALT_COMPILER(t) . { A = t; }
 
-semi_reserved ::= reserved_non_modifiers .
-semi_reserved ::= T_STATIC .
-semi_reserved ::= T_ABSTRACT .
-semi_reserved ::= T_FINAL .
-semi_reserved ::= T_PRIVATE .
-semi_reserved ::= T_PROTECTED .
-semi_reserved ::= T_PUBLIC .
+semi_reserved(A) ::= reserved_non_modifiers(t) . { A = t; }
+semi_reserved(A) ::= T_STATIC(t) . { A = t; }
+semi_reserved(A) ::= T_ABSTRACT(t) . { A = t; }
+semi_reserved(A) ::= T_FINAL(t) . { A = t; }
+semi_reserved(A) ::= T_PRIVATE(t) . { A = t; }
+semi_reserved(A) ::= T_PROTECTED(t) . { A = t; }
+semi_reserved(A) ::= T_PUBLIC(t) . { A = t; }
 
 identifier(A) ::= T_STRING(n) . { A = n; }
-identifier ::= semi_reserved .
+identifier(A) ::= semi_reserved(t) . { A = t; }
 
 top_statement_list ::= top_statement_list top_statement .
 top_statement_list ::= /* empty */ .
