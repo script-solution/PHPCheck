@@ -49,7 +49,7 @@ class PC_Obj_MultiType extends FWS_Object
 	 * @param string $classname the class-name
 	 * @return PC_Obj_MultiType the multitype
 	 */
-	public static function create_object($classname)
+	public static function create_object($classname = '')
 	{
 		return new self(array(new PC_Obj_Type(PC_Obj_Type::OBJECT,null,$classname)));
 	}
