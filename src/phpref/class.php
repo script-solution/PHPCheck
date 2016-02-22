@@ -60,7 +60,7 @@ final class PC_PHPRef_Class extends FWS_Object
 		$match = array();
 		$content = file_get_contents($this->file);
 		
-		if(!preg_match('/class="classname">(.*?)<\//s',$content,$match))
+		if(!preg_match('/<strong class="classname">(.*?)<\//s',$content,$match))
 			throw new PC_PHPRef_Exception('Unable to find class-name in file "'.$this->file.'"');
 		$name = $match[1];
 		
