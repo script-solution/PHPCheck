@@ -24,7 +24,7 @@
 	{endif}
 	{loop consts as const}
 	<tr>
-		<td><a href="{const:url}">{const:name}</a></td>
+		<td>{if const:url}<a href="{const:url}">{const:name}</a>{else}{const:name}{endif}:</td>
 		<td>{const:type}</td>
 	</tr>
 	{endloop}
@@ -38,7 +38,7 @@
 	{endif}
 	{loop fields as field}
 	<tr>
-		<td><a href="{field:url}">{field:name}</a></td>
+		<td>{if field:url}<a href="{field:url}">{field:name}</a>{else}{field:name}{endif}:</td>
 		<td>{field:type}</td>
 	</tr>
 	{endloop}
@@ -52,7 +52,7 @@
 	{endif}
 	{loop methods as method}
 	<tr>
-		<td><a href="{method:url}">{method:name}</a>:</td>
+		<td>{if method:url}<a href="{method:url}">{method:name}</a>{else}{method:name}{endif}:</td>
 		<td>
 		{method:type}
 		{if method:since}, {method:since}{endif}

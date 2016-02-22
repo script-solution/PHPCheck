@@ -167,9 +167,10 @@ final class PC_Module_Class extends FWS_Module
 	 */
 	private function _get_url($classfile,$loc)
 	{
+		if($loc->get_line() == 0)
+			return '';
 		if($loc->get_file() == $classfile)
 			return '#l'.$loc->get_line();
-		else
-			return PC_URL::get_code_url($loc);
+		return PC_URL::get_code_url($loc);
 	}
 }
