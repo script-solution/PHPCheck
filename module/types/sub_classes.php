@@ -80,7 +80,9 @@ final class PC_SubModule_types_classes extends PC_SubModule
 			$classes[] = array(
 				'name' => $sig,
 				'file' => $c->get_file(),
-				'line' => $c->get_line()
+				'line' => $c->get_line(),
+				'since' => implode(', ',$c->get_version()->get_min()),
+				'till' => implode(', ',$c->get_version()->get_max()),
 			);
 		}
 		

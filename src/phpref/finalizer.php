@@ -76,8 +76,23 @@ final class PC_PHPRef_Finalizer extends FWS_Object
 				$func = $class->get_method($funcname);
 				if($func !== null)
 				{
-					$func->set_since($version);
+					if($func->get_version()->is_empty())
+						$func->get_version()->set($version->get_min(),$version->get_max());
 					PC_DAO::get_functions()->update($func,$class->get_id());
+				}
+			}
+		}
+		
+		// inherit version info to methods, if still empty
+		foreach($typecon->get_classes() as $c)
+		{
+			$version = $c->get_version();
+			foreach($c->get_methods() as $m)
+			{
+				if($m->get_version()->is_empty())
+				{
+					$m->get_version()->set($version->get_min(),$version->get_max());
+					PC_DAO::get_functions()->update($m,$c->get_id());
 				}
 			}
 		}

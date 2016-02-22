@@ -33,18 +33,33 @@
 	<tr>
 		<th>Name</th>
 		<th>Location</th>
+		<th>Requirements</th>
 	</tr>
 	{if classes.length == 0}
 	<tr>
-		<td colspan="2" class="pc_main" align="center">No classes found</td>
+		<td colspan="3" class="pc_main" align="center">No classes found</td>
 	</tr>
 	{else}
 	{loop classes as c}
 	<tr>
 		<td class="pc_main">{c:name}</td>
 		<td class="pc_main">
-		{if c:file}{c:file}{else}<i>Unknown</i>{endif}
-		{if c:line > 0}, line {c:line}{endif}
+		{if c:file && c:line}
+		{c:file}, line {c:line}
+		{else}
+		{if c:file}
+		<a href="{c:file}">{c:file}</a>
+		{else}
+		<i>Unknown</i>
+		{endif}
+		{endif}
+		</td>
+		<td class="pc_main" align="center">
+		{if c:since}&gt;= {c:since}{endif}
+		{if c:till}
+		{if c:since} and {endif}
+		&lt; {c:till}
+		{endif}
 		</td>
 	</tr>
 	{endloop}

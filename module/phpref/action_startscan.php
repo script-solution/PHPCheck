@@ -39,7 +39,7 @@ final class PC_Action_PHPRef_startscan extends FWS_Action_Base
 		$files = array();
 		foreach(FWS_FileUtils::get_list('phpman',false,false) as $file)
 		{
-			if(preg_match('/^(function|class)\./',$file))
+			if(preg_match('/\.html$/',$file))
 				$files[] = 'phpman/'.$file;
 		}
 		// store in session

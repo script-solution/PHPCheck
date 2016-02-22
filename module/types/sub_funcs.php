@@ -73,7 +73,8 @@ final class PC_SubModule_types_funcs extends PC_SubModule
 				'func' => (string)$f,
 				'file' => $f->get_file(),
 				'line' => $f->get_line(),
-				'since' => $f->get_since()
+				'since' => implode(', ',$f->get_version()->get_min()),
+				'till' => implode(', ',$f->get_version()->get_max()),
 			);
 		}
 		

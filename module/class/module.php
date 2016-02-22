@@ -71,6 +71,7 @@ final class PC_Module_Class extends FWS_Module
 		}
 		
 		$curl = PC_URL::get_mod_url();
+		$classname = $this->_class->get_name();
 		
 		// build class-declaration
 		$declaration = '';
@@ -84,7 +85,7 @@ final class PC_Module_Class extends FWS_Module
 		}
 		else
 			$declaration .= 'interface ';
-		$declaration .= $this->_class->get_name().' ';
+		$declaration .= $classname.' ';
 		if(!$this->_class->is_interface() && ($cn = $this->_class->get_super_class()))
 			$declaration .= 'extends <a href="'.$curl->set('name',$cn)->to_url().'">'.$cn.'</a> ';
 		if(count($this->_class->get_interfaces()) > 0)
@@ -97,7 +98,7 @@ final class PC_Module_Class extends FWS_Module
 		$declaration = FWS_String::substr($declaration,0,-1).';';
 		
 		$tpl->add_variables(array(
-			'classname' => $this->_class->get_name(),
+			'classname' => $classname,
 			'declaration' => $declaration
 		));
 		
@@ -142,19 +143,22 @@ final class PC_Module_Class extends FWS_Module
 				'type' => $method->__ToString(),
 				'line' => $method->get_line(),
 				'url' => $this->_get_url($classfile,$method),
-				'since' => $method->get_since()
+				'since' => implode(', ',$method->get_version()->get_min()),
+				'till' => implode(', ',$method->get_version()->get_max()),
 			);
 		}
 		$tpl->add_variable_ref('methods',$methods);
 		
-		if($this->_class->get_file())
+		if($this->_class->get_file() && $this->_class->get_line())
 			$source = PC_Utils::highlight_file($this->_class->get_file());
 		else
 			$source = '';
 		$tpl->add_variables(array(
 			'source' => $source,
 			'file' => $this->_class->get_file(),
-			'line' => $this->_class->get_line()
+			'line' => $this->_class->get_line(),
+			'since' => implode(', ',$this->_class->get_version()->get_min()),
+			'till' => implode(', ',$this->_class->get_version()->get_max()),
 		));
 	}
 	
@@ -168,7 +172,7 @@ final class PC_Module_Class extends FWS_Module
 	private function _get_url($classfile,$loc)
 	{
 		if($loc->get_line() == 0)
-			return '';
+			return $loc->get_file();
 		if($loc->get_file() == $classfile)
 			return '#l'.$loc->get_line();
 		return PC_URL::get_code_url($loc);

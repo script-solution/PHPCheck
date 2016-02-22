@@ -3,59 +3,82 @@
 {if module_error == false}
 <table width="100%" class="pc_table">
 	<tr>
-		<th colspan="2">{classname}</th>
+		<th colspan="3">{classname}</th>
 	</tr>
 	<tr>
 		<td>Location</td>
-		<td>
-		{if file}{file}, line {line}{else}<i>Unknown</i>{endif}</td>
+		<td colspan="2">
+		{if file && line}
+		{file}, line {line}
+		{else}
+		{if file}
+		<a href="{file}">{file}</a>
+		{else}
+		<i>Unknown</i>
+		{endif}
+		{endif}
+		</td>
 	</tr>
 	<tr>
 		<td>Declaration</td>
-		<td>{declaration}</td>
+		<td colspan="2">{declaration}</td>
 	</tr>
 	<tr>
-		<td align="center" class="pc_coldesc" colspan="2">Constants</td>
+		<td>Requirements</td>
+		<td colspan="2">
+		{if since}&gt;= {since}{endif}
+		{if till}
+		{if since} and {endif}
+		&lt; {till}
+		{endif}
+		</td>
+	</tr>
+	<tr>
+		<td align="center" class="pc_coldesc" colspan="3">Constants</td>
 	</tr>
 	{if consts.length == 0}
 	<tr>
-		<td colspan="2">-</td>
+		<td colspan="3">-</td>
 	</tr>
 	{endif}
 	{loop consts as const}
 	<tr>
 		<td>{if const:url}<a href="{const:url}">{const:name}</a>{else}{const:name}{endif}:</td>
-		<td>{const:type}</td>
+		<td colspan="2">{const:type}</td>
 	</tr>
 	{endloop}
 	<tr>
-		<td align="center" class="pc_coldesc" colspan="2">Fields</td>
+		<td align="center" class="pc_coldesc" colspan="3">Fields</td>
 	</tr>
 	{if fields.length == 0}
 	<tr>
-		<td colspan="2">-</td>
+		<td colspan="3">-</td>
 	</tr>
 	{endif}
 	{loop fields as field}
 	<tr>
 		<td>{if field:url}<a href="{field:url}">{field:name}</a>{else}{field:name}{endif}:</td>
-		<td>{field:type}</td>
+		<td colspan="2">{field:type}</td>
 	</tr>
 	{endloop}
 	<tr>
-		<td align="center" class="pc_coldesc" colspan="2">Methods</td>
+		<td align="center" class="pc_coldesc" colspan="3">Methods</td>
 	</tr>
 	{if methods.length == 0}
 	<tr>
-		<td colspan="2">-</td>
+		<td colspan="3">-</td>
 	</tr>
 	{endif}
 	{loop methods as method}
 	<tr>
 		<td>{if method:url}<a href="{method:url}">{method:name}</a>{else}{method:name}{endif}:</td>
+		<td>{method:type}</td>
 		<td>
-		{method:type}
-		{if method:since}, {method:since}{endif}
+		{if method:since}&gt;= {method:since}{endif}
+		{if method:till}
+		{if method:since} and {endif}
+		&lt; {method:till}
+		{endif}
 		</td>
 	</tr>
 	{endloop}

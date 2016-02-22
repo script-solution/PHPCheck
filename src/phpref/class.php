@@ -64,7 +64,7 @@ final class PC_PHPRef_Class extends FWS_Object
 			throw new PC_PHPRef_Exception('Unable to find class-name in file "'.$this->file.'"');
 		$name = $match[1];
 		
-		$class = new PC_Obj_Class('',0);
+		$class = new PC_Obj_Class($this->file,0);
 		$class->set_name($name);
 		
 		// determine super-class
@@ -110,7 +110,7 @@ final class PC_PHPRef_Class extends FWS_Object
 		{
 			foreach($matches[0] as $k => $v)
 			{
-				list($type,$classname,$method) = PC_PHPRef_Utils::parse_method_desc($matches[1][$k]);
+				list($type,$classname,$method) = PC_PHPRef_Utils::parse_method_desc($this->file,$matches[1][$k]);
 				$class->add_method($method);
 			}
 		}
@@ -118,10 +118,19 @@ final class PC_PHPRef_Class extends FWS_Object
 		{
 			foreach($matches[0] as $k => $v)
 			{
-				list($type,$classname,$method) = PC_PHPRef_Utils::parse_method_desc($matches[1][$k]);
+				list($type,$classname,$method) = PC_PHPRef_Utils::parse_method_desc($this->file,$matches[1][$k]);
 				$class->add_method($method);
 			}
 		}
+		
+		// find version-information
+		$vinfo = '';
+		$vmatch = array();
+		if(preg_match('/<p class="verinfo">\s*\((.*?)\)\s*<\/p>/',$content,$vmatch))
+			$vinfo = trim($vmatch[1]);
+		$version = PC_PHPRef_Utils::parse_version($vinfo);
+		
+		$class->get_version()->set($version['min'],$version['max']);
 		return $class;
 	}
 	

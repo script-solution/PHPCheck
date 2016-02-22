@@ -121,11 +121,11 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	private $throws;
 	
 	/**
-	 * The version since when this method exists
-	 * 
-	 * @var string
+	 * The version  info
+	 *
+	 * @var PC_Obj_VersionInfo
 	 */
-	private $since = '';
+	private $version;
 	
 	/**
 	 * The class-id
@@ -151,6 +151,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 		$this->params = array();
 		$this->throws = array();
 		$this->return = new PC_Obj_MultiType();
+		$this->version = new PC_Obj_VersionInfo();
 		$this->free = $free;
 		$this->class = $classid;
 	}
@@ -392,21 +393,11 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	}
 	
 	/**
-	 * @return string the version in which the method exists
+	 * @return PC_Obj_VersionInfo the version info
 	 */
-	public function get_since()
+	public function get_version()
 	{
-		return $this->since;
-	}
-	
-	/**
-	 * Sets the since-value
-	 * 
-	 * @param string $since the new value
-	 */
-	public function set_since($since)
-	{
-		$this->since = $since;
+		return $this->version;
 	}
 	
 	protected function get_dump_vars()

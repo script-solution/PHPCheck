@@ -85,28 +85,28 @@ final class PC_PHPRef_Function extends FWS_Object
 			$content,$matches
 		);
 		if(!$res)
-			throw new PC_PHPRef_Exception('Unable to find method-description');
+			return array();
 		
 		// find version-information
-		$version = '';
+		$vinfo = '';
 		$vmatch = array();
 		if(preg_match('/<p class="verinfo">\s*\((.*?)\)\s*<\/p>/',$content,$vmatch))
-			$version = trim($vmatch[1]);
+			$vinfo = trim($vmatch[1]);
 		
 		$methods = array();
 		foreach($matches[0] as $k => $v)
-			$methods[] = PC_PHPRef_Utils::parse_method_desc($matches[1][$k]);
-		$version = PC_PHPRef_Utils::parse_version($version);
+			$methods[] = PC_PHPRef_Utils::parse_method_desc($this->file,$matches[1][$k]);
+		$version = PC_PHPRef_Utils::parse_version($vinfo);
 		
 		// if we've found more than one synopsis, we have to merge them into one. this is, of course,
 		// not perfect, but adding multiple methods with the same name would break the current concept
 		if(count($methods) > 1)
 		{
 			$method = PC_PHPRef_Utils::merge_methods($methods);
-			$method->set_since($version);
+			$method->get_version()->set($version['min'],$version['max']);
 			return array($methods[0][0],$methods[0][1],$method);
 		}
-		$methods[0][2]->set_since($version);
+		$methods[0][2]->get_version()->set($version['min'],$version['max']);
 		return $methods[0];
 	}
 	

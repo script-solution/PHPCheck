@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 13, 2016 at 10:39 PM
+-- Generation Time: Feb 22, 2016 at 01:34 PM
 -- Server version: 10.1.11-MariaDB-log
 -- PHP Version: 7.0.3
 
@@ -48,7 +48,9 @@ CREATE TABLE `pc_classes` (
   `final` tinyint(1) NOT NULL,
   `interface` tinyint(1) NOT NULL,
   `superclass` varchar(255) DEFAULT NULL,
-  `interfaces` text NOT NULL
+  `interfaces` text NOT NULL,
+  `min_version` text NOT NULL,
+  `max_version` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -121,7 +123,8 @@ CREATE TABLE `pc_functions` (
   `return_type` text NOT NULL,
   `throws` text NOT NULL,
   `params` text NOT NULL,
-  `since` varchar(10) NOT NULL
+  `min_version` text NOT NULL,
+  `max_version` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------

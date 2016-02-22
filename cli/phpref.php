@@ -53,10 +53,10 @@ final class PC_CLI_PHPRef implements PC_CLIJob
 		{
 			try
 			{
-				if(preg_match('/\/function\./',$file))
-					$this->grab_function($typecon,$file);
-				else
+				if(preg_match('/\/class\./',$file))
 					$this->grab_class($typecon,$file);
+				else
+					$this->grab_function($typecon,$file);
 			}
 			catch(PC_PHPRef_Exception $e)
 			{
@@ -100,6 +100,9 @@ final class PC_CLI_PHPRef implements PC_CLIJob
 	{
 		$func = new PC_PHPRef_Function($file);
 		$res = $func->get_method();
+		if(count($res) == 0)
+			return;
+		
 		if($res[0] == 'alias')
 		{
 			list(,$funcname,$aliasclass,$aliasfunc) = $res;
@@ -110,9 +113,15 @@ final class PC_CLI_PHPRef implements PC_CLIJob
 			list(,$classname,$method) = $res;
 				// save method-version-information for later use
 			if($classname)
-				$this->versions[] = array($classname,$method->get_name(),$method->get_since());
+			{
+				$this->versions[] = array(
+					$classname,
+					$method->get_name(),
+					$method->get_version()
+				);
+			}
 			else
-					PC_DAO::get_functions()->create($method,0,PC_Project::PHPREF_ID);
+				PC_DAO::get_functions()->create($method,0,PC_Project::PHPREF_ID);
 		}
 	}
 }

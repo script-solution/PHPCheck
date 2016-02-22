@@ -128,9 +128,15 @@ final class PC_Module_PHPRef_Task_Scan extends FWS_Object implements FWS_Progres
 			list(,$classname,$method) = $res;
 				// save method-version-information for later use
 			if($classname)
-				$this->versions[] = array($classname,$method->get_name(),$method->get_since());
+			{
+				$this->versions[] = array(
+					$classname,
+					$method->get_name(),
+					$method->get_version(),
+				);
+			}
 			else
-					PC_DAO::get_functions()->create($method,0,PC_Project::PHPREF_ID);
+				PC_DAO::get_functions()->create($method,0,PC_Project::PHPREF_ID);
 		}
 	}
 

@@ -40,7 +40,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 	public static function merge_methods($methods)
 	{
 		list(,,$first) = $methods[0];
-		$method = new PC_Obj_Method('',0,true);
+		$method = new PC_Obj_Method($first->get_file(),0,true);
 		$method->set_name($first->get_name());
 		$method->set_visibility($first->get_visibility());
 		$method->set_static($first->is_static());
@@ -122,30 +122,108 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 	 * Parses the given version
 	 * 
 	 * @param string $version the version
-	 * @return string the parsed version
+	 * @return array an array with min and max versions
 	 */
 	public static function parse_version($version)
 	{
-		$lowest = '';
+		$res = array(
+			'min' => array(),
+			'max' => array(),
+		);
+		
 		if($version)
 		{
+			$minversion = 0;
+			$phpversions = array(
+				4 => false,
+				5 => false,
+				7 => false
+			);
+			$phpfound = false;
+			
 			$versions = explode(',',$version);
-			natsort($versions);
-			$lowest = $versions[0];
-			if(($pos = strpos($lowest,'PHP')) !== false)
+			foreach($versions as $v)
 			{
-				$lowest = substr($lowest,$pos + 3);
-				if(($pos = strpos($lowest,'&lt;=')) !== false)
-					$lowest = '-'.trim(substr($lowest,$pos + 5));
-				else if(($pos = strpos($lowest,'&gt;=')) !== false)
-					$lowest = '+'.trim(substr($lowest,$pos + 5));
-				else
-					$lowest = '+'.trim($lowest);
+				$v = trim($v);
+				if(preg_match('/^PHP (\d)$/',$v,$m))
+				{
+					// remember that we found that version
+					$phpversions[$m[1]] = true;
+					$phpfound = true;
+					
+					// don't add a higher version as minimum
+					if($minversion == 0)
+						$minversion = $m[1];
+					else if($minversion < $m[1])
+						continue;
+					
+					$res['min'][] = $v;
+				}
+				else if(preg_match('/^PECL \S+ ([\d\.]+)$/',$v))
+					$res['min'][] = $v;
+				else if(preg_match('/^(PHP|PECL \S+) ([\d\.]+ )?&gt;=\s*([\d\.]+)$/',$v,$m))
+				{
+					if($m[1] == 'PHP')
+					{
+						$phpversions[$m[3][0]] = true;
+						$phpfound = true;
+						
+						if($minversion == 0)
+							$minversion = $m[3][0];
+						else if($minversion < $m[3][0])
+							continue;
+					}
+					
+					$res['min'][] = $m[1].' '.$m[3];
+				}
+				else if(preg_match('/^(PHP|PECL \S+) ([\d\.]+ )?&lt;\s*([\d\.]+)$/',$v,$m))
+				{
+					// if we don't have a minimum yet, 'X < X.Y.Z' does also define a minimum
+					if($m[2] && count($res['min']) == 0)
+						$res['min'][] = $m[1].' '.$m[2];
+					$res['max'][] = $m[1].' '.$m[3];
+				}
+				else if(preg_match('/^(PHP|PECL \S+) ([\d\.]+ )?&lt;=\s*([\d\.]+)$/',$v,$m))
+				{
+					if($m[2] && count($res['min']) == 0)
+						$res['min'][] = $m[1].' '.$m[2];
+					// calculate the next version; TODO this is not correct in general
+					$m[3] = preg_replace_callback(
+						'/^(\d\.\d\.)(\d)$/',
+						function($m) {
+							return $m[1].($m[2] + 1);
+						},
+						$m[3]
+					);
+					$res['max'][] = $m[1].' '.$m[3];
+				}
+				else if(preg_match('/^(PECL \S+) &gt;= Unknown$/',$v,$m))
+					$res['min'][] = $m[1];
+				else if(preg_match('/^(PECL \S+) ([\d\.]+)-([\d\.]+)$/',$v,$m))
+				{
+					$res['min'][] = $m[1].' '.$m[2];
+					$res['max'][] = $m[1].' '.$m[3];
+				}
 			}
-			else
-				$lowest = '';
+			
+			// if we don't have a max version yet, determine it from the not found min versions
+			if($phpfound && count($res['max']) == 0)
+			{
+				$last = 0;
+				foreach($phpversions as $k => $v)
+				{
+					if(!$v && $last)
+					{
+						$res['max'][] = 'PHP '.$k;
+						break;
+					}
+					else if($v)
+						$last = $k;
+				}
+			}
 		}
-		return $lowest;
+		
+		return $res;
 	}
 	
 	/**
@@ -207,13 +285,19 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 	/**
 	 * Parses a method-description into a PC_Obj_Method
 	 * 
+	 * @param string $file the filename
 	 * @param string $desc the description
 	 * @return array an array of the class-name and the PC_Obj_Method
 	 * @throws PC_PHPRef_Exception if it failed
 	 */
-	public static function parse_method_desc($desc)
+	public static function parse_method_desc($file,$desc)
 	{
 		$classname = '';
+		
+		// find link to method
+		if(preg_match('/<a href="(.*?)" class="methodname">/',$desc,$m))
+			$file = dirname($file).'/'.$m[1];
+		
 		// prepare description
 		$desc = trim(strip_tags($desc));
 		$desc = FWS_StringHelper::htmlspecialchars_back($desc);
@@ -243,7 +327,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 		}
 		
 		// build basic method
-		$method = new PC_Obj_Method('',0,$classname != '');
+		$method = new PC_Obj_Method($file,0,$classname != '');
 		if($modifier1 == 'static' || $modifier2 == 'static' || $modifier3 == 'static')
 			$method->set_static(true);
 		if($modifier1 == 'final' || $modifier2 == 'final' || $modifier3 == 'final')

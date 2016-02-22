@@ -33,7 +33,7 @@
 	<tr>
 		<th>Function</th>
 		<th>Location</th>
-		<th>Since</th>
+		<th>Requirements</th>
 	</tr>
 	{if funcs.length == 0}
 	<tr>
@@ -44,10 +44,23 @@
 	<tr>
 		<td class="pc_main">{f:func}</td>
 		<td class="pc_main">
-		{if f:file}{f:file}{else}<i>Unknown</i>{endif}
-		{if f:line > 0}, line {f:line}{endif}
+		{if f:file && f:line}
+		{f:file}, line {f:line}
+		{else}
+		{if f:file}
+		<a href="{f:file}">{f:file}</a>
+		{else}
+		<i>Unknown</i>
+		{endif}
+		{endif}
 		</td>
-		<td class="pc_main" align="center">{f:since}</td>
+		<td class="pc_main" align="center">
+		{if f:since}&gt;= {f:since}{endif}
+		{if f:till}
+		{if f:since} and {endif}
+		&lt; {f:till}
+		{endif}
+		</td>
 	</tr>
 	{endloop}
 	{endif}

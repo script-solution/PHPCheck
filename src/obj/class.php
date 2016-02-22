@@ -92,6 +92,13 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	private $methods = null;
 	
 	/**
+	 * The version  info
+	 *
+	 * @var PC_Obj_VersionInfo
+	 */
+	private $version;
+	
+	/**
 	 * Constructor
 	 *
 	 * @param string $file the file of the class-def
@@ -113,6 +120,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 			$this->methods = array();
 			$this->constants = array();
 		}
+		$this->version = new PC_Obj_VersionInfo();
 	}
 	
 	/**
@@ -374,6 +382,14 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 			}
 		}
 		return $str;
+	}
+	
+	/**
+	 * @return PC_Obj_VersionInfo the version info
+	 */
+	public function get_version()
+	{
+		return $this->version;
 	}
 	
 	public function __toString()

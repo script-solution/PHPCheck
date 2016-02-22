@@ -212,7 +212,9 @@ class PC_DAO_Classes extends FWS_Singleton
 			'final' => $class->is_final() ? 1 : 0,
 			'interface' => $class->is_interface() ? 1 : 0,
 			'superclass' => $class->get_super_class() === null ? '' : $class->get_super_class(),
-			'interfaces' => implode(',',$class->get_interfaces())
+			'interfaces' => implode(',',$class->get_interfaces()),
+			'min_version' => serialize($class->get_version()->get_min()),
+			'max_version' => serialize($class->get_version()->get_max())
 		));
 		
 		// create constants
@@ -287,6 +289,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		$c->set_abstract($row['abstract']);
 		$c->set_interface($row['interface']);
 		$c->set_final($row['final']);
+		$c->get_version()->set(unserialize($row['min_version']),unserialize($row['max_version']));
 		foreach(FWS_Array_Utils::advanced_explode(',',$row['interfaces']) as $if)
 			$c->add_interface($if);
 		return $c;
