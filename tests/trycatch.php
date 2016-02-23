@@ -38,7 +38,7 @@ catch(Exception $e) {
 		
 		list(,,$vars,$calls,,) = $this->analyze($code);
 		
-		self::assertEquals('myfunc(Exception)',(string)$calls[0]->get_call(false,false));
+		self::assertEquals('myfunc(Exception)',(string)$calls[0]->get_call(null,false));
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['e']->get_type());

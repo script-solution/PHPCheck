@@ -46,6 +46,7 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	private $_missing = array(
 		'classes' => array(),
 		'funcs' => array(),
+		'methods' => array(),
 		'consts' => array(),
 	);
 	
@@ -61,6 +62,12 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	 * @var array
 	 */
 	private $_functions = array();
+	/**
+	 * All currently known methods
+	 *
+	 * @var array
+	 */
+	private $_methods = array();
 	/**
 	 * All currently known constants
 	 *
@@ -241,6 +248,53 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	public function get_functions()
 	{
 		return $this->_functions;
+	}
+	
+	/**
+	 * Returns the method or freestanding function with given name/class.
+	 *
+	 * @param string $class the class-name
+	 * @param string $method the method-name
+	 * @return PC_Obj_Method the function or null if not found
+	 */
+	public function get_method_or_func($class,$method)
+	{
+		if($class == '')
+			return $this->get_function($method);
+		return $this->get_method($class,$method);
+	}
+	
+	/**
+	 * Returns the method with given name. Will fetch it from db if not already present
+	 *
+	 * @param string $class the class-name
+	 * @param string $method the method-name
+	 * @return PC_Obj_Method the function or null if not found
+	 */
+	public function get_method($class,$method)
+	{
+		if(!isset($this->_missing['methods'][$class.'::'.$method]))
+		{
+			if(!isset($this->_methods[$class.'::'.$method]) && $this->_use_db)
+			{
+				$f = PC_DAO::get_functions()->get_by_name($method,$this->_pid,$class);
+				if($f)
+					$this->_methods[$class.'::'.$method] = $f;
+				else
+					$this->_missing['methods'][$class.'::'.$method] = true;
+			}
+			if(!isset($this->_methods[$class.'::'.$method]) && $this->_use_phpref)
+			{
+				$f = PC_DAO::get_functions()->get_by_name($method,PC_Project::PHPREF_ID,$class);
+				if($f)
+					$this->_methods[$class.'::'.$method] = $f;
+				else
+					$this->_missing['methods'][$class.'::'.$method] = true;
+			}
+		}
+		if(isset($this->_methods[$class.'::'.$method]))
+			return $this->_methods[$class.'::'.$method];
+		return null;
 	}
 	
 	/**

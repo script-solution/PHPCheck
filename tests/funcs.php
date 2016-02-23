@@ -110,8 +110,8 @@ abstract class myc {
 		self::assertEquals('MyClass',(string)$func->get_param('c'));
 		self::assertEquals('integer',(string)$func->get_param('d'));
 		
-		self::assertEquals('myc->doit()',(string)$calls[0]->get_call(false,false));
-		self::assertEquals('myc2::mystatic()',(string)$calls[1]->get_call(false,false));
+		self::assertEquals('myc->doit()',(string)$calls[0]->get_call(null,false));
+		self::assertEquals('myc2::mystatic()',(string)$calls[1]->get_call(null,false));
 	}
 	
 	public function testNesting()
@@ -151,9 +151,9 @@ function e() {
 		
 		list(,,$vars,$calls,,) = $this->analyze($code);
 		
-		self::assertEquals('f3(integer=3)',(string)$calls[0]->get_call(false,false));
-		self::assertEquals('f2(integer=2)',(string)$calls[1]->get_call(false,false));
-		self::assertEquals('f1(integer=1)',(string)$calls[2]->get_call(false,false));
+		self::assertEquals('f3(integer=3)',(string)$calls[0]->get_call(null,false));
+		self::assertEquals('f2(integer=2)',(string)$calls[1]->get_call(null,false));
+		self::assertEquals('f1(integer=1)',(string)$calls[2]->get_call(null,false));
 		
 		self::assertEquals((string)PC_Obj_MultiType::create_int(1),(string)$vars['A::a']['a']->get_type());
 		self::assertEquals((string)PC_Obj_MultiType::create_int(2),(string)$vars['b']['b']->get_type());

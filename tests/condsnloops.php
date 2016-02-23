@@ -288,31 +288,31 @@ if($_)
 		
 		self::assertEquals(
 			'func1(bool=1)',
-			(string)$calls[0]->get_call(false,false)
+			(string)$calls[0]->get_call(null,false)
 		);
 		self::assertEquals(
 			'func2(bool=1 or string=str)',
-			(string)$calls[1]->get_call(false,false)
+			(string)$calls[1]->get_call(null,false)
 		);
 		self::assertEquals(
 			'func3(bool=1 or string=str or float=12.3)',
-			(string)$calls[2]->get_call(false,false)
+			(string)$calls[2]->get_call(null,false)
 		);
 		self::assertEquals(
 			'func4(bool=1 or string=str or float=12.3 or integer=2)',
-			(string)$calls[3]->get_call(false,false)
+			(string)$calls[3]->get_call(null,false)
 		);
 		self::assertEquals(
 			'func5(bool=1 or string=str or float=12.3 or integer)',
-			(string)$calls[4]->get_call(false,false)
+			(string)$calls[4]->get_call(null,false)
 		);
 		self::assertEquals(
 			'func6(integer)',
-			(string)$calls[5]->get_call(false,false)
+			(string)$calls[5]->get_call(null,false)
 		);
 		self::assertEquals(
 			'func7(integer)',
-			(string)$calls[6]->get_call(false,false)
+			(string)$calls[6]->get_call(null,false)
 		);
 	}
 	
@@ -360,35 +360,35 @@ foreach($b as list($x,$y,$z))
 		
 		self::assertEquals(
 			'f1(integer, integer)',
-			(string)$calls[0]->get_call(false,false)
+			(string)$calls[0]->get_call(null,false)
 		);
 		self::assertEquals(
 			'f2(string)',
-			(string)$calls[1]->get_call(false,false)
+			(string)$calls[1]->get_call(null,false)
 		);
 		self::assertEquals(
 			'f3(unknown)',
-			(string)$calls[2]->get_call(false,false)
+			(string)$calls[2]->get_call(null,false)
 		);
 		self::assertEquals(
 			'f4(unknown)',
-			(string)$calls[3]->get_call(false,false)
+			(string)$calls[3]->get_call(null,false)
 		);
 		self::assertEquals(
 			'f5(unknown, integer)',
-			(string)$calls[4]->get_call(false,false)
+			(string)$calls[4]->get_call(null,false)
 		);
 		self::assertEquals(
 			'f6(integer, unknown)',
-			(string)$calls[5]->get_call(false,false)
+			(string)$calls[5]->get_call(null,false)
 		);
 		self::assertEquals(
 			'f7(unknown, unknown)',
-			(string)$calls[6]->get_call(false,false)
+			(string)$calls[6]->get_call(null,false)
 		);
 		self::assertEquals(
 			'f8(unknown, unknown, unknown)',
-			(string)$calls[7]->get_call(false,false)
+			(string)$calls[7]->get_call(null,false)
 		);
 	}
 }

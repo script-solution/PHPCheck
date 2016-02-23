@@ -197,11 +197,11 @@ class PC_Obj_Call extends PC_Obj_Location
 	/**
 	 * Builds a string-representation of the call
 	 * 
-	 * @param bool $use_db wether to query the db for more info
+	 * @param PC_Engine_TypeContainer $types the type container to use or null
 	 * @param bool $use_links use links?
 	 * @return string
 	 */
-	public function get_call($use_db = true,$use_links = true)
+	public function get_call($types = null,$use_links = true)
 	{
 		$classname = $this->class && $this->class == PC_Obj_Class::UNKNOWN ? '<i>UNKNOWN</i>' : $this->class;
 		if($use_links)
@@ -215,8 +215,8 @@ class PC_Obj_Call extends PC_Obj_Location
 			$str .= $use_links ? '<a href="'.$url->to_url().'">'.$classname.'</a>' : $classname;
 			$str .= $this->static ? '::' : '->';
 		}
-		if($use_db && $use_links)
-			$func = PC_DAO::get_functions()->get_by_name($this->function,PC_Project::CURRENT_ID,$this->class);
+		if($types !== null && $use_links)
+			$func = $types->get_method_or_func($this->class,$this->function);
 		else
 			$func = null;
 		if($func)
@@ -240,6 +240,6 @@ class PC_Obj_Call extends PC_Obj_Location
 	
 	public function __ToString()
 	{
-		return $this->get_call(false,false).' in "'.$this->get_file().'", line '.$this->get_line();
+		return $this->get_call(null,false).' in "'.$this->get_file().'", line '.$this->get_line();
 	}
 }
