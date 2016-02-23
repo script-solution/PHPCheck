@@ -110,7 +110,7 @@ class H {
 		$error = $errors[2];
 		self::assertEquals(PC_Obj_Error::E_T_MAGIC_METHOD_RET_INVALID,$error->get_type());
 		self::assertRegExp(
-			'/The magic method "#D#::__set" has a return-specification in PHPDoc, but should not return a value/',
+			'/The return-type of the magic-method "#D#::__set" is invalid \(expected="void", found="float"\)/',
 			$error->get_msg()
 		);
 		
@@ -148,12 +148,12 @@ class B {
 		$params = array(
 			new PC_Obj_Parameter('name',PC_Obj_MultiType::create_string())
 		);
-				
+
 		self::assertEquals(2,count($errors));
 		
 		$m = $classes['A']->get_method('__get');
 		self::assertParamsEqual($params,$m->get_params());
-		self::assertEquals((string)new PC_Obj_MultiType(),(string)$m->get_return_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_void(),(string)$m->get_return_type());
 		
 		$m = $classes['B']->get_method('__get');
 		self::assertParamsEqual($params,$m->get_params());
@@ -301,7 +301,7 @@ class D {
 	
 	public function test__set_state()
 	{
-		// public static mixed __set_state( array $props )
+		// public static object __set_state( array $props )
 		$code = '<?php
 class A {
 	public function __set_state($arr);
@@ -318,11 +318,11 @@ class B {
 		
 		$m = $classes['A']->get_method('__set_state');
 		self::assertParamsEqual($params,$m->get_params());
-		self::assertEquals((string)new PC_Obj_MultiType(),(string)$m->get_return_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_object(),(string)$m->get_return_type());
 		
 		$m = $classes['B']->get_method('__set_state');
 		self::assertParamsEqual($params,$m->get_params());
-		self::assertEquals((string)new PC_Obj_MultiType(),(string)$m->get_return_type());
+		self::assertEquals((string)PC_Obj_MultiType::create_object(),(string)$m->get_return_type());
 		
 		self::assertEquals(3,count($errors));
 		

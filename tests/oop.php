@@ -170,11 +170,11 @@ $r = $p[1]->test2($b);
 			(string)$a->get_field('p')
 		);
 		self::assertEquals(
-			'public function __construct(): unknown',
+			'public function __construct()',
 			(string)$a->get_method('__construct')
 		);
 		self::assertEquals(
-			'private function test(): unknown',
+			'private function test(): void',
 			(string)$a->get_method('test')
 		);
 		self::assertEquals(
@@ -226,7 +226,7 @@ $r = $p[1]->test2($b);
 			(string)$x->get_method('test2')
 		);
 		self::assertEquals(
-			'public static function mystatic(): unknown',
+			'public static function mystatic(): void',
 			(string)$x->get_method('mystatic')
 		);
 		$field = new PC_Obj_Field('',0,'var',PC_Obj_MultiType::create_int(4),PC_Obj_Field::V_PRIVATE);

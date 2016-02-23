@@ -40,6 +40,7 @@ final class PC_Obj_Type extends FWS_Object
 	const OBJECT		= 5;
 	const RESOURCE	= 6;
 	const TCALLABLE	= 7;
+	const VOID			= 8;
 	
 	/**
 	 * Determines the type-instance by the given type-name
@@ -80,6 +81,8 @@ final class PC_Obj_Type extends FWS_Object
 				return new self(self::RESOURCE);
 			
 			case 'void':
+				return new self(self::VOID);
+
 			case 'mixed':
 			case 'NULL':					// return from gettype()
 			case 'unknown type':	// return from gettype()
@@ -498,6 +501,8 @@ final class PC_Obj_Type extends FWS_Object
 				return 'object';
 			case self::TCALLABLE:
 				return 'callable';
+			case self::VOID:
+				return 'void';
 		}
 	}
 	

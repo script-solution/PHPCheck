@@ -124,6 +124,16 @@ class PC_Obj_MultiType extends FWS_Object
 	}
 	
 	/**
+	 * Creates a multitype with type VOID
+	 * 
+	 * @return PC_Obj_MultiType the multitype
+	 */
+	public static function create_void()
+	{
+		return new self(array(new PC_Obj_Type(PC_Obj_Type::VOID)));
+	}
+	
+	/**
 	 * Builds the MultiType-instance from the given name. '|' will be assumed as separator
 	 * of the types.
 	 *
@@ -141,10 +151,6 @@ class PC_Obj_MultiType extends FWS_Object
 			$typeobj = PC_Obj_Type::get_type_by_name($type);
 			if($typeobj !== null)
 				$ts[] = $typeobj;
-			// for void, return "no type"
-			// TODO maybe we should report an error if there are other return types specified?
-			else if($is_return && FWS_String::strtolower($type) == 'void')
-				return null;
 		}
 		return new PC_Obj_MultiType($ts);
 	}

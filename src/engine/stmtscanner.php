@@ -1212,11 +1212,18 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 					$hasother = true;
 			}
 			
-			$mtype = new PC_Obj_MultiType();
-			foreach($this->allrettypes as $t)
+			if(count($this->allrettypes) == 0)
+				$mtype = PC_Obj_MultiType::create_void();
+			else
 			{
-				if($t !== null)
-					$mtype->merge($t,false);
+				$mtype = new PC_Obj_MultiType();
+				foreach($this->allrettypes as $t)
+				{
+					if($t !== null)
+						$mtype->merge($t,false);
+					else
+						$mtype->merge(PC_Obj_MultiType::create_void(),false);
+				}
 			}
 			
 			$name = ($classname ? '#'.$classname.'#::' : '').$funcname;
@@ -1230,7 +1237,10 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 					PC_Obj_Error::E_S_MIXED_RET_AND_NO_RET
 				);
 			}
-			if($func->has_return_doc() && !$hasother)
+			
+			$void = new PC_Obj_Type(PC_Obj_Type::VOID);
+			$docreturn = $func->has_return_doc() && !$func->get_return_type()->contains($void);
+			if($docreturn && !$hasother)
 			{
 				$this->report_error(
 					$func,
@@ -1239,7 +1249,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 					PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET
 				);
 			}
-			else if(!$func->has_return_doc() && !$func->is_anonymous() && $hasother)
+			else if(!$docreturn && !$func->is_anonymous() && $hasother)
 			{
 				$this->report_error(
 					$func,

@@ -430,7 +430,9 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 		}
 		$str .= '(';
 		$str .= implode(', ',$this->get_params());
-		$str .= '): '.$this->get_return_type();
+		$str .= ')';
+		if($this->get_name() != '__construct')
+			$str .= ': '.$this->get_return_type();
 		if(count($this->throws) > 0)
 			$str .= ' throws '.implode(', ',array_keys($this->throws));
 		return $str;

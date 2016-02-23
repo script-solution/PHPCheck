@@ -138,7 +138,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 		// * void__wakeup( void )
 		// public string __toString( void )
 		// public void __invoke( ... )
-		// public static mixed __set_state( array $props )
+		// public static object __set_state( array $props )
 		// * void __clone( void )
 		
 		$ismagic = true;
@@ -239,14 +239,17 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 				}
 			}
 		
-			$return = null;
+			$return = new PC_Obj_MultiType();
 			switch(strtolower($method->get_name()))
 			{
-				case '__get':
-				case '__call':
-				case '__callstatic':
+				case '__set':
+				case '__unset':
+				case '__wakeup':
+				case '__clone':
+					$return = PC_Obj_MultiType::create_void();
+					break;
 				case '__set_state':
-					$return = new PC_Obj_MultiType();
+					$return = PC_Obj_MultiType::create_object();
 					break;
 				case '__isset':
 					$return = PC_Obj_MultiType::create_bool();
@@ -259,27 +262,21 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 					break;
 			}
 			
-			if($method->has_return_doc() && $return === null)
+			if($method->has_return_doc() && !$method->get_return_type()->equals($return))
 			{
-				$this->report_error(
-					$method,
-					'The magic method "#'.$classname.'#::'.$method->get_name().'" has a return-specification'
-					.' in PHPDoc, but should not return a value',
-					PC_Obj_Error::E_T_MAGIC_METHOD_RET_INVALID
-				);
+				// its ok to specify a more specific return-value if the expected one is "mixed"
+				if(!$return->is_unknown())
+				{
+					$this->report_error(
+						$method,
+						'The return-type of the magic-method "#'.$classname.'#::'.$method->get_name().'" is invalid '
+						.'(expected="'.$return.'", found="'.$method->get_return_type().'")',
+						PC_Obj_Error::E_T_MAGIC_METHOD_RET_INVALID
+					);
+				}
 			}
-			// its ok to specify a more specific return-value if the expected one is "mixed"
-			else if($method->has_return_doc() && !$return->is_unknown() &&
-				!$method->get_return_type()->equals($return))
-			{
-				$this->report_error(
-					$method,
-					'The return-type of the magic-method "#'.$classname.'#::'.$method->get_name().'" is invalid '
-					.'(expected="'.$return.'", found="'.$method->get_return_type().'")',
-					PC_Obj_Error::E_T_MAGIC_METHOD_RET_INVALID
-				);
-			}
-			else if($return !== null && !$method->has_return_doc())
+			
+			if($return !== null && !$method->has_return_doc())
 			{
 				$method->set_return_type($return);
 				$method->set_has_return_doc(true);

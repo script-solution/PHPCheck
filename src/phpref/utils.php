@@ -340,7 +340,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 			$method->set_visibility($modifier2);
 		else if(in_array($modifier3,array('private','protected')))
 			$method->set_visibility($modifier3);
-		if($return && $return != 'void')
+		if($return)
 		{
 			$method->set_return_type(PC_Obj_MultiType::get_type_by_name($return));
 			// set this always for builtin types since it makes no sense to report errors for
