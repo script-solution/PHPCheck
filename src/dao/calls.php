@@ -79,7 +79,7 @@ class PC_DAO_Calls extends FWS_Singleton
 		if($function)
 			$stmt->bind(':func','%'.$function.'%');
 		$set = $db->execute($stmt->get_statement());
-		$row = $set->next();
+		$row = $set->current();
 		return $row['num'];
 	}
 	

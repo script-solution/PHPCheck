@@ -29,7 +29,7 @@
  * @subpackage	src
  * @author			Nils Asmussen <nils@script-solution.de>
  */	
-class PC_UnitTest extends FWS_Object
+class PC_UnitTest extends FWS_Test_Case
 {
 	/**
 	 * Performs an analysis of the given code.
@@ -37,6 +37,9 @@ class PC_UnitTest extends FWS_Object
 	 * @param string $code the code to analyze
 	 * @param boolean $report_mixed whether to report errors on mixed types
 	 * @param boolean $report_unknown whether to report errors on unknown types
+	 * @param boolean $use_phpref use the PHP manual (and the DB)
+	 * @param string $vmin the minimal PHP version
+	 * @param string $vmax the maximal PHP version
 	 * @return array the following array: array(
 	 *  0 => <functions>,
 	 *  1 => <classes>,
@@ -46,16 +49,16 @@ class PC_UnitTest extends FWS_Object
 	 *  5 => <analyzer errors>
 	 * )
 	 */
-	protected function analyze($code,$report_mixed = false,$report_unknown = false)
+	protected function analyze($code,$report_mixed = false,$report_unknown = false,$use_phpref = false,$vmin = '',$vmax = '')
 	{
-		$tscanner = new PC_Engine_TypeScannerFrontend();
+		$tscanner = new PC_Engine_TypeScannerFrontend($use_phpref,$use_phpref);
 		$tscanner->scan($code);
 		
 		$typecon = $tscanner->get_types();
 		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
 		$fin->finalize();
 		
-		$stmt = new PC_Engine_StmtScannerFrontend($typecon);
+		$stmt = new PC_Engine_StmtScannerFrontend($typecon,$vmin,$vmax);
 		$stmt->scan($code);
 		
 		$an = new PC_Engine_Analyzer($report_mixed,$report_unknown);
@@ -70,32 +73,6 @@ class PC_UnitTest extends FWS_Object
 			$typecon->get_errors(),
 			$an->get_errors(),
 		);
-	}
-	
-	/**
-	 * Checks whether both strings are equal.
-	 *
-	 * @param mixed $exp the expected value
-	 * @param mixed $recv the received value
-	 * @throws Exception if the values are not equal
-	 */
-	protected static function assertEquals($exp,$recv)
-	{
-		if($exp != $recv)
-			throw new Exception('Values are not equal. Expected "'.$exp.'", got "'.$recv.'"');
-	}
-	
-	/**
-	 * Checks whether the string matches the given regular expression.
-	 *
-	 * @param string $pattern the regular expression
-	 * @param string $string the received string
-	 * @throws Exception if the string does not match the pattern
-	 */
-	protected static function assertRegExp($pattern,$string)
-	{
-		if(!preg_match($pattern,$string))
-			throw new Exception('String does not match pattern. Expected "'.$pattern.'", got "'.$string.'"');
 	}
 	
 	protected function get_dump_vars()

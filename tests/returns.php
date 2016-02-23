@@ -86,49 +86,49 @@ function i() {
 ?>';
 		
 		list($functions,,,,$errors,) = $this->analyze($code);
-		self::assertEquals(5,count($errors));
+		self::assert_equals(5,count($errors));
 		
-		self::assertEquals("function b(): integer=0",$functions['b']);
-		self::assertEquals("function c(): integer or string",$functions['c']);
-		self::assertEquals("function d(): integer=1 or void",$functions['d']);
-		self::assertEquals("function e(): foo",$functions['e']);
-		self::assertEquals("function f(): integer",$functions['f']);
-		self::assertEquals("function g(): array",$functions['g']);
-		self::assertEquals("function h(): float",$functions['h']);
-		self::assertEquals("function i(): void",$functions['i']);
+		self::assert_equals("function b(): integer=0",$functions['b']);
+		self::assert_equals("function c(): integer or string",$functions['c']);
+		self::assert_equals("function d(): integer=1 or void",$functions['d']);
+		self::assert_equals("function e(): foo",$functions['e']);
+		self::assert_equals("function f(): integer",$functions['f']);
+		self::assert_equals("function g(): array",$functions['g']);
+		self::assert_equals("function h(): float",$functions['h']);
+		self::assert_equals("function i(): void",$functions['i']);
 		
 		$error = $errors[0];
-		self::assertEquals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
-		self::assertRegExp(
+		self::assert_equals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
+		self::assert_regex(
 			'/The function\/method "#foo#::a" has a return-specification in PHPDoc, but does not return a value/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[1];
-		self::assertEquals(PC_Obj_Error::E_S_RET_BUT_NO_RET_SPEC,$error->get_type());
-		self::assertRegExp(
+		self::assert_equals(PC_Obj_Error::E_S_RET_BUT_NO_RET_SPEC,$error->get_type());
+		self::assert_regex(
 			'/The function\/method "b" has no return-specification in PHPDoc, but does return a value/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[2];
-		self::assertEquals(PC_Obj_Error::E_S_RETURNS_DIFFER_FROM_SPEC,$error->get_type());
-		self::assertRegExp(
+		self::assert_equals(PC_Obj_Error::E_S_RETURNS_DIFFER_FROM_SPEC,$error->get_type());
+		self::assert_regex(
 			'/The return-specification \(PHPDoc\) of function\/method "c" does not match with the returned'
 			.' values \(spec="integer or string", returns="integer=0 or float=12.3"\)/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[3];
-		self::assertEquals(PC_Obj_Error::E_S_MIXED_RET_AND_NO_RET,$error->get_type());
-		self::assertRegExp(
+		self::assert_equals(PC_Obj_Error::E_S_MIXED_RET_AND_NO_RET,$error->get_type());
+		self::assert_regex(
 			'/The function\/method "d" has return-statements without expression and return-statements with expression/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[4];
-		self::assertEquals(PC_Obj_Error::E_S_RET_BUT_NO_RET_SPEC,$error->get_type());
-		self::assertRegExp(
+		self::assert_equals(PC_Obj_Error::E_S_RET_BUT_NO_RET_SPEC,$error->get_type());
+		self::assert_regex(
 			'/The function\/method "d" has no return-specification in PHPDoc, but does return a value/',
 			$error->get_msg()
 		);

@@ -113,48 +113,48 @@ $r = $p[1]->test2($b);
 		
 		$a = $classes['a'];
 		/* @var $a PC_Obj_Class */
-		self::assertEquals(false,$a->is_abstract());
-		self::assertEquals(false,$a->is_interface());
-		self::assertEquals(false,$a->is_final());
-		self::assertEquals(null,$a->get_super_class());
-		self::assertEquals(array(),$a->get_interfaces());
+		self::assert_equals(false,$a->is_abstract());
+		self::assert_equals(false,$a->is_interface());
+		self::assert_equals(false,$a->is_final());
+		self::assert_equals(null,$a->get_super_class());
+		self::assert_equals(array(),$a->get_interfaces());
 		
-		self::assertEquals(
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_int(0),
 			(string)$a->get_constant('c')->get_type()
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_int(4),
 			(string)$a->get_constant('ME')->get_type()
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_string('str'),
 			(string)$a->get_constant('YOU')->get_type()
 		);
 		
-		self::assertEquals(
+		self::assert_equals(
 			(string)new PC_Obj_Field('',0,'f',PC_Obj_MultiType::create_string('abc'),PC_Obj_Field::V_PRIVATE),
 			(string)$a->get_field('f')
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)new PC_Obj_Field(
 				'',0,'foo',PC_Obj_MultiType::get_type_by_name('int|string'),PC_Obj_Field::V_PRIVATE
 			),
 			(string)$a->get_field('foo')
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)new PC_Obj_Field(
 				'',0,'bar',PC_Obj_MultiType::get_type_by_name('int|string'),PC_Obj_Field::V_PRIVATE
 			),
 			(string)$a->get_field('bar')
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)new PC_Obj_Field(
 				'',0,'a',PC_Obj_MultiType::create_string(),PC_Obj_Field::V_PRIVATE
 			),
 			(string)$a->get_field('a')
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)new PC_Obj_Field(
 				'',0,'b',PC_Obj_MultiType::create_string('a'),PC_Obj_Field::V_PRIVATE
 			),
@@ -165,116 +165,116 @@ $r = $p[1]->test2($b);
 		$array->get_first()->set_array_type(0,PC_Obj_MultiType::create_int(1));
 		$array->get_first()->set_array_type(1,PC_Obj_MultiType::create_int(2));
 		$array->get_first()->set_array_type(2,PC_Obj_MultiType::create_int(3));
-		self::assertEquals(
+		self::assert_equals(
 			(string)new PC_Obj_Field('',0,'p',$array,PC_Obj_Field::V_PROTECTED),
 			(string)$a->get_field('p')
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'public function __construct()',
 			(string)$a->get_method('__construct')
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'private function test(): void',
 			(string)$a->get_method('test')
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'protected function test2(a): a',
 			(string)$a->get_method('test2')
 		);
 		
 		$b = $classes['b'];
 		/* @var $b PC_Obj_Class */
-		self::assertEquals(true,$b->is_abstract());
-		self::assertEquals(false,$b->is_interface());
-		self::assertEquals(false,$b->is_final());
-		self::assertEquals('a',$b->get_super_class());
-		self::assertEquals(array('i','j'),$b->get_interfaces());
-		self::assertEquals(
+		self::assert_equals(true,$b->is_abstract());
+		self::assert_equals(false,$b->is_interface());
+		self::assert_equals(false,$b->is_final());
+		self::assert_equals('a',$b->get_super_class());
+		self::assert_equals(array('i','j'),$b->get_interfaces());
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_int(0),
 			(string)$b->get_constant('c')->get_type()
 		);
-		self::assertEquals(null,$b->get_field('f'));
-		self::assertEquals(
+		self::assert_equals(null,$b->get_field('f'));
+		self::assert_equals(
 			(string)new PC_Obj_Field('',0,'p',$array,PC_Obj_Field::V_PROTECTED),
 			(string)$b->get_field('p')
 		);
 		
 		$i = $classes['i'];
 		/* @var $i PC_Obj_Class */
-		self::assertEquals(true,$i->is_abstract());
-		self::assertEquals(true,$i->is_interface());
-		self::assertEquals(false,$i->is_final());
-		self::assertEquals(array('i1','i2'),$i->get_interfaces());
-		self::assertEquals(
+		self::assert_equals(true,$i->is_abstract());
+		self::assert_equals(true,$i->is_interface());
+		self::assert_equals(false,$i->is_final());
+		self::assert_equals(array('i1','i2'),$i->get_interfaces());
+		self::assert_equals(
 			'public abstract function doSomething(): string',
 			(string)$i->get_method('doSomething')
 		);
 		
 		$x = $classes['x'];
 		/* @var $x PC_Obj_Class */
-		self::assertEquals(false,$x->is_abstract());
-		self::assertEquals(false,$x->is_interface());
-		self::assertEquals(true,$x->is_final());
-		self::assertEquals('b',$x->get_super_class());
-		self::assertEquals(array('i'),$x->get_interfaces());
-		self::assertEquals(
+		self::assert_equals(false,$x->is_abstract());
+		self::assert_equals(false,$x->is_interface());
+		self::assert_equals(true,$x->is_final());
+		self::assert_equals('b',$x->get_super_class());
+		self::assert_equals(array('i'),$x->get_interfaces());
+		self::assert_equals(
 			'public function doSomething(): string',
 			(string)$x->get_method('doSomething')
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'protected function test2(b): b',
 			(string)$x->get_method('test2')
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'public static function mystatic(): void',
 			(string)$x->get_method('mystatic')
 		);
 		$field = new PC_Obj_Field('',0,'var',PC_Obj_MultiType::create_int(4),PC_Obj_Field::V_PRIVATE);
 		$field->set_static(true);
-		self::assertEquals(
+		self::assert_equals(
 			(string)$field,
 			(string)$x->get_field('var')
 		);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
-		self::assertEquals((string)PC_Obj_MultiType::create_int(0),(string)$global['a']->get_type());
-		self::assertEquals('a',(string)$global['b']->get_type());
-		self::assertEquals('a',(string)$global['c']->get_type());
-		self::assertEquals('x',(string)$global['d']->get_type());
-		self::assertEquals('b',(string)$global['e']->get_type());
-		self::assertEquals(
+		self::assert_equals((string)PC_Obj_MultiType::create_int(0),(string)$global['a']->get_type());
+		self::assert_equals('a',(string)$global['b']->get_type());
+		self::assert_equals('a',(string)$global['c']->get_type());
+		self::assert_equals('x',(string)$global['d']->get_type());
+		self::assert_equals('b',(string)$global['e']->get_type());
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_int(4),
 			(string)$global['f']->get_type()
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_int(1),
 			(string)$global['g']->get_type()
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_int(4),
 			(string)$global['h']->get_type()
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_object('b'),
 			(string)$global['i']->get_type()
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_int(),
 			(string)$global['j']->get_type()
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_string(),
 			(string)$global['n']->get_type()
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_int(78),
 			(string)$global['o']->get_type()
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_object('a'),
 			(string)$global['q']->get_type()
 		);
-		self::assertEquals(
+		self::assert_equals(
 			(string)PC_Obj_MultiType::create_object('b'),
 			(string)$global['r']->get_type()
 		);
@@ -283,11 +283,11 @@ $r = $p[1]->test2($b);
 		$i = 0;
 		self::assertCall($calls[$i++],'b','get42',true);
 		self::assertCall($calls[$i++],'a','test',false);
-		self::assertEquals((string)$calls[$i++]->get_call(null,false),'dummy1(integer=2)');
-		self::assertEquals((string)$calls[$i++]->get_call(null,false),'dummy2(integer=3)');
-		self::assertEquals((string)$calls[$i++]->get_call(null,false),'dummy3(integer=6)');
-		self::assertEquals((string)$calls[$i++]->get_call(null,false),'dummy4(unknown)');
-		self::assertEquals((string)$calls[$i++]->get_call(null,false),'dummy5(unknown)');
+		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy1(integer=2)');
+		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy2(integer=3)');
+		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy3(integer=6)');
+		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy4(unknown)');
+		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy5(unknown)');
 		self::assertCall($calls[$i++],'a','__construct',false);
 		self::assertCall($calls[$i++],'a','test2',false);
 		self::assertCall($calls[$i++],'x','__construct',false);
@@ -304,9 +304,9 @@ $r = $p[1]->test2($b);
 
 	private static function assertCall($call,$class,$method,$static)
 	{
-		self::assertEquals($class,$call->get_class());
-		self::assertEquals($method,$call->get_function());
-		self::assertEquals($static,$call->is_static());
+		self::assert_equals($class,$call->get_class());
+		self::assert_equals($method,$call->get_function());
+		self::assert_equals($static,$call->is_static());
 	}
 	
 	public function testFields()
@@ -326,26 +326,26 @@ $b = $a->foo;
 
 		list(,,,,$errors,) = $this->analyze($code);
 		
-		self::assertEquals(5,count($errors));
+		self::assert_equals(5,count($errors));
 		
 		$error = $errors[0];
-		self::assertEquals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
-		self::assertRegExp('/Access of not-existing field "a" of class "#A#"/',$error->get_msg());
+		self::assert_equals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
+		self::assert_regex('/Access of not-existing field "a" of class "#A#"/',$error->get_msg());
 		
 		$error = $errors[1];
-		self::assertEquals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
-		self::assertRegExp('/Access of not-existing field "x" of class "#A#"/',$error->get_msg());
+		self::assert_equals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
+		self::assert_regex('/Access of not-existing field "x" of class "#A#"/',$error->get_msg());
 		
 		$error = $errors[2];
-		self::assertEquals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
-		self::assertRegExp('/Access of not-existing field "y" of class "#A#"/',$error->get_msg());
+		self::assert_equals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
+		self::assert_regex('/Access of not-existing field "y" of class "#A#"/',$error->get_msg());
 		
 		$error = $errors[3];
-		self::assertEquals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
-		self::assertRegExp('/Access of not-existing field "asd" of class "#A#"/',$error->get_msg());
+		self::assert_equals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
+		self::assert_regex('/Access of not-existing field "asd" of class "#A#"/',$error->get_msg());
 		
 		$error = $errors[4];
-		self::assertEquals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
-		self::assertRegExp('/Access of not-existing field "foo" of class "#A#"/',$error->get_msg());
+		self::assert_equals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
+		self::assert_regex('/Access of not-existing field "foo" of class "#A#"/',$error->get_msg());
 	}
 }

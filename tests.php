@@ -54,8 +54,6 @@ FWS_AutoLoader::register_loader('PC_autoloader');
 // set error-handling
 error_reporting((E_ALL | E_STRICT) & ~E_DEPRECATED);
 
-// CLI or webserver?
-define('LINE_WRAP',PHP_SAPI == 'cli' ? "\n" : '<br />');
 define('PC_UNITTESTS',1);
 
 // set our loader and accessor
@@ -63,35 +61,12 @@ $accessor = new PC_PropAccessor();
 $accessor->set_loader(new PC_PropLoader());
 FWS_Props::set_accessor($accessor);
 
-function run_test($test,&$succ,&$fail)
-{
-	echo "-- ".$test.":".LINE_WRAP;
-	$t = new $test();
-	foreach(get_class_methods($t) as $m)
-	{
-		if(FWS_String::starts_with($m,'test'))
-		{
-			try
-			{
-				echo "   - Testing method ".$m."...".LINE_WRAP;
-				$t->$m();
-				$succ++;
-			}
-			catch(Exception $e)
-			{
-				echo $e."\n";
-				$fail++;
-			}
-		}
-	}
-}
+$suite = new FWS_Test_Suite();
 
-$succ = 0;
-$fail = 0;
 if($argc > 1)
 {
 	for($i = 1; $i < $argc; $i++)
-		run_test($argv[$i],$succ,$fail);
+		$suite->add($argv[$i]);
 }
 else
 {
@@ -107,14 +82,12 @@ else
 		'PC_Tests_Returns',
 		'PC_Tests_Magic',
 		'PC_Tests_TryCatch',
+		'PC_Tests_Versions',
 	);
 
 	foreach($tests as $test)
-		run_test($test,$succ,$fail);
+		$suite->add($test);
 }
 
-echo LINE_WRAP;
-echo "------------------------".LINE_WRAP;
-echo "Total: ".$succ." / ".($succ+$fail)." succeeded".LINE_WRAP;
-echo "------------------------".LINE_WRAP;
+$suite->run();
 ?>

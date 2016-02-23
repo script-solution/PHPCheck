@@ -89,25 +89,25 @@ else
 		list(,,$vars,$calls,,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
-		self::assertEquals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
+		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
 		$type = new PC_Obj_MultiType(array(
 			new PC_Obj_Type(PC_Obj_Type::BOOL,true),
 			new PC_Obj_Type(PC_Obj_Type::STRING,"str"),
 			new PC_Obj_Type(PC_Obj_Type::FLOAT,12.3),
 			new PC_Obj_Type(PC_Obj_Type::TARRAY,array())
 		));
-		self::assertEquals((string)$type,(string)$global['b']->get_type());
+		self::assert_equals((string)$type,(string)$global['b']->get_type());
 		$type = new PC_Obj_MultiType(array(
 			new PC_Obj_Type(PC_Obj_Type::INT,15),
 			new PC_Obj_Type(PC_Obj_Type::BOOL,true)
 		));
-		self::assertEquals((string)$type,(string)$global['c']->get_type());
-		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['d']->get_type());
-		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['e']->get_type());
-		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['f']->get_type());
-		self::assertEquals((string)PC_Obj_MultiType::create_int(),(string)$global['g']->get_type());
-		self::assertEquals((string)PC_Obj_MultiType::create_int(),(string)$global['h']->get_type());
-		self::assertEquals((string)PC_Obj_MultiType::create_int(1),(string)$global['i']->get_type());
+		self::assert_equals((string)$type,(string)$global['c']->get_type());
+		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['d']->get_type());
+		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['e']->get_type());
+		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['f']->get_type());
+		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$global['g']->get_type());
+		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$global['h']->get_type());
+		self::assert_equals((string)PC_Obj_MultiType::create_int(1),(string)$global['i']->get_type());
 	}
 	
 	public function testLoops()
@@ -154,16 +154,16 @@ while(1);
 		list(,,$vars,$calls,,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
-		self::assertEquals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
-		self::assertEquals((string)PC_Obj_MultiType::create_string(),(string)$global['b']->get_type());
-		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['c']->get_type());
+		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
+		self::assert_equals((string)PC_Obj_MultiType::create_string(),(string)$global['b']->get_type());
+		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['c']->get_type());
 		$type = new PC_Obj_MultiType(array(
 			new PC_Obj_Type(PC_Obj_Type::BOOL,true),
 			new PC_Obj_Type(PC_Obj_Type::INT,12)
 		));
-		self::assertEquals((string)$type,(string)$global['d']->get_type());
-		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['e']->get_type());
-		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['f']->get_type());
+		self::assert_equals((string)$type,(string)$global['d']->get_type());
+		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['e']->get_type());
+		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['f']->get_type());
 	}
 	
 	public function testNesting()
@@ -265,52 +265,52 @@ if($_)
 		list(,,$vars,$calls,,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
-		self::assertEquals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
-		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['b']->get_type());
+		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
+		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['b']->get_type());
 		$type = new PC_Obj_MultiType(array(
 			new PC_Obj_Type(PC_Obj_Type::INT,1),
 			new PC_Obj_Type(PC_Obj_Type::STRING,"str")
 		));
-		self::assertEquals((string)$type,(string)$global['c']->get_type());
+		self::assert_equals((string)$type,(string)$global['c']->get_type());
 		$type = new PC_Obj_MultiType(array(
 			new PC_Obj_Type(PC_Obj_Type::STRING,"str"),
 			new PC_Obj_Type(PC_Obj_Type::INT,1)
 		));
-		self::assertEquals((string)$type,(string)$global['d']->get_type());
+		self::assert_equals((string)$type,(string)$global['d']->get_type());
 		$type = new PC_Obj_MultiType(array(
 			new PC_Obj_Type(PC_Obj_Type::BOOL,true),
 			new PC_Obj_Type(PC_Obj_Type::STRING,"str"),
 			new PC_Obj_Type(PC_Obj_Type::FLOAT,12.3),
 			new PC_Obj_Type(PC_Obj_Type::INT)
 		));
-		self::assertEquals((string)$type,(string)$global['e']->get_type());
-		self::assertEquals((string)new PC_Obj_MultiType(),(string)$global['f']->get_type());
+		self::assert_equals((string)$type,(string)$global['e']->get_type());
+		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['f']->get_type());
 		
-		self::assertEquals(
+		self::assert_equals(
 			'func1(bool=1)',
 			(string)$calls[0]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'func2(bool=1 or string=str)',
 			(string)$calls[1]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'func3(bool=1 or string=str or float=12.3)',
 			(string)$calls[2]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'func4(bool=1 or string=str or float=12.3 or integer=2)',
 			(string)$calls[3]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'func5(bool=1 or string=str or float=12.3 or integer)',
 			(string)$calls[4]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'func6(integer)',
 			(string)$calls[5]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'func7(integer)',
 			(string)$calls[6]->get_call(null,false)
 		);
@@ -355,38 +355,38 @@ foreach($b as list($x,$y,$z))
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		
 		$type = new PC_Obj_MultiType();
-		self::assertEquals((string)$type,(string)$global['k']->get_type());
-		self::assertEquals((string)$type,(string)$global['v']->get_type());
+		self::assert_equals((string)$type,(string)$global['k']->get_type());
+		self::assert_equals((string)$type,(string)$global['v']->get_type());
 		
-		self::assertEquals(
+		self::assert_equals(
 			'f1(integer, integer)',
 			(string)$calls[0]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'f2(string)',
 			(string)$calls[1]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'f3(unknown)',
 			(string)$calls[2]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'f4(unknown)',
 			(string)$calls[3]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'f5(unknown, integer)',
 			(string)$calls[4]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'f6(integer, unknown)',
 			(string)$calls[5]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'f7(unknown, unknown)',
 			(string)$calls[6]->get_call(null,false)
 		);
-		self::assertEquals(
+		self::assert_equals(
 			'f8(unknown, unknown, unknown)',
 			(string)$calls[7]->get_call(null,false)
 		);
