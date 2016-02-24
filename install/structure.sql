@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 22, 2016 at 07:19 PM
+-- Generation Time: Feb 24, 2016 at 09:44 PM
 -- Server version: 10.1.11-MariaDB-log
 -- PHP Version: 7.0.3
 
@@ -155,9 +155,10 @@ CREATE TABLE `pc_projects` (
 CREATE TABLE `pc_vars` (
   `id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
+  `file` varchar(255) NOT NULL,
+  `line` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `function` varchar(255) NOT NULL,
-  `class` varchar(255) DEFAULT NULL,
+  `scope` varchar(255) NOT NULL,
   `type` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 

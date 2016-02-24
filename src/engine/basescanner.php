@@ -332,15 +332,27 @@ class PC_Engine_BaseScanner
 	protected function handle_error($msg)
 	{
 		trigger_error('Error in '.$this->file.', line '.$this->line.': '.$msg,E_USER_ERROR);
-		return $this->get_unknown();
+		return $this->create_unknown();
 	}
 	
 	/**
 	 * @return PC_Obj_MultiType an unknown type
 	 */
-	protected function get_unknown()
+	protected function create_unknown()
 	{
 		return new PC_Obj_MultiType();
+	}
+	
+	/**
+	 * @param string $name the name
+	 * @param PC_Obj_MultiType $type the type
+	 * @return PC_Obj_Variable an unknown variable
+	 */
+	protected function create_var($name = '',$type = null)
+	{
+		if($type == null)
+			$type = new PC_Obj_MultiType();
+		return new PC_Obj_Variable($this->file,$this->line,$name,$type);
 	}
 	
 	/**

@@ -140,13 +140,15 @@ class PC_Engine_VarContainer extends FWS_Object
 	/**
 	 * Leaves a loop
 	 * 
+	 * @param string $file the current file
+	 * @param int $line the current line
 	 * @param PC_Obj_Scope $scope the current scope
 	 */
-	public function leave_loop($scope)
+	public function leave_loop($file,$line,$scope)
 	{
 		assert($this->loopdepth > 0);
 		$this->loopdepth--;
-		$this->perform_pending_changes($scope);
+		$this->perform_pending_changes($file,$line,$scope);
 	}
 	
 	/**
@@ -179,15 +181,17 @@ class PC_Engine_VarContainer extends FWS_Object
 	/**
 	 * Leaves a condition
 	 * 
+	 * @param string $file the current file
+	 * @param int $line the current line
 	 * @param PC_Obj_Scope $scope the current scope
 	 */
-	public function leave_cond($scope)
+	public function leave_cond($file,$line,$scope)
 	{
 		assert($this->conddepth > 0);
 		if($this->layers[count($this->layers) - 1]['elseifs']-- == 0)
 		{
 			$this->conddepth--;
-			$this->perform_pending_changes($scope);
+			$this->perform_pending_changes($file,$line,$scope);
 		}
 	}
 	
@@ -233,9 +237,11 @@ class PC_Engine_VarContainer extends FWS_Object
 	/**
 	 * Performs the required actions when leaving a loop/condition
 	 * 
+	 * @param string $file the current file
+	 * @param int $line the current line
 	 * @param PC_Obj_Scope $scope the current scope
 	 */
-	private function perform_pending_changes($scope)
+	private function perform_pending_changes($file,$line,$scope)
 	{
 		$layer = array_pop($this->layers);
 		// if there is only one block (loops, if without else)
@@ -243,7 +249,7 @@ class PC_Engine_VarContainer extends FWS_Object
 		{
 			// its never present in all blocks here since we never have an else-block
 			foreach($layer['vars'][0] as $name => $var)
-				$this->change_var($scope,$layer,$name,$var,false);
+				$this->change_var($file,$line,$scope,$layer,$name,$var,false);
 		}
 		else
 		{
@@ -275,7 +281,7 @@ class PC_Engine_VarContainer extends FWS_Object
 								}
 							}
 						}
-						$this->change_var($scope,$layer,$name,$var,$present);
+						$this->change_var($file,$line,$scope,$layer,$name,$var,$present);
 						$changed[$name] = true;
 					}
 				}
@@ -286,13 +292,15 @@ class PC_Engine_VarContainer extends FWS_Object
 	/**
 	 * Changes the variable with given name in the current scope
 	 * 
+	 * @param string $file the current file
+	 * @param int $line the current line
 	 * @param PC_Obj_Scope $scope the current scope
 	 * @param array $layer the current layer
 	 * @param string $name the var-name
 	 * @param PC_Obj_Variable $backup the backup (0 if not present before the layer)
 	 * @param bool $present wether its present in all blocks in this layer
 	 */
-	private function change_var($scope,$layer,$name,$backup,$present)
+	private function change_var($file,$line,$scope,$layer,$name,$backup,$present)
 	{
 		$scopename = $scope->get_name();
 		// if its present in all blocks, merge the types
@@ -305,7 +313,7 @@ class PC_Engine_VarContainer extends FWS_Object
 				$mtype->merge($layer['vars'][$i][$name]->get_type());
 			// note that this may discard the old value, if the variable was present
 			$this->vars[$scopename][$name] = new PC_Obj_Variable(
-				$name,$mtype,$scope->get_name_of(T_FUNC_C),$scope->get_name_of(T_CLASS_C)
+				$file,$line,$name,$mtype,$scope->get_name_of(T_FUNC_C),$scope->get_name_of(T_CLASS_C)
 			);
 		}
 		// if it was present before, we know that it is either the old or one of the new ones
@@ -324,7 +332,8 @@ class PC_Engine_VarContainer extends FWS_Object
 			if(!isset($this->vars[$scopename][$name]))
 			{
 				$this->vars[$scopename][$name] = new PC_Obj_Variable(
-					$name,new PC_Obj_MultiType(),$scope->get_name_of(T_FUNC_C),$scope->get_name_of(T_CLASS_C)
+					$file,$line,$name,new PC_Obj_MultiType(),
+					$scope->get_name_of(T_FUNC_C),$scope->get_name_of(T_CLASS_C)
 				);
 			}
 			else

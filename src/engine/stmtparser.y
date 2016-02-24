@@ -305,7 +305,10 @@ catch_list ::= catch_head LCURLY inner_statement_list RCURLY .
 
 catch_head ::= catch_list T_CATCH LPAREN name(class) T_VARIABLE(var) RPAREN . {
 		$value = PC_Obj_MultiType::create_object(class);
-		$this->state->set_var(new PC_Obj_Variable(substr(var,1)),$value);
+		$vobj = new PC_Obj_Variable(
+			$this->state->get_file(),$this->state->get_line(),substr(var,1)
+		);
+		$this->state->set_var($vobj,$value);
 }
 
 foreach_inner ::= expr(e) T_AS foreach_variable(first) . {
@@ -911,7 +914,9 @@ callable_variable(A) ::= dereferencable(obj) T_OBJECT_OPERATOR property_name(vpr
     );
     A = $this->state->handle_object_prop_chain(obj,$chain);
 }
-callable_variable(A) ::= function_call(call) . { A = new PC_Obj_Variable('',call); }
+callable_variable(A) ::= function_call(call) . {
+	A = new PC_Obj_Variable($this->state->get_file(),$this->state->get_line(),'',call);
+}
 
 variable(A) ::= callable_variable(v) . { A = v; }
 variable(A) ::= static_member(m) . { A = m; }

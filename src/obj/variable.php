@@ -29,7 +29,7 @@
  * @subpackage	src.obj
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Obj_Variable extends FWS_Object
+class PC_Obj_Variable extends PC_Obj_Location
 {
 	/**
 	 * Represents the global scope
@@ -39,98 +39,142 @@ class PC_Obj_Variable extends FWS_Object
 	/**
 	 * Creates a variable with given type and no value
 	 * 
+	 * @param string $file the file of the def
+	 * @param int $line the line of the def
 	 * @param int $type the type
 	 * @param string $varname optionally, the variable-name
 	 * @return PC_Obj_Variable the variable
 	 */
-	public static function create_type($type,$varname = '')
+	public static function create_type($file,$line,$type,$varname = '')
 	{
-		return new self($varname,PC_Obj_MultiType::create_type($type));
+		return new self($file,$line,$varname,PC_Obj_MultiType::create_type($type));
 	}
 	
 	/**
 	 * Creates a variable with type OBJECT and given class-name
 	 * 
+	 * @param string $file the file of the def
+	 * @param int $line the line of the def
 	 * @param string $classname the class-name
 	 * @param string $varname optionally, the variable-name
 	 * @return PC_Obj_Variable the variable
 	 */
-	public static function create_object($classname,$varname = '')
+	public static function create_object($file,$line,$classname,$varname = '')
 	{
-		return new self($varname,PC_Obj_MultiType::create_object($classname));
+		return new self($file,$line,$varname,PC_Obj_MultiType::create_object($classname));
 	}
 	
 	/**
 	 * Creates a variable with type STRING and given value
 	 * 
+	 * @param string $file the file of the def
+	 * @param int $line the line of the def
 	 * @param string $value the value
 	 * @param string $varname optionally, the variable-name
 	 * @return PC_Obj_Variable the variable
 	 */
-	public static function create_string($value = null,$varname = '')
+	public static function create_string($file,$line,$value = null,$varname = '')
 	{
-		return new self($varname,PC_Obj_MultiType::create_string($value));
+		return new self($file,$line,$varname,PC_Obj_MultiType::create_string($value));
 	}
 	
 	/**
 	 * Creates a variable with type TARRAY and given value
 	 * 
+	 * @param string $file the file of the def
+	 * @param int $line the line of the def
 	 * @param array $value the value
 	 * @param string $varname optionally, the variable-name
 	 * @return PC_Obj_Variable the variable
 	 */
-	public static function create_array($value = null,$varname = '')
+	public static function create_array($file,$line,$value = null,$varname = '')
 	{
-		return new self($varname,PC_Obj_MultiType::create_array($value));
+		return new self($file,$line,$varname,PC_Obj_MultiType::create_array($value));
 	}
 	
 	/**
 	 * Creates a variable with type INT and given value
 	 * 
+	 * @param string $file the file of the def
+	 * @param int $line the line of the def
 	 * @param int $value the value
 	 * @param string $varname optionally, the variable-name
 	 * @return PC_Obj_Variable the variable
 	 */
-	public static function create_int($value = null,$varname = '')
+	public static function create_int($file,$line,$value = null,$varname = '')
 	{
-		return new self($varname,PC_Obj_MultiType::create_int($value));
+		return new self($file,$line,$varname,PC_Obj_MultiType::create_int($value));
 	}
 	
 	/**
 	 * Creates a variable with type FLOAT and given value
 	 * 
+	 * @param string $file the file of the def
+	 * @param int $line the line of the def
 	 * @param float $value the value
 	 * @param string $varname optionally, the variable-name
 	 * @return PC_Obj_Variable the variable
 	 */
-	public static function create_float($value = null,$varname = '')
+	public static function create_float($file,$line,$value = null,$varname = '')
 	{
-		return new self($varname,PC_Obj_MultiType::create_float($value));
+		return new self($file,$line,$varname,PC_Obj_MultiType::create_float($value));
 	}
 	
 	/**
 	 * Creates a multitype with type BOOL and given value
 	 * 
+	 * @param string $file the file of the def
+	 * @param int $line the line of the def
 	 * @param bool $value the value
 	 * @param string $varname optionally, the variable-name
 	 * @return PC_Obj_Variable the variable
 	 */
-	public static function create_bool($value = null,$varname = '')
+	public static function create_bool($file,$line,$value = null,$varname = '')
 	{
-		return new self($varname,PC_Obj_MultiType::create_bool($value));
+		return new self($file,$line,$varname,PC_Obj_MultiType::create_bool($value));
 	}
 	
 	/**
 	 * Creates a variable with type TCALLABLE
 	 * 
+	 * @param string $file the file of the def
+	 * @param int $line the line of the def
 	 * @param string $varname optionally, the variable-name
 	 * @return PC_Obj_Variable the variable
 	 */
-	public static function create_callable($varname = '')
+	public static function create_callable($file,$line,$varname = '')
 	{
-		return new self($varname,PC_Obj_MultiType::create_callable());
+		return new self($file,$line,$varname,PC_Obj_MultiType::create_callable());
 	}
 	
+	/**
+	 * Creates a variable from the given type
+	 * 
+	 * @param string $file the file of the def
+	 * @param int $line the line of the def
+	 * @param string $name the variable-name
+	 * @param PC_Obj_MultiType $type the type
+	 * @param string $scope the scope
+	 * @return PC_Obj_Variable the variable
+	 */
+	public static function create_from_scope($file,$line,$name,$type,$scope)
+	{
+		if($scope == self::SCOPE_GLOBAL)
+			return new self($file,$line,$name,$type);
+		if(strstr($scope,'::'))
+		{
+			list($class,$func) = explode('::',$scope);
+			return new self($file,$line,$name,$type,$func,$class);
+		}
+		return new self($file,$line,$name,$type,$scope);
+	}
+	
+	/**
+	 * The call-id
+	 * 
+	 * @var int
+	 */
+	private $id = 0;
 	/**
 	 * For assigning values to array-elements: Store the reference to the array so that we can
 	 * put the value into the array as soon as we assign it to it. Before the array doesn't know
@@ -173,18 +217,20 @@ class PC_Obj_Variable extends FWS_Object
 	 * @var PC_Obj_MultiType
 	 */
 	private $type;
-	
+
 	/**
 	 * Constructor
 	 * 
+	 * @param string $file the file of the def
+	 * @param int $line the line of the def
 	 * @param string $name the name
 	 * @param PC_Obj_MultiType $type the type
 	 * @param string $function the function-name (scope)
 	 * @param string $class the class-name (scope)
 	 */
-	public function __construct($name,$type = null,$function = '',$class = '')
+	public function __construct($file,$line,$name,$type = null,$function = '',$class = '')
 	{
-		parent::__construct();
+		parent::__construct($file,$line);
 		
 		if($type !== null && !($type instanceof PC_Obj_MultiType))
 			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
@@ -201,6 +247,24 @@ class PC_Obj_Variable extends FWS_Object
 		$this->type = clone $this->type;
 		$this->arrayref = null;
 		$this->arrayoff = null;
+	}
+	
+	/**
+	 * @return int the id
+	 */
+	public function get_id()
+	{
+		return $this->id;
+	}
+	
+	/**
+	 * Sets the id
+	 * 
+	 * @param int $id the new value
+	 */
+	public function set_id($id)
+	{
+		$this->id = $id;
 	}
 	
 	/**
@@ -256,7 +320,7 @@ class PC_Obj_Variable extends FWS_Object
 			$akey = $key;
 			$key = $first->get_array_type($key->get_first()->get_value());
 		}
-		$var = new self('',$key);
+		$var = new self($this->get_file(),$this->get_line(),'',$key);
 		// connect the var to us
 		$var->arrayref = $first;
 		$var->arrayoff = $akey;

@@ -172,7 +172,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$cname = $class !== null ? $class->get_string() : null;
 		$fname = $func->get_string();
 		if($fname === null || ($class !== null && $cname === null))
-			return $this->get_unknown();
+			return $this->create_unknown();
 		
 		// create call
 		$call = new PC_Obj_Call($this->get_file(),$this->get_line());
@@ -194,7 +194,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				$cname = $this->scope->get_name_of(T_CLASS_C);
 				$classobj = $this->types->get_class($cname);
 				if($classobj === null || $classobj->get_super_class() == '')
-					return $this->get_unknown();
+					return $this->create_unknown();
 				$cname = $classobj->get_super_class();
 				// if we're in a static method, the call is always static
 				$curfname = $this->scope->get_name_of(T_FUNC_C);
@@ -241,7 +241,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		// get function-object and determine return-type
 		$funcobj = $this->get_method_object($cname,$fname);
 		if($funcobj === null)
-			return $this->get_unknown();
+			return $this->create_unknown();
 		
 		// add the throws of the method to our throws
 		foreach($funcobj->get_throws() as $tclass => $ttype)
@@ -265,9 +265,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	public function handle_object_prop_chain($obj,$chain)
 	{
 		if(!($obj instanceof PC_Obj_Variable))
-			return new PC_Obj_Variable('',$this->handle_error('$obj is invalid'));
+			return $this->create_var('',$this->handle_error('$obj is invalid'));
 		if(!is_array($chain))
-			return new PC_Obj_Variable('',$this->handle_error('$chain is invalid'));
+			return $this->create_var('',$this->handle_error('$chain is invalid'));
 		
 		$objt = null;
 		if($obj->get_name() == 'this')
@@ -286,11 +286,11 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			// if we don't know the class-name or its no object, stop here
 			$classname = $objt !== null ? $objt->get_classname() : null;
 			if($classname === null)
-				return new PC_Obj_Variable('',$this->get_unknown());
+				return $this->create_var();
 			// if we don't know the class, give up, as well
 			$class = $this->types->get_class($classname);
 			if($class === null)
-				return new PC_Obj_Variable('',$this->get_unknown());
+				return $this->create_var();
 			
 			$prop = $access['prop'];
 			$args = $access['args'];
@@ -300,7 +300,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				$fieldvar = $prop[0]['data'];
 				$fieldname = $fieldvar->get_string();
 				if($fieldname === null)
-					return new PC_Obj_Variable('',$this->get_unknown());
+					return $this->create_var();
 				$field = $class->get_field($fieldname);
 				if($field === null)
 				{
@@ -309,7 +309,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 						'Access of not-existing field "'.$fieldname.'" of class "#'.$classname.'#"',
 						PC_Obj_Error::E_S_NOT_EXISTING_FIELD
 					);
-					return new PC_Obj_Variable('',$this->get_unknown());
+					return $this->create_var();
 				}
 				$res = $field->get_type();
 				for($i = 1; $i < count($prop); $i++)
@@ -319,10 +319,10 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 					// if the offset is null it means that we should append to the array. this is not supported
 					// for class-fields. therefore stop here and return unknown
 					if($offset === null || $res === null || $res->get_array() === null)
-						return new PC_Obj_Variable('',$this->get_unknown());
+						return $this->create_var();
 					$off = $offset->get_scalar();
 					if($off === null)
-						return new PC_Obj_Variable('',$this->get_unknown());
+						return $this->create_var();
 					$res = $res->get_first()->get_array_type($off);
 				}
 			}
@@ -331,18 +331,18 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				$mnamevar = $prop[0]['data'];
 				$mname = $mnamevar->get_string();
 				if($mname === null)
-					return new PC_Obj_Variable('',$this->get_unknown());
+					return $this->create_var();
 				$this->add_call(PC_Obj_MultiType::create_string($class->get_name()),$mnamevar,$args,false);
 				$method = $class->get_method($mname);
 				if($method === null)
-					return new PC_Obj_Variable('',$this->get_unknown());
+					return $this->create_var();
 				$res = clone $method->get_return_type();
 			}
 			$objt = $res;
 		}
 		if($res === null)
-			return new PC_Obj_Variable('',$this->get_unknown());
-		return new PC_Obj_Variable('',$res);
+			return $this->create_var();
+		return $this->create_var('',$res);
 	}
 	
 	/**
@@ -355,7 +355,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	{
 		$const = $this->types->get_constant($name);
 		if($const === null)
-			return $this->get_unknown();
+			return $this->create_unknown();
 		return $const->get_type();
 	}
 	
@@ -414,16 +414,21 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	public function get_var($var,$parent = false)
 	{
 		if(!($var instanceof PC_Obj_MultiType))
-			return new PC_Obj_Variable('',$this->handle_error('$var is invalid'));
+			return $this->create_var('',$this->handle_error('$var is invalid'));
 		
 		$name = $var->get_string();
 		if($name == null)
-			return new PC_Obj_Variable('',$this->get_unknown());
+			return $this->create_var();
 		if($name == 'this')
-			return PC_Obj_Variable::create_object($this->scope->get_name_of(T_CLASS_C,$parent));
+		{
+			$res = PC_Obj_Variable::create_object(
+				$this->get_file(),$this->get_line(),$this->scope->get_name_of(T_CLASS_C,$parent)
+			);
+			return $res;
+		}
 		$scopename = $this->scope->get_name($parent);
 		if(!$this->vars->exists($scopename,$name))
-			return new PC_Obj_Variable($name,$this->get_unknown());
+			return $this->create_var($name,$this->create_unknown());
 		return $this->vars->get($scopename,$name);
 	}
 	
@@ -563,11 +568,11 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if($arrval === null || $array->is_array_unknown() || count($arrval) == 0)
 		{
 			foreach($first as $f)
-				$this->set_var($f,$this->get_unknown());
+				$this->set_var($f,$this->create_unknown());
 			if($sec !== null)
 			{
 				foreach($sec as $s)
-					$this->set_var($s,$this->get_unknown());
+					$this->set_var($s,$this->create_unknown());
 			}
 		}
 		else
@@ -681,7 +686,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		{
 			if($list[$i] === null)
 				continue;
-			$el = isset($array[$i]) ? $array[$i] : $this->get_unknown();
+			$el = isset($array[$i]) ? $array[$i] : $this->create_unknown();
 			if(is_array($list[$i]))
 				$this->handle_list_rek($list[$i],$el);
 			else
@@ -739,8 +744,8 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if($this->vars->exists(PC_Obj_Variable::SCOPE_GLOBAL,$var->get_name()))
 			$val = $this->vars->get(PC_Obj_Variable::SCOPE_GLOBAL,$var->get_name())->get_type();
 		else
-			$val = $this->get_unknown();
-		$this->set_var(new PC_Obj_Variable($var->get_name(),$this->get_unknown()),$val,true);
+			$val = $this->create_unknown();
+		$this->set_var($this->create_var($var->get_name(),$this->create_unknown()),$val,true);
 	}
 	
 	/**
@@ -792,7 +797,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	public function end_loop()
 	{
-		$this->vars->leave_loop($this->scope);
+		$this->vars->leave_loop($this->get_file(),$this->get_line(),$this->scope);
 	}
 	
 	/**
@@ -811,7 +816,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	public function end_cond()
 	{
-		$this->vars->leave_cond($this->scope);
+		$this->vars->leave_cond($this->get_file(),$this->get_line(),$this->scope);
 	}
 	
 	/**
@@ -839,14 +844,14 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		
 		$cname = $classname->get_string();
 		if($cname === null)
-			return $this->get_unknown();
+			return $this->create_unknown();
 		
 		$class = $this->types->get_class($cname);
 		if($class === null)
-			return $this->get_unknown();
+			return $this->create_unknown();
 		$const = $class->get_constant($constname);
 		if($const === null)
-			return $this->get_unknown();
+			return $this->create_unknown();
 		return $const->get_type();
 	}
 	
@@ -860,18 +865,18 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	public function handle_field_access($class,$field)
 	{
 		if(!($class instanceof PC_Obj_MultiType))
-			return new PC_Obj_Variable('',$this->handle_error('$class is invalid'));
+			return $this->create_var('',$this->handle_error('$class is invalid'));
 		
 		$cname = $class->get_string();
 		if($cname == 'self')
 			$cname = $this->scope->get_name_of(T_CLASS_C);
 		$classobj = $this->types->get_class($cname);
 		if($classobj === null)
-			return new PC_Obj_Variable('',$this->get_unknown());
+			return $this->create_var();
 		$fieldobj = $classobj->get_field($field);
 		if($fieldobj === null)
-			return new PC_Obj_Variable('',$this->get_unknown());
-		return new PC_Obj_Variable('',$fieldobj->get_type());
+			return $this->create_var();
+		return $this->create_var('',$fieldobj->get_type());
 	}
 	
 	/**
@@ -884,16 +889,16 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	public function handle_array_access($var,$offset)
 	{
 		if(!($var instanceof PC_Obj_Variable))
-			return new PC_Obj_Variable('',$this->handle_error('$var is invalid'));
+			return $this->create_var('',$this->handle_error('$var is invalid'));
 		if($offset !== null && !($offset instanceof PC_Obj_MultiType))
-			return new PC_Obj_Variable('',$this->handle_error('$offset is invalid'));
+			return $this->create_var('',$this->handle_error('$offset is invalid'));
 		
 		$this->check_known($var);
 		// if we don't know the variable-type, we can't do anything; additionally, better do nothing
 		// if its no array.
 		// note that null as value is okay because it might be an empty array
 		if($var->get_type()->get_array() === null)
-			return new PC_Obj_Variable('',$this->get_unknown());
+			return $this->create_var();
 		
 		// PC_Obj_Variable will do the rest for us; simply access the offset
 		return $var->array_offset($offset);
@@ -1137,7 +1142,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		// unset casts to null. in this case we don't really know the value
 		// object-cast make no sense here, I think
 		if($cast == 'unset' || $cast == 'object')
-			return $this->get_unknown();
+			return $this->create_unknown();
 		
 		// if we don't know the type or value, just provide the type; in loops as well
 		if($this->vars->is_in_loop() || $e->is_array_unknown())

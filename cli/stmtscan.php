@@ -54,6 +54,11 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 			PC_DAO::get_calls()->create_bulk($types->get_calls());
 		foreach($types->get_errors() as $err)
 			PC_DAO::get_errors()->create($err);
+		foreach($ascanner->get_vars() as $vars)
+		{
+			foreach($vars as $scope => $var)
+				PC_DAO::get_vars()->create($var);
+		}
 		
 		// write errors to shared data
 		$mutex = new FWS_MutexFile(PC_CLI_MUTEX_FILE);

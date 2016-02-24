@@ -50,9 +50,56 @@ class PC_DAO_Vars extends FWS_Singleton
 	 */
 	public function get_count($pid = PC_Project::CURRENT_ID)
 	{
+		return $this->get_count_for('','',$pid);
+	}
+	
+	/**
+	 * Returns the number of items for the given scope and variable name
+	 *
+	 * @param string $scope the scope
+	 * @param string $name the variable-name
+	 * @param int $pid the project-id (default = current)
+	 * @return int the number
+	 */
+	public function get_count_for($scope = '',$name = '',$pid = PC_Project::CURRENT_ID)
+	{
 		$db = FWS_Props::get()->db();
-		$pid = PC_Utils::get_project_id($pid);
-		return $db->get_row_count(PC_TB_VARS,'*',' WHERE project_id = '.$pid);
+		$stmt = $db->get_prepared_statement(
+			'SELECT COUNT(*) num FROM '.PC_TB_VARS.' WHERE project_id = :pid'
+				.($scope ? ' AND scope LIKE :scope' : '')
+				.($name ? ' AND name LIKE :name' : '')
+		);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		if($scope)
+			$stmt->bind(':scope','%'.$scope.'%');
+		if($name)
+			$stmt->bind(':name','%'.$name.'%');
+		$set = $db->execute($stmt->get_statement());
+		$row = $set->current();
+		return $row['num'];
+	}
+	
+	/**
+	 * Fetches the variable with given id from db
+	 * 
+	 * @param int $id the variable-id
+	 * @return PC_Obj_Variable the variable or null
+	 */
+	public function get_by_id($id)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(!FWS_Helper::is_integer($id) || $id <= 0)
+			FWS_Helper::def_error('intgt0','id',$id);
+		
+		$stmt = $db->get_prepared_statement(
+			'SELECT * FROM '.PC_TB_VARS.' WHERE id = :id'
+		);
+		$stmt->bind(':id',$id);
+		$row = $db->get_row($stmt->get_statement());
+		if($row)
+			return $this->_build_var($row);
+		return null;
 	}
 	
 	/**
@@ -60,10 +107,12 @@ class PC_DAO_Vars extends FWS_Singleton
 	 *
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
+	 * @param string $scope the scope
+	 * @param string $name the variable-name
 	 * @param int $pid the project-id (default = current)
 	 * @return array all found vars
 	 */
-	public function get_list($start = 0,$count = 0,$pid = PC_Project::CURRENT_ID)
+	public function get_list($start = 0,$count = 0,$scope = '',$name = '',$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
@@ -73,12 +122,20 @@ class PC_DAO_Vars extends FWS_Singleton
 			FWS_Helper::def_error('intge0','count',$count);
 		
 		$vars = array();
-		$rows = $db->get_rows(
+		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_VARS.'
-			 WHERE project_id = '.PC_Utils::get_project_id($pid).'
+			 WHERE project_id = :pid'
+				.($scope ? ' AND scope LIKE :scope' : '')
+				.($name ? ' AND name LIKE :name' : '')
+			 .' ORDER BY id ASC
 			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
 		);
-		foreach($rows as $row)
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		if($scope)
+			$stmt->bind(':scope','%'.$scope.'%');
+		if($name)
+			$stmt->bind(':name','%'.$name.'%');
+		foreach($db->get_rows($stmt->get_statement()) as $row)
 			$vars[] = $this->_build_var($row);
 		return $vars;
 	}
@@ -106,9 +163,10 @@ class PC_DAO_Vars extends FWS_Singleton
 		}
 		return $db->insert(PC_TB_VARS,array(
 			'project_id' => PC_Utils::get_project_id(PC_Project::CURRENT_ID),
+			'file' => $var->get_file(),
+			'line' => $var->get_line(),
 			'name' => $var->get_name(),
-			'function' => $var->get_function(),
-			'class' => $var->get_class(),
+			'scope' => $var->get_scope(),
 			'type' => $type
 		));
 	}
@@ -140,6 +198,10 @@ class PC_DAO_Vars extends FWS_Singleton
 	 */
 	private function _build_var($row)
 	{
-		return new PC_Obj_Variable($row['name'],unserialize($row['type']),$row['function'],$row['class']);
+		$var = PC_Obj_Variable::create_from_scope(
+			$row['file'],$row['line'],$row['name'],unserialize($row['type']),$row['scope']
+		);
+		$var->set_id($row['id']);
+		return $var;
 	}
 }
