@@ -62,8 +62,9 @@ final class PC_Module_StmtScan_Task_Scan extends FWS_Object implements FWS_Progr
 		$msgs = FWS_Props::get()->msgs();
 		
 		// scan for statements
-		$types = new PC_Engine_TypeContainer();
-		$ascanner = new PC_Engine_StmtScannerFrontend($types);
+		$options = new PC_Engine_Options();
+		$types = new PC_Engine_TypeContainer($options);
+		$ascanner = new PC_Engine_StmtScannerFrontend($types,$options);
 		$files = $user->get_session_data('stmtscan_files',array());
 		$end = min($pos + $ops,count($files));
 		for($i = $pos;$i < $end;$i++)

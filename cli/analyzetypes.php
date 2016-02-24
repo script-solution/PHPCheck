@@ -34,11 +34,15 @@ final class PC_CLI_AnalyzeTypes implements PC_CLIJob
 	public function run($args)
 	{
 		$project = FWS_Props::get()->project();
-		$an = new PC_Engine_Analyzer(
-			$project !== null ? $project->get_report_mixed() : false,
-			$project !== null ? $project->get_report_unknown() : false
-		);
-		$types = new PC_Engine_TypeContainer();
+		$options = new PC_Engine_Options();
+		if($project !== null)
+		{
+			$options->set_report_mixed($project->get_report_mixed());
+			$options->set_report_unknown($project->get_report_unknown());
+		}
+		
+		$an = new PC_Engine_Analyzer($options);
+		$types = new PC_Engine_TypeContainer($options);
 		
 		$classes = PC_DAO::get_classes()->get_list();
 		$an->analyze_classes($types,$classes);

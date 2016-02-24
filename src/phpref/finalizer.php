@@ -62,7 +62,12 @@ final class PC_PHPRef_Finalizer extends FWS_Object
 	 */
 	public function finalize()
 	{
-		$typecon = new PC_Engine_TypeContainer(PC_Project::PHPREF_ID,false,false);
+		$options = new PC_Engine_Options();
+		$options->set_pid(PC_Project::PHPREF_ID);
+		$options->set_use_db(false);
+		$options->set_use_phpref(false);
+		
+		$typecon = new PC_Engine_TypeContainer($options);
 		// fetch all classes and functions because we will probably need many of them
 		$typecon->add_classes(PC_DAO::get_classes()->get_list(0,0,'','',PC_Project::PHPREF_ID));
 		$typecon->add_functions(PC_DAO::get_functions()->get_list(0,0,0,'','',PC_Project::PHPREF_ID));

@@ -32,18 +32,19 @@
 class PC_Engine_StmtScannerFrontend extends FWS_Object
 {
 	/**
-	 * Our lexer
-	 * 
-	 * @var PC_Engine_StmtScanner
-	 */
-	private $lexer;
-	
-	/**
 	 * The found types and errors
 	 * 
 	 * @var PC_Engine_TypeContainer
 	 */
 	private $types;
+	
+	/**
+	 * The options
+	 *
+	 * @var PC_Engine_Options
+	 */
+	private $options;
+	
 	/**
 	 * The variables
 	 * 
@@ -55,11 +56,19 @@ class PC_Engine_StmtScannerFrontend extends FWS_Object
 	 * Constructor
 	 * 
 	 * @param PC_Engine_TypeContainer $types the type-container
+	 * @param PC_Engine_Options $options the options
 	 */
-	public function __construct($types)
+	public function __construct($types,$options)
 	{
 		parent::__construct();
+		
+		if(!($types instanceof PC_Engine_TypeContainer))
+			FWS_Helper::def_error('instance','types',PC_Engine_TypeContainer,$types);
+		if(!($options instanceof PC_Engine_Options))
+			FWS_Helper::def_error('instance','options','PC_Engine_Options',$options);
+		
 		$this->types = $types;
+		$this->options = $options;
 	}
 	
 	/**
@@ -85,8 +94,8 @@ class PC_Engine_StmtScannerFrontend extends FWS_Object
 	 */
 	public function scan_file($file)
 	{
-		$this->lexer = PC_Engine_StmtScanner::get_for_file($file,$this->types);
-		$this->parse();
+		$lexer = PC_Engine_StmtScanner::get_for_file($file,$this->types,$this->options);
+		$this->parse($lexer);
 	}
 	
 	/**
@@ -96,21 +105,23 @@ class PC_Engine_StmtScannerFrontend extends FWS_Object
 	 */
 	public function scan($source)
 	{
-		$this->lexer = PC_Engine_StmtScanner::get_for_string($source,$this->types);
-		$this->parse();
+		$lexer = PC_Engine_StmtScanner::get_for_string($source,$this->types,$this->options);
+		$this->parse($lexer);
 	}
 	
 	/**
 	 * Does the actual parsing
+	 * 
+	 * @param PC_Engine_StmtScanner $lexer our lexer
 	 */
-	private function parse()
+	private function parse($lexer)
 	{
-		$parser = new PC_Engine_StmtParser($this->lexer);
-		while($this->lexer->advance($parser))
-			$parser->doParse($this->lexer->get_token(),$this->lexer->get_value());
+		$parser = new PC_Engine_StmtParser($lexer);
+		while($lexer->advance($parser))
+			$parser->doParse($lexer->get_token(),$lexer->get_value());
 		$parser->doParse(0,0);
 		
-		$this->vars = array_merge($this->vars,$this->lexer->get_vars()->get_all());
+		$this->vars = array_merge($this->vars,$lexer->get_vars()->get_all());
 	}
 	
 	protected function get_dump_vars()

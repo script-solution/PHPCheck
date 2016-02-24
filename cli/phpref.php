@@ -48,7 +48,9 @@ final class PC_CLI_PHPRef implements PC_CLIJob
 	{
 		$user = FWS_Props::get()->user();
 		$errors = array();
-		$typecon = new PC_Engine_TypeContainer(PC_Project::PHPREF_ID);
+		$options = new PC_Engine_Options();
+		$options->set_pid(PC_Project::PHPREF_ID);
+		$typecon = new PC_Engine_TypeContainer($options);
 		foreach($args as $file)
 		{
 			try

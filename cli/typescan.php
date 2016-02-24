@@ -34,7 +34,8 @@ final class PC_CLI_TypeScan implements PC_CLIJob
 	public function run($args)
 	{
 		$errors = array();
-		$tscanner = new PC_Engine_TypeScannerFrontend();
+		$options = new PC_Engine_Options();
+		$tscanner = new PC_Engine_TypeScannerFrontend($options);
 		foreach($args as $file)
 		{
 			try

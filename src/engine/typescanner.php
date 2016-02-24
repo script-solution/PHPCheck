@@ -34,20 +34,22 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 {
 	/**
 	 * @param string $file the filename
+	 * @param PC_Engine_TypeContainer $types the type-container
 	 * @return PC_Engine_TypeScanner the instance for lexing a file
 	 */
-	public static function get_for_file($file)
+	public static function get_for_file($file,$options)
 	{
-		return new self($file,true);
+		return new self($file,true,$options);
 	}
 	
 	/**
 	 * @param string $string the string
+	 * @param PC_Engine_TypeContainer $types the type-container
 	 * @return PC_Engine_TypeScanner the instance for lexing a string
 	 */
-	public static function get_for_string($string)
+	public static function get_for_string($string,$options)
 	{
-		return new self($string,false);
+		return new self($string,false,$options);
 	}
 	
 	/**
@@ -98,14 +100,19 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param string $str the file or string
 	 * @param bool $is_file wether $str is a file
+	 * @param PC_Engine_TypeContainer $types the type-container
 	 */
-	protected function __construct($str,$is_file)
+	protected function __construct($str,$is_file,$options)
 	{
 		parent::__construct($str,$is_file);
-		$this->types = new PC_Engine_TypeContainer(PC_Project::CURRENT_ID,false);
+		
+		if(!($options instanceof PC_Engine_Options))
+			FWS_Helper::def_error('instance','options','PC_Engine_Options',$options);
+		
+		$this->types = new PC_Engine_TypeContainer($options);
 	}
 	
 	/**

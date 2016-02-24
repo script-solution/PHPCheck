@@ -33,7 +33,8 @@ final class PC_CLI_TypeFin implements PC_CLIJob
 {
 	public function run($args)
 	{
-		$typecon = new PC_Engine_TypeContainer(PC_Project::CURRENT_ID,true);
+		$options = new PC_Engine_Options();
+		$typecon = new PC_Engine_TypeContainer($options);
 		$typecon->add_classes(PC_DAO::get_classes()->get_list());
 		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_DB());
 		$fin->finalize();

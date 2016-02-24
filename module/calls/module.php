@@ -65,7 +65,7 @@ final class PC_Module_calls extends PC_Module
 		$url->set('function',$function);
 		$surl = clone $url;
 		
-		$typecon = new PC_Engine_TypeContainer();
+		$typecon = new PC_Engine_TypeContainer(new PC_Engine_Options());
 		
 		$pagination = new PC_Pagination(
 			PC_ENTRIES_PER_PAGE,PC_DAO::get_calls()->get_count_for($file,$class,$function)

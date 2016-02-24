@@ -278,7 +278,9 @@ $A = new $x();
 $A = new ${$_ . "foo"}();
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code,false,true);
+		$options = new PC_Engine_Options();
+		$options->set_report_unknown(true);
+		list(,,,,,$errors) = $this->analyze($code,$options);
 		self::assert_equals(0,count($errors));
 	}
 	

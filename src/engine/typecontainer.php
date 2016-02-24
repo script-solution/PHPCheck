@@ -32,13 +32,6 @@
 final class PC_Engine_TypeContainer extends FWS_Object
 {
 	/**
-	 * The project-id
-	 *
-	 * @var int
-	 */
-	private $_pid;
-	
-	/**
 	 * An array of already tried names, that did not exist
 	 *
 	 * @var array
@@ -94,40 +87,33 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	private $_calls = array();
 	
 	/**
-	 * Wether the db should be queried if a type can't be found
+	 * The options
 	 *
-	 * @var bool
+	 * @var PC_Engine_Options
 	 */
-	private $_use_db;
-	/**
-	 * Whether to query also the phpref-entries in the db
-	 *
-	 * @var bool
-	 */
-	private $_use_phpref;
+	private $options;
 	
 	/**
 	 * Constructor
 	 *
-	 * @param int $pid the project-id
-	 * @param bool $use_db wether the db should be queried if a type can't be found
-	 * @param bool $use_phpref whether to query also the phpref-entries in the db
-	 * 	(ignored if $use_db is false)
+	 * @param PC_Engine_Options $options the options
 	 */
-	public function __construct($pid = PC_Project::CURRENT_ID,$use_db = true,$use_phpref = true)
+	public function __construct($options)
 	{
 		parent::__construct();
-		$this->_pid = PC_Utils::get_project_id($pid);
-		$this->_use_db = $use_db;
-		$this->_use_phpref = $use_db && $use_phpref;
+		
+		if(!($options instanceof PC_Engine_Options))
+			FWS_Helper::def_error('instance','options','PC_Engine_Options',$options);
+		
+		$this->options = $options;
 	}
 	
 	/**
-	 * @return bool wether the db is used
+	 * @return PC_Engine_Options the options
 	 */
-	public function is_db_used()
+	public function get_options()
 	{
-		return $this->_use_db;
+		return $this->options;
 	}
 	
 	/**
@@ -175,15 +161,15 @@ final class PC_Engine_TypeContainer extends FWS_Object
 			return null;
 		if(!isset($this->_missing['classes'][$name]))
 		{
-			if(!isset($this->_classes[$name]) && $this->_use_db)
+			if(!isset($this->_classes[$name]) && $this->options->get_use_db())
 			{
-				$c = PC_DAO::get_classes()->get_by_name($name,$this->_pid);
+				$c = PC_DAO::get_classes()->get_by_name($name,$this->options->get_pid());
 				if($c)
 					$this->_classes[$name] = $c;
 				else
 					$this->_missing['classes'][$name] = true;
 			}
-			if(!isset($this->_classes[$name]) && $this->_use_phpref)
+			if(!isset($this->_classes[$name]) && $this->options->get_use_phpref())
 			{
 				$c = PC_DAO::get_classes()->get_by_name($name,PC_Project::PHPREF_ID);
 				if($c)
@@ -220,15 +206,15 @@ final class PC_Engine_TypeContainer extends FWS_Object
 			return null;
 		if(!isset($this->_missing['funcs'][$name]))
 		{
-			if(!isset($this->_functions[$name]) && $this->_use_db)
+			if(!isset($this->_functions[$name]) && $this->options->get_use_db())
 			{
-				$f = PC_DAO::get_functions()->get_by_name($name,$this->_pid);
+				$f = PC_DAO::get_functions()->get_by_name($name,$this->options->get_pid());
 				if($f)
 					$this->_functions[$name] = $f;
 				else
 					$this->_missing['funcs'][$name] = true;
 			}
-			if(!isset($this->_functions[$name]) && $this->_use_phpref)
+			if(!isset($this->_functions[$name]) && $this->options->get_use_phpref())
 			{
 				$f = PC_DAO::get_functions()->get_by_name($name,PC_Project::PHPREF_ID);
 				if($f)
@@ -275,15 +261,15 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	{
 		if(!isset($this->_missing['methods'][$class.'::'.$method]))
 		{
-			if(!isset($this->_methods[$class.'::'.$method]) && $this->_use_db)
+			if(!isset($this->_methods[$class.'::'.$method]) && $this->options->get_use_db())
 			{
-				$f = PC_DAO::get_functions()->get_by_name($method,$this->_pid,$class);
+				$f = PC_DAO::get_functions()->get_by_name($method,$this->options->get_pid(),$class);
 				if($f)
 					$this->_methods[$class.'::'.$method] = $f;
 				else
 					$this->_missing['methods'][$class.'::'.$method] = true;
 			}
-			if(!isset($this->_methods[$class.'::'.$method]) && $this->_use_phpref)
+			if(!isset($this->_methods[$class.'::'.$method]) && $this->options->get_use_phpref())
 			{
 				$f = PC_DAO::get_functions()->get_by_name($method,PC_Project::PHPREF_ID,$class);
 				if($f)
@@ -320,15 +306,15 @@ final class PC_Engine_TypeContainer extends FWS_Object
 			return null;
 		if(!isset($this->_missing['consts'][$name]))
 		{
-			if(!isset($this->_constants[$name]) && $this->_use_db)
+			if(!isset($this->_constants[$name]) && $this->options->get_use_db())
 			{
-				$c = PC_DAO::get_constants()->get_by_name($name,$this->_pid);
+				$c = PC_DAO::get_constants()->get_by_name($name,$this->options->get_pid());
 				if($c)
 					$this->_constants[$name] = $c;
 				else
 					$this->_missing['consts'][$name] = true;
 			}
-			if(!isset($this->_constants[$name]) && $this->_use_phpref)
+			if(!isset($this->_constants[$name]) && $this->options->get_use_phpref())
 			{
 				$c = PC_DAO::get_constants()->get_by_name($name,PC_Project::PHPREF_ID);
 				if($c)

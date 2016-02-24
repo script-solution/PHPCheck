@@ -75,11 +75,16 @@ final class PC_Module_Analyze_Task_Scan extends FWS_Object implements FWS_Progre
 	public function run($pos,$ops)
 	{
 		$project = FWS_Props::get()->project();
-		$an = new PC_Engine_Analyzer(
-			$project !== null ? $project->get_report_mixed() : false,
-			$project !== null ? $project->get_report_unknown() : false
-		);
-		$types = new PC_Engine_TypeContainer();
+		$options = new PC_Engine_Options();
+		if($project !== null)
+		{
+			$options->set_report_mixed($project->get_report_mixed());
+			$options->set_report_unknown($project->get_report_unknown());
+		}
+		
+		$an = new PC_Engine_Analyzer($options);
+		$types = new PC_Engine_TypeContainer($options);
+		
 		// we need all classes in the type-container to be able to search for sub-classes and interface-
 		// implementations
 		$types->add_classes(PC_DAO::get_classes()->get_list());

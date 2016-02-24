@@ -55,7 +55,8 @@ final class PC_Module_TypeScan_Task_Scan extends FWS_Object implements FWS_Progr
 		
 		$files = $user->get_session_data('typescan_files',array());
 		
-		$tscanner = new PC_Engine_TypeScannerFrontend();
+		$options = new PC_Engine_Options();
+		$tscanner = new PC_Engine_TypeScannerFrontend($options);
 		$end = min($pos + $ops,count($files));
 		for($i = $pos;$i < $end;$i++)
 		{
@@ -83,7 +84,7 @@ final class PC_Module_TypeScan_Task_Scan extends FWS_Object implements FWS_Progr
 		// finish all classes if the typescan is finished
 		if($pos + $ops >= $this->get_total_operations())
 		{
-			$typecon = new PC_Engine_TypeContainer();
+			$typecon = new PC_Engine_TypeContainer($options);
 			$typecon->add_classes(PC_DAO::get_classes()->get_list());
 			$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_DB());
 			$fin->finalize();

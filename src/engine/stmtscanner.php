@@ -35,21 +35,23 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * @param string $file the filename
 	 * @param PC_Engine_TypeContainer $types the type-container
+	 * @param PC_Engine_Options $options the options
 	 * @return PC_Engine_StmtScanner the instance for lexing a file
 	 */
-	public static function get_for_file($file,$types)
+	public static function get_for_file($file,$types,$options)
 	{
-		return new self($file,true,$types);
+		return new self($file,true,$types,$options);
 	}
 	
 	/**
 	 * @param string $string the string
 	 * @param PC_Engine_TypeContainer $types the type-container
+	 * @param PC_Engine_Options $options the options
 	 * @return PC_Engine_StmtScanner the instance for lexing a string
 	 */
-	public static function get_for_string($string,$types)
+	public static function get_for_string($string,$types,$options)
 	{
-		return new self($string,false,$types);
+		return new self($string,false,$types,$options);
 	}
 	
 	/**
@@ -104,6 +106,13 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	private $allthrows = array();
 	
 	/**
+	 * The options
+	 *
+	 * @var PC_Engine_Options
+	 */
+	private $options;
+	
+	/**
 	 * The next id for anonymous functions
 	 *
 	 * @var int
@@ -116,14 +125,21 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * @param string $str the file or string
 	 * @param bool $is_file wether $str is a file
 	 * @param PC_Engine_TypeContainer $types the type-container
+	 * @param PC_Engine_Options $options the options
 	 */
-	protected function __construct($str,$is_file,$types)
+	protected function __construct($str,$is_file,$types,$options)
 	{
 		parent::__construct($str,$is_file);
+		
+		if(!($types instanceof PC_Engine_TypeContainer))
+			FWS_Helper::def_error('instance','types',PC_Engine_TypeContainer,$types);
+		if(!($options instanceof PC_Engine_Options))
+			FWS_Helper::def_error('instance','options','PC_Engine_Options',$options);
 		
 		$this->types = $types;
 		$this->scope = new PC_Engine_Scope();
 		$this->vars = new PC_Engine_VarContainer();
+		$this->options = $options;
 	}
 	
 	/**

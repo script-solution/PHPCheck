@@ -32,18 +32,6 @@
 final class PC_Engine_Analyzer extends FWS_Object
 {
 	/**
-	 * Wether errors with mixed types involved should be reported
-	 * 
-	 * @var boolean
-	 */
-	private $report_mixed;
-	/**
-	 * Wether errors with unknown types involved should be reported
-	 * 
-	 * @var boolean
-	 */
-	private $report_unknown;
-	/**
 	 * The container for all errors / warnings
 	 *
 	 * @var array
@@ -51,15 +39,23 @@ final class PC_Engine_Analyzer extends FWS_Object
 	private $errors = array();
 	
 	/**
+	 * The options
+	 *
+	 * @var PC_Engine_Options
+	 */
+	private $options;
+	
+	/**
 	 * Constructor
 	 * 
-	 * @param boolean $report_mixed wether errors with mixed types involved should be reported
-	 * @param boolean $report_unknown wether errors with unknown types involved should be reported
+	 * @param PC_Engine_Options $options the options
 	 */
-	public function __construct($report_mixed = false,$report_unknown = false)
+	public function __construct($options)
 	{
-		$this->report_mixed = $report_mixed;
-		$this->report_unknown = $report_unknown;
+		if(!($options instanceof PC_Engine_Options))
+			FWS_Helper::def_error('instance','options','PC_Engine_Options',$options);
+		
+		$this->options = $options;
 	}
 	
 	/**
@@ -175,7 +171,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 				$this->_check_params($types,$call,$m);
 			}
 		}
-		else if($this->report_unknown && $classname == PC_Obj_Class::UNKNOWN)
+		else if($this->options->get_report_unknown() && $classname == PC_Obj_Class::UNKNOWN)
 		{
 			$this->_report(
 				$call,
@@ -329,7 +325,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 				/* @var $param PC_Obj_Parameter */
 				$arg = isset($arguments[$i]) ? $arguments[$i] : null;
 				// arg- or param-type unknown?
-				if(!$this->report_unknown &&
+				if(!$this->options->get_report_unknown() &&
 					($arg === null || $arg->is_unknown() || $param->get_mtype()->is_unknown()))
 				{
 					$i++;
@@ -408,7 +404,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 		$first = $arg->get_first();
 		if($first->get_type() == PC_Obj_Type::STRING)
 		{
-			if(!$this->report_unknown && $first->is_val_unknown())
+			if(!$this->options->get_report_unknown() && $first->is_val_unknown())
 				return;
 			
 			$func = $types->get_function($first->get_value());
@@ -423,7 +419,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 		}
 		else if($first->get_type() == PC_Obj_Type::TARRAY)
 		{
-			if(!$this->report_unknown && $first->is_val_unknown())
+			if(!$this->options->get_report_unknown() && $first->is_val_unknown())
 				return;
 			
 			$callable = $first->get_value();
@@ -439,7 +435,8 @@ final class PC_Engine_Analyzer extends FWS_Object
 			}
 			else
 			{
-				if(!$this->report_unknown && ($callable[0]->is_unknown() || $callable[1]->is_unknown()))
+				if(!$this->options->get_report_unknown() && ($callable[0]->is_unknown() ||
+					 $callable[1]->is_unknown()))
 					return;
 				
 				$obj = $callable[0]->get_first();

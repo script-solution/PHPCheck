@@ -34,8 +34,9 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 	public function run($args)
 	{
 		$errors = array();
-		$types = new PC_Engine_TypeContainer();
-		$ascanner = new PC_Engine_StmtScannerFrontend($types);
+		$options = new PC_Engine_Options();
+		$types = new PC_Engine_TypeContainer($options);
+		$ascanner = new PC_Engine_StmtScannerFrontend($types,$options);
 		
 		foreach($args as $file)
 		{

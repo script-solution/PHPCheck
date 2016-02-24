@@ -35,11 +35,7 @@ class PC_UnitTest extends FWS_Test_Case
 	 * Performs an analysis of the given code.
 	 * 
 	 * @param string $code the code to analyze
-	 * @param boolean $report_mixed whether to report errors on mixed types
-	 * @param boolean $report_unknown whether to report errors on unknown types
-	 * @param boolean $use_phpref use the PHP manual (and the DB)
-	 * @param string $vmin the minimal PHP version
-	 * @param string $vmax the maximal PHP version
+	 * @param PC_Engine_Options $options the options
 	 * @return array the following array: array(
 	 *  0 => <functions>,
 	 *  1 => <classes>,
@@ -49,19 +45,26 @@ class PC_UnitTest extends FWS_Test_Case
 	 *  5 => <analyzer errors>
 	 * )
 	 */
-	protected function analyze($code,$report_mixed = false,$report_unknown = false,$use_phpref = false,$vmin = '',$vmax = '')
+	protected function analyze($code,$options = null)
 	{
-		$tscanner = new PC_Engine_TypeScannerFrontend($use_phpref,$use_phpref);
+		if($options === null)
+		{
+			$options = new PC_Engine_Options();
+			$options->set_use_db(false);
+			$options->set_use_phpref(false);
+		}
+		
+		$tscanner = new PC_Engine_TypeScannerFrontend($options);
 		$tscanner->scan($code);
 		
 		$typecon = $tscanner->get_types();
 		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
 		$fin->finalize();
 		
-		$stmt = new PC_Engine_StmtScannerFrontend($typecon,$vmin,$vmax);
+		$stmt = new PC_Engine_StmtScannerFrontend($typecon,$options);
 		$stmt->scan($code);
 		
-		$an = new PC_Engine_Analyzer($report_mixed,$report_unknown);
+		$an = new PC_Engine_Analyzer($options);
 		$an->analyze_classes($typecon,$typecon->get_classes());
 		$an->analyze_calls($typecon,$typecon->get_calls());
 		

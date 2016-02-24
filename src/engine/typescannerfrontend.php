@@ -32,13 +32,6 @@
 class PC_Engine_TypeScannerFrontend extends FWS_Object
 {
 	/**
-	 * Our lexer
-	 * 
-	 * @var PC_Engine_TypeScanner
-	 */
-	private $lexer;
-	
-	/**
 	 * The found types and errors
 	 * 
 	 * @var PC_Engine_TypeContainer
@@ -47,11 +40,17 @@ class PC_Engine_TypeScannerFrontend extends FWS_Object
 	
 	/**
 	 * Constructor
+	 *
+	 * @param PC_Engine_Options $options the options
 	 */
-	public function __construct()
+	public function __construct($options)
 	{
 		parent::__construct();
-		$this->types = new PC_Engine_TypeContainer(PC_Project::CURRENT_ID,false);
+		
+		if(!($options instanceof PC_Engine_Options))
+			FWS_Helper::def_error('instance','options','PC_Engine_Options',$options);
+		
+		$this->types = new PC_Engine_TypeContainer($options);
 	}
 
 	/**
@@ -69,8 +68,7 @@ class PC_Engine_TypeScannerFrontend extends FWS_Object
 	 */
 	public function scan_file($file)
 	{
-		$this->lexer = PC_Engine_TypeScanner::get_for_file($file);
-		$this->parse();
+		$this->parse(PC_Engine_TypeScanner::get_for_file($file,$this->types->get_options()));
 	}
 	
 	/**
@@ -80,21 +78,22 @@ class PC_Engine_TypeScannerFrontend extends FWS_Object
 	 */
 	public function scan($source)
 	{
-		$this->lexer = PC_Engine_TypeScanner::get_for_string($source);
-		$this->parse();
+		$this->parse(PC_Engine_TypeScanner::get_for_string($source,$this->types->get_options()));
 	}
 	
 	/**
 	 * Does the actual parsing
+	 * 
+	 * @param PC_Engine_TypeScanner $lexer the lexer
 	 */
-	private function parse()
+	private function parse($lexer)
 	{
-		$parser = new PC_Engine_TypeParser($this->lexer);
-		while($this->lexer->advance($parser))
-			$parser->doParse($this->lexer->get_token(),$this->lexer->get_value());
+		$parser = new PC_Engine_TypeParser($lexer);
+		while($lexer->advance($parser))
+			$parser->doParse($lexer->get_token(),$lexer->get_value());
 		$parser->doParse(0,0);
 		
-		$this->types->add($this->lexer->get_types());
+		$this->types->add($lexer->get_types());
 	}
 	
 	protected function get_dump_vars()
