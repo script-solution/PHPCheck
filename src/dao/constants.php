@@ -119,6 +119,29 @@ class PC_DAO_Constants extends FWS_Singleton
 	}
 	
 	/**
+	 * Fetches the constant with given id from db
+	 * 
+	 * @param int $id the constant-id
+	 * @return PC_Obj_Constant the constant or null
+	 */
+	public function get_by_id($id)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(!FWS_Helper::is_integer($id) || $id <= 0)
+			FWS_Helper::def_error('intgt0','id',$id);
+		
+		$stmt = $db->get_prepared_statement(
+			'SELECT * FROM '.PC_TB_CONSTANTS.' WHERE id = :id'
+		);
+		$stmt->bind(':id',$id);
+		$row = $db->get_row($stmt->get_statement());
+		if($row)
+			return $this->_build_const($row);
+		return null;
+	}
+	
+	/**
 	 * Returns all constants
 	 *
 	 * @param int|array $class the class-id (0 = freestanding) (or ids, if its an array)
@@ -223,8 +246,10 @@ class PC_DAO_Constants extends FWS_Singleton
 		$type = unserialize($row['type']);
 		if($type === null)
 			$type = new PC_Obj_MultiType();
-		return new PC_Obj_Constant(
+		$const = new PC_Obj_Constant(
 			$row['file'],$row['line'],$row['name'],$type,$row['class']
 		);
+		$const->set_id($row['id']);
+		return $const;
 	}
 }

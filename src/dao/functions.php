@@ -103,6 +103,29 @@ class PC_DAO_Functions extends FWS_Singleton
 	}
 	
 	/**
+	 * Fetches the function with given id from db
+	 * 
+	 * @param int $id the function-id
+	 * @return PC_Obj_Method the function or null
+	 */
+	public function get_by_id($id)
+	{
+		$db = FWS_Props::get()->db();
+		
+		if(!FWS_Helper::is_integer($id) || $id <= 0)
+			FWS_Helper::def_error('intgt0','id',$id);
+		
+		$stmt = $db->get_prepared_statement(
+			'SELECT * FROM '.PC_TB_FUNCTIONS.' WHERE id = :id'
+		);
+		$stmt->bind(':id',$id);
+		$row = $db->get_row($stmt->get_statement());
+		if($row)
+			return $this->_build_func($row);
+		return null;
+	}
+	
+	/**
 	 * Returns all functions
 	 *
 	 * @param int|array $class the class-id (0 = free functions) (or ids, if its an array)

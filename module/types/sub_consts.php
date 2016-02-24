@@ -72,17 +72,29 @@ final class PC_SubModule_types_consts extends PC_SubModule
 		);
 		foreach($constants as $const)
 		{
+			$url = PC_URL::get_mod_url('file');
+			$url->set('path',$const->get_file());
+			$url->set('line',$const->get_line());
+			$url->set_anchor('l'.$const->get_line());
+			
 			$consts[] = array(
+				'id' => $const->get_id(),
 				'name' => $const->get_name(),
 				'type' => (string)$const->get_type(),
 				'file' => $const->get_file(),
-				'line' => $const->get_line()
+				'line' => $const->get_line(),
+				'url' => $url->to_url(),
 			);
 		}
+		
+		$callurl = PC_URL::get_mod_url('filepart');
+		$callurl->set('id','__ID__');
+		$callurl->set('type','const');
 		
 		$this->request_formular();
 		$tpl->add_variables(array(
 			'consts' => $consts,
+			'get_code_url' => $callurl->to_url(),
 			'file' => $file,
 			'name' => $name,
 			'search_target' => $surl->to_url(),

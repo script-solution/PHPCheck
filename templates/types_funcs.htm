@@ -42,7 +42,20 @@
 	{else}
 	{loop funcs as f}
 	<tr>
-		<td class="pc_main">{f:func}</td>
+		<td class="pc_main">
+		{if f:line}
+		<a href="{f:url}"><img src="images/goto.gif" alt="-&gt;" /></a>
+		{endif}
+		{f:func}
+		{if f:line}
+		<div style="float: right;">
+			<a href="#" onclick="javascript:toggleCode('{get_code_url}','func','{f:id}');">
+			<img id="func_img_{f:id}" src="images/crossclosed.gif" alt="+" />
+			</a>
+		</div>
+		<div id="func_area_{f:id}" class="pc_code" style="display: none;"></div>
+		{endif}
+		</td>
 		<td class="pc_main">
 		{if f:file && f:line}
 		{f:file}, line {f:line}

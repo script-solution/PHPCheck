@@ -32,6 +32,12 @@
 final class PC_Obj_Constant extends PC_Obj_Location
 {
 	/**
+	 * The call-id
+	 * 
+	 * @var int
+	 */
+	private $id = 0;
+	/**
 	 * The name of the constant
 	 *
 	 * @var string
@@ -76,6 +82,24 @@ final class PC_Obj_Constant extends PC_Obj_Location
 		
 		if($this->_type !== null)
 			$this->_type = clone $this->_type;
+	}
+	
+	/**
+	 * @return int the id
+	 */
+	public function get_id()
+	{
+		return $this->id;
+	}
+	
+	/**
+	 * Sets the id
+	 * 
+	 * @param int $id the new value
+	 */
+	public function set_id($id)
+	{
+		$this->id = $id;
 	}
 	
 	/**

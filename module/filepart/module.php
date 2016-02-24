@@ -52,7 +52,9 @@ final class PC_Module_filepart extends PC_Module
 		$doc = FWS_Props::get()->doc();
 		
 		$id = $input->get_var('id','get',FWS_Input::INTEGER);
-		$type = $input->correct_var('type','get',FWS_Input::STRING,array('call','var','error'),'call');
+		$type = $input->correct_var(
+			'type','get',FWS_Input::STRING,array('call','var','func','const','error'),'call'
+		);
 		if($id === null)
 		{
 			$this->report_error();
@@ -67,6 +69,12 @@ final class PC_Module_filepart extends PC_Module
 				break;
 			case 'var':
 				$loc = PC_DAO::get_vars()->get_by_id($id);
+				break;
+			case 'func':
+				$loc = PC_DAO::get_functions()->get_by_id($id);
+				break;
+			case 'const':
+				$loc = PC_DAO::get_constants()->get_by_id($id);
 				break;
 			case 'error':
 				$loc = PC_DAO::get_errors()->get_by_id($id);

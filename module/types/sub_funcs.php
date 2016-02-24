@@ -69,7 +69,14 @@ final class PC_SubModule_types_funcs extends PC_SubModule
 		$funcs = array();
 		foreach(PC_DAO::get_functions()->get_list(0,$start,PC_ENTRIES_PER_PAGE,$file,$func) as $f)
 		{
+			$url = PC_URL::get_mod_url('file');
+			$url->set('path',$f->get_file());
+			$url->set('line',$f->get_line());
+			$url->set_anchor('l'.$f->get_line());
+			
 			$funcs[] = array(
+				'id' => $f->get_id(),
+				'url' => $url->to_url(),
 				'func' => (string)$f,
 				'file' => $f->get_file(),
 				'line' => $f->get_line(),
@@ -78,8 +85,13 @@ final class PC_SubModule_types_funcs extends PC_SubModule
 			);
 		}
 		
+		$callurl = PC_URL::get_mod_url('filepart');
+		$callurl->set('id','__ID__');
+		$callurl->set('type','func');
+		
 		$this->request_formular();
 		$tpl->add_variables(array(
+			'get_code_url' => $callurl->to_url(),
 			'funcs' => $funcs,
 			'file' => $file,
 			'func' => $func,

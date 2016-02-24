@@ -31,19 +31,30 @@
 
 <table width="100%" class="pc_table">
 	<tr>
-		<th>Name</th>
-		<th>Type</th>
+		<th>Constant</th>
 		<th>Location</th>
 	</tr>
 	{if consts.length == 0}
 	<tr>
-		<td colspan="3" class="pc_main" align="center">No constants found</td>
+		<td colspan="2" class="pc_main" align="center">No constants found</td>
 	</tr>
 	{else}
 	{loop consts as const}
 	<tr>
-		<td class="pc_main">{const:name}</td>
-		<td class="pc_main">{const:type}</td>
+		<td class="pc_main">
+		{if const:line}
+		<a href="{const:url}"><img src="images/goto.gif" alt="-&gt;" /></a>
+		{endif}
+		{const:name} : {const:type}
+		{if const:line}
+		<div style="float: right;">
+			<a href="#" onclick="javascript:toggleCode('{get_code_url}','const','{const:id}');">
+			<img id="const_img_{const:id}" src="images/crossclosed.gif" alt="+" />
+			</a>
+		</div>
+		<div id="const_area_{const:id}" class="pc_code" style="display: none;"></div>
+		{endif}
+		</td>
 		<td class="pc_main">
 		{if const:file}{const:file}{else}<i>Unknown</i>{endif}
 		{if const:line > 0}, line {const:line}{endif}
