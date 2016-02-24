@@ -83,10 +83,18 @@ function h(): float {
 
 function i() {
 }
+
+class j {
+	public function __construct() {
+		return 1;
+	}
+}
+
+$x = i();
 ?>';
 		
 		list($functions,,,,$errors,) = $this->analyze($code);
-		self::assert_equals(5,count($errors));
+		self::assert_equals(7,count($errors));
 		
 		self::assert_equals("function b(): integer=0",$functions['b']);
 		self::assert_equals("function c(): integer or string",$functions['c']);
@@ -130,6 +138,20 @@ function i() {
 		self::assert_equals(PC_Obj_Error::E_S_RET_BUT_NO_RET_SPEC,$error->get_type());
 		self::assert_regex(
 			'/The function\/method "d" has no return-specification in PHPDoc, but does return a value/',
+			$error->get_msg()
+		);
+		
+		$error = $errors[5];
+		self::assert_equals(PC_Obj_Error::E_S_CONSTR_RETURN,$error->get_type());
+		self::assert_regex(
+			'/The constructor of "j" has a return-statement with expression/',
+			$error->get_msg()
+		);
+		
+		$error = $errors[6];
+		self::assert_equals(PC_Obj_Error::E_S_VOID_ASSIGN,$error->get_type());
+		self::assert_regex(
+			'/Assignment of void to \$x/',
 			$error->get_msg()
 		);
 	}

@@ -445,6 +445,16 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$varname = $var->get_name();
 		$scopename = $this->scope->get_name();
 		
+		// generate error for assignments of void
+		if($value->contains(new PC_Obj_Type(PC_Obj_Type::VOID)))
+		{
+			$this->report_error(
+				new PC_Obj_Location($this->get_file(),$this->get_line()),
+				'Assignment of void to $'.$varname,
+				PC_Obj_Error::E_S_VOID_ASSIGN
+			);
+		}
+		
 		$this->vars->backup($var,$this->scope);
 		if($isref)
 			$var->set_type($value);
@@ -1242,46 +1252,60 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				}
 			}
 			
-			$name = ($classname ? '#'.$classname.'#::' : '').$funcname;
-			// empty return-expression and non-empty?
-			if($hasnull && $hasother)
+			if($classname && $funcname == '__construct')
 			{
-				$this->report_error(
-					$func,
-					'The function/method "'.$name.'" has return-'
-					.'statements without expression and return-statements with expression',
-					PC_Obj_Error::E_S_MIXED_RET_AND_NO_RET
-				);
+				if($hasother)
+				{
+					$this->report_error(
+						$func,
+						'The constructor of "'.$classname.'" has a return-statement with expression',
+						PC_Obj_Error::E_S_CONSTR_RETURN
+					);
+				}
 			}
-			
-			$void = new PC_Obj_Type(PC_Obj_Type::VOID);
-			$docreturn = $func->has_return_doc() && !$func->get_return_type()->contains($void);
-			if($docreturn && !$hasother)
+			else
 			{
-				$this->report_error(
-					$func,
-					'The function/method "'.$name.'" has a return-specification in PHPDoc'
-					.', but does not return a value',
-					PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET
-				);
-			}
-			else if(!$docreturn && !$func->is_anonymous() && $hasother)
-			{
-				$this->report_error(
-					$func,
-					'The function/method "'.$name.'" has no return-specification in PHPDoc'
-					.', but does return a value',
-					PC_Obj_Error::E_S_RET_BUT_NO_RET_SPEC
-				);
-			}
-			else if($this->has_forbidden($this->allrettypes,$func->get_return_type()))
-			{
-				$this->report_error(
-					$func,
-					'The return-specification (PHPDoc) of function/method "'.$name.'" does not match with '
-					.'the returned values (spec="'.$func->get_return_type().'", returns="'.$mtype.'")',
-					PC_Obj_Error::E_S_RETURNS_DIFFER_FROM_SPEC
-				);
+				$name = ($classname ? '#'.$classname.'#::' : '').$funcname;
+				// empty return-expression and non-empty?
+				if($hasnull && $hasother)
+				{
+					$this->report_error(
+						$func,
+						'The function/method "'.$name.'" has return-'
+						.'statements without expression and return-statements with expression',
+						PC_Obj_Error::E_S_MIXED_RET_AND_NO_RET
+					);
+				}
+				
+				$void = new PC_Obj_Type(PC_Obj_Type::VOID);
+				$docreturn = $func->has_return_doc() && !$func->get_return_type()->contains($void);
+				if($docreturn && !$hasother)
+				{
+					$this->report_error(
+						$func,
+						'The function/method "'.$name.'" has a return-specification in PHPDoc'
+						.', but does not return a value',
+						PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET
+					);
+				}
+				else if(!$docreturn && !$func->is_anonymous() && $hasother)
+				{
+					$this->report_error(
+						$func,
+						'The function/method "'.$name.'" has no return-specification in PHPDoc'
+						.', but does return a value',
+						PC_Obj_Error::E_S_RET_BUT_NO_RET_SPEC
+					);
+				}
+				else if($this->has_forbidden($this->allrettypes,$func->get_return_type()))
+				{
+					$this->report_error(
+						$func,
+						'The return-specification (PHPDoc) of function/method "'.$name.'" does not match with '
+						.'the returned values (spec="'.$func->get_return_type().'", returns="'.$mtype.'")',
+						PC_Obj_Error::E_S_RETURNS_DIFFER_FROM_SPEC
+					);
+				}
 			}
 			
 			if($func->get_return_type()->is_unknown())

@@ -59,6 +59,8 @@ final class PC_Obj_Error extends FWS_Object
 	const E_S_DOC_WITHOUT_THROW									= 36;
 	const E_S_THROW_NOT_IN_DOC									= 37;
 	const E_S_THROW_INVALID											= 38;
+	const E_S_CONSTR_RETURN											= 39;
+	const E_S_VOID_ASSIGN												= 40;
 	
 	const E_T_MAGIC_IS_STATIC										= 50;
 	const E_T_DOC_WITHOUT_PARAM									= 51;
@@ -112,6 +114,8 @@ final class PC_Obj_Error extends FWS_Object
 			self::E_S_DOC_WITHOUT_THROW =>							'Throws spec but no throw',
 			self::E_S_THROW_NOT_IN_DOC =>								'Throws but no throws spec',
 			self::E_S_THROW_INVALID =>									'Invalid throw',
+			self::E_S_CONSTR_RETURN =>									'Constructor returns value',
+			self::E_S_VOID_ASSIGN =>										'Assignment of void',
 			
 			self::E_T_MAGIC_METHOD_PARAMS_INVALID =>		'Magic params invalid',
 			self::E_T_MAGIC_METHOD_RET_INVALID =>				'Magic return invalid',
@@ -152,6 +156,8 @@ final class PC_Obj_Error extends FWS_Object
 				self::E_S_DOC_WITHOUT_THROW,
 				self::E_S_THROW_NOT_IN_DOC,
 				self::E_S_THROW_INVALID,
+				self::E_S_CONSTR_RETURN,
+				self::E_S_VOID_ASSIGN,
 			),
 			self::R_ANALYZER => array(
 				self::E_A_METHOD_MISSING,
