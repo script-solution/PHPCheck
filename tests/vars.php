@@ -66,7 +66,7 @@ function x($a,MyClass $b) {
 }
 ?>';
 	
-	public function testVars()
+	public function test_vars()
 	{
 		list(,,$vars,,$errors,) = $this->analyze(self::$code);
 		

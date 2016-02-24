@@ -150,7 +150,7 @@ $bi = array(
 );
 ?>';
 	
-	public function testExprs()
+	public function test_exprs()
 	{
 		list(,,$vars,,,) = $this->analyze(self::$code);
 		

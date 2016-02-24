@@ -24,7 +24,7 @@
 
 class PC_Tests_Returns extends PC_UnitTest
 {
-	public function testReturns()
+	public function test_returns()
 	{
 		$code = '<?php
 class superfoo {

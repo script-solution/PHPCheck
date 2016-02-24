@@ -24,7 +24,7 @@
 
 class PC_Tests_TryCatch extends PC_UnitTest
 {
-	public function testTryCatch()
+	public function test_try_catch()
 	{
 		$code = '<?php
 try {
@@ -44,7 +44,7 @@ catch(Exception $e) {
 		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['e']->get_type());
 	}
 	
-	public function testThrows()
+	public function test_throws()
 	{
 		$code = '<?php
 class A {

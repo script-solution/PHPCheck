@@ -107,7 +107,7 @@ $q = $p[0]->test2($b);
 $r = $p[1]->test2($b);
 ?>';
 	
-	public function testOOP()
+	public function test_oop()
 	{
 		list(,$classes,$vars,$calls,,) = $this->analyze(self::$code);
 		
@@ -281,35 +281,35 @@ $r = $p[1]->test2($b);
 		
 		// check calls
 		$i = 0;
-		self::assertCall($calls[$i++],'b','get42',true);
-		self::assertCall($calls[$i++],'a','test',false);
+		self::assert_call($calls[$i++],'b','get42',true);
+		self::assert_call($calls[$i++],'a','test',false);
 		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy1(integer=2)');
 		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy2(integer=3)');
 		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy3(integer=6)');
 		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy4(unknown)');
 		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy5(unknown)');
-		self::assertCall($calls[$i++],'a','__construct',false);
-		self::assertCall($calls[$i++],'a','test2',false);
-		self::assertCall($calls[$i++],'x','__construct',false);
-		self::assertCall($calls[$i++],'x','test2',false);
-		self::assertCall($calls[$i++],'x','test2',false);
-		self::assertCall($calls[$i++],'b','test2',false);
-		self::assertCall($calls[$i++],'b','sdf',true);
-		self::assertCall($calls[$i++],'x','partest',false);
-		self::assertCall($calls[$i++],'a','__construct',false);
-		self::assertCall($calls[$i++],'b','__construct',false);
-		self::assertCall($calls[$i++],'a','test2',false);
-		self::assertCall($calls[$i++],'b','test2',false);
+		self::assert_call($calls[$i++],'a','__construct',false);
+		self::assert_call($calls[$i++],'a','test2',false);
+		self::assert_call($calls[$i++],'x','__construct',false);
+		self::assert_call($calls[$i++],'x','test2',false);
+		self::assert_call($calls[$i++],'x','test2',false);
+		self::assert_call($calls[$i++],'b','test2',false);
+		self::assert_call($calls[$i++],'b','sdf',true);
+		self::assert_call($calls[$i++],'x','partest',false);
+		self::assert_call($calls[$i++],'a','__construct',false);
+		self::assert_call($calls[$i++],'b','__construct',false);
+		self::assert_call($calls[$i++],'a','test2',false);
+		self::assert_call($calls[$i++],'b','test2',false);
 	}
 
-	private static function assertCall($call,$class,$method,$static)
+	private static function assert_call($call,$class,$method,$static)
 	{
 		self::assert_equals($class,$call->get_class());
 		self::assert_equals($method,$call->get_function());
 		self::assert_equals($static,$call->is_static());
 	}
 	
-	public function testFields()
+	public function test_fields()
 	{
 		$code = '<?php
 class A {

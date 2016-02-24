@@ -24,7 +24,7 @@
 
 class PC_Tests_Funcs extends PC_UnitTest
 {
-	public function testFuncs()
+	public function test_funcs()
 	{
 		$code = '<?php
 function a() {}
@@ -114,7 +114,7 @@ abstract class myc {
 		self::assert_equals('myc2::mystatic()',(string)$calls[1]->get_call(null,false));
 	}
 	
-	public function testNesting()
+	public function test_nesting()
 	{
 		$code = '<?php
 class A {
@@ -165,7 +165,7 @@ function e() {
 		self::assert_equals((string)PC_Obj_MultiType::create_int(4),(string)$vars['B::g']['h']->get_type());
 	}
 	
-	public function testAnon()
+	public function test_anon()
 	{
 		$code = '<?php
 $a = function() {};

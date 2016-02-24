@@ -24,7 +24,7 @@
 
 class PC_Tests_Arrays extends PC_UnitTest
 {
-	public function testArrays()
+	public function test_arrays()
 	{
 		$code = '<?php
 $x = array();
@@ -116,7 +116,7 @@ class foo {
 		self::assert_equals((string)$type,(string)$global['e']->get_type());
 	}
 	
-	public function testList()
+	public function test_list()
 	{
 		$code = '<?php
 $a = array(1,2,3);

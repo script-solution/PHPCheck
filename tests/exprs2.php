@@ -119,7 +119,7 @@ $bf = 1 ?: -1;
 $bg = "f" ?: "g";
 ?>';
 	
-	public function testExprs2()
+	public function test_exprs2()
 	{
 		list(,,$vars,,,) = $this->analyze(self::$code);
 		

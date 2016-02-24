@@ -24,7 +24,7 @@
 
 class PC_Tests_CondsNLoops extends PC_UnitTest
 {	
-	public function testConditions()
+	public function test_conditions()
 	{
 		$code = '<?php
 $a = 2;
@@ -110,7 +110,7 @@ else
 		self::assert_equals((string)PC_Obj_MultiType::create_int(1),(string)$global['i']->get_type());
 	}
 	
-	public function testLoops()
+	public function test_loops()
 	{
 		$code = '<?php
 $a = 0;
@@ -166,7 +166,7 @@ while(1);
 		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['f']->get_type());
 	}
 	
-	public function testNesting()
+	public function test_nesting()
 	{
 		$code = '<?php
 $a = 0;
@@ -316,7 +316,7 @@ if($_)
 		);
 	}
 	
-	public function testForeach()
+	public function test_foreach()
 	{
 		$code = '<?php
 foreach(array(1,2,3) as $k => $v)
