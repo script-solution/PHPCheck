@@ -219,7 +219,7 @@ class PC_Obj_Call extends PC_Obj_Location
 			$func = $types->get_method_or_func($this->class,$this->function);
 		else
 			$func = null;
-		if($func)
+		if($func && $func->get_line())
 		{
 			$url = PC_URL::get_mod_url('class');
 			$url->set('name',$classname);
