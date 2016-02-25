@@ -240,6 +240,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		
 		// get function-object and determine return-type
 		$funcobj = $this->get_method_object($cname,$fname);
+		
+		$this->analyze_modifiers($call,$funcobj);
+		
 		if($funcobj === null)
 			return $this->create_unknown();
 		
@@ -1391,6 +1394,82 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Analyzes whether the given method is visible at the given call.
+	 *
+	 * @param PC_Obj_Call $call the method call
+	 * @param PC_Obj_Method $func the method object
+	 */
+	private function analyze_modifiers($call,$method)
+	{
+		if($method && $method->get_visibility() == PC_Obj_Method::V_PUBLIC)
+			return;
+		
+		// if we don't know it yet, search in the superclasses. in this case, it's always private
+		if(!$method && $call->get_class())
+			$method = $this->get_method_of_super($call->get_class(),$call->get_function());
+		else if($method)
+		{
+			$cur_class = $this->scope->get_name_of(T_CLASS_C);
+			if($cur_class)
+			{
+				// the owner is not restricted in any way
+				if($cur_class == $call->get_class())
+					return;
+				
+				// calling a protected method from a subclass is ok as well
+				$isprot = $method->get_visibility() == PC_Obj_Method::V_PROTECTED;
+				if($isprot && $this->is_subclass_of($cur_class,$call->get_class()))
+					return;
+			}
+		}
+		
+		if($method)
+		{
+			// everything else is not. i.e., calling a private/protected method from a non-subclass
+			$name = $call->get_class().'::'.$call->get_function();
+			$this->report_error(
+				$method,
+				'The function/method "'.$name.'" is '.$method->get_visibility().' at this location',
+				PC_Obj_Error::E_S_METHOD_VISIBILITY
+			);
+		}
+	}
+	
+	/**
+	 * Searches for the given method in any superclass.
+	 *
+	 * @param string $class the class name
+	 * @param string $name the method name
+	 * @return PC_Obj_Method the method or null
+	 */
+	private function get_method_of_super($class,$name)
+	{
+		$cobj = $this->types->get_class($class);
+		if(!$cobj)
+			return null;
+		if($cobj->contains_method($name))
+			return $cobj->get_method($name);
+		return $this->get_method_of_super($cobj->get_super_class(),$name);
+	}
+	
+	/**
+	 * Determines whether $class is a subclass of $super.
+	 *
+	 * @param string $class the class name
+	 * @param string $super the potential superclass name
+	 * @return bool true if so
+	 */
+	private function is_subclass_of($class,$super)
+	{
+		$cobj = $this->types->get_class($class);
+		if(!$cobj)
+			return false;
+		if($cobj->get_super_class() == $super)
+			return true;
+		return $this->is_subclass_of($cobj->get_super_class(),$super);
 	}
 	
 	/**

@@ -348,4 +348,62 @@ $b = $a->foo;
 		self::assert_equals(PC_Obj_Error::E_S_NOT_EXISTING_FIELD,$error->get_type());
 		self::assert_regex('/Access of not-existing field "foo" of class "#A#"/',$error->get_msg());
 	}
+	
+	public function test_modifiers()
+	{
+		$code = '<?php
+class A {
+	public function foo() {
+		$this->priv();
+		$this->prot();
+	}
+	
+	/** @param A $a */
+	public function bar(A $a) {
+		$a->priv();
+		$a->prot();
+	}
+	
+	private function priv() {
+	}
+	protected function prot() {
+	}
+}
+
+class B extends A {
+	/** @param B $b */
+	public function test(B $b) {
+		$this->prot();
+		$b->prot();
+		$this->priv();
+		$b->priv();
+	}
+}
+
+$a = new A();
+$a->foo();
+$a->priv();
+$a->prot();
+?>';
+
+		list(,,,,$errors,) = $this->analyze($code);
+		
+		self::assert_equals(4,count($errors));
+		
+		$error = $errors[0];
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
+		self::assert_regex('/The function\/method "B::priv" is private at this location/',$error->get_msg());
+		
+		$error = $errors[1];
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
+		self::assert_regex('/The function\/method "B::priv" is private at this location/',$error->get_msg());
+		
+		$error = $errors[2];
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
+		self::assert_regex('/The function\/method "A::priv" is private at this location/',$error->get_msg());
+		
+		$error = $errors[3];
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
+		self::assert_regex('/The function\/method "A::prot" is protected at this location/',$error->get_msg());
+	}
 }
