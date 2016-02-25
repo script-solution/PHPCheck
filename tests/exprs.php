@@ -221,7 +221,7 @@ $bi = array(
 		self::assert_equals((string)PC_Obj_MultiType::create_int(123),(string)$global['bb']->get_type());
 		self::assert_equals((string)PC_Obj_MultiType::create_float(1),(string)$global['bc']->get_type());
 		self::assert_equals((string)PC_Obj_MultiType::create_string("12"),(string)$global['bd']->get_type());
-		$ar = PC_Obj_MultiType::create_array();
+		$ar = PC_Obj_MultiType::create_array(array());
 		$ar->get_first()->set_array_type(0,PC_Obj_MultiType::create_int(4));
 		self::assert_equals((string)$ar,(string)$global['be']->get_type());
 		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['bf']->get_type());

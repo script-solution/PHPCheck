@@ -6028,7 +6028,7 @@ static public $yy_action = array(
 #line 6033 "src/engine/typeparser.php"
 #line 763 "src/engine/typeparser.y"
     function yy_r446(){
-	$this->_retvalue = PC_Obj_MultiType::create_array();
+	$this->_retvalue = PC_Obj_MultiType::create_array(array());
 	$this->_retvalue->get_first()->set_array_type($this->yystack[$this->yyidx + 0]->minor['key'],$this->yystack[$this->yyidx + 0]->minor['val'],$this->yystack[$this->yyidx + 0]->minor['append']);
     }
 #line 6039 "src/engine/typeparser.php"

@@ -6814,7 +6814,7 @@ static public $yy_action = array(
 #line 6819 "src/engine/stmtparser.php"
 #line 989 "src/engine/stmtparser.y"
     function yy_r448(){
-	$this->_retvalue = PC_Obj_MultiType::create_array();
+	$this->_retvalue = PC_Obj_MultiType::create_array(array());
 	$this->_retvalue->get_first()->set_array_type($this->yystack[$this->yyidx + 0]->minor['key'],$this->yystack[$this->yyidx + 0]->minor['val'],$this->yystack[$this->yyidx + 0]->minor['append']);
     }
 #line 6825 "src/engine/stmtparser.php"

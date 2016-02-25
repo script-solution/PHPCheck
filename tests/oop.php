@@ -161,7 +161,7 @@ $r = $p[1]->test2($b);
 			(string)$a->get_field('b')
 		);
 		
-		$array = PC_Obj_MultiType::create_array();
+		$array = PC_Obj_MultiType::create_array(array());
 		$array->get_first()->set_array_type(0,PC_Obj_MultiType::create_int(1));
 		$array->get_first()->set_array_type(1,PC_Obj_MultiType::create_int(2));
 		$array->get_first()->set_array_type(2,PC_Obj_MultiType::create_int(3));

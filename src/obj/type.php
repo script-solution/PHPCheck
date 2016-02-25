@@ -285,6 +285,10 @@ final class PC_Obj_Type extends FWS_Object
 		if(!($key instanceof PC_Obj_MultiType) && !is_scalar($key))
 			FWS_Helper::error('$key has to be a scalar or PC_Obj_MultiType (got '.gettype($key).')');
 		
+		// if it is already an array, but unknown, leave it unknown
+		if($this->_type == self::TARRAY && $this->_value === null)
+			return;
+		
 		// convert implicitly to an array
 		$this->_type = self::TARRAY;
 		if(!is_array($this->_value))

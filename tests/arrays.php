@@ -62,6 +62,14 @@ class foo {
 		);
 	}
 }
+
+/** @return array */
+function f() {
+	return $_;
+}
+
+$g = f();
+$g[] = 1;
 ?>';
 		
 		list(,,$vars,$calls,,) = $this->analyze($code);
@@ -73,7 +81,7 @@ class foo {
 		$args = $calls[2]->get_arguments();
 		self::assert_equals((string)PC_Obj_MultiType::create_int(3),(string)$args[0]);
 		$args = $calls[3]->get_arguments();
-		$type = PC_Obj_MultiType::create_array();
+		$type = PC_Obj_MultiType::create_array(array());
 		$type->get_first()->set_array_type(0,PC_Obj_MultiType::create_string('abc'));
 		$type->get_first()->set_array_type(1,PC_Obj_MultiType::create_int(2));
 		self::assert_equals((string)$type,(string)$args[0]);
@@ -91,16 +99,16 @@ class foo {
 		self::assert_equals((string)PC_Obj_Type::get_type_by_value(array(4,5)),(string)$global['y']->get_type());
 		self::assert_equals((string)PC_Obj_Type::get_type_by_value(array(4,5,6)),(string)$global['z']->get_type());
 		
-		$type = PC_Obj_MultiType::create_array();
+		$type = PC_Obj_MultiType::create_array(array());
 		$type->get_first()->set_array_type(0,PC_Obj_MultiType::create_object('a'));
 		$type->get_first()->set_array_type(1,PC_Obj_MultiType::create_int(4));
 		$type->get_first()->set_array_type(2,PC_Obj_MultiType::create_int(5));
 		$type->get_first()->set_array_type('Abc',PC_Obj_MultiType::create_string('me'));
 		self::assert_equals((string)$type,(string)$global['a']->get_type());
 		
-		$type = PC_Obj_MultiType::create_array();
+		$type = PC_Obj_MultiType::create_array(array());
 		$type->get_first()->set_array_type(0,PC_Obj_MultiType::create_int(0));
-		$subtype = PC_Obj_MultiType::create_array();
+		$subtype = PC_Obj_MultiType::create_array(array());
 		$subtype->get_first()->set_array_type(0,PC_Obj_MultiType::create_int(2));
 		$type->get_first()->set_array_type(1,$subtype);
 		$type->get_first()->set_array_type(2,PC_Obj_MultiType::create_int(2));
@@ -110,10 +118,12 @@ class foo {
 		$bar = $vars['foo::bar'];
 		self::assert_equals('array',(string)$bar['a']->get_type());
 		
-		$type = PC_Obj_MultiType::create_array();
+		$type = PC_Obj_MultiType::create_array(array());
 		$type->get_first()->set_array_type(1,PC_Obj_MultiType::create_int(4));
 		$type->get_first()->set_array_type("foo",PC_Obj_MultiType::create_int(5));
 		self::assert_equals((string)$type,(string)$global['e']->get_type());
+		
+		self::assert_equals((string)PC_Obj_MultiType::create_array(),(string)$global['g']->get_type());
 	}
 	
 	public function test_list()

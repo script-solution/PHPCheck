@@ -987,7 +987,7 @@ non_empty_array_pair_list(A) ::= non_empty_array_pair_list(list) COMMA array_pai
 	A->get_first()->set_array_type(p['key'],p['val'],p['append']);
 }
 non_empty_array_pair_list(A) ::= array_pair(p) . {
-	A = PC_Obj_MultiType::create_array();
+	A = PC_Obj_MultiType::create_array(array());
 	A->get_first()->set_array_type(p['key'],p['val'],p['append']);
 }
 
