@@ -6,28 +6,29 @@ before shipping them. It searches through all files and collects information abo
 function calls and variables. Finally it analyzes this information and tries to find potential
 errors in it.
 
-It exists to overcome a problem of interpreted languages: There is no compile time. Therefore, you
-will errors *only* until you run the application. Running it does always mean that exactly one code
-path is taken. For example, if you have an if-else statement, it will always execute either the if
-branch or the else branch, but never both. If the else branch is executed nearly never, the
-probability that errors in it are not found is quite high.
+It exists to overcome a problem of interpreted languages: there is no compile time. Therefore, you
+will notice errors *only* if you run the application. In fact, it's even worse: in every run,
+exactly one code path is taken. For example, if you have an if-else statement, it will always
+execute either the if branch or the else branch, but never both. If the else branch is executed
+nearly never, the probability that errors in it are not found is quite high.
 
 Errors in this case mean for example:
 
-- Call of not-existing function
-- Instantiation of not-existing class
+- Call of a not-existing function
+- Instantiation of a not-existing class
 - Wrong parameter count
 - Wrong parameter types
-- Method call of an non object
+- Method call of a non object
 - ...
 
 So, semantic errors, that PHP would complain about, if it executed the affected code path. To give
 developers the chance to find these semantic errors in PHP applications ahead of time, I wrote this
 tool. Note however, that there will be false positives and false negatives due to the lack of
-information at compile time. For example, variables that are initialized with a value from an
-external source (GET, POST, ...). PHP makes it even more difficult for us by providing things like
-variable variables, variable function calls, variable class instantiations and so on. And of course,
-PHP is a dynamically typed language, so that we simply don't know the type in most cases.
+information at compile time. For example, if variables are initialized with a value from an external
+source (GET, POST, ...), their value and maybe even their type is unknown at compile time. PHP makes
+it even more difficult for us by providing things like variable variables, variable function calls,
+variable class instantiations and so on. And of course, PHP is a dynamically typed language, so that
+we simply don't know the type in most cases.
 
 In summary: Don't expect this tool to be perfect and always correct. It should give you **hints** to
 things that **might** by wrong. Nothing more. So, **you** have to check the potential problems
@@ -74,6 +75,7 @@ PHPDoc Tags are:
 - `@var <type> ...`
 - `@param <type> <paramName> ...`
 - `@return <type> ...`
+- `@throws <type> ...`
 
 The supported types are:
 
@@ -82,9 +84,11 @@ The supported types are:
 - Float: `float` or `double`
 - String: `string`, `str` or `char`
 - Array: `array`
+- Resource: `resource` or `res`
+- Void: `void`
+- Callable: `callable`
 - Generic object: `object`
 - Specific object: `<yourClassName>`
-- Resource: `resource` or `res`
 - Various types: `mixed`
 
 Multiple types can be specified by separating them with '|'.
@@ -104,11 +108,5 @@ fields dynamically.
 Similarly, ill-formed or missing PHPDoc comments are detected. That means, the tool will complain if
 you don't document parameters or return values or if you document non-existent parameters. This
 serves also the purpose of improving the quality of PHPChecks analysis. Because without relying on
-PHPDoc comments, it is not possible in many cases (at least, in "real" applications) to determine
-the type of a variable at compile time.
-
-Limitations:
-------------
-
-Currently, most of the new language features (except anonymous functions) introduced since
-PHP 5.2.0 are not yet supported.
+PHPDoc comments (or type hinting), it is not possible in many cases (at least, in "real"
+applications) to determine the type of a variable at compile time.
