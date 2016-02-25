@@ -485,7 +485,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	public function unset_var($var)
 	{
 		$scopename = $this->scope->get_name();
-		$this->vars->unset($scopename,$var);
+		$this->vars->remove($scopename,$var);
 	}
 	
 	/**

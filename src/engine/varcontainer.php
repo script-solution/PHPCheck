@@ -110,7 +110,7 @@ class PC_Engine_VarContainer extends FWS_Object
 	 * @param string $scope the scope-name
 	 * @param PC_Obj_Variable $var the variable
 	 */
-	public function unset($scope,$var)
+	public function remove($scope,$var)
 	{
 		unset($this->vars[$scope][$var->get_name()]);
 	}
