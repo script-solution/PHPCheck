@@ -856,6 +856,8 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$cname = $classname->get_string();
 		if($cname === null)
 			return $this->create_unknown();
+		if($cname == 'self')
+			$cname = $this->scope->get_name_of(T_CLASS_C);
 		
 		$class = $this->types->get_class($cname);
 		if($class === null)

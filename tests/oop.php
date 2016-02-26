@@ -47,6 +47,10 @@ class a {
   protected function test2(a $arg) {
   	return $arg;
   }
+  
+  public function aaa() {
+  	strstr(self::ME,a::YOU);
+  }
 }
 
 abstract class b extends a implements i,j {
@@ -267,7 +271,7 @@ $r = $p[1]->test2($b);
 			(string)$global['n']->get_type()
 		);
 		self::assert_equals(
-			(string)PC_Obj_MultiType::create_int(78),
+			(string)PC_Obj_MultiType::create_int(82),
 			(string)$global['o']->get_type()
 		);
 		self::assert_equals(
@@ -281,6 +285,7 @@ $r = $p[1]->test2($b);
 		
 		// check calls
 		$i = 0;
+		self::assert_equals((string)$calls[$i++]->get_call(null,false),'strstr(integer=4, string=str)');
 		self::assert_call($calls[$i++],'b','get42',true);
 		self::assert_call($calls[$i++],'a','test',false);
 		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy1(integer=2)');
