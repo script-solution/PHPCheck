@@ -10,27 +10,32 @@ var rowHL = new FWS_TableRowSelector('row_','check_');
 </script>
 
 <form method="post" action="{gurl.build_mod_url()}">
-<input type="hidden" name="aid" value="{action_id}" />
 <div class="pc_border">
 	<h1 class="pc_topic">Projects</h1>
 	<table width="100%" class="pc_table">
 		<tr>
 			<td class="pc_left">Name</td>
+			<td class="pc_left" align="center">Content</td>
 			<td class="pc_left" align="center">Created</td>
 			<td class="pc_left" align="center">Clean</td>
+			<td class="pc_left" align="center">Edit</td>
 			<td align="center" class="pc_left">Delete</td>
 		</tr>
 		{if projects.length == 0}
 		<tr>
-			<td class="hlCol" align="center" colspan="4">No projects found</td>
+			<td class="hlCol" align="center" colspan="6">No projects found</td>
 		</tr>
 		{endif}
 		{loop projects as row => project}
 		<tr id="row_{row}" class="hlRow">
-			<td class="hlCol">{form.get_textbox('name['~project:id~']',project:name,30)}</td>
+			<td class="hlCol">{project:name}</td>
+			<td class="hlCol" align="center">{project:classes} classes, {project:functions} functions, {project:errors} errors</td>
 			<td class="hlCol" align="center">{project:created}</td>
 			<td class="hlCol" align="center">
 			<a href="{project:clean_url}">Clean</a>
+			</td>
+			<td class="hlCol" align="center">
+			<a class="hlCol" href="{project:edit_url}">Edit</a>
 			</td>
 			<td class="hlCol" align="center" onclick="rowHL.toggleRowSelected({row});">
 			<input id="check_{row}" type="checkbox" name="delete[]" value="{project:id}" />
@@ -40,7 +45,7 @@ var rowHL = new FWS_TableRowSelector('row_','check_');
 	</table>
 </div>
 <center>
-	<input type="submit" name="submit" value="Submit" />
+	<input type="submit" name="submit" value="Delete" />
 </center>
 </form>
 

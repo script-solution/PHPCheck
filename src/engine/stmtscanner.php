@@ -93,6 +93,12 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	private $vars;
 	/**
+	 * Analyzes the requirements
+	 *
+	 * @var PC_Engine_ReqAnalyzer
+	 */
+	private $reqanalyzer;
+	/**
 	 * An array of all return-types of the current function/method
 	 * 
 	 * @var array
@@ -139,6 +145,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$this->types = $types;
 		$this->scope = new PC_Engine_Scope();
 		$this->vars = new PC_Engine_VarContainer();
+		$this->reqanalyzer = new PC_Engine_ReqAnalyzer($this->types);
 		$this->options = $options;
 	}
 	
@@ -242,17 +249,21 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$call->set_static($static);
 		$this->types->add_call($call);
 		
-		// if its a constructor we know the type directly
-		if(strcasecmp($fname,'__construct') == 0 || strcasecmp($fname,$cname) == 0)
-			return PC_Obj_MultiType::create_object($cname);
-		
-		// get function-object and determine return-type
 		$funcobj = $this->get_method_object($cname,$fname);
 		
 		$this->analyze_modifiers($call,$funcobj);
 		
 		if($funcobj === null)
+		{
+			// if it's a constructor, we still know the type
+			if(strcasecmp($fname,'__construct') == 0 || strcasecmp($fname,$cname) == 0)
+				return PC_Obj_MultiType::create_object($cname);
 			return $this->create_unknown();
+		}
+		
+		$this->reqanalyzer->analyze(
+			$call,$funcobj->get_version()->get_min(),$funcobj->get_version()->get_max()
+		);
 		
 		// add the throws of the method to our throws
 		foreach(array_keys($funcobj->get_throws()) as $tclass)
@@ -263,6 +274,9 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			);
 		}
 		
+		// if its a constructor we know the type directly
+		if(strcasecmp($fname,'__construct') == 0 || strcasecmp($fname,$cname) == 0)
+			return PC_Obj_MultiType::create_object($cname);
 		return clone $funcobj->get_return_type();
 	}
 	

@@ -64,6 +64,8 @@ final class PC_Obj_Error extends FWS_Object
 	const E_S_METHOD_VISIBILITY									= 41;
 	const E_S_VAR_UNUSED												= 42;
 	const E_S_PARAM_UNUSED											= 43;
+	const E_S_REQUIRES_NEWER										= 44;
+	const E_S_REQUIRES_OLDER										= 45;
 	
 	const E_T_MAGIC_IS_STATIC										= 50;
 	const E_T_DOC_WITHOUT_PARAM									= 51;
@@ -122,6 +124,8 @@ final class PC_Obj_Error extends FWS_Object
 			self::E_S_METHOD_VISIBILITY =>							'Method not visible',
 			self::E_S_VAR_UNUSED =>											'Unused variable',
 			self::E_S_PARAM_UNUSED =>										'Unused parameter',
+			self::E_S_REQUIRES_NEWER =>									'Feature not yet available',
+			self::E_S_REQUIRES_OLDER =>									'Feature no longer available',
 			
 			self::E_T_MAGIC_METHOD_PARAMS_INVALID =>		'Magic params invalid',
 			self::E_T_MAGIC_METHOD_RET_INVALID =>				'Magic return invalid',
@@ -167,6 +171,8 @@ final class PC_Obj_Error extends FWS_Object
 				self::E_S_METHOD_VISIBILITY,
 				self::E_S_VAR_UNUSED,
 				self::E_S_PARAM_UNUSED,
+				self::E_S_REQUIRES_NEWER,
+				self::E_S_REQUIRES_OLDER,
 			),
 			self::R_ANALYZER => array(
 				self::E_A_METHOD_MISSING,

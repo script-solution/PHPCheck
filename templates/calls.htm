@@ -37,6 +37,7 @@
 	<tr>
 		<th>Call</th>
 		<th>Location</th>
+		<th>Requirements</th>
 	</tr>
 	{if calls.length == 0}
 	<tr>
@@ -55,6 +56,13 @@
 		<div id="call_area_{call:id}" class="pc_code" style="display: none;"></div>
 		</td>
 		<td class="pc_main">{call:file}, line {call:line}</td>
+		<td class="pc_main">
+		{if call:since}&gt;= {call:since}{endif}
+		{if call:till}
+		{if call:since} and {endif}
+		&lt; {call:till}
+		{endif}
+		</td>
 	</tr>
 	{endloop}
 	{endif}

@@ -33,9 +33,18 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 {
 	public function run($args)
 	{
-		$errors = array();
+		$project = FWS_Props::get()->project();
 		$options = new PC_Engine_Options();
 		$options->set_report_unused(true);
+		foreach($project->get_req() as $r)
+		{
+			if($r['type'] == 'min')
+				$options->add_min_req($r['name'],$r['version']);
+			else
+				$options->add_max_req($r['name'],$r['version']);
+		}
+		
+		$errors = array();
 		$types = new PC_Engine_TypeContainer($options);
 		$ascanner = new PC_Engine_StmtScannerFrontend($types,$options);
 		

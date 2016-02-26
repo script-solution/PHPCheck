@@ -71,6 +71,19 @@ class PC_Engine_Options extends FWS_Object
 	private $use_phpref = true;
 	
 	/**
+	 * The minimum requirement (PHP, PECL modules, ...)
+	 *
+	 * @var array
+	 */
+	private $min_req = array();
+	/**
+	 * The maximum requirement (PHP, PECL modules, ...), i.e., the first unsupported versions
+	 *
+	 * @var array
+	 */
+	private $max_req = array();
+	
+	/**
 	 * @return int the project id
 	 */
 	public function get_pid()
@@ -176,6 +189,44 @@ class PC_Engine_Options extends FWS_Object
 	public function set_use_phpref($use)
 	{
 		$this->use_phpref = $use;
+	}
+	
+	/**
+	 * @return array an array of minimum requirements (inclusive): array(<name> => <version>)
+	 */
+	public function get_min_req()
+	{
+		return $this->min_req;
+	}
+	
+	/**
+	 * Adds the given minimum requirement (inclusive).
+	 * 
+	 * @param string $name the component name (e.g., PHP or PECL pdo)
+	 * @param string $version the version
+	 */
+	public function add_min_req($name,$version)
+	{
+		$this->min_req[$name] = $version;
+	}
+	
+	/**
+	 * @return array an array of maximum requirements (exclusive): array(<name> => <version>)
+	 */
+	public function get_max_req()
+	{
+		return $this->max_req;
+	}
+	
+	/**
+	 * Adds the given maximum requirement (exclusive).
+	 * 
+	 * @param string $name the component name (e.g., PHP or PECL pdo)
+	 * @param string $version the version
+	 */
+	public function add_max_req($name,$version)
+	{
+		$this->max_req[$name] = $version;
 	}
 	
 	protected function get_dump_vars()

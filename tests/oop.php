@@ -376,6 +376,9 @@ class A {
 }
 
 class B extends A {
+	private function __construct() {
+	}
+	
 	/** @param B $b */
 	public function test(B $b) {
 		$this->prot();
@@ -389,11 +392,12 @@ $a = new A();
 $a->foo();
 $a->priv();
 $a->prot();
+$b = new B();
 ?>';
 
 		list(,,,,$errors,) = $this->analyze($code);
 		
-		self::assert_equals(4,count($errors));
+		self::assert_equals(5,count($errors));
 		
 		$error = $errors[0];
 		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
@@ -410,5 +414,9 @@ $a->prot();
 		$error = $errors[3];
 		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
 		self::assert_regex('/The function\/method "A::prot" is protected at this location/',$error->get_msg());
+		
+		$error = $errors[4];
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
+		self::assert_regex('/The function\/method "B::__construct" is private at this location/',$error->get_msg());
 	}
 }

@@ -54,6 +54,18 @@ class PC_DAO_Projects extends FWS_Singleton
 	}
 	
 	/**
+	 * Returns the project with given id
+	 *
+	 * @param int $id the id
+	 * @return PC_Project the project
+	 */
+	public function get_by_id($id)
+	{
+		$res = $this->get_by_ids(array($id));
+		return $res[0];
+	}
+	
+	/**
 	 * Returns the projects with given ids
 	 *
 	 * @param array $ids the ids
@@ -133,6 +145,7 @@ class PC_DAO_Projects extends FWS_Singleton
 		$db = FWS_Props::get()->db();
 		$db->update(PC_TB_PROJECTS,'WHERE id = '.$project->get_id(),array(
 			'name' => $project->get_name(),
+			'created' => $project->get_created(),
 			'type_folders' => $project->get_type_folders(),
 			'type_exclude' => $project->get_type_exclude(),
 			'stmt_folders' => $project->get_stmt_folders(),
@@ -140,6 +153,15 @@ class PC_DAO_Projects extends FWS_Singleton
 			'report_mixed' => $project->get_report_mixed(),
 			'report_unknown' => $project->get_report_unknown()
 		));
+		
+		foreach($project->get_req() as $r)
+		{
+			$db->update(PC_TB_REQUIREMENTS,'WHERE id = '.$r['id'],array(
+				'type' => $r['type'],
+				'name' => $r['name'],
+				'version' => $r['version'],
+			));
+		}
 	}
 	
 	/**
@@ -159,6 +181,37 @@ class PC_DAO_Projects extends FWS_Singleton
 	}
 	
 	/**
+	 * Adds the given requirement to the given project.
+	 *
+	 * @param int $id the project-id
+	 * @param string $type the type: min or max
+	 * @param string $name the name of the component
+	 * @param string $version the version number
+	 */
+	public function add_req($id,$type,$name,$version)
+	{
+		$db = FWS_Props::get()->db();
+		
+		$db->insert(PC_TB_REQUIREMENTS,array(
+			'project_id' => $id,
+			'type' => $type,
+			'name' => $name,
+			'version' => $version
+		));
+	}
+	
+	/**
+	 * Deletes the given requirement
+	 *
+	 * @param int $vid the requirement id
+	 */
+	public function del_req($vid)
+	{
+		$db = FWS_Props::get()->db();
+		$db->execute('DELETE FROM '.PC_TB_REQUIREMENTS.' WHERE id = '.$vid);
+	}
+	
+	/**
 	 * Builds an instance of PC_Project from the given row
 	 *
 	 * @param array $row the row from db
@@ -168,9 +221,16 @@ class PC_DAO_Projects extends FWS_Singleton
 	{
 		if(!$row)
 			return null;
-		return new PC_Project(
+		
+		$db = FWS_Props::get()->db();
+		$req = $db->get_rows('SELECT * FROM '.PC_TB_REQUIREMENTS.' WHERE project_id = '.$row['id']);
+		
+		$proj = new PC_Project(
 			$row['id'],$row['name'],$row['created'],$row['type_folders'],$row['type_exclude'],
 			$row['stmt_folders'],$row['stmt_exclude'],$row['report_mixed'],$row['report_unknown']
 		);
+		foreach($req as $v)
+			$proj->add_req($v['id'],$v['type'],$v['name'],$v['version']);
+		return $proj;
 	}
 }

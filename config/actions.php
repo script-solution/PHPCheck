@@ -38,31 +38,41 @@ define('PC_ACTION_START_STMNTSCAN',2);
 define('PC_ACTION_START_ANALYZE',3);
 
 /**
- * Saves all projects
- */
-define('PC_ACTION_SAVE_PROJECTS',4);
-
-/**
  * Adds a project
  */
-define('PC_ACTION_ADD_PROJECT',5);
+define('PC_ACTION_ADD_PROJECT',4);
 
 /**
  * Deletes projects
  */
-define('PC_ACTION_DELETE_PROJECTS',6);
+define('PC_ACTION_DELETE_PROJECTS',5);
 
 /**
  * Changes the project
  */
-define('PC_ACTION_CHG_PROJECT',7);
+define('PC_ACTION_CHG_PROJECT',6);
 
 /**
  * The start-phpref-scan-action
  */
-define('PC_ACTION_START_PHPREFSCAN',8);
+define('PC_ACTION_START_PHPREFSCAN',7);
 
 /**
  * Cleans a project
  */
-define('PC_ACTION_CLEAN_PROJECT',9);
+define('PC_ACTION_CLEAN_PROJECT',8);
+
+/**
+ * Adds a requirement to a project
+ */
+define('PC_ACTION_ADD_REQ',9);
+
+/**
+ * Deletes a requirement from a project
+ */
+define('PC_ACTION_DELETE_REQ',10);
+
+/**
+ * Edits a project
+ */
+define('PC_ACTION_EDIT_PROJECT',11);

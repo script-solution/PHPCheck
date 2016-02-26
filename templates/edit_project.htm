@@ -1,0 +1,52 @@
+{include "inc_header.htm"}
+
+{if action_result < 1}
+{if module_error == false}
+<form method="post" action="{target_url}">
+<input type="hidden" name="aid" value="{action_type}" />
+<div class="pc_border">
+	<h1 class="pc_topic">Edit project</h1>
+	<fieldset class="pc_form">
+		<dl>
+			<dt>Name:</dt>
+			<dd>{form.get_textbox('name',def_name,40,255)}</dd>
+		</dl>
+		<dl>
+			<dt>Start:</dt>
+			<dd>{form.get_date_chooser('start_',def_start,false)}</dd>
+		</dl>
+		<dl>
+			<dt>Requirements:</dt>
+			<dd>
+				{if req.length == 0}
+				-
+				{endif}
+				{loop req as r}
+				<div style="padding: 2px">
+					{form.get_textbox('edit_name['~r:id~']',r:name,10,255)}
+					{form.get_combobox('edit_type['~r:id~']',types,r:type)}
+					{form.get_textbox('edit_version['~r:id~']',r:version,10,10)}
+					<input type="button" name="del" value="Delete"
+						onclick="document.location.href = '{r:del_url}';" />
+				</div>
+				{endloop}
+				<div style="padding: 2px; padding-top: 10px">
+					{form.get_textbox('add_name',add_name,10,255)}
+					{form.get_combobox('add_type',types,add_type)}
+					{form.get_textbox('add_version',add_version,10,10)}
+					<input type="submit" name="add" value="Add" />
+					(e.g., &quot;PHP&quot; >= &quot;5.3.0&quot; or &quot;PECL pdo&quot; >= &quot;0.2.0&quot;)
+				</div>
+			</dd>
+		</dl>
+	</fieldset>
+</div>
+<center>
+	<input type="button" value="Back" onclick="document.location.href='{gurl.build_mod_url('projects')}'" />
+	<input type="submit" name="submit" value="Save" />
+</center>
+</form>
+{endif}
+{endif}
+
+{include "inc_footer.htm"}

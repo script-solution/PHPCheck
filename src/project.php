@@ -108,6 +108,13 @@ final class PC_Project extends FWS_Object
 	private $_report_unknown;
 	
 	/**
+	 * The lower and upper bounds for versions.
+	 *
+	 * @var array
+	 */
+	private $_req;
+	
+	/**
 	 * Constructor
 	 *
 	 * @param int $id the project-id
@@ -139,6 +146,7 @@ final class PC_Project extends FWS_Object
 		$this->_stmt_exclude = $stmt_exclude;
 		$this->_report_mixed = $report_mixed;
 		$this->_report_unknown = $report_unknown;
+		$this->_req = array();
 	}
 	
 	/**
@@ -173,6 +181,16 @@ final class PC_Project extends FWS_Object
 	public function get_created()
 	{
 		return $this->_created;
+	}
+	
+	/**
+	 * Sets the created timestamp.
+	 *
+	 * @param int $time the timestamp
+	 */
+	public function set_created($time)
+	{
+		$this->_created = $time;
 	}
 	
 	/**
@@ -281,6 +299,42 @@ final class PC_Project extends FWS_Object
 	public function set_report_unknown($b)
 	{
 		$this->_report_unknown = $b;
+	}
+	
+	/**
+	 * @return array the requirements
+	 */
+	public function get_req()
+	{
+		return $this->_req;
+	}
+	
+	/**
+	 * Sets the requirements.
+	 *
+	 * @param array $req the new requirements
+	 */
+	public function set_req($req)
+	{
+		$this->_req = $req;
+	}
+	
+	/**
+	 * Adds the given requirement to the list
+	 *
+	 * @param int $id the id
+	 * @param string $type the type: min or max
+	 * @param string $name the name of the component
+	 * @param string $version the version number
+	 */
+	public function add_req($id,$type,$name,$version)
+	{
+		$this->_req[] = array(
+			'id' => $id,
+			'type' => $type,
+			'name' => $name,
+			'version' => $version
+		);
 	}
 
 	/**

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 24, 2016 at 09:44 PM
+-- Generation Time: Feb 26, 2016 at 10:56 PM
 -- Server version: 10.1.11-MariaDB-log
 -- PHP Version: 7.0.3
 
@@ -162,6 +162,20 @@ CREATE TABLE `pc_vars` (
   `type` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pc_versions`
+--
+
+CREATE TABLE `pc_versions` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `type` enum('min','max') NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `version` varchar(10) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 --
 -- Indexes for dumped tables
 --
@@ -220,6 +234,12 @@ ALTER TABLE `pc_vars`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `pc_versions`
+--
+ALTER TABLE `pc_versions`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -262,4 +282,9 @@ ALTER TABLE `pc_projects`
 -- AUTO_INCREMENT for table `pc_vars`
 --
 ALTER TABLE `pc_vars`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `pc_versions`
+--
+ALTER TABLE `pc_versions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;

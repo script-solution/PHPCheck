@@ -1,9 +1,9 @@
 <?php
 /**
- * Contains the save-projects-action
+ * Contains the delete-requirements action
  * 
  * @package			PHPCheck
- * @subpackage	module
+ * @subpackage	modules
  *
  * Copyright (C) 2008 - 2016 Nils Asmussen
  *
@@ -23,34 +23,35 @@
  */
 
 /**
- * The save-projects-action
+ * The delete-requirements action
  *
  * @package			PHPCheck
- * @subpackage	module
+ * @subpackage	modules
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Action_projects_save extends FWS_Action_Base
+class PC_Action_edit_project_delete_req extends FWS_Action_Base
 {
 	public function perform_action()
 	{
 		$input = FWS_Props::get()->input();
-		if(!$input->isset_var('submit','post'))
-			return '';
+		$db = FWS_Props::get()->db();
 		
-		$names = $input->get_var('name','post');
-		if(!FWS_Array_Utils::is_numeric(array_keys($names)))
-			return 'Invalid name-array';
+		$pid = $input->get_var('id','get',FWS_Input::INTEGER);
+		$vid = $input->get_var('vid','get',FWS_Input::INTEGER);
+		if($pid == null || $vid == null)
+			return TDL_GENERAL_ERROR;
 		
-		foreach(PC_DAO::get_projects()->get_by_ids(array_keys($names)) as $project)
-		{
-			$project->set_name($names[$project->get_id()]);
-			PC_DAO::get_projects()->update($project);
-		}
+		PC_DAO::get_projects()->del_req($vid);
 		
+		$this->set_success_msg('The requirement has been deleted');
+		$this->set_redirect(
+			true,
+			PC_URL::get_mod_url('edit_project')->set('id',$pid)
+		);
 		$this->set_show_status_page(false);
-		$this->set_redirect(false);
 		$this->set_action_performed(true);
-
+	
 		return '';
 	}
 }
+?>

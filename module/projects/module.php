@@ -40,7 +40,6 @@ final class PC_Module_projects extends PC_Module
 	{
 		parent::init($doc);
 		$renderer = $doc->use_default_renderer();
-		$renderer->add_action(PC_ACTION_SAVE_PROJECTS,'save');
 		$renderer->add_action(PC_ACTION_ADD_PROJECT,'add');
 		$renderer->add_action(PC_ACTION_DELETE_PROJECTS,'delete');
 		$renderer->add_action(PC_ACTION_CLEAN_PROJECT,'clean');
@@ -83,11 +82,19 @@ final class PC_Module_projects extends PC_Module
 			$cleanurl = PC_URL::get_mod_url();
 			$cleanurl->set('id',$project->get_id());
 			$cleanurl->set('aid',PC_ACTION_CLEAN_PROJECT);
+			
+			$editurl = PC_URL::get_mod_url('edit_project');
+			$editurl->set('id',$project->get_id());
+			
 			$projects[] = array(
 				'name' => $project->get_name(),
 				'id' => $project->get_id(),
+				'classes' => PC_DAO::get_classes()->get_count($project->get_id()),
+				'functions' => PC_DAO::get_functions()->get_count(0,$project->get_id()),
+				'errors' => PC_DAO::get_errors()->get_count($project->get_id()),
 				'created' => FWS_Date::get_date($project->get_created()),
-				'clean_url' => $cleanurl->to_url()
+				'clean_url' => $cleanurl->to_url(),
+				'edit_url' => $editurl->to_url()
 			);
 		}
 		
@@ -95,7 +102,6 @@ final class PC_Module_projects extends PC_Module
 		$url = PC_URL::get_mod_url();
 		$url->set('aid',PC_ACTION_ADD_PROJECT);
 		$tpl->add_variables(array(
-			'action_id' => PC_ACTION_SAVE_PROJECTS,
 			'add_project_url' => $url->to_url(),
 			'projects' => $projects
 		));

@@ -88,7 +88,9 @@ final class PC_Module_calls extends PC_Module
 				'call' => $call->get_call($typecon),
 				'file' => $call->get_file(),
 				'line' => $call->get_line(),
-				'url' => $url->to_url()
+				'url' => $url->to_url(),
+				'since' => $func ? implode(', ',$func->get_version()->get_min()) : '',
+				'till' => $func ? implode(', ',$func->get_version()->get_max()) : '',
 			);
 		}
 		
