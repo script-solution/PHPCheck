@@ -24,7 +24,9 @@
 
 class PC_Tests_Vars extends PC_UnitTest
 {
-	private static $code = '<?php
+	public function test_vars()
+	{
+		$code = '<?php
 define("MYCONST",123);
 $i1 = +1;
 $i2 = -412;
@@ -65,10 +67,8 @@ function x($a,MyClass $b) {
 	return $a;
 }
 ?>';
-	
-	public function test_vars()
-	{
-		list(,,$vars,,$errors,) = $this->analyze(self::$code);
+
+		list(,,$vars,,$errors,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_int(1),(string)$global['i1']->get_type());
@@ -108,5 +108,93 @@ function x($a,MyClass $b) {
 		self::assert_equals((string)PC_Obj_MultiType::create_array(),(string)$x['i1']->get_type());
 		self::assert_equals((string)PC_Obj_MultiType::create_array(),(string)$x['i2']->get_type());
 		self::assert_equals((string)PC_Obj_MultiType::create_bool(true),(string)$x['b1']->get_type());
+	}
+	
+	public function test_unused()
+	{
+		$code = '<?php
+$a = 1;
+$b = 2;
+$c = 3;
+$d = 4;
+$e = 5;
+$f = 1;
+$g = 1;
+$h = 1;
+$i = "foo bar $f test $g{5} $_{$h}";
+
+$b += 1;
+$c = $c + 2;
+++$d;
+$e++;
+
+/**
+ * @param int $p1
+ * @param int $p2
+ * @return int
+ */
+function test($p1,$p2) {
+	$p1 = 1;
+	$a = 0;
+	$b = 1;
+	return $a + $p2;
+}
+
+class A {
+	/** @var int */
+	private $foo;
+	
+	/**
+	 * @param int $a
+	 * @return int
+	 */
+	public function test($a) {
+		$this->foo++;
+		return $x = $a;
+	}
+}
+
+interface I {
+	/** @param int $x */
+	public abstract function foo($x);
+}
+
+class C implements I {
+	public function foo($x) {
+	}
+}
+
+class B extends A {
+	public function test($a) {
+		return 1;
+	}
+}
+?>';
+		
+		$options = new PC_Engine_Options();
+		$options->set_report_unused(true);
+		list(,,,,$errors,) = $this->analyze($code,$options);
+		
+		self::assert_equals(5,count($errors));
+		
+		$error = $errors[0];
+		self::assert_equals(PC_Obj_Error::E_S_PARAM_UNUSED,$error->get_type());
+		self::assert_regex('/The parameter \$p1 in #test# is unused/',$error->get_msg());
+		
+		$error = $errors[1];
+		self::assert_equals(PC_Obj_Error::E_S_VAR_UNUSED,$error->get_type());
+		self::assert_regex('/The variable \$b in #test# is unused/',$error->get_msg());
+		
+		$error = $errors[2];
+		self::assert_equals(PC_Obj_Error::E_S_VAR_UNUSED,$error->get_type());
+		self::assert_regex('/The variable \$x in #A::test# is unused/',$error->get_msg());
+		
+		$error = $errors[3];
+		self::assert_equals(PC_Obj_Error::E_S_VAR_UNUSED,$error->get_type());
+		self::assert_regex('/The variable \$a in ##global# is unused/',$error->get_msg());
+		
+		$error = $errors[4];
+		self::assert_equals(PC_Obj_Error::E_S_VAR_UNUSED,$error->get_type());
+		self::assert_regex('/The variable \$i in ##global# is unused/',$error->get_msg());
 	}
 }

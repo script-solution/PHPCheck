@@ -144,9 +144,22 @@ final class PC_Module_errors extends PC_Module
 	{
 		$msg = $err->get_msg();
 		return preg_replace_callback(
-			'/#([a-zA-Z0-9_]+?)#/',
-			function($match) {
-				return "<a href=\"".PC_URL::get_mod_url('class')->set('name',$match[1])->to_url()."\">".$match[1]."</a>";
+			'/#(#?[a-zA-Z0-9_:]+?)#/',
+			function($match)
+			{
+				$func = '';
+				if(strstr($match[1],'::'))
+				{
+					list($class,$func) = explode('::',$match[1]);
+					$func = '::'.$func;
+				}
+				else if($match[1] == PC_Obj_Variable::SCOPE_GLOBAL)
+					return '<i>Global</i>';
+				else
+					$class = $match[1];
+				
+				$url = PC_URL::get_mod_url('class')->set('name',$class)->to_url();
+				return "<a href=\"".$url."\">".$class."</a>".$func;
 			},
 			$msg
 		);

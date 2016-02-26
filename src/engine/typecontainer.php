@@ -261,6 +261,14 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	{
 		if(!isset($this->_missing['methods'][$class.'::'.$method]))
 		{
+			// move the method over from the class, if necessary
+			if(!isset($this->_methods[$class.'::'.$method]))
+			{
+				$cobj = $this->get_class($class);
+				if($cobj && $cobj->contains_method($method))
+					$this->_methods[$class.'::'.$method] = $cobj->get_method($method);
+			}
+			
 			if(!isset($this->_methods[$class.'::'.$method]) && $this->options->get_use_db())
 			{
 				$f = PC_DAO::get_functions()->get_by_name($method,$this->options->get_pid(),$class);

@@ -50,6 +50,12 @@ class PC_Engine_Options extends FWS_Object
 	 * @var boolean
 	 */
 	private $report_unknown = false;
+	/**
+	 * Whether unused variables should be reported.
+	 *
+	 * @var boolean
+	 */
+	private $report_unused = false;
 	
 	/**
 	 * Wether the db should be queried if a type can't be found
@@ -116,6 +122,24 @@ class PC_Engine_Options extends FWS_Object
 	public function set_report_unknown($report)
 	{
 		$this->report_unknown = $report;
+	}
+	
+	/**
+	 * @return bool whether unused variables should be reported
+	 */
+	public function get_report_unused()
+	{
+		return $this->report_unused;
+	}
+	
+	/**
+	 * Sets whether unused variables should be reported
+	 * 
+	 * @param bool $report the new value
+	 */
+	public function set_report_unused($report)
+	{
+		$this->report_unused = $report;
 	}
 	
 	/**

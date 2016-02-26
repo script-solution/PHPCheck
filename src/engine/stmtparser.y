@@ -1013,9 +1013,15 @@ encaps_list ::= encaps_list T_ENCAPSED_AND_WHITESPACE .
 encaps_list ::= encaps_var .
 encaps_list ::= T_ENCAPSED_AND_WHITESPACE encaps_var .
 
-encaps_var ::= T_VARIABLE .
-encaps_var ::= T_VARIABLE LBRACKET encaps_var_offset RBRACKET .
-encaps_var ::= T_VARIABLE T_OBJECT_OPERATOR T_STRING .
+encaps_var ::= T_VARIABLE(name) . {
+  $this->state->get_var(PC_Obj_MultiType::create_string(substr(name,1)));
+}
+encaps_var ::= T_VARIABLE(name) LBRACKET encaps_var_offset RBRACKET . {
+  $this->state->get_var(PC_Obj_MultiType::create_string(substr(name,1)));
+}
+encaps_var ::= T_VARIABLE(name) T_OBJECT_OPERATOR T_STRING . {
+  $this->state->get_var(PC_Obj_MultiType::create_string(substr(name,1)));
+}
 encaps_var ::= T_DOLLAR_OPEN_CURLY_BRACES expr RCURLY .
 encaps_var ::= T_DOLLAR_OPEN_CURLY_BRACES T_STRING_VARNAME RCURLY .
 encaps_var ::= T_DOLLAR_OPEN_CURLY_BRACES T_STRING_VARNAME LBRACKET expr RBRACKET RCURLY .
@@ -1023,7 +1029,9 @@ encaps_var ::= T_CURLY_OPEN variable RCURLY .
 
 encaps_var_offset ::= T_STRING .
 encaps_var_offset ::= T_NUM_STRING .
-encaps_var_offset ::= T_VARIABLE .
+encaps_var_offset ::= T_VARIABLE(name) . {
+  $this->state->get_var(PC_Obj_MultiType::create_string(substr(name,1)));
+}
 
 internal_functions_in_yacc(A) ::= T_ISSET LPAREN isset_variables RPAREN . {
 	A = PC_Obj_MultiType::create_bool();

@@ -143,6 +143,14 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
+	 * Destructor
+	 */
+	public function __destruct()
+	{
+		$this->analyze_vars(PC_Obj_Variable::SCOPE_GLOBAL);
+	}
+	
+	/**
 	 * @return PC_Engine_VarContainer the variable-container
 	 */
 	public function get_vars()
@@ -784,6 +792,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	{
 		$this->analyze_rettypes();
 		$this->analyze_throws();
+		$this->analyze_vars($this->scope->get_name());
 		$this->scope->leave_function();
 	}
 	
@@ -938,6 +947,13 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			return $this->handle_error('$var is invalid');
 		if(!($e instanceof PC_Obj_MultiType))
 			return $this->handle_error('$e is invalid');
+		
+		// it does not exist, if it's not a local/global variable, e.g., a class field
+		if($this->vars->exists($this->scope->get_name(),$var->get_name()))
+		{
+			// since the variable does not occur literally in the code, we have to emulate a read access
+			$this->vars->get($this->scope->get_name(),$var->get_name());
+		}
 		
 		$res = $this->handle_bin_op($op,$var->get_type(),$e);
 		$this->set_var($var,$res,true);
@@ -1099,6 +1115,14 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			eval('$res = '.$type->get_first()->get_value_for_eval().$op.'1;');
 			$res = $this->get_type_from_php($res);
 		}
+		
+		if($this->vars->exists($this->scope->get_name(),$var->get_name()))
+		{
+			// pre-{increment,decrement}s count as read access. thus, emulate another read access to have
+			// one read more than write
+			$this->vars->get($this->scope->get_name(),$var->get_name());
+		}
+		
 		return $this->set_var($var,$res,true);
 	}
 	
@@ -1126,6 +1150,14 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			eval('$res = '.$type->get_first()->get_value_for_eval().$op.'1;');
 			$res = $this->get_type_from_php($res);
 		}
+		
+		if($this->vars->exists($this->scope->get_name(),$var->get_name()))
+		{
+			// post-{increment,decrement}s count as read access. thus, emulate another read access to have
+			// one read more than write
+			$this->vars->get($this->scope->get_name(),$var->get_name());
+		}
+		
 		$this->set_var($var,$res,true);
 		return $clone;
 	}
@@ -1470,6 +1502,86 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if($cobj->get_super_class() == $super)
 			return true;
 		return $this->is_subclass_of($cobj->get_super_class(),$super);
+	}
+	
+	/**
+	 * Finds variables that have not been read in the given scope.
+	 *
+	 * @param string $scope the scope
+	 */
+	private function analyze_vars($scope)
+	{
+		if(!$this->options->get_report_unused())
+			return;
+		
+		$accesses = $this->vars->get_accesses();
+		if(isset($accesses[$scope]))
+		{
+			// determine the parameters to handle them special
+			$params = array();
+			if($scope != PC_Obj_Variable::SCOPE_GLOBAL)
+			{
+				if(strstr($scope,'::'))
+				{
+					list($cname,$fname) = explode('::',$scope);
+					$func = $this->types->get_method($cname,$fname);
+				}
+				else
+					$func = $this->types->get_function($scope);
+				
+				if($func)
+				{
+					// don't report anything for abstract methods
+					if($func->is_abstract())
+						return;
+					
+					$params = $func->get_params();
+				}
+			}
+			
+			foreach($accesses[$scope] as $vname => $count)
+			{
+				if($count == 0)
+				{
+					if(isset($params[$vname]))
+					{
+						// if it's a method and this method exists in a superclass, too, don't report the error
+						// because it happens quite often that you don't use a parameter in subclasses, but you
+						// are still forced to specify it.
+						if(strstr($scope,'::'))
+						{
+							list($cname,$fname) = explode('::',$scope);
+							$class = $this->types->get_class($cname);
+							if($class)
+							{
+								if($this->get_method_of_super($class->get_super_class(),$fname) !== null)
+									return;
+								foreach($class->get_interfaces() as $if)
+								{
+									if($this->get_method_of_super($if,$fname))
+										return;
+								}
+							}
+						}
+						
+						$name = 'parameter';
+						$error = PC_Obj_Error::E_S_PARAM_UNUSED;
+					}
+					else
+					{
+						$name = 'variable';
+						$error = PC_Obj_Error::E_S_VAR_UNUSED;
+					}
+
+					$var = $this->vars->get($scope,$vname);
+					$this->report_error(
+						$var,
+						'The '.$name.' $'.$vname.' in #'.$scope.'# is unused',
+						$error
+					);
+				}
+			}
+		}
 	}
 	
 	/**

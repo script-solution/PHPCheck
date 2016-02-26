@@ -40,6 +40,21 @@ class PC_Engine_VarContainer extends FWS_Object
 	private $vars = array(
 		PC_Obj_Variable::SCOPE_GLOBAL => array()
 	);
+	
+	/**
+	 * An array that stores for each variable how often it has been accessed (or just set).
+	 * The idea is the following:
+	 * - we notice every access (read/write) to a variable with get()
+	 * - we notice all writes to a variable with set()
+	 * - we increment the counter for every access and decrement it for every write
+	 * - thus, if the counter is > 0, a variable has been used
+	 *
+	 * @var array
+	 */
+	private $accessed = array(
+		PC_Obj_Variable::SCOPE_GLOBAL => array()
+	);
+	
 	/**
 	 * Will be > 0 if we're in a loop
 	 * 
@@ -52,6 +67,7 @@ class PC_Engine_VarContainer extends FWS_Object
 	 * @var int
 	 */
 	private $conddepth = 0;
+	
 	/**
 	 * For each condition and loop a list of variables we should mark as unknown as soon
 	 * as we leave the condition.
@@ -69,6 +85,15 @@ class PC_Engine_VarContainer extends FWS_Object
 	}
 	
 	/**
+	 * @return array an array with all variables of all scopes that indicates whether they have been
+	 *  accessed
+	 */
+	public function get_accesses()
+	{
+		return $this->accessed;
+	}
+	
+	/**
 	 * Checks wether $name exists in $scope
 	 * 
 	 * @param string $scope the scope-name
@@ -81,7 +106,8 @@ class PC_Engine_VarContainer extends FWS_Object
 	}
 	
 	/**
-	 * Returns the variable with given name in given scope. Assumes that it exists
+	 * Returns the variable with given name in given scope. Assumes that it exists.
+	 * This will increase the number of read accesses to this variable!
 	 * 
 	 * @param string $scope the scope-name
 	 * @param string $name the variable-name
@@ -90,18 +116,25 @@ class PC_Engine_VarContainer extends FWS_Object
 	public function get($scope,$name)
 	{
 		assert(isset($this->vars[$scope][$name]));
+		assert(isset($this->accessed[$scope][$name]));
+		$this->accessed[$scope][$name]++;
 		return $this->vars[$scope][$name];
 	}
 	
 	/**
-	 * Sets the given variable in given scope
+	 * Sets the given variable in given scope.
+	 * This will decrease the number of read accesses to this variable!
 	 * 
 	 * @param string $scope the scope-name
 	 * @param PC_Obj_Variable $var the variable
 	 */
 	public function set($scope,$var)
 	{
-		$this->vars[$scope][$var->get_name()] = $var;
+		$name = $var->get_name();
+		if(!isset($this->vars[$scope][$name]))
+			$this->accessed[$scope][$name] = 1;
+		$this->accessed[$scope][$name]--;
+		$this->vars[$scope][$name] = $var;
 	}
 	
 	/**
