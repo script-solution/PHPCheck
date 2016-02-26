@@ -47,7 +47,6 @@ final class PC_Module_filepart extends PC_Module
 	 */
 	public function run()
 	{
-		$tpl = FWS_Props::get()->tpl();
 		$input = FWS_Props::get()->input();
 		$doc = FWS_Props::get()->doc();
 		

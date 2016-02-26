@@ -151,7 +151,6 @@ class PC_DAO_Functions extends FWS_Singleton
 		if(is_array($class) && count($class) == 0)
 			return array();
 		
-		$project = FWS_Props::get()->project();
 		$funcs = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_FUNCTIONS.'

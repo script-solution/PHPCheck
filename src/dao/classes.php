@@ -170,7 +170,6 @@ class PC_DAO_Classes extends FWS_Singleton
 		if(!FWS_Helper::is_integer($count) || $count < 0)
 			FWS_Helper::def_error('intge0','count',$count);
 		
-		$classes = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASSES.'
 			 WHERE project_id = :pid'

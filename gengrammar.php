@@ -101,7 +101,6 @@ while($sec < 2 && ($line = fgets($in)) !== false)
 		$sec++;
 	else if(preg_match('/^([a-z0-9_]+):/',$line,$m))
 	{
-		$in_rule = true;
 		$rule_name = $m[1];
 		fputs($out,"\n".$rule_name.' ::= ');
 		

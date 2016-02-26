@@ -34,7 +34,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 {
 	/**
 	 * @param string $file the filename
-	 * @param PC_Engine_TypeContainer $types the type-container
+	 * @param PC_Engine_Options $options the options
 	 * @return PC_Engine_TypeScanner the instance for lexing a file
 	 */
 	public static function get_for_file($file,$options)
@@ -44,7 +44,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	
 	/**
 	 * @param string $string the string
-	 * @param PC_Engine_TypeContainer $types the type-container
+	 * @param PC_Engine_Options $options the options
 	 * @return PC_Engine_TypeScanner the instance for lexing a string
 	 */
 	public static function get_for_string($string,$options)
@@ -103,7 +103,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	 *
 	 * @param string $str the file or string
 	 * @param bool $is_file wether $str is a file
-	 * @param PC_Engine_TypeContainer $types the type-container
+	 * @param PC_Engine_Options $options the options
 	 */
 	protected function __construct($str,$is_file,$options)
 	{
@@ -286,7 +286,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 		foreach($params as $param)
 			$m->put_param($param);
 		if($return !== null)
-			$this->set_return_type($return);
+			$m->set_return_type($return);
 		$this->parse_method_doc($m);
 		return $m;
 	}
@@ -449,7 +449,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 			// look for return-type
 			if(preg_match('/\@return\s+&?\s*([^\s]+)/',$doc,$matches))
 			{
-				$mtype = PC_Obj_MultiType::get_type_by_name($matches[1],true);
+				$mtype = PC_Obj_MultiType::get_type_by_name($matches[1]);
 				if($mtype !== null)
 				{
 					$func->set_return_type($mtype);

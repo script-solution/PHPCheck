@@ -48,7 +48,6 @@ final class PC_Module_jobstate extends PC_Module
 	public function run()
 	{
 		$doc = FWS_Props::get()->doc();
-		$user = FWS_Props::get()->user();
 		$renderer = $doc->use_raw_renderer();
 		
 		// read from file

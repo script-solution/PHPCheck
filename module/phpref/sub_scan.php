@@ -56,8 +56,6 @@ final class PC_SubModule_PHPRef_scan extends PC_SubModule implements FWS_Progres
 	 */
 	public function run()
 	{
-		$user = FWS_Props::get()->user();
-
 		$storage = new FWS_Progress_Storage_Session('pphprefscan_');
 		$this->_pm = new FWS_Progress_Manager($storage);
 		$this->_pm->set_ops_per_cycle(PC_PHPREF_PAGES_PER_CYCLE);

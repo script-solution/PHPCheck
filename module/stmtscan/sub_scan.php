@@ -56,8 +56,6 @@ final class PC_SubModule_stmtscan_scan extends PC_SubModule implements FWS_Progr
 	 */
 	public function run()
 	{
-		$user = FWS_Props::get()->user();
-
 		$storage = new FWS_Progress_Storage_Session('pstmtscan_');
 		$this->_pm = new FWS_Progress_Manager($storage);
 		$this->_pm->set_ops_per_cycle(PC_STMT_FILES_PER_CYCLE);

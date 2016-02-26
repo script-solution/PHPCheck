@@ -153,7 +153,6 @@ class PC_DAO_Vars extends FWS_Singleton
 		if(!($var instanceof PC_Obj_Variable))
 			FWS_Helper::def_error('instance','var','PC_Obj_Variable',$var);
 		
-		$project = FWS_Props::get()->project();
 		$type = serialize($var->get_type());
 		if(strlen($type) > self::MAX_VALUE_LEN)
 		{

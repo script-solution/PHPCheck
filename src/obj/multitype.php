@@ -138,10 +138,9 @@ class PC_Obj_MultiType extends FWS_Object
 	 * of the types.
 	 *
 	 * @param string $name the name
-	 * @param bool $is_return whether the type is for a return value
 	 * @return PC_Obj_MultiType the instance
 	 */
-	public static function get_type_by_name($name,$is_return = false)
+	public static function get_type_by_name($name)
 	{
 		$types = explode('|',$name);
 		$ts = array();

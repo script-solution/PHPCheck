@@ -245,7 +245,7 @@ final class PC_Obj_Type extends FWS_Object
 		if($this->_type != self::TARRAY || $this->_value === null)
 			return PC_Obj_MultiType::create_int(0);
 		$max = -1;
-		foreach($this->_value as $k => $v)
+		foreach(array_keys($this->_value) as $k)
 		{
 			if(FWS_Helper::is_integer($k) && $k > $max)
 				$max = $k;

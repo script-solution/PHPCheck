@@ -73,16 +73,15 @@ final class PC_Module_PHPRef_Task_Scan extends FWS_Object implements FWS_Progres
 		$options = new PC_Engine_Options();
 		$options->set_pid(PC_Project::PHPREF_ID);
 		$options->set_use_phpref(false);
-		$typecon = new PC_Engine_TypeContainer($options);
 		
 		for($i = $pos, $end = min($pos + $ops,$this->get_total_operations()); $i < $end; $i++)
 		{
 			try
 			{
 				if(preg_match('/\/function\./',$files[$i]))
-					$this->grab_function($typecon,$files[$i]);
+					$this->grab_function($files[$i]);
 				else
-					$this->grab_class($typecon,$files[$i]);
+					$this->grab_class($files[$i]);
 			}
 			catch(PC_PHPRef_Exception $e)
 			{
@@ -103,10 +102,9 @@ final class PC_Module_PHPRef_Task_Scan extends FWS_Object implements FWS_Progres
 	/**
 	 * Grabs a class from the given file
 	 * 
-	 * @param PC_Engine_TypeContainer $typecon the type-container
 	 * @param string $file the file
 	 */
-	private function grab_class($typecon,$file)
+	private function grab_class($file)
 	{
 		$classp = new PC_PHPRef_Class($file);
 		PC_DAO::get_classes()->create($classp->get_class(),PC_Project::PHPREF_ID);
@@ -115,10 +113,9 @@ final class PC_Module_PHPRef_Task_Scan extends FWS_Object implements FWS_Progres
 	/**
 	 * Grabs a function from the given file
 	 * 
-	 * @param PC_Engine_TypeContainer $typecon the type-container
 	 * @param string $file the file
 	 */
-	private function grab_function($typecon,$file)
+	private function grab_function($file)
 	{
 		$func = new PC_PHPRef_Function($file);
 		$res = $func->get_method();

@@ -255,7 +255,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			return $this->create_unknown();
 		
 		// add the throws of the method to our throws
-		foreach($funcobj->get_throws() as $tclass => $ttype)
+		foreach(array_keys($funcobj->get_throws()) as $tclass)
 		{
 			$this->allthrows[] = array(
 				PC_Obj_Method::THROW_FUNC,
@@ -692,7 +692,6 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	{
 		$array = $expr->get_array();
 		$lcount = count($list);
-		$ecount = $array === null ? 0 : count($array);
 		for($i = 0; $i < $lcount; $i++)
 		{
 			if($list[$i] === null)
@@ -1656,11 +1655,6 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			$type = $this->tokens[$this->pos][0];
 			switch($type)
 			{
-				case T_COMMENT:
-				case self::$T_DOC_COMMENT:
-					$wascomment = true;
-					break;
-				
 				case T_FUNCTION:
 					$this->start_function($this->get_type_name());
 					break;

@@ -66,7 +66,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 	 */
 	public function finalize()
 	{
-		foreach($this->_types->get_classes() as $name => $c)
+		foreach($this->_types->get_classes() as $c)
 		{
 			/* @var $c PC_Obj_Class */
 			$this->_add_members($c,$c->get_name());
@@ -391,7 +391,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 							}
 							
 							// add missing throws
-							foreach($function->get_throws() as $tclass => $ttype)
+							foreach(array_keys($function->get_throws()) as $tclass)
 							{
 								if(!$f->contains_throw($tclass))
 								{

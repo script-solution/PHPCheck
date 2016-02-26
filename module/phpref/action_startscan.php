@@ -33,7 +33,6 @@ final class PC_Action_PHPRef_startscan extends FWS_Action_Base
 {
 	public function perform_action()
 	{
-		$input = FWS_Props::get()->input();
 		$user = FWS_Props::get()->user();
 		
 		$files = array();

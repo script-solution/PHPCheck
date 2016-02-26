@@ -94,7 +94,7 @@ final class PC_PHPRef_Function extends FWS_Object
 			$vinfo = trim($vmatch[1]);
 		
 		$methods = array();
-		foreach($matches[0] as $k => $v)
+		foreach(array_keys($matches[0]) as $k)
 			$methods[] = PC_PHPRef_Utils::parse_method_desc($this->file,$matches[1][$k]);
 		$version = PC_PHPRef_Utils::parse_version($vinfo);
 		

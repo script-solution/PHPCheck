@@ -373,7 +373,7 @@ final class PC_Engine_Analyzer extends FWS_Object
 		{
 			if(!$arg->is_unknown())
 			{
-				$this->_check_callable($types,$loc,$arg,$param);
+				$this->_check_callable($types,$loc,$arg);
 				return true;
 			}
 		}
@@ -397,9 +397,8 @@ final class PC_Engine_Analyzer extends FWS_Object
 	 * @param PC_Engine_TypeContainer $types the types
 	 * @param PC_Obj_Location $loc the location
 	 * @param PC_Obj_MultiType $arg the argument
-	 * @param PC_Obj_Parameter $param the parameter
 	 */
-	private function _check_callable($types,$loc,$arg,$param)
+	private function _check_callable($types,$loc,$arg)
 	{
 		$first = $arg->get_first();
 		if($first->get_type() == PC_Obj_Type::STRING)

@@ -68,7 +68,6 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 			$mparams[] = array_values($m->get_params());
 		for($i = 0; ; $i++)
 		{
-			$name = '';
 			$optional = false;
 			$firstvar = false;
 			$mtypes = array();
@@ -77,7 +76,6 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 				if($i < count($mparams[$j]))
 				{
 					$mtypes[] = $mparams[$j][$i]->get_mtype();
-					$name = $mparams[$j][$i]->get_name();
 					if($mparams[$j][$i]->is_optional())
 						$optional = true;
 					if($mparams[$j][$i]->is_first_vararg())

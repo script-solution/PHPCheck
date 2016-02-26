@@ -57,7 +57,7 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 			PC_DAO::get_errors()->create($err);
 		foreach($ascanner->get_vars() as $vars)
 		{
-			foreach($vars as $scope => $var)
+			foreach($vars as $var)
 				PC_DAO::get_vars()->create($var);
 		}
 		

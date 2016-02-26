@@ -85,7 +85,7 @@ final class PC_PHPRef_Class extends FWS_Object
 		);
 		if($res)
 		{
-			foreach($matches[0] as $k => $v)
+			foreach(array_keys($matches[0]) as $k)
 				$class->add_interface($matches[1][$k]);
 		}
 		
@@ -97,7 +97,7 @@ final class PC_PHPRef_Class extends FWS_Object
 		
 		if(preg_match_all('/<div class="fieldsynopsis">(.*?)<\/div>/s',$content,$matches))
 		{
-			foreach($matches[0] as $k => $v)
+			foreach(array_keys($matches[0]) as $k)
 			{
 				$obj = PC_PHPRef_Utils::parse_field_desc($matches[1][$k]);
 				if($obj instanceof PC_Obj_Field)
@@ -108,17 +108,17 @@ final class PC_PHPRef_Class extends FWS_Object
 		}
 		if(preg_match_all('/<div class="constructorsynopsis dc-description">(.*?)<\/div>/s',$content,$matches))
 		{
-			foreach($matches[0] as $k => $v)
+			foreach(array_keys($matches[0]) as $k)
 			{
-				list($type,$classname,$method) = PC_PHPRef_Utils::parse_method_desc($this->file,$matches[1][$k]);
+				list(,,$method) = PC_PHPRef_Utils::parse_method_desc($this->file,$matches[1][$k]);
 				$class->add_method($method);
 			}
 		}
 		if(preg_match_all('/<div class="methodsynopsis dc-description">(.*?)<\/div>/s',$content,$matches))
 		{
-			foreach($matches[0] as $k => $v)
+			foreach(array_keys($matches[0]) as $k)
 			{
-				list($type,$classname,$method) = PC_PHPRef_Utils::parse_method_desc($this->file,$matches[1][$k]);
+				list(,,$method) = PC_PHPRef_Utils::parse_method_desc($this->file,$matches[1][$k]);
 				$class->add_method($method);
 			}
 		}

@@ -46,19 +46,15 @@ final class PC_CLI_PHPRef implements PC_CLIJob
 	
 	public function run($args)
 	{
-		$user = FWS_Props::get()->user();
 		$errors = array();
-		$options = new PC_Engine_Options();
-		$options->set_pid(PC_Project::PHPREF_ID);
-		$typecon = new PC_Engine_TypeContainer($options);
 		foreach($args as $file)
 		{
 			try
 			{
 				if(preg_match('/\/class\./',$file))
-					$this->grab_class($typecon,$file);
+					$this->grab_class($file);
 				else
-					$this->grab_function($typecon,$file);
+					$this->grab_function($file);
 			}
 			catch(PC_PHPRef_Exception $e)
 			{
@@ -83,10 +79,9 @@ final class PC_CLI_PHPRef implements PC_CLIJob
 	/**
 	 * Grabs a class from the given file
 	 * 
-	 * @param PC_Engine_TypeContainer $typecon the type-container
 	 * @param string $file the file
 	 */
-	private function grab_class($typecon,$file)
+	private function grab_class($file)
 	{
 		$classp = new PC_PHPRef_Class($file);
 		PC_DAO::get_classes()->create($classp->get_class(),PC_Project::PHPREF_ID);
@@ -95,10 +90,9 @@ final class PC_CLI_PHPRef implements PC_CLIJob
 	/**
 	 * Grabs a function from the given file
 	 * 
-	 * @param PC_Engine_TypeContainer $typecon the type-container
 	 * @param string $file the file
 	 */
-	private function grab_function($typecon,$file)
+	private function grab_function($file)
 	{
 		$func = new PC_PHPRef_Function($file);
 		$res = $func->get_method();
