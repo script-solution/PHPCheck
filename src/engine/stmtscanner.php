@@ -1431,7 +1431,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * Analyzes whether the given method is visible at the given call.
 	 *
 	 * @param PC_Obj_Call $call the method call
-	 * @param PC_Obj_Method $func the method object
+	 * @param PC_Obj_Method $method the method object
 	 */
 	private function analyze_modifiers($call,$method)
 	{
