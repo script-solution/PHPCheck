@@ -82,7 +82,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	 * Constructor
 	 *
 	 * @param string $str the file or string
-	 * @param bool $is_file wether $str is a file
+	 * @param bool $is_file whether $str is a file
 	 * @param PC_Engine_Env $env the environment
 	 */
 	public function __construct($str,$is_file,$env)

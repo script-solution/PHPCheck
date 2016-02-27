@@ -53,7 +53,7 @@ class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 	private $type;
 	
 	/**
-	 * Wether the field is static
+	 * Whether the field is static
 	 *
 	 * @var boolean
 	 */
@@ -121,7 +121,7 @@ class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 	}
 	
 	/**
-	 * @return boolean wether the method is static
+	 * @return boolean whether the method is static
 	 */
 	public function is_static()
 	{
@@ -129,7 +129,7 @@ class PC_Obj_Field extends PC_Obj_Location implements PC_Obj_Visible
 	}
 	
 	/**
-	 * Sets wether the method is static
+	 * Sets whether the method is static
 	 *
 	 * @param boolean $static the new value
 	 */

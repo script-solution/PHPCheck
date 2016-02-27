@@ -39,7 +39,7 @@ class PC_Engine_Scope extends FWS_Object
 	 */
 	private $class = '';
 	/**
-	 * Wether the current class-definition is in a function
+	 * Whether the current class-definition is in a function
 	 * 
 	 * @var bool
 	 */

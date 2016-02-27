@@ -23,7 +23,7 @@
  */
 
 /**
- * Stores wether an "object" is abstract or final and the name.
+ * Stores whether an "object" is abstract or final and the name.
  *
  * @package			PHPCheck
  * @subpackage	src.obj
@@ -82,7 +82,7 @@ class PC_Obj_Modifiable extends PC_Obj_Location
 	}
 	
 	/**
-	 * @return boolean wether it is final
+	 * @return boolean whether it is final
 	 */
 	public function is_final()
 	{
@@ -90,7 +90,7 @@ class PC_Obj_Modifiable extends PC_Obj_Location
 	}
 	
 	/**
-	 * Sets wether it is final
+	 * Sets whether it is final
 	 *
 	 * @param boolean $final the new value
 	 */
@@ -100,7 +100,7 @@ class PC_Obj_Modifiable extends PC_Obj_Location
 	}
 	
 	/**
-	 * @return boolean wether it is abstract
+	 * @return boolean whether it is abstract
 	 */
 	public function is_abstract()
 	{
@@ -108,7 +108,7 @@ class PC_Obj_Modifiable extends PC_Obj_Location
 	}
 	
 	/**
-	 * Sets wether it is abstract
+	 * Sets whether it is abstract
 	 *
 	 * @param boolean $abstract the new value
 	 */

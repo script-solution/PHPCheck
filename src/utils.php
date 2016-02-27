@@ -82,7 +82,7 @@ class PC_Utils extends FWS_UtilBase
 	 * @param string $source the string
 	 * @param int $start_line the first line (0 = display no lines)
 	 * @param int $line optional the line to mark
-	 * @param bool $links wether to use links for the line-numbers
+	 * @param bool $links whether to use links for the line-numbers
 	 * @return string the highlighted source
 	 */
 	public static function highlight_string($source,$start_line = 0,$line = 0,$links = true)

@@ -277,7 +277,7 @@ class PC_DAO_Classes extends FWS_Singleton
 	 *
 	 * @param array $row the row from the db
 	 * @param int $pid the project-id
-	 * @param bool $lazy wether to load it lazy
+	 * @param bool $lazy whether to load it lazy
 	 * @return PC_Obj_Class the class
 	 */
 	private function build_class($row,$pid,$lazy = true)

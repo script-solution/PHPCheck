@@ -61,7 +61,7 @@ final class PC_PHPRef_Function extends FWS_Object
 		$funcname = preg_replace('/^.*?function\.(.*?)\.html$/','\\1',$this->file);
 		$funcname = str_replace('-','_',$funcname);
 		
-		// check wether this function is just an alias or deprecated
+		// check whether this function is just an alias or deprecated
 		$match = array();
 		if(preg_match('/<p class="refpurpose">(.*?)<\/p>/s',$content,$match))
 		{

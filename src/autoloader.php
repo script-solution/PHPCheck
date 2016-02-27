@@ -26,7 +26,7 @@
  * The autoloader for the phpcheck src-files
  * 
  * @param string $item the item to load
- * @return boolean wether the file has been loaded
+ * @return boolean whether the file has been loaded
  */
 function PC_autoloader($item)
 {

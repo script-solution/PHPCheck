@@ -80,7 +80,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 	 *
 	 * @param PC_Obj_Class $data the class to which the members should be added
 	 * @param string $class the class-name
-	 * @param boolean $overwrite just internal: wether the members should be overwritten
+	 * @param boolean $overwrite just internal: whether the members should be overwritten
 	 */
 	private function add_members($data,$class,$overwrite = true)
 	{

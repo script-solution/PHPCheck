@@ -94,7 +94,7 @@ class PC_Engine_VarContainer extends FWS_Object
 	}
 	
 	/**
-	 * Checks wether $name exists in $scope
+	 * Checks whether $name exists in $scope
 	 * 
 	 * @param string $scope the scope-name
 	 * @param string $name the variable-name
@@ -187,8 +187,8 @@ class PC_Engine_VarContainer extends FWS_Object
 	/**
 	 * Enters a condition
 	 * 
-	 * @param bool $newblock wether a new block is opened in the current layer
-	 * @param bool $is_else wether an T_ELSE opened this block
+	 * @param bool $newblock whether a new block is opened in the current layer
+	 * @param bool $is_else whether an T_ELSE opened this block
 	 */
 	public function enter_cond($newblock = false,$is_else = false)
 	{
@@ -331,7 +331,7 @@ class PC_Engine_VarContainer extends FWS_Object
 	 * @param array $layer the current layer
 	 * @param string $name the var-name
 	 * @param PC_Obj_Variable $backup the backup (0 if not present before the layer)
-	 * @param bool $present wether its present in all blocks in this layer
+	 * @param bool $present whether its present in all blocks in this layer
 	 */
 	private function change_var($file,$line,$scope,$layer,$name,$backup,$present)
 	{

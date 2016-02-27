@@ -158,7 +158,7 @@ class PC_Analyzer_Returns extends PC_Analyzer
 	}
 	
 	/**
-	 * Checks wether $types contains a type, that is not contained in $mtype.
+	 * Checks whether $types contains a type, that is not contained in $mtype.
 	 * 
 	 * @param array $types the types
 	 * @param PC_Obj_MultiType $mtype the multitype

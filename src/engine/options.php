@@ -58,7 +58,7 @@ class PC_Engine_Options extends FWS_Object
 	private $report_unused = false;
 	
 	/**
-	 * Wether the db should be queried if a type can't be found
+	 * Whether the db should be queried if a type can't be found
 	 *
 	 * @var bool
 	 */

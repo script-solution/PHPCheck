@@ -99,7 +99,7 @@ class PC_Engine_BaseScanner
 	 * Protected constructor because its a bit ugly (without method-overloading)
 	 * 
 	 * @param string $str the file or string
-	 * @param bool $is_file wether $str is a file
+	 * @param bool $is_file whether $str is a file
 	 */
 	protected function __construct($str,$is_file)
 	{
@@ -256,7 +256,7 @@ class PC_Engine_BaseScanner
 			case '*':
 			case '/':
 			case '%':
-				// if one of them is unknown we don't know wether we would get a float or int
+				// if one of them is unknown we don't know whether we would get a float or int
 				if($t1->is_unknown() || $t1->is_multiple() ||
 						($t2 !== null && ($t2->is_unknown() || $t2->is_multiple())))
 					return new PC_Obj_MultiType();

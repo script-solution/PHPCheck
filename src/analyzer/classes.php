@@ -48,7 +48,7 @@ class PC_Analyzer_Classes extends PC_Analyzer
 	 */
 	public function analyze($class)
 	{
-		// test wether abstract is used in a usefull way
+		// test whether abstract is used in a usefull way
 		$abstractcount = 0;
 		foreach($class->get_methods() as $method)
 		{

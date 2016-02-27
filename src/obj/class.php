@@ -112,7 +112,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	 * @param int $line the line of the class-def
 	 * @param int $id the class-id (just used when loaded from db)
 	 * @param int $pid the project-id (just used when loaded from db)
-	 * @param bool $lazy wether to load fields, methods and constants lazy
+	 * @param bool $lazy whether to load fields, methods and constants lazy
 	 */
 	public function __construct($file,$line,$id = 0,$pid = 0,$lazy = true)
 	{
@@ -139,7 +139,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	}
 	
 	/**
-	 * @return boolean wether it is an interface
+	 * @return boolean whether it is an interface
 	 */
 	public function is_interface()
 	{
@@ -147,7 +147,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	}
 	
 	/**
-	 * Sets wether it is an interface
+	 * Sets whether it is an interface
 	 *
 	 * @param boolean $if the new value
 	 */
@@ -316,7 +316,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	}
 	
 	/**
-	 * Checks wether the given method exists
+	 * Checks whether the given method exists
 	 *
 	 * @param string $name the method-name
 	 * @return boolean true if so

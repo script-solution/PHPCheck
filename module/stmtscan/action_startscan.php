@@ -87,7 +87,7 @@ final class PC_Action_stmtscan_startscan extends FWS_Action_Base
 	}
 	
 	/**
-	 * Checks wether the given file is excluded
+	 * Checks whether the given file is excluded
 	 *
 	 * @param string $file the file
 	 * @param array $excl the excluded files

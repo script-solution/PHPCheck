@@ -94,14 +94,14 @@ final class PC_Project extends FWS_Object
 	private $stmt_exclude;
 	
 	/**
-	 * Wether potential problems in which mixed types are involved should be treaten as errors
+	 * Whether potential problems in which mixed types are involved should be treaten as errors
 	 * 
 	 * @var boolean
 	 */
 	private $report_mixed;
 	
 	/**
-	 * Wether potential problems in which unknown types are involved should be treaten as errors
+	 * Whether potential problems in which unknown types are involved should be treaten as errors
 	 * 
 	 * @var boolean
 	 */
@@ -266,7 +266,7 @@ final class PC_Project extends FWS_Object
 	}
 	
 	/**
-	 * @return boolean wether errors with mixed types should be treaten as errors (or ignored)
+	 * @return boolean whether errors with mixed types should be treaten as errors (or ignored)
 	 */
 	public function get_report_mixed()
 	{
@@ -284,7 +284,7 @@ final class PC_Project extends FWS_Object
 	}
 	
 	/**
-	 * @return boolean wether errors with unknown types should be treaten as errors (or ignored)
+	 * @return boolean whether errors with unknown types should be treaten as errors (or ignored)
 	 */
 	public function get_report_unknown()
 	{

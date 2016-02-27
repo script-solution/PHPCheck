@@ -29,7 +29,7 @@ include_once(FWS_PATH.'init.php');
  * The autoloader for the test-cases
  * 
  * @param string $item the item to load
- * @return boolean wether the file has been loaded
+ * @return boolean whether the file has been loaded
  */
 function PC_UnitTest_autoloader($item)
 {

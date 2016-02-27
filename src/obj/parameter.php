@@ -46,14 +46,14 @@ class PC_Obj_Parameter extends FWS_Object
 	private $optional = false;
 	
 	/**
-	 * Wether its the first variable argument of the function
+	 * Whether its the first variable argument of the function
 	 * 
 	 * @var boolean
 	 */
 	private $first_var_arg = false;
 	
 	/**
-	 * Wether this parameter has a PHPDoc-description
+	 * Whether this parameter has a PHPDoc-description
 	 * 
 	 * @var boolean
 	 */
@@ -99,7 +99,7 @@ class PC_Obj_Parameter extends FWS_Object
 	}
 	
 	/**
-	 * @return boolean wether this parameter has a PHPDoc-description
+	 * @return boolean whether this parameter has a PHPDoc-description
 	 */
 	public function has_doc()
 	{
@@ -107,7 +107,7 @@ class PC_Obj_Parameter extends FWS_Object
 	}
 	
 	/**
-	 * Sets wether this parameter has a PHPDoc-description
+	 * Sets whether this parameter has a PHPDoc-description
 	 * 
 	 * @param boolean $has_doc the new value
 	 */
@@ -138,7 +138,7 @@ class PC_Obj_Parameter extends FWS_Object
 	}
 	
 	/**
-	 * @return boolean wether the parameter is optional
+	 * @return boolean whether the parameter is optional
 	 */
 	public function is_optional()
 	{
@@ -146,7 +146,7 @@ class PC_Obj_Parameter extends FWS_Object
 	}
 	
 	/**
-	 * Sets wether the parameter is optional
+	 * Sets whether the parameter is optional
 	 *
 	 * @param boolean $opt the new value
 	 */
@@ -158,7 +158,7 @@ class PC_Obj_Parameter extends FWS_Object
 	}
 	
 	/**
-	 * @return boolean wether the parameter is the first variable argument
+	 * @return boolean whether the parameter is the first variable argument
 	 */
 	public function is_first_vararg()
 	{
@@ -166,7 +166,7 @@ class PC_Obj_Parameter extends FWS_Object
 	}
 	
 	/**
-	 * Sets wether the parameter is the first variable argument
+	 * Sets whether the parameter is the first variable argument
 	 *
 	 * @param boolean $first the new value
 	 */

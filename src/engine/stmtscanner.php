@@ -108,14 +108,14 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	private $lastCheckComment = '';
 	/**
-	 * Wether we should ignore the next while-token. This is used for "do ... while" since in that
+	 * Whether we should ignore the next while-token. This is used for "do ... while" since in that
 	 * case while is the end of a loop, not the beginning.
 	 * 
 	 * @var bool
 	 */
 	private $ignoreNextWhile = false;
 	/**
-	 * Wether the last (usefull) token was an T_ELSE
+	 * Whether the last (usefull) token was an T_ELSE
 	 * 
 	 * @var bool
 	 */
@@ -132,7 +132,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * Constructor
 	 * 
 	 * @param string $str the file or string
-	 * @param bool $is_file wether $str is a file
+	 * @param bool $is_file whether $str is a file
 	 * @param PC_Engine_Env $env the environment
 	 */
 	public function __construct($str,$is_file,$env)
@@ -177,7 +177,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * @param PC_Obj_MultiType $class the class-name (or null)
 	 * @param PC_Obj_MultiType $func the function-name
 	 * @param array $args the function-arguments
-	 * @param bool $static wether its a static call
+	 * @param bool $static whether its a static call
 	 * @return PC_Obj_MultiType the result
 	 */
 	public function add_call($class,$func,$args,$static = false)
@@ -391,7 +391,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
-	 * Checks wether the given variable is known. If not, it reports an error
+	 * Checks whether the given variable is known. If not, it reports an error
 	 * 
 	 * @param PC_Obj_Variable $var the variable
 	 */
@@ -468,7 +468,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * 
 	 * @param PC_Obj_Variable $var the variable to set
 	 * @param PC_Obj_MultiType $value the value
-	 * @param bool $isref wether to store a reference (default = false)
+	 * @param bool $isref whether to store a reference (default = false)
 	 * @return PC_Obj_MultiType the value
 	 */
 	public function set_var($var,$value,$isref = false)
@@ -857,8 +857,8 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * Starts a condition
 	 * 
-	 * @param bool $newblock wether a new block is opened in the current layer
-	 * @param bool $is_else wether an T_ELSE opened this block
+	 * @param bool $newblock whether a new block is opened in the current layer
+	 * @param bool $is_else whether an T_ELSE opened this block
 	 */
 	private function start_cond($newblock = false,$is_else = false)
 	{

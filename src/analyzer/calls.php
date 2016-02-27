@@ -330,7 +330,7 @@ class PC_Analyzer_Calls extends PC_Analyzer
 	}
 	
 	/**
-	 * Checks wether the method with given name may be a method of a subclass of $class
+	 * Checks whether the method with given name may be a method of a subclass of $class
 	 *
 	 * @param PC_Obj_Class $class the class
 	 * @param string $name the method-name

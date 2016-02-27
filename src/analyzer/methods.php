@@ -244,7 +244,7 @@ class PC_Analyzer_Methods extends PC_Analyzer
 	}
 	
 	/**
-	 * Checks wether the expected parameters match the actual
+	 * Checks whether the expected parameters match the actual
 	 * 
 	 * @param string $classname the class-name
 	 * @param PC_Obj_Method $method the method

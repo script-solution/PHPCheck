@@ -180,7 +180,7 @@ final class PC_Obj_Type extends FWS_Object
 	}
 	
 	/**
-	 * Checks wether this type is equal to the given one
+	 * Checks whether this type is equal to the given one
 	 *
 	 * @param object $o the object to compare with
 	 * @return boolean true if they are equal
@@ -313,7 +313,7 @@ final class PC_Obj_Type extends FWS_Object
 	}
 	
 	/**
-	 * @return boolean wether this type is a scalar type
+	 * @return boolean whether this type is a scalar type
 	 */
 	public function is_scalar()
 	{

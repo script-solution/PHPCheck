@@ -72,7 +72,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	private $visibility = self::V_PUBLIC;
 	
 	/**
-	 * Wether the method is static
+	 * Whether the method is static
 	 *
 	 * @var boolean
 	 */
@@ -86,7 +86,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	private $anonymous = false;
 	
 	/**
-	 * Wether this is a free function (belongs to no class)
+	 * Whether this is a free function (belongs to no class)
 	 *
 	 * @var boolean
 	 */
@@ -139,7 +139,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	 *
 	 * @param string $file the file of the def
 	 * @param int $line the line of the def
-	 * @param boolean $free wether it is a free function
+	 * @param boolean $free whether it is a free function
 	 * @param int $id the function-id
 	 * @param int $classid the class-id if loaded from db
 	 */
@@ -201,7 +201,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	}
 	
 	/**
-	 * @return boolean wether this is a free function (belongs to no class)
+	 * @return boolean whether this is a free function (belongs to no class)
 	 */
 	public function is_free()
 	{
@@ -209,7 +209,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	}
 	
 	/**
-	 * @return boolean wether the method is static
+	 * @return boolean whether the method is static
 	 */
 	public function is_static()
 	{
@@ -217,7 +217,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	}
 	
 	/**
-	 * Sets wether the method is static
+	 * Sets whether the method is static
 	 *
 	 * @param boolean $static the new value
 	 */
@@ -353,7 +353,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	}
 	
 	/**
-	 * Checks wether the parameter with given name exists
+	 * Checks whether the parameter with given name exists
 	 *
 	 * @param string $name the param-name
 	 * @return boolean true if so

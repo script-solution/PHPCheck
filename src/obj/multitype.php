@@ -185,7 +185,7 @@ class PC_Obj_MultiType extends FWS_Object
 	}
 	
 	/**
-	 * Checks wether all types in the given multitype are equal to those in $this
+	 * Checks whether all types in the given multitype are equal to those in $this
 	 * 
 	 * @param PC_Obj_MultiType $mtype the multitype
 	 * @return bool true if equal
@@ -332,7 +332,7 @@ class PC_Obj_MultiType extends FWS_Object
 	}
 	
 	/**
-	 * @return boolean wether the type is unknown
+	 * @return boolean whether the type is unknown
 	 */
 	public function is_unknown()
 	{
@@ -340,7 +340,7 @@ class PC_Obj_MultiType extends FWS_Object
 	}
 	
 	/**
-	 * @return boolean wether the value is unknown (which is also true, if the type is unknown etc.)
+	 * @return boolean whether the value is unknown (which is also true, if the type is unknown etc.)
 	 */
 	public function is_val_unknown()
 	{
@@ -360,7 +360,7 @@ class PC_Obj_MultiType extends FWS_Object
 	}
 	
 	/**
-	 * @return boolean wether multiple types are allowed
+	 * @return boolean whether multiple types are allowed
 	 */
 	public function is_multiple()
 	{
@@ -376,7 +376,7 @@ class PC_Obj_MultiType extends FWS_Object
 	}
 	
 	/**
-	 * Checks wether it contains the given type
+	 * Checks whether it contains the given type
 	 *
 	 * @param PC_Obj_Type $type the type
 	 * @return boolean true if so
