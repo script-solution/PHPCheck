@@ -56,6 +56,13 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	private $interface = false;
 	
 	/**
+	 * Whether it is an anonymous class.
+	 *
+	 * @var boolean
+	 */
+	private $anonymous = false;
+	
+	/**
 	 * The super-class-name or null
 	 *
 	 * @var string
@@ -147,6 +154,24 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	public function set_interface($if)
 	{
 		$this->interface = (bool)$if;
+	}
+	
+	/**
+	 * @return boolean whether the class is anonymous
+	 */
+	public function is_anonymous()
+	{
+		return $this->anonymous;
+	}
+	
+	/**
+	 * Sets whether this an anonymous class
+	 * 
+	 * @param bool $anon the new value
+	 */
+	public function set_anonymous($anon)
+	{
+		$this->anonymous = $anon;
 	}
 	
 	/**
@@ -370,7 +395,9 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 				$str .= 'abstract ';
 			else if($this->is_final())
 				$str .= 'final ';
-			$str .= 'class '.$name.' ';
+			$str .= 'class ';
+			if(!$this->anonymous)
+				$str .= $name.' ';
 			if($this->superclass)
 				$str .= 'extends '.($hlnames ? '#'.$this->superclass.'#' : $this->superclass).' ';
 			if(count($this->interfaces) > 0)

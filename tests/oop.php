@@ -419,4 +419,37 @@ $b = new B();
 		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
 		self::assert_regex('/The function\/method "B::__construct" is private at this location/',$error->get_msg());
 	}
+	
+	public function test_anon()
+	{
+		$code = '<?php
+$a = new class extends A implements I {
+	public function test() {
+	}
+};
+
+$a->test();
+?>';
+
+		list(,$classes,$vars,$calls,$errors,) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
+		
+		$anon = $classes['#anon1'];
+		/* @var $anon PC_Obj_Class */
+		self::assert_equals(false,$anon->is_abstract());
+		self::assert_equals(false,$anon->is_interface());
+		self::assert_equals(true,$anon->is_final());
+		self::assert_equals(true,$anon->is_anonymous());
+		self::assert_equals('A',$anon->get_super_class());
+		self::assert_equals(array('I'),$anon->get_interfaces());
+		
+		self::assert_equals(
+			'public function test(): void',
+			(string)$anon->get_method('test')
+		);
+		
+		$a = $vars[PC_Obj_Variable::SCOPE_GLOBAL]['a'];
+		self::assert_equals('#anon1',$a->get_type());
+	}
 }

@@ -526,7 +526,12 @@ for_exprs ::= non_empty_for_exprs .
 non_empty_for_exprs ::= non_empty_for_exprs COMMA expr .
 non_empty_for_exprs ::= expr .
 
-anonymous_class ::= T_CLASS ctor_arguments extends_from implements_list backup_doc_comment LCURLY class_statement_list RCURLY .
+anonymous_class ::= T_CLASS ctor_arguments extends_from(extends) implements_list(implements)
+										backup_doc_comment LCURLY class_statement_list(stmts) RCURLY . {
+	$this->state->declare_class(
+		'',array(),extends,implements,stmts
+	);
+}
 
 new_expr ::= T_NEW class_name_reference ctor_arguments .
 new_expr ::= T_NEW anonymous_class .

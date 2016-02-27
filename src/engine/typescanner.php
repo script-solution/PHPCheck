@@ -167,7 +167,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	/**
 	 * Declares a class
 	 * 
-	 * @param string $name the name
+	 * @param string $name the name (empty for anonymous classes)
 	 * @param array $modifiers an array of modifiers (public, protected, abstract, final, ...) as keys
 	 * @param string $extends the class-name of the super-class or empty
 	 * @param array $implements an array of implemented interface-names
@@ -176,9 +176,20 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	public function declare_class($name,$modifiers,$extends,$implements,$stmts)
 	{
 		$class = new PC_Obj_Class($this->get_file(),$this->get_last_class_line());
-		$class->set_name($name);
-		$class->set_abstract(isset($modifiers['abstract']));
-		$class->set_final(isset($modifiers['final']));
+		if($name == '')
+		{
+			$class->set_anonymous(true);
+			// anonymous classes are always non-abstract and final
+			$class->set_abstract(false);
+			$class->set_final(true);
+			$class->set_name(PC_Obj_Method::ANON_PREFIX.($this->anon_id++));
+		}
+		else
+		{
+			$class->set_abstract(isset($modifiers['abstract']));
+			$class->set_final(isset($modifiers['final']));
+			$class->set_name($name);
+		}
 		$class->set_super_class($extends ? $extends : null);
 		foreach($implements as $if)
 			$class->add_interface($if);
