@@ -801,8 +801,6 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	public function start_function($name = '')
 	{
-		$this->allrettypes = array();
-		$this->allthrows = array();
 		if($name == '')
 			$name = PC_Obj_Method::ANON_PREFIX.($this->anon_id++);
 		$this->scope->enter_function($name);
@@ -817,6 +815,8 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$this->analyze_throws();
 		$this->analyze_vars($this->scope->get_name());
 		$this->scope->leave_function();
+		$this->allrettypes = array();
+		$this->allthrows = array();
 	}
 	
 	/**
