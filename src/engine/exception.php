@@ -62,6 +62,15 @@ final class PC_Engine_Exception extends Exception
 	 */
 	private $_expected;
 	
+	/**
+	 * Constructor
+	 *
+	 * @param string $file the file
+	 * @param int $line the line
+	 * @param string $token the token
+	 * @param string $tokvalue the token value
+	 * @param array $expected the expected tokens
+	 */
 	public function __construct($file,$line,$token,$tokvalue,$expected)
 	{
 		parent::__construct(
