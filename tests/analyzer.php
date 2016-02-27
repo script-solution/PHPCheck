@@ -42,7 +42,7 @@ $B->bar();
 
 /** @return C */
 function getc() { return new C; }
-/** @return I */
+/** @return E */
 function geti() { return new E; }
 
 interface I {}
@@ -79,7 +79,7 @@ $E->foobar();		// not ok, because there is no class that implements that method
 		
 		$error = $errors[3];
 		self::assert_equals(PC_Obj_Error::E_S_METHOD_MISSING,$error->get_type());
-		self::assert_regex('/The method "foobar" does not exist in the class "#I#"!/',$error->get_msg());
+		self::assert_regex('/The method "foobar" does not exist in the class "#E#"!/',$error->get_msg());
 	}
 	
 	public function test_s_return_spec()
