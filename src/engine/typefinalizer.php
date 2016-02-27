@@ -101,6 +101,11 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 		// check if its a "magic" method
 		if($class && $this->handle_magic($class,$method))
 			return;
+		
+		// don't require comments for anonymous functions
+		if($method->is_anonymous())
+			return;
+		
 		foreach($method->get_params() as $param)
 		{
 			if(!$param->has_doc())

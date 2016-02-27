@@ -182,9 +182,19 @@ $f = function() use(&$b) { return $b; };
 $b(function() {
 	$x = 3.2;
 });
+
+class A {
+	public function foo() {
+		$a = function() {
+			return 1;
+		};
+	}
+}
 ?>';
 		
-		list($functions,$classes,$vars,$calls,,) = $this->analyze($code);
+		list($functions,$classes,$vars,$calls,$errors,) = $this->analyze($code);
+
+		self::assert_equals(0,count($errors));
 		
 		$func = $functions['#anon1'];
 		/* @var $func PC_Obj_Method */

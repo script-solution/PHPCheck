@@ -38,7 +38,6 @@ $accessor = new PC_PropAccessor();
 $accessor->set_loader(new PC_PropLoader());
 FWS_Props::set_accessor($accessor);
 
-// TODO don't expect doc comments for anonymous functions
 // TODO we could detect if conditions are always true/false
 // TODO introduce a phpdoc comment or so for unused parameters?
 // TODO we could extend the type-hinting in doc-comments: array(int,ClassName,float)
