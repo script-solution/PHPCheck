@@ -32,35 +32,23 @@
 final class PC_Engine_Exception extends Exception
 {
 	/**
-	 * The current line
-	 * 
-	 * @var int
-	 */
-	private $_line;
-	/**
-	 * The current file
-	 * 
-	 * @var string
-	 */
-	private $_file;
-	/**
 	 * The current token-name
 	 * 
 	 * @var string
 	 */
-	private $_token;
+	private $token;
 	/**
 	 * The current token-value
 	 * 
 	 * @var string
 	 */
-	private $_tokvalue;
+	private $tokvalue;
 	/**
 	 * The expected tokens
 	 * 
 	 * @var array
 	 */
-	private $_expected;
+	private $expected;
 	
 	/**
 	 * Constructor
@@ -76,13 +64,13 @@ final class PC_Engine_Exception extends Exception
 		parent::__construct(
 			'Unexpected token: '.$token.' ('.$tokvalue.') in file "'.$file.'", line '.$line
 		);
-		$this->_token = $token;
-		$this->_tokvalue = $tokvalue;
-		$this->_expected = $expected;
+		$this->token = $token;
+		$this->tokvalue = $tokvalue;
+		$this->expected = $expected;
 	}
 	
 	public function __toString()
 	{
-		return $this->getMessage().'; Expected one of '.implode(', ',$this->_expected);
+		return $this->getMessage().'; Expected one of '.implode(', ',$this->expected);
 	}
 }

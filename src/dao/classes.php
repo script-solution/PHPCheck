@@ -121,7 +121,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		$stmt->bind(1,$file);
 		$classes = array();
 		foreach($db->get_rows($stmt->get_statement()) as $row)
-			$classes[] = $this->_build_class($row,$pid);
+			$classes[] = $this->build_class($row,$pid);
 		return $classes;
 	}
 	
@@ -147,7 +147,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		$stmt->bind(1,$name);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
-			return $this->_build_class($row,$pid);
+			return $this->build_class($row,$pid);
 		return null;
 	}
 	
@@ -184,7 +184,7 @@ class PC_DAO_Classes extends FWS_Singleton
 		if($class)
 			$stmt->bind(':class','%'.$class.'%');
 		$rows = $db->get_rows($stmt->get_statement());
-		return $this->_build_complete_classes($rows,$pid);
+		return $this->build_complete_classes($rows,$pid);
 	}
 	
 	/**
@@ -257,11 +257,11 @@ class PC_DAO_Classes extends FWS_Singleton
 	 * @param int $pid the project-id
 	 * @return array the class-objects
 	 */
-	private function _build_complete_classes($rows,$pid)
+	private function build_complete_classes($rows,$pid)
 	{
 		$classes = array();
 		foreach($rows as $row)
-			$classes[$row['id']] = $this->_build_class($row,$pid,false);
+			$classes[$row['id']] = $this->build_class($row,$pid,false);
 		$cids = array_keys($classes);
 		foreach(PC_DAO::get_constants()->get_list($cids,'','',$pid) as $const)
 			$classes[$const->get_class()]->add_constant($const);
@@ -280,7 +280,7 @@ class PC_DAO_Classes extends FWS_Singleton
 	 * @param bool $lazy wether to load it lazy
 	 * @return PC_Obj_Class the class
 	 */
-	private function _build_class($row,$pid,$lazy = true)
+	private function build_class($row,$pid,$lazy = true)
 	{
 		$c = new PC_Obj_Class($row['file'],$row['line'],$row['id'],$pid,$lazy);
 		$c->set_name($row['name']);

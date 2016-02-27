@@ -23,8 +23,7 @@
  */
 
 /**
- * Scans for types in a given string or file. That means classes, functions and constants will
- * be collected.
+ * Performs finalizing operations on all collected classes.
  *
  * @package			PHPCheck
  * @subpackage	src.engine
@@ -53,15 +52,14 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 	
 	/**
 	 * Finishes the classes. That means, inheritance will be performed and missing
-	 * constructors will be added. Additionally it finalizes the given potential errors,
-	 * i.e. it removes the ones that are none anymore.
+	 * constructors will be added.
 	 */
 	public function finalize()
 	{
 		foreach($this->env->get_types()->get_classes() as $c)
 		{
 			/* @var $c PC_Obj_Class */
-			$this->_add_members($c,$c->get_name());
+			$this->add_members($c,$c->get_name());
 			
 			// add missing constructor
 			if(!$c->is_interface() && $c->get_method('__construct') === null &&
@@ -84,7 +82,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 	 * @param string $class the class-name
 	 * @param boolean $overwrite just internal: wether the members should be overwritten
 	 */
-	private function _add_members($data,$class,$overwrite = true)
+	private function add_members($data,$class,$overwrite = true)
 	{
 		$cobj = $this->env->get_types()->get_class($class);
 		if($cobj !== null)
@@ -172,11 +170,11 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 			// protect ourself from recursion here. in fact, Iterator implements itself, so that this is
 			// actually necessary.
 			if($class != $cobj->get_super_class())
-				$this->_add_members($data,$cobj->get_super_class(),false);
+				$this->add_members($data,$cobj->get_super_class(),false);
 			foreach($cobj->get_interfaces() as $interface)
 			{
 				if($class != $interface)
-					$this->_add_members($data,$interface,false);
+					$this->add_members($data,$interface,false);
 			}
 		}
 	}

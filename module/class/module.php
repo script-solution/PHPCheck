@@ -36,7 +36,7 @@ final class PC_Module_Class extends FWS_Module
 	 *
 	 * @var PC_Obj_Class
 	 */
-	private $_class;
+	private $class;
 	
 	/**
 	 * @see FWS_Module::init()
@@ -50,9 +50,9 @@ final class PC_Module_Class extends FWS_Module
 		$renderer = $doc->use_default_renderer();
 		
 		$name = $input->get_var('name','get',FWS_Input::STRING);
-		$this->_class = PC_DAO::get_classes()->get_by_name($name);
-		if($this->_class === null)
-			$this->_class = PC_DAO::get_classes()->get_by_name($name,PC_Project::PHPREF_ID);
+		$this->class = PC_DAO::get_classes()->get_by_name($name);
+		if($this->class === null)
+			$this->class = PC_DAO::get_classes()->get_by_name($name,PC_Project::PHPREF_ID);
 		
 		$renderer->add_breadcrumb('Types',PC_URL::build_submod_url('types'));
 		$renderer->add_breadcrumb('Classes',PC_URL::build_submod_url('types','classes'));
@@ -66,34 +66,34 @@ final class PC_Module_Class extends FWS_Module
 	{
 		$tpl = FWS_Props::get()->tpl();
 		
-		if(!$this->_class)
+		if(!$this->class)
 		{
 			$this->report_error();
 			return;
 		}
 		
 		$curl = PC_URL::get_mod_url();
-		$classname = $this->_class->get_name();
+		$classname = $this->class->get_name();
 		
 		// build class-declaration
 		$declaration = '';
-		if(!$this->_class->is_interface())
+		if(!$this->class->is_interface())
 		{
-			if($this->_class->is_abstract())
+			if($this->class->is_abstract())
 				$declaration .= 'abstract ';
-			else if($this->_class->is_final())
+			else if($this->class->is_final())
 				$declaration .= 'final ';
 			$declaration .= 'class ';
 		}
 		else
 			$declaration .= 'interface ';
 		$declaration .= $classname.' ';
-		if(!$this->_class->is_interface() && ($cn = $this->_class->get_super_class()))
+		if(!$this->class->is_interface() && ($cn = $this->class->get_super_class()))
 			$declaration .= 'extends <a href="'.$curl->set('name',$cn)->to_url().'">'.$cn.'</a> ';
-		if(count($this->_class->get_interfaces()) > 0)
+		if(count($this->class->get_interfaces()) > 0)
 		{
-			$declaration .= !$this->_class->is_interface() ? 'implements ' : 'extends ';
-			foreach($this->_class->get_interfaces() as $if)
+			$declaration .= !$this->class->is_interface() ? 'implements ' : 'extends ';
+			foreach($this->class->get_interfaces() as $if)
 				$declaration .= '<a href="'.$curl->set('name',$if)->to_url().'">'.$if.'</a>, ';
 			$declaration = FWS_String::substr($declaration,0,-1);
 		}
@@ -104,24 +104,24 @@ final class PC_Module_Class extends FWS_Module
 			'declaration' => $declaration
 		));
 		
-		$classfile = $this->_class->get_file();
+		$classfile = $this->class->get_file();
 		
 		// constants
 		$consts = array();
-		foreach($this->_class->get_constants() as $const)
+		foreach($this->class->get_constants() as $const)
 		{
 			$consts[] = array(
 				'name' => $const->get_name(),
 				'type' => $const->get_type(),
 				'line' => $const->get_line(),
-				'url' => $this->_get_url($classfile,$const)
+				'url' => $this->get_url($classfile,$const)
 			);
 		}
 		$tpl->add_variable_ref('consts',$consts);
 		
 		// fields
 		$fields = array();
-		$cfields = $this->_class->get_fields();
+		$cfields = $this->class->get_fields();
 		ksort($cfields);
 		foreach($cfields as $field)
 		{
@@ -129,14 +129,14 @@ final class PC_Module_Class extends FWS_Module
 				'name' => $field->get_name(),
 				'type' => (string)$field,
 				'line' => $field->get_line(),
-				'url' => $this->_get_url($classfile,$field)
+				'url' => $this->get_url($classfile,$field)
 			);
 		}
 		$tpl->add_variable_ref('fields',$fields);
 		
 		// methods
 		$methods = array();
-		$cmethods = $this->_class->get_methods();
+		$cmethods = $this->class->get_methods();
 		ksort($cmethods);
 		foreach($cmethods as $method)
 		{
@@ -144,23 +144,23 @@ final class PC_Module_Class extends FWS_Module
 				'name' => $method->get_name(),
 				'type' => $method->__ToString(),
 				'line' => $method->get_line(),
-				'url' => $this->_get_url($classfile,$method),
+				'url' => $this->get_url($classfile,$method),
 				'since' => implode(', ',$method->get_version()->get_min()),
 				'till' => implode(', ',$method->get_version()->get_max()),
 			);
 		}
 		$tpl->add_variable_ref('methods',$methods);
 		
-		if($this->_class->get_file() && $this->_class->get_line())
-			$source = PC_Utils::highlight_file($this->_class->get_file());
+		if($this->class->get_file() && $this->class->get_line())
+			$source = PC_Utils::highlight_file($this->class->get_file());
 		else
 			$source = '';
 		$tpl->add_variables(array(
 			'source' => $source,
-			'file' => $this->_class->get_file(),
-			'line' => $this->_class->get_line(),
-			'since' => implode(', ',$this->_class->get_version()->get_min()),
-			'till' => implode(', ',$this->_class->get_version()->get_max()),
+			'file' => $this->class->get_file(),
+			'line' => $this->class->get_line(),
+			'since' => implode(', ',$this->class->get_version()->get_min()),
+			'till' => implode(', ',$this->class->get_version()->get_max()),
 		));
 	}
 	
@@ -171,7 +171,7 @@ final class PC_Module_Class extends FWS_Module
 	 * @param PC_Obj_Location $loc the location of the item
 	 * @return string the URL
 	 */
-	private function _get_url($classfile,$loc)
+	private function get_url($classfile,$loc)
 	{
 		if($loc->get_line() == 0)
 			return $loc->get_file();

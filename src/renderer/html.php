@@ -105,7 +105,7 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 		
 		// add messages
 		if($msgs->contains_msg())
-			$this->_handle_msgs($msgs);
+			$this->handle_msgs($msgs);
 	}
 
 	/**
@@ -168,7 +168,7 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 	 *
 	 * @param FWS_Document_Messages $msgs the messages
 	 */
-	private function _handle_msgs($msgs)
+	private function handle_msgs($msgs)
 	{
 		$tpl = FWS_Props::get()->tpl();
 		$locale = FWS_Props::get()->locale();

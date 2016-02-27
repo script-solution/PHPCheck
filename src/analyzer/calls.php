@@ -198,7 +198,7 @@ class PC_Analyzer_Calls extends PC_Analyzer
 					$tactual = $arg;
 					$this->report(
 						$call,
-						'The argument '.($i + 1).' in "'.$this->get_call_link($call).'" requires '
+						'The parameter '.($i + 1).' in "'.$this->get_call_link($call).'" requires '
 							.$this->get_article($trequired).' "'.$trequired.'" but you have given '
 							.$this->get_article($tactual).' "'.($tactual === null ? "<i>NULL</i>" : $tactual).'"',
 						PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE

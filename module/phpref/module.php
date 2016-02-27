@@ -52,6 +52,6 @@ final class PC_Module_PHPRef extends PC_SubModuleContainer
 		$renderer->add_breadcrumb('PHP-reference scanner',PC_URL::build_mod_url('phpref'));
 		
 		// init submodule
-		$this->_sub->init($doc);
+		$this->sub->init($doc);
 	}
 }

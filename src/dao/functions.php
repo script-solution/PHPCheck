@@ -98,7 +98,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		$stmt->bind(':funcname',$name);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
-			return $this->_build_func($row);
+			return $this->build_func($row);
 		return null;
 	}
 	
@@ -121,7 +121,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		$stmt->bind(':id',$id);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
-			return $this->_build_func($row);
+			return $this->build_func($row);
 		return null;
 	}
 	
@@ -167,7 +167,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			$stmt->bind(':name','%'.$name.'%');
 		$rows = $db->get_rows($stmt->get_statement());
 		foreach($rows as $row)
-			$funcs[] = $this->_build_func($row);
+			$funcs[] = $this->build_func($row);
 		return $funcs;
 	}
 	
@@ -188,7 +188,7 @@ class PC_DAO_Functions extends FWS_Singleton
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
 		
-		return $db->insert(PC_TB_FUNCTIONS,$this->_get_fields($function,$class,$pid));
+		return $db->insert(PC_TB_FUNCTIONS,$this->get_fields($function,$class,$pid));
 	}
 	
 	/**
@@ -206,7 +206,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			FWS_Helper::def_error('instance','function','PC_Obj_Method',$function);
 		
 		return $db->update(
-			PC_TB_FUNCTIONS,' WHERE id = '.$function->get_id(),$this->_get_fields($function,$class)
+			PC_TB_FUNCTIONS,' WHERE id = '.$function->get_id(),$this->get_fields($function,$class)
 		);
 	}
 	
@@ -237,7 +237,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	 * @param int $pid the project-id (default = current)
 	 * @return array all fields
 	 */
-	private function _get_fields($function,$class,$pid = PC_Project::CURRENT_ID)
+	private function get_fields($function,$class,$pid = PC_Project::CURRENT_ID)
 	{
 		$params = serialize($function->get_params());
 		return array(
@@ -265,7 +265,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	 * @param array $row the row from db
 	 * @return PC_Obj_Method the method
 	 */
-	private function _build_func($row)
+	private function build_func($row)
 	{
 		$c = new PC_Obj_Method($row['file'],$row['line'],$row['class'] == 0,$row['id'],$row['class']);
 		$c->set_name($row['name']);

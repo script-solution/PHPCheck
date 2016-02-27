@@ -38,14 +38,14 @@ final class FWS_Props extends FWS_UtilBase
 	 *
 	 * @var FWS_PropAccessor
 	 */
-	private static $_accessor;
+	private static $accessor;
 	
 	/**
 	 * @return PC_PropAccessor the property-accessor-instance
 	 */
 	public static function get()
 	{
-		return self::$_accessor;
+		return self::$accessor;
 	}
 	
 	/**
@@ -53,7 +53,7 @@ final class FWS_Props extends FWS_UtilBase
 	 */
 	public static function print_all()
 	{
-		echo '<pre>'.FWS_Printer::to_string(self::$_accessor->get_all()).'</pre>';
+		echo '<pre>'.FWS_Printer::to_string(self::$accessor->get_all()).'</pre>';
 	}
 	
 	/**
@@ -66,6 +66,6 @@ final class FWS_Props extends FWS_UtilBase
 		if(!($accessor instanceof FWS_PropAccessor))
 			FWS_Helper::def_error('instance','accessor','FWS_PropAccessor',$accessor);
 		
-		self::$_accessor = $accessor;
+		self::$accessor = $accessor;
 	}
 }

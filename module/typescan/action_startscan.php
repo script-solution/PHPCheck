@@ -53,7 +53,7 @@ final class PC_Action_typescan_startscan extends FWS_Action_Base
 			{
 				foreach(FWS_FileUtils::get_list($folder,true,true) as $item)
 				{
-					if(!$this->_is_excluded($item,$excl))
+					if(!$this->is_excluded($item,$excl))
 						$files[] = $item;
 				}
 			}
@@ -95,7 +95,7 @@ final class PC_Action_typescan_startscan extends FWS_Action_Base
 	 * @param array $excl the excluded files
 	 * @return boolean true if so
 	 */
-	private function _is_excluded($file,$excl)
+	private function is_excluded($file,$excl)
 	{
 		if(!FWS_String::ends_with($file,'.php'))
 			return true;

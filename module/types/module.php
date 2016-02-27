@@ -52,6 +52,6 @@ final class PC_Module_types extends PC_SubModuleContainer
 		$renderer->add_breadcrumb('Types',PC_URL::build_mod_url());
 		
 		// init submodule
-		$this->_sub->init($doc);
+		$this->sub->init($doc);
 	}
 }

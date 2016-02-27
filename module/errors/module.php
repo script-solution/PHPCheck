@@ -89,7 +89,7 @@ final class PC_Module_errors extends PC_Module
 			$errs[] = array(
 				'id' => $err->get_id(),
 				'type' => PC_Obj_Error::get_type_name($err->get_type()),
-				'message' => $this->_get_msg($err),
+				'message' => $this->get_msg($err),
 				'file' => $err->get_loc()->get_file(),
 				'line' => $err->get_loc()->get_line(),
 				'fileurl' => $url->to_url()
@@ -140,7 +140,7 @@ final class PC_Module_errors extends PC_Module
 	 * @param PC_Obj_Error $err the error
 	 * @return string the message
 	 */
-	private function _get_msg($err)
+	private function get_msg($err)
 	{
 		$msg = $err->get_msg();
 		return preg_replace_callback(

@@ -102,7 +102,7 @@ class PC_DAO_Calls extends FWS_Singleton
 		$stmt->bind(':id',$id);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
-			return $this->_build_call($row);
+			return $this->build_call($row);
 		return null;
 	}
 	
@@ -145,7 +145,7 @@ class PC_DAO_Calls extends FWS_Singleton
 		if($function)
 			$stmt->bind(':func','%'.$function.'%');
 		foreach($db->get_rows($stmt->get_statement()) as $row)
-			$calls[] = $this->_build_call($row);
+			$calls[] = $this->build_call($row);
 		return $calls;
 	}
 	
@@ -208,7 +208,7 @@ class PC_DAO_Calls extends FWS_Singleton
 	 * @return PC_Obj_Call the call
 	 * @throws Exception if the arguments can't be serialized
 	 */
-	private function _build_call($row)
+	private function build_call($row)
 	{
 		$c = new PC_Obj_Call($row['file'],$row['line']);
 		$c->set_id($row['id']);

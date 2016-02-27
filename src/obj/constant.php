@@ -42,21 +42,21 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	 *
 	 * @var string
 	 */
-	private $_name;
+	private $name;
 	
 	/**
 	 * The type (and maybe value)
 	 *
 	 * @var PC_Obj_MultiType
 	 */
-	private $_type;
+	private $type;
 	
 	/**
 	 * The class-id
 	 * 
 	 * @var int
 	 */
-	private $_class;
+	private $class;
 	
 	/**
 	 * Constructor
@@ -73,15 +73,15 @@ final class PC_Obj_Constant extends PC_Obj_Location
 		
 		$this->set_name($name);
 		$this->set_type($type);
-		$this->_class = $classid;
+		$this->class = $classid;
 	}
 	
 	public function __clone()
 	{
 		parent::__clone();
 		
-		if($this->_type !== null)
-			$this->_type = clone $this->_type;
+		if($this->type !== null)
+			$this->type = clone $this->type;
 	}
 	
 	/**
@@ -107,7 +107,7 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	 */
 	public function get_class()
 	{
-		return $this->_class;
+		return $this->class;
 	}
 	
 	/**
@@ -115,7 +115,7 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	 */
 	public function get_name()
 	{
-		return $this->_name;
+		return $this->name;
 	}
 	
 	/**
@@ -128,7 +128,7 @@ final class PC_Obj_Constant extends PC_Obj_Location
 		if(empty($name))
 			FWS_Helper::def_error('notempty','name',$name);
 		
-		$this->_name = $name;
+		$this->name = $name;
 	}
 	
 	/**
@@ -136,7 +136,7 @@ final class PC_Obj_Constant extends PC_Obj_Location
 	 */
 	public function get_type()
 	{
-		return $this->_type;
+		return $this->type;
 	}
 	
 	/**
@@ -149,12 +149,12 @@ final class PC_Obj_Constant extends PC_Obj_Location
 		if($type !== null && !($type instanceof PC_Obj_MultiType))
 			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
 		
-		$this->_type = $type;
+		$this->type = $type;
 	}
 	
 	public function __toString()
 	{
-		return 'const '.$this->_name.'['.$this->_type.']';
+		return 'const '.$this->name.'['.$this->type.']';
 	}
 	
 	protected function get_dump_vars()

@@ -98,7 +98,7 @@ class PC_DAO_Errors extends FWS_Singleton
 		$stmt->bind(':id',$id);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
-			return $this->_build_error($row);
+			return $this->build_error($row);
 		return null;
 	}
 	
@@ -141,7 +141,7 @@ class PC_DAO_Errors extends FWS_Singleton
 		if($msg)
 			$stmt->bind(':msg','%'.$msg.'%');
 		foreach($db->get_rows($stmt->get_statement()) as $row)
-			$errs[] = $this->_build_error($row);
+			$errs[] = $this->build_error($row);
 		return $errs;
 	}
 	
@@ -214,7 +214,7 @@ class PC_DAO_Errors extends FWS_Singleton
 	 * @param array $row the row from db
 	 * @return PC_Obj_Error the error
 	 */
-	private function _build_error($row)
+	private function build_error($row)
 	{
 		$err = new PC_Obj_Error(new PC_Obj_Location($row['file'],$row['line']),$row['message'],$row['type']);
 		$err->set_id($row['id']);

@@ -52,7 +52,7 @@ final class PC_Module_StmtScan extends PC_SubModuleContainer
 		$renderer->add_breadcrumb('Statement scanner',PC_URL::build_mod_url('stmtscan'));
 		
 		// init submodule
-		$this->_sub->init($doc);
+		$this->sub->init($doc);
 		
 		if(FWS_Props::get()->project() === null)
 			$this->report_error(FWS_Document_Messages::ERROR,'Please create and select a project first!');

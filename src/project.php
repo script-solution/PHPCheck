@@ -49,70 +49,70 @@ final class PC_Project extends FWS_Object
 	 *
 	 * @var int
 	 */
-	private $_id;
+	private $id;
 	
 	/**
 	 * The project-name
 	 *
 	 * @var string
 	 */
-	private $_name;
+	private $name;
 	
 	/**
 	 * The created-date
 	 *
 	 * @var int
 	 */
-	private $_created;
+	private $created;
 	
 	/**
 	 * A newline-separated list of folders for the type-scanner
 	 *
 	 * @var string
 	 */
-	private $_type_folders;
+	private $type_folders;
 	
 	/**
 	 * A newline-separated list of excluded items for the type-scanner
 	 *
 	 * @var string
 	 */
-	private $_type_exclude;
+	private $type_exclude;
 	
 	/**
 	 * A newline-separated list of folders for the statement-scanner
 	 *
 	 * @var string
 	 */
-	private $_stmt_folders;
+	private $stmt_folders;
 	
 	/**
 	 * A newline-separated list of excluded items for the statement-scanner
 	 *
 	 * @var string
 	 */
-	private $_stmt_exclude;
+	private $stmt_exclude;
 	
 	/**
 	 * Wether potential problems in which mixed types are involved should be treaten as errors
 	 * 
 	 * @var boolean
 	 */
-	private $_report_mixed;
+	private $report_mixed;
 	
 	/**
 	 * Wether potential problems in which unknown types are involved should be treaten as errors
 	 * 
 	 * @var boolean
 	 */
-	private $_report_unknown;
+	private $report_unknown;
 	
 	/**
 	 * The lower and upper bounds for versions.
 	 *
 	 * @var array
 	 */
-	private $_req;
+	private $req;
 	
 	/**
 	 * Constructor
@@ -137,16 +137,16 @@ final class PC_Project extends FWS_Object
 		if(!FWS_Helper::is_integer($created) || $created < 0)
 			FWS_Helper::def_error('intge0','created',$created);
 		
-		$this->_id = $id;
-		$this->_name = $name;
-		$this->_created = $created;
-		$this->_type_folders = $type_folders;
-		$this->_type_exclude = $type_exclude;
-		$this->_stmt_folders = $stmt_folders;
-		$this->_stmt_exclude = $stmt_exclude;
-		$this->_report_mixed = $report_mixed;
-		$this->_report_unknown = $report_unknown;
-		$this->_req = array();
+		$this->id = $id;
+		$this->name = $name;
+		$this->created = $created;
+		$this->type_folders = $type_folders;
+		$this->type_exclude = $type_exclude;
+		$this->stmt_folders = $stmt_folders;
+		$this->stmt_exclude = $stmt_exclude;
+		$this->report_mixed = $report_mixed;
+		$this->report_unknown = $report_unknown;
+		$this->req = array();
 	}
 	
 	/**
@@ -154,7 +154,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function get_id()
 	{
-		return $this->_id;
+		return $this->id;
 	}
 	
 	/**
@@ -162,7 +162,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function get_name()
 	{
-		return $this->_name;
+		return $this->name;
 	}
 	
 	/**
@@ -172,7 +172,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function set_name($name)
 	{
-		$this->_name = $name;
+		$this->name = $name;
 	}
 	
 	/**
@@ -180,7 +180,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function get_created()
 	{
-		return $this->_created;
+		return $this->created;
 	}
 	
 	/**
@@ -190,7 +190,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function set_created($time)
 	{
-		$this->_created = $time;
+		$this->created = $time;
 	}
 	
 	/**
@@ -198,7 +198,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function get_type_folders()
 	{
-		return $this->_type_folders;
+		return $this->type_folders;
 	}
 	
 	/**
@@ -208,7 +208,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function set_type_folders($str)
 	{
-		$this->_type_folders = $str;
+		$this->type_folders = $str;
 	}
 	
 	/**
@@ -216,7 +216,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function get_type_exclude()
 	{
-		return $this->_type_exclude;
+		return $this->type_exclude;
 	}
 	
 	/**
@@ -226,7 +226,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function set_type_exclude($str)
 	{
-		$this->_type_exclude = $str;
+		$this->type_exclude = $str;
 	}
 	
 	/**
@@ -234,7 +234,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function get_stmt_folders()
 	{
-		return $this->_stmt_folders;
+		return $this->stmt_folders;
 	}
 	
 	/**
@@ -244,7 +244,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function set_stmt_folders($str)
 	{
-		$this->_stmt_folders = $str;
+		$this->stmt_folders = $str;
 	}
 	
 	/**
@@ -252,7 +252,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function get_stmt_exclude()
 	{
-		return $this->_stmt_exclude;
+		return $this->stmt_exclude;
 	}
 	
 	/**
@@ -262,7 +262,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function set_stmt_exclude($str)
 	{
-		$this->_stmt_exclude = $str;
+		$this->stmt_exclude = $str;
 	}
 	
 	/**
@@ -270,7 +270,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function get_report_mixed()
 	{
-		return $this->_report_mixed;
+		return $this->report_mixed;
 	}
 	
 	/**
@@ -280,7 +280,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function set_report_mixed($b)
 	{
-		$this->_report_mixed = $b;
+		$this->report_mixed = $b;
 	}
 	
 	/**
@@ -288,7 +288,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function get_report_unknown()
 	{
-		return $this->_report_unknown;
+		return $this->report_unknown;
 	}
 	
 	/**
@@ -298,7 +298,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function set_report_unknown($b)
 	{
-		$this->_report_unknown = $b;
+		$this->report_unknown = $b;
 	}
 	
 	/**
@@ -306,7 +306,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function get_req()
 	{
-		return $this->_req;
+		return $this->req;
 	}
 	
 	/**
@@ -316,7 +316,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function set_req($req)
 	{
-		$this->_req = $req;
+		$this->req = $req;
 	}
 	
 	/**
@@ -329,7 +329,7 @@ final class PC_Project extends FWS_Object
 	 */
 	public function add_req($id,$type,$name,$version)
 	{
-		$this->_req[] = array(
+		$this->req[] = array(
 			'id' => $id,
 			'type' => $type,
 			'name' => $name,

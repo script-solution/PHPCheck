@@ -52,7 +52,7 @@ final class PC_Module_TypeScan extends PC_SubModuleContainer
 		$renderer->add_breadcrumb('Type scanner',PC_URL::build_mod_url('typescan'));
 		
 		// init submodule
-		$this->_sub->init($doc);
+		$this->sub->init($doc);
 		
 		if(FWS_Props::get()->project() === null)
 			$this->report_error(FWS_Document_Messages::ERROR,'Please create and select a project first!');

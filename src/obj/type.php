@@ -485,7 +485,7 @@ final class PC_Obj_Type extends FWS_Object
 	 * @param int $type the type
 	 * @return string the name
 	 */
-	private function _get_type_name($type)
+	private function get_type_name($type)
 	{
 		switch($type)
 		{
@@ -537,7 +537,7 @@ final class PC_Obj_Type extends FWS_Object
 			return $str;
 		}
 		
-		$str = $this->_get_type_name($this->_type);
+		$str = $this->get_type_name($this->_type);
 		if($this->_value !== null)
 			$str .= '='.FWS_Printer::to_string($this->_value,!PC_UNITTESTS && PHP_SAPI != 'cli',false);
 		return $str;

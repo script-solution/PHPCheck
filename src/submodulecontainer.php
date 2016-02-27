@@ -37,7 +37,7 @@ abstract class PC_SubModuleContainer extends PC_Module
 	 *
 	 * @var PC_SubModule
 	 */
-	protected $_sub;
+	protected $sub;
 	
 	/**
 	 * Constructor
@@ -58,7 +58,7 @@ abstract class PC_SubModuleContainer extends PC_Module
 		// include the sub-module and create it
 		include_once(FWS_Path::server_app().'module/'.$module.'/sub_'.$sub.'.php');
 		$classname = 'PC_SubModule_'.$module.'_'.$sub;
-		$this->_sub = new $classname();
+		$this->sub = new $classname();
 	}
 
 	/**
@@ -68,7 +68,7 @@ abstract class PC_SubModuleContainer extends PC_Module
 	 */
 	public function error_occurred()
 	{
-		return parent::error_occurred() || $this->_sub->error_occurred();
+		return parent::error_occurred() || $this->sub->error_occurred();
 	}
 
 	/**
@@ -82,7 +82,7 @@ abstract class PC_SubModuleContainer extends PC_Module
 		
 		$renderer = $doc->use_default_renderer();
 		
-		$classname = get_class($this->_sub);
+		$classname = get_class($this->sub);
 		$lastus = strrpos($classname,'_');
 		$prevlastus = strrpos(FWS_String::substr($classname,0,$lastus),'_');
 		$renderer->set_template(FWS_String::strtolower(FWS_String::substr($classname,$prevlastus + 1)).'.htm');
@@ -93,6 +93,6 @@ abstract class PC_SubModuleContainer extends PC_Module
 	 */
 	public function run()
 	{
-		$this->_sub->run();
+		$this->sub->run();
 	}
 }

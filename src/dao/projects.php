@@ -49,7 +49,7 @@ class PC_DAO_Projects extends FWS_Singleton
 		$res = array();
 		$rows = $db->get_rows('SELECT * FROM '.PC_TB_PROJECTS);
 		foreach($rows as $row)
-			$res[] = $this->_build_project($row);
+			$res[] = $this->build_project($row);
 		return $res;
 	}
 	
@@ -80,7 +80,7 @@ class PC_DAO_Projects extends FWS_Singleton
 		$res = array();
 		$rows = $db->get_rows('SELECT * FROM '.PC_TB_PROJECTS.' WHERE id IN ('.implode(',',$ids).')');
 		foreach($rows as $row)
-			$res[] = $this->_build_project($row);
+			$res[] = $this->build_project($row);
 		return $res;
 	}
 	
@@ -91,7 +91,7 @@ class PC_DAO_Projects extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		$row = $db->get_row('SELECT * FROM '.PC_TB_PROJECTS.' WHERE current = 1');
-		return $this->_build_project($row);
+		return $this->build_project($row);
 	}
 	
 	/**
@@ -217,7 +217,7 @@ class PC_DAO_Projects extends FWS_Singleton
 	 * @param array $row the row from db
 	 * @return PC_Project the project
 	 */
-	private function _build_project($row)
+	private function build_project($row)
 	{
 		if(!$row)
 			return null;

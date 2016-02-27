@@ -98,7 +98,7 @@ class PC_DAO_Vars extends FWS_Singleton
 		$stmt->bind(':id',$id);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
-			return $this->_build_var($row);
+			return $this->build_var($row);
 		return null;
 	}
 	
@@ -136,7 +136,7 @@ class PC_DAO_Vars extends FWS_Singleton
 		if($name)
 			$stmt->bind(':name','%'.$name.'%');
 		foreach($db->get_rows($stmt->get_statement()) as $row)
-			$vars[] = $this->_build_var($row);
+			$vars[] = $this->build_var($row);
 		return $vars;
 	}
 	
@@ -195,7 +195,7 @@ class PC_DAO_Vars extends FWS_Singleton
 	 * @param array $row the row from the db
 	 * @return PC_Obj_Variable the var
 	 */
-	private function _build_var($row)
+	private function build_var($row)
 	{
 		$var = PC_Obj_Variable::create_from_scope(
 			$row['file'],$row['line'],$row['name'],unserialize($row['type']),$row['scope']

@@ -459,70 +459,70 @@ foobar("str",true);				// both wrong
 		$error = $errors[0];
 		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
-			'/argument 1 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "string=str"/',
+			'/parameter 1 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "string=str"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[1];
 		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
-			'/argument 2 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "float=12.3"/',
+			'/parameter 2 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "float=12.3"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[2];
 		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
-			'/argument 3 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "array={}"/',
+			'/parameter 3 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "array={}"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[3];
 		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
-			'/argument 1 in "foo\(bool=1, bool=, integer=3\)" requires an "integer" .*? "bool=1"/',
+			'/parameter 1 in "foo\(bool=1, bool=, integer=3\)" requires an "integer" .*? "bool=1"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[4];
 		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
-			'/argument 2 in "foo\(bool=1, bool=, integer=3\)" requires an "integer" .*? "bool="/',
+			'/parameter 2 in "foo\(bool=1, bool=, integer=3\)" requires an "integer" .*? "bool="/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[5];
 		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
-			'/argument 3 in "bar\(unknown, unknown, float=12.3\)" requires an "integer" .*? "float=12.3"/',
+			'/parameter 3 in "bar\(unknown, unknown, float=12.3\)" requires an "integer" .*? "float=12.3"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[6];
 		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
-			'/argument 3 in "bar\(string=str, string=str, bool=1\)" requires an "integer" .*? "bool=1"/',
+			'/parameter 3 in "bar\(string=str, string=str, bool=1\)" requires an "integer" .*? "bool=1"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[7];
 		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
-			'/argument 2 in "foobar\(unknown, integer=12\)" requires an "array" .*? "integer=12"/',
+			'/parameter 2 in "foobar\(unknown, integer=12\)" requires an "array" .*? "integer=12"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[8];
 		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
-			'/argument 1 in "foobar\(string=str, bool=1\)" requires an "A" .*? "string=str"/',
+			'/parameter 1 in "foobar\(string=str, bool=1\)" requires an "A" .*? "string=str"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[9];
 		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
-			'/argument 2 in "foobar\(string=str, bool=1\)" requires an "array" .*? "bool=1"/',
+			'/parameter 2 in "foobar\(string=str, bool=1\)" requires an "array" .*? "bool=1"/',
 			$error->get_msg()
 		);
 	}

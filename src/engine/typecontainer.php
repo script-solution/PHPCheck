@@ -36,7 +36,7 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	 *
 	 * @var array
 	 */
-	private $_missing = array(
+	private $missing = array(
 		'classes' => array(),
 		'funcs' => array(),
 		'methods' => array(),
@@ -48,31 +48,31 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	 *
 	 * @var array
 	 */
-	private $_classes = array();
+	private $classes = array();
 	/**
 	 * All currently known functions
 	 *
 	 * @var array
 	 */
-	private $_functions = array();
+	private $functions = array();
 	/**
 	 * All currently known methods
 	 *
 	 * @var array
 	 */
-	private $_methods = array();
+	private $methods = array();
 	/**
 	 * All currently known constants
 	 *
 	 * @var array
 	 */
-	private $_constants = array();
+	private $constants = array();
 	/**
 	 * The calls
 	 * 
 	 * @var array
 	 */
-	private $_calls = array();
+	private $calls = array();
 	
 	/**
 	 * The options
@@ -97,14 +97,6 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	}
 	
 	/**
-	 * @return PC_Engine_Options the options
-	 */
-	public function get_options()
-	{
-		return $this->options;
-	}
-	
-	/**
 	 * Adds all from the given type-container into this one (does not make clones of the objects!)
 	 * 
 	 * @param PC_Engine_TypeContainer $typecon the container
@@ -124,7 +116,7 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	public function add_classes($classes)
 	{
 		foreach($classes as $class)
-			$this->_classes[$class->get_name()] = $class;
+			$this->classes[$class->get_name()] = $class;
 	}
 	
 	/**
@@ -132,7 +124,7 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	 */
 	public function get_classes()
 	{
-		return $this->_classes;
+		return $this->classes;
 	}
 	
 	/**
@@ -145,27 +137,27 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if(!isset($this->_missing['classes'][$name]))
+		if(!isset($this->missing['classes'][$name]))
 		{
-			if(!isset($this->_classes[$name]) && $this->options->get_use_db())
+			if(!isset($this->classes[$name]) && $this->options->get_use_db())
 			{
 				$c = PC_DAO::get_classes()->get_by_name($name,$this->options->get_pid());
 				if($c)
-					$this->_classes[$name] = $c;
+					$this->classes[$name] = $c;
 				else
-					$this->_missing['classes'][$name] = true;
+					$this->missing['classes'][$name] = true;
 			}
-			if(!isset($this->_classes[$name]) && $this->options->get_use_phpref())
+			if(!isset($this->classes[$name]) && $this->options->get_use_phpref())
 			{
 				$c = PC_DAO::get_classes()->get_by_name($name,PC_Project::PHPREF_ID);
 				if($c)
-					$this->_classes[$name] = $c;
+					$this->classes[$name] = $c;
 				else
-					$this->_missing['classes'][$name] = true;
+					$this->missing['classes'][$name] = true;
 			}
 		}
-		if(isset($this->_classes[$name]))
-			return $this->_classes[$name];
+		if(isset($this->classes[$name]))
+			return $this->classes[$name];
 		return null;
 	}
 	
@@ -177,7 +169,7 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	public function add_functions($funcs)
 	{
 		foreach($funcs as $func)
-			$this->_functions[$func->get_name()] = $func;
+			$this->functions[$func->get_name()] = $func;
 	}
 	
 	/**
@@ -190,27 +182,27 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if(!isset($this->_missing['funcs'][$name]))
+		if(!isset($this->missing['funcs'][$name]))
 		{
-			if(!isset($this->_functions[$name]) && $this->options->get_use_db())
+			if(!isset($this->functions[$name]) && $this->options->get_use_db())
 			{
 				$f = PC_DAO::get_functions()->get_by_name($name,$this->options->get_pid());
 				if($f)
-					$this->_functions[$name] = $f;
+					$this->functions[$name] = $f;
 				else
-					$this->_missing['funcs'][$name] = true;
+					$this->missing['funcs'][$name] = true;
 			}
-			if(!isset($this->_functions[$name]) && $this->options->get_use_phpref())
+			if(!isset($this->functions[$name]) && $this->options->get_use_phpref())
 			{
 				$f = PC_DAO::get_functions()->get_by_name($name,PC_Project::PHPREF_ID);
 				if($f)
-					$this->_functions[$name] = $f;
+					$this->functions[$name] = $f;
 				else
-					$this->_missing['funcs'][$name] = true;
+					$this->missing['funcs'][$name] = true;
 			}
 		}
-		if(isset($this->_functions[$name]))
-			return $this->_functions[$name];
+		if(isset($this->functions[$name]))
+			return $this->functions[$name];
 		return null;
 	}
 	
@@ -219,7 +211,7 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	 */
 	public function get_functions()
 	{
-		return $this->_functions;
+		return $this->functions;
 	}
 	
 	/**
@@ -245,35 +237,35 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	 */
 	public function get_method($class,$method)
 	{
-		if(!isset($this->_missing['methods'][$class.'::'.$method]))
+		if(!isset($this->missing['methods'][$class.'::'.$method]))
 		{
 			// move the method over from the class, if necessary
-			if(!isset($this->_methods[$class.'::'.$method]))
+			if(!isset($this->methods[$class.'::'.$method]))
 			{
 				$cobj = $this->get_class($class);
 				if($cobj && $cobj->contains_method($method))
-					$this->_methods[$class.'::'.$method] = $cobj->get_method($method);
+					$this->methods[$class.'::'.$method] = $cobj->get_method($method);
 			}
 			
-			if(!isset($this->_methods[$class.'::'.$method]) && $this->options->get_use_db())
+			if(!isset($this->methods[$class.'::'.$method]) && $this->options->get_use_db())
 			{
 				$f = PC_DAO::get_functions()->get_by_name($method,$this->options->get_pid(),$class);
 				if($f)
-					$this->_methods[$class.'::'.$method] = $f;
+					$this->methods[$class.'::'.$method] = $f;
 				else
-					$this->_missing['methods'][$class.'::'.$method] = true;
+					$this->missing['methods'][$class.'::'.$method] = true;
 			}
-			if(!isset($this->_methods[$class.'::'.$method]) && $this->options->get_use_phpref())
+			if(!isset($this->methods[$class.'::'.$method]) && $this->options->get_use_phpref())
 			{
 				$f = PC_DAO::get_functions()->get_by_name($method,PC_Project::PHPREF_ID,$class);
 				if($f)
-					$this->_methods[$class.'::'.$method] = $f;
+					$this->methods[$class.'::'.$method] = $f;
 				else
-					$this->_missing['methods'][$class.'::'.$method] = true;
+					$this->missing['methods'][$class.'::'.$method] = true;
 			}
 		}
-		if(isset($this->_methods[$class.'::'.$method]))
-			return $this->_methods[$class.'::'.$method];
+		if(isset($this->methods[$class.'::'.$method]))
+			return $this->methods[$class.'::'.$method];
 		return null;
 	}
 	
@@ -302,7 +294,7 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	public function add_constants($consts)
 	{
 		foreach($consts as $const)
-			$this->_constants[$const->get_name()] = $const;
+			$this->constants[$const->get_name()] = $const;
 	}
 	
 	/**
@@ -315,27 +307,27 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	{
 		if(empty($name))
 			return null;
-		if(!isset($this->_missing['consts'][$name]))
+		if(!isset($this->missing['consts'][$name]))
 		{
-			if(!isset($this->_constants[$name]) && $this->options->get_use_db())
+			if(!isset($this->constants[$name]) && $this->options->get_use_db())
 			{
 				$c = PC_DAO::get_constants()->get_by_name($name,$this->options->get_pid());
 				if($c)
-					$this->_constants[$name] = $c;
+					$this->constants[$name] = $c;
 				else
-					$this->_missing['consts'][$name] = true;
+					$this->missing['consts'][$name] = true;
 			}
-			if(!isset($this->_constants[$name]) && $this->options->get_use_phpref())
+			if(!isset($this->constants[$name]) && $this->options->get_use_phpref())
 			{
 				$c = PC_DAO::get_constants()->get_by_name($name,PC_Project::PHPREF_ID);
 				if($c)
-					$this->_constants[$name] = $c;
+					$this->constants[$name] = $c;
 				else
-					$this->_missing['consts'][$name] = true;
+					$this->missing['consts'][$name] = true;
 			}
 		}
-		if(isset($this->_constants[$name]))
-			return $this->_constants[$name];
+		if(isset($this->constants[$name]))
+			return $this->constants[$name];
 		return null;
 	}
 	
@@ -344,7 +336,7 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	 */
 	public function get_constants()
 	{
-		return $this->_constants;
+		return $this->constants;
 	}
 	
 	/**
@@ -354,7 +346,7 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	 */
 	public function add_call($call)
 	{
-		$this->_calls[] = $call;
+		$this->calls[] = $call;
 	}
 	
 	/**
@@ -362,7 +354,7 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	 */
 	public function get_calls()
 	{
-		return $this->_calls;
+		return $this->calls;
 	}
 
 	/**

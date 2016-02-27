@@ -36,26 +36,26 @@ final class PC_JobData
 	 * 
 	 * @var int
 	 */
-	private $_done = 0;
+	private $done = 0;
 	/**
 	 * The errors that occurred
 	 * 
 	 * @var array
 	 */
-	private $_errors = array();
+	private $errors = array();
 	/**
 	 * Misc data for other purposes
 	 * 
 	 * @var mixed
 	 */
-	private $_misc = null;
+	private $misc = null;
 	
 	/**
 	 * @return int the number of jobs done so far
 	 */
 	public function get_done()
 	{
-		return $this->_done;
+		return $this->done;
 	}
 	
 	/**
@@ -63,7 +63,7 @@ final class PC_JobData
 	 */
 	public function increase_done()
 	{
-		$this->_done++;
+		$this->done++;
 	}
 	
 	/**
@@ -71,7 +71,7 @@ final class PC_JobData
 	 */
 	public function get_errors()
 	{
-		return $this->_errors;
+		return $this->errors;
 	}
 	
 	/**
@@ -83,7 +83,7 @@ final class PC_JobData
 	{
 		if(!is_string($msg))
 			FWS_Helper::def_error('string','msg',$msg);
-		$this->_errors[] = $msg;
+		$this->errors[] = $msg;
 	}
 	
 	/**
@@ -95,7 +95,7 @@ final class PC_JobData
 	{
 		if(!is_array($errors))
 			FWS_Helper::def_error('array','errors',$errors);
-		$this->_errors = array_merge($this->_errors,$errors);
+		$this->errors = array_merge($this->errors,$errors);
 	}
 	
 	/**
@@ -103,7 +103,7 @@ final class PC_JobData
 	 */
 	public function get_misc()
 	{
-		return $this->_misc;
+		return $this->misc;
 	}
 	
 	/**
@@ -113,6 +113,6 @@ final class PC_JobData
 	 */
 	public function set_misc($misc)
 	{
-		$this->_misc = $misc;
+		$this->misc = $misc;
 	}
 }

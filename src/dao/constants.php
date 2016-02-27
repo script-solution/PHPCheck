@@ -114,7 +114,7 @@ class PC_DAO_Constants extends FWS_Singleton
 		$stmt->bind(0,$name);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
-			return $this->_build_const($row);
+			return $this->build_const($row);
 		return null;
 	}
 	
@@ -137,7 +137,7 @@ class PC_DAO_Constants extends FWS_Singleton
 		$stmt->bind(':id',$id);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
-			return $this->_build_const($row);
+			return $this->build_const($row);
 		return null;
 	}
 	
@@ -182,7 +182,7 @@ class PC_DAO_Constants extends FWS_Singleton
 		if($name)
 			$stmt->bind(':name','%'.$name.'%');
 		foreach($db->get_rows($stmt->get_statement()) as $row)
-			$consts[] = $this->_build_const($row);
+			$consts[] = $this->build_const($row);
 		return $consts;
 	}
 	
@@ -241,7 +241,7 @@ class PC_DAO_Constants extends FWS_Singleton
 	 * @param array $row the row from db
 	 * @return PC_Obj_Constant the constant
 	 */
-	private function _build_const($row)
+	private function build_const($row)
 	{
 		$type = unserialize($row['type']);
 		if($type === null)
