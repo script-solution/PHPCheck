@@ -220,12 +220,7 @@ class PC_Obj_Call extends PC_Obj_Location
 		else
 			$func = null;
 		if($func && $func->get_line())
-		{
-			$url = PC_URL::get_mod_url('class');
-			$url->set('name',$classname);
-			$url->set_anchor('l'.$func->get_line());
-			$str .= '<a href="'.$url->to_url().'">'.$this->function.'</a>(';
-		}
+			$str .= '<a href="'.PC_URL::get_code_url($func).'">'.$this->function.'</a>(';
 		else
 			$str .= $this->function.'(';
 		$str .= implode(', ',$this->arguments);
