@@ -44,7 +44,8 @@ a wrong way.</p>
 
 <p>To analyze an application, use the following steps:</p>
 <ol>
-	<li><a href="{gurl.build_mod_url('projects')}">Create a project</a> for your application.</li>
+	<li><a href="{gurl.build_mod_url('projects')}">Create a project</a> for your application and edit
+	it to adjust some settings.</li>
 	<li>Use the <a href="{gurl.build_mod_url('typescan')}">type scanner</a> to collect
 	<a href="{gurl.build_submod_url('types','classes')}">classes</a> with their constants, fields and methods,
 	<a href="{gurl.build_submod_url('types','funcs')}">functions</a> and
@@ -52,12 +53,10 @@ a wrong way.</p>
 	<li>Use the <a href="{gurl.build_mod_url('stmtscan')}">statement scanner</a> to walk through the code, track
 	<a href="{gurl.build_mod_url('vars')}">variable</a> assignments and collects
 	<a href="{gurl.build_mod_url('calls')}">function calls</a>.</li>
-	<li>Finally, use the <a href="{gurl.build_mod_url('analyze')}">analyzer</a> to search for potential errors within the collected data.</li>
 </ol>
 
 <p>That means, after step 2, classes, functions and constants will be available. After the step 3,
-calls and variables. Although step 4 detects most of the potential errors, the previous two steps
-raise errors as well.</p>
+calls and variables. Both steps raise errors in the process.</p>
 
 <h2>Important internals:</h2>
 
@@ -102,11 +101,6 @@ you don't document parameters or return values or if you document non-existent p
 serves also the purpose of improving the quality of PHPChecks analysis. Because without relying on
 PHPDoc comments, it is not possible in many cases (at least, in "real" applications) to determine
 the type of a variable at compile time.</p>
-
-<h2>Limitations:</h2>
-
-<p>Currently, most of the new language features (except anonymous functions) introduced since
-PHP 5.2.0 are not yet supported.</p>
 {endif}
 
 {include "inc_footer.htm"}

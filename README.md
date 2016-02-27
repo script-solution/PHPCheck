@@ -56,15 +56,13 @@ way.
 
 To analyze an application, use the following steps:
 
-1. Create a project for your application.
+1. Create a project for your application and edit it to adjust some settings.
 2. Use the type scanner to collect classes, contants, fields, methods and functions.
 3. Use the statement scanner to walk through the code, track variable assignments and collects
    function calls.
-4. Finally, use the analyzer to search for potential errors within the collected data.
 
 That means, after step 2, classes, functions and constants will be available. After the step 3,
-calls and variables. Although step 4 detects most of the potential errors, the previous two steps
-raise errors as well.
+calls and variables. Both steps raise errors in the process.
 
 Important internals:
 --------------------
