@@ -38,13 +38,9 @@ define('PC_PHP_EXEC','php');
  * run in parallel, it makes sense to use separate processes (via proc_open()) for them. This way
  * we can take advantage of multiple cores/cpus.
  * 
- * With this setting you can specify how many processes should run in parallel. You can also set
- * '0' to indicate that you want to use the 'traditional' way. I.e. don't use AJAX to start the
- * jobs but do that with PHP and process a bunch of files per request.
- * 
- * If PC_PARALLEL_JOB_COUNT is not zero, PC_*_PER_CYCLE sets the number of files/items to execute
- * per process. I.e. each process gets PC_*_PER_CYCLE arguments and processes them.
- * Otherwise its is the number of files/items to execute per cycle/request.
+ * With this setting you can specify how many processes should run in parallel. PC_*_PER_CYCLE sets
+ * the number of files/items to execute per process. I.e. each process gets PC_*_PER_CYCLE arguments
+ * and processes them.
  */
 define('PC_PARALLEL_JOB_COUNT',8);
 /**
