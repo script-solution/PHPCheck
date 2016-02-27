@@ -774,10 +774,16 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	
 	/**
 	 * Starts the given class
+	 *
+	 * @param string $name the class name (empty = anonymous)
+	 * @return string the class name
 	 */
-	private function start_class($name)
+	public function start_class($name = '')
 	{
+		if($name == '')
+			$name = PC_Obj_Method::ANON_PREFIX.($this->anon_id++);
 		$this->scope->enter_class($name);
+		return $name;
 	}
 
 	/**
@@ -790,11 +796,15 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	
 	/**
 	 * Starts the given function
+	 *
+	 * @param string $name the function name (empty = anonymous)
 	 */
-	private function start_function($name)
+	public function start_function($name = '')
 	{
 		$this->allrettypes = array();
 		$this->allthrows = array();
+		if($name == '')
+			$name = PC_Obj_Method::ANON_PREFIX.($this->anon_id++);
 		$this->scope->enter_function($name);
 	}
 	
@@ -1671,13 +1681,6 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			$type = $this->tokens[$this->pos][0];
 			switch($type)
 			{
-				case T_FUNCTION:
-					$this->start_function($this->get_type_name());
-					break;
-				case T_INTERFACE:
-				case T_CLASS:
-					$this->start_class($this->get_type_name());
-					break;
 				case T_FOR:
 				case T_FOREACH:
 					$this->start_loop();
@@ -1737,20 +1740,5 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			$this->lastCheckComment = $this->lastComment;
 		}
 		return $res;
-	}
-	
-	/**
-	 * @return string the value of the next following T_STRING-token
-	 */
-	private function get_type_name()
-	{
-		for($i = $this->pos + 1; $i < $this->tokCount; $i++)
-		{
-			if($this->tokens[$i][0] == T_STRING)
-				return $this->tokens[$i][1];
-			if($this->tokens[$i][1] == '(')
-				return PC_Obj_Method::ANON_PREFIX.($this->anon_id++);
-		}
-		return null;
 	}
 }

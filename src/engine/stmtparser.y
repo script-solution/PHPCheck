@@ -328,7 +328,7 @@ unset_variable ::= variable(var) . {
 	$this->state->unset_var(var);
 }
 
-function_declaration_statement ::= function returns_ref T_STRING
+function_declaration_statement ::= func_head
 																	 LPAREN parameter_list RPAREN
 																	 return_type backup_doc_comment
 																	 LCURLY inner_statement_list RCURLY . {
@@ -341,7 +341,7 @@ is_reference ::= AMPERSAND .
 is_variadic ::= /* empty */ .
 is_variadic ::= T_ELLIPSIS .
 
-class_declaration_statement ::= class_modifiers T_STRING extends_from
+class_declaration_statement ::= class_head extends_from
 																implements_list
 																backup_doc_comment LCURLY class_statement_list RCURLY . {
   	$this->state->end_class();
@@ -353,7 +353,7 @@ class_modifiers ::= T_FINAL T_CLASS .
 
 trait_declaration_statement ::= T_TRAIT T_STRING backup_doc_comment LCURLY class_statement_list RCURLY .
 
-interface_declaration_statement ::= T_INTERFACE T_STRING interface_extends_list
+interface_declaration_statement ::= interface_head interface_extends_list
 																		backup_doc_comment LCURLY class_statement_list RCURLY . {
   	$this->state->end_class();
 }
@@ -475,7 +475,7 @@ class_statement_list ::= /* empty */ .
 class_statement ::= variable_modifiers property_list SEMI .
 class_statement ::= method_modifiers T_CONST class_const_list SEMI .
 class_statement ::= T_USE name_list trait_adaptations .
-class_statement ::= method_modifiers function returns_ref identifier
+class_statement ::= method_head
 										LPAREN parameter_list RPAREN
 										return_type backup_doc_comment method_body . {
 		$this->state->end_function();
@@ -553,8 +553,10 @@ for_exprs ::= non_empty_for_exprs .
 non_empty_for_exprs ::= non_empty_for_exprs COMMA expr .
 non_empty_for_exprs ::= expr .
 
-anonymous_class ::= T_CLASS ctor_arguments extends_from implements_list backup_doc_comment LCURLY class_statement_list RCURLY . {
+anonymous_class(A) ::= anon_class_head(name) ctor_arguments extends_from implements_list
+										backup_doc_comment LCURLY class_statement_list RCURLY . {
     $this->state->end_class();
+    A = PC_Obj_MultiType::create_object(name);
 }
 
 new_expr(A) ::= T_NEW class_name_reference(name) ctor_arguments(args) . {
@@ -564,7 +566,7 @@ new_expr(A) ::= T_NEW class_name_reference(name) ctor_arguments(args) . {
     	args
     );
 }
-new_expr ::= T_NEW anonymous_class .
+new_expr(A) ::= T_NEW anonymous_class(c) . { A = c; }
 
 expr_without_variable(A) ::= T_LIST LPAREN assignment_list(list) RPAREN EQUALS expr(e). {
     A = $this->state->handle_list(list,e);
@@ -770,13 +772,13 @@ expr_without_variable ::= T_YIELD .
 expr_without_variable ::= T_YIELD expr .
 expr_without_variable ::= T_YIELD expr T_DOUBLE_ARROW expr .
 expr_without_variable ::= T_YIELD_FROM expr .
-expr_without_variable(A) ::= function returns_ref LPAREN parameter_list RPAREN
+expr_without_variable(A) ::= anon_func_head LPAREN parameter_list RPAREN
 													lexical_vars return_type backup_doc_comment
 													LCURLY inner_statement_list RCURLY . {
     A = PC_Obj_MultiType::create_callable();
     $this->state->end_function();
 }
-expr_without_variable(A) ::= T_STATIC function returns_ref LPAREN parameter_list RPAREN
+expr_without_variable(A) ::= T_STATIC anon_func_head LPAREN parameter_list RPAREN
 													lexical_vars return_type backup_doc_comment
 													LCURLY inner_statement_list RCURLY . {
     A = PC_Obj_MultiType::create_callable();
@@ -784,6 +786,26 @@ expr_without_variable(A) ::= T_STATIC function returns_ref LPAREN parameter_list
 }
 
 function ::= T_FUNCTION .
+
+func_head ::= function returns_ref T_STRING(name) . {
+	$this->state->start_function(name);
+}
+method_head ::= method_modifiers function returns_ref identifier(name) . {
+	$this->state->start_function(name);
+}
+anon_func_head ::= function returns_ref . {
+	$this->state->start_function();
+}
+
+interface_head ::= T_INTERFACE T_STRING(name) . {
+	$this->state->start_class(name);
+}
+class_head ::= class_modifiers T_STRING(name) . {
+	$this->state->start_class(name);
+}
+anon_class_head(A) ::= T_CLASS . {
+	A = $this->state->start_class();
+}
 
 backup_doc_comment ::= /* empty */ .
 
