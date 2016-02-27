@@ -34,7 +34,6 @@ class PC_Action_edit_project_delete_req extends FWS_Action_Base
 	public function perform_action()
 	{
 		$input = FWS_Props::get()->input();
-		$db = FWS_Props::get()->db();
 		
 		$pid = $input->get_var('id','get',FWS_Input::INTEGER);
 		$vid = $input->get_var('vid','get',FWS_Input::INTEGER);
