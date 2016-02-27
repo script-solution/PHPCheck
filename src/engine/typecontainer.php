@@ -68,18 +68,6 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	 */
 	private $_constants = array();
 	/**
-	 * The found errors
-	 * 
-	 * @var array
-	 */
-	private $_errors = array();
-	/**
-	 * The potential errors, processed later in the finalizer
-	 * 
-	 * @var array
-	 */
-	private $_poterrors = array();
-	/**
 	 * The calls
 	 * 
 	 * @var array
@@ -126,8 +114,6 @@ final class PC_Engine_TypeContainer extends FWS_Object
 		$this->add_functions($typecon->get_functions());
 		$this->add_classes($typecon->get_classes());
 		$this->add_constants($typecon->get_constants());
-		$this->add_errors($typecon->get_errors());
-		$this->add_pot_errors($typecon->get_pot_errors());
 	}
 	
 	/**
@@ -292,6 +278,23 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	}
 	
 	/**
+	 * Searches for the given method in any superclass.
+	 *
+	 * @param string $class the class name
+	 * @param string $name the method name
+	 * @return PC_Obj_Method the method or null
+	 */
+	public function get_method_of_super($class,$name)
+	{
+		$cobj = $this->get_class($class);
+		if(!$cobj)
+			return null;
+		if($cobj->contains_method($name))
+			return $cobj->get_method($name);
+		return $this->get_method_of_super($cobj->get_super_class(),$name);
+	}
+	
+	/**
 	 * Adds all given constants to the container
 	 *
 	 * @param array $consts an array of constants
@@ -342,52 +345,6 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	public function get_constants()
 	{
 		return $this->_constants;
-	}
-	
-	/**
-	 * Adds the given errors
-	 * 
-	 * @param array $errors the errors to add
-	 */
-	public function add_errors($errors)
-	{
-		$this->_errors = array_merge($this->_errors,$errors);
-	}
-	
-	/**
-	 * @return array the found errors
-	 */
-	public function get_errors()
-	{
-		return $this->_errors;
-	}
-	
-	/**
-	 * Adds the given potential errors
-	 * 
-	 * @param array $errors the errors to add
-	 */
-	public function add_pot_errors($errors)
-	{
-		$this->_poterrors = array_merge($this->_poterrors,$errors);
-	}
-	
-	/**
-	 * @return array the found potential errors
-	 */
-	public function get_pot_errors()
-	{
-		return $this->_poterrors;
-	}
-	
-	/**
-	 * Removes the pot-error with given index
-	 * 
-	 * @param int $index the index
-	 */
-	public function remove_pot_error($index)
-	{
-		unset($this->_poterrors[$index]);
 	}
 	
 	/**

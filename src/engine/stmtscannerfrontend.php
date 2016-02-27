@@ -32,18 +32,11 @@
 class PC_Engine_StmtScannerFrontend extends FWS_Object
 {
 	/**
-	 * The found types and errors
-	 * 
-	 * @var PC_Engine_TypeContainer
-	 */
-	private $types;
-	
-	/**
-	 * The options
+	 * The environment
 	 *
-	 * @var PC_Engine_Options
+	 * @var PC_Engine_Env
 	 */
-	private $options;
+	private $env;
 	
 	/**
 	 * The variables
@@ -55,20 +48,13 @@ class PC_Engine_StmtScannerFrontend extends FWS_Object
 	/**
 	 * Constructor
 	 * 
-	 * @param PC_Engine_TypeContainer $types the type-container
-	 * @param PC_Engine_Options $options the options
+	 * @param PC_Engine_Env $env the environment
 	 */
-	public function __construct($types,$options)
+	public function __construct($env)
 	{
 		parent::__construct();
 		
-		if(!($types instanceof PC_Engine_TypeContainer))
-			FWS_Helper::def_error('instance','types',PC_Engine_TypeContainer,$types);
-		if(!($options instanceof PC_Engine_Options))
-			FWS_Helper::def_error('instance','options','PC_Engine_Options',$options);
-		
-		$this->types = $types;
-		$this->options = $options;
+		$this->env = $env;
 	}
 	
 	/**
@@ -78,14 +64,6 @@ class PC_Engine_StmtScannerFrontend extends FWS_Object
 	{
 		return $this->vars;
 	}
-
-	/**
-	 * @return PC_Engine_TypeContainer the found types and errors
-	 */
-	public function get_types()
-	{
-		return $this->types;
-	}
 	
 	/**
 	 * Scans the given file
@@ -94,7 +72,7 @@ class PC_Engine_StmtScannerFrontend extends FWS_Object
 	 */
 	public function scan_file($file)
 	{
-		$lexer = PC_Engine_StmtScanner::get_for_file($file,$this->types,$this->options);
+		$lexer = new PC_Engine_StmtScanner($file,true,$this->env);
 		$this->parse($lexer);
 	}
 	
@@ -105,7 +83,7 @@ class PC_Engine_StmtScannerFrontend extends FWS_Object
 	 */
 	public function scan($source)
 	{
-		$lexer = PC_Engine_StmtScanner::get_for_string($source,$this->types,$this->options);
+		$lexer = new PC_Engine_StmtScanner($source,false,$this->env);
 		$this->parse($lexer);
 	}
 	

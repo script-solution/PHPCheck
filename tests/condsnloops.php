@@ -86,7 +86,7 @@ else
 // that its still an integer with value 1
 ?>';
 		
-		list(,,$vars,$calls,,) = $this->analyze($code);
+		list(,,$vars,$calls,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
@@ -151,7 +151,7 @@ while(1);
 // $f wasnt known before, therefore unknown.
 ?>';
 		
-		list(,,$vars,$calls,,) = $this->analyze($code);
+		list(,,$vars,$calls,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
@@ -262,7 +262,7 @@ if($_)
 // here we dont know that anymore since it didnt exist before
 ?>';
 		
-		list(,,$vars,$calls,,) = $this->analyze($code);
+		list(,,$vars,$calls,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
@@ -350,7 +350,7 @@ foreach($b as list($x,$y,$z))
 	f8($x,$y,$z);
 ?>';
 		
-		list(,,$vars,$calls,,) = $this->analyze($code);
+		list(,,$vars,$calls,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		

@@ -32,33 +32,25 @@
 class PC_Engine_TypeScannerFrontend extends FWS_Object
 {
 	/**
-	 * The found types and errors
-	 * 
-	 * @var PC_Engine_TypeContainer
+	 * The environment
+	 *
+	 * @var PC_Engine_Env
 	 */
-	private $types;
+	private $env;
 	
 	/**
 	 * Constructor
-	 *
-	 * @param PC_Engine_Options $options the options
+	 * 
+	 * @param PC_Engine_Env $env the environment
 	 */
-	public function __construct($options)
+	public function __construct($env)
 	{
 		parent::__construct();
 		
-		if(!($options instanceof PC_Engine_Options))
-			FWS_Helper::def_error('instance','options','PC_Engine_Options',$options);
-		
-		$this->types = new PC_Engine_TypeContainer($options);
-	}
-
-	/**
-	 * @return PC_Engine_TypeContainer the found types and errors
-	 */
-	public function get_types()
-	{
-		return $this->types;
+		if(!($env instanceof PC_Engine_Env))
+			FWS_Helper::def_error('instance','env','PC_Engine_Env',$env);
+	
+		$this->env = $env;
 	}
 	
 	/**
@@ -68,7 +60,7 @@ class PC_Engine_TypeScannerFrontend extends FWS_Object
 	 */
 	public function scan_file($file)
 	{
-		$this->parse(PC_Engine_TypeScanner::get_for_file($file,$this->types->get_options()));
+		$this->parse(new PC_Engine_TypeScanner($file,true,$this->env));
 	}
 	
 	/**
@@ -78,7 +70,7 @@ class PC_Engine_TypeScannerFrontend extends FWS_Object
 	 */
 	public function scan($source)
 	{
-		$this->parse(PC_Engine_TypeScanner::get_for_string($source,$this->types->get_options()));
+		$this->parse(new PC_Engine_TypeScanner($source,false,$this->env));
 	}
 	
 	/**
@@ -92,8 +84,6 @@ class PC_Engine_TypeScannerFrontend extends FWS_Object
 		while($lexer->advance($parser))
 			$parser->doParse($lexer->get_token(),$lexer->get_value());
 		$parser->doParse(0,0);
-		
-		$this->types->add($lexer->get_types());
 	}
 	
 	protected function get_dump_vars()

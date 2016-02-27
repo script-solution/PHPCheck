@@ -1,9 +1,9 @@
 <?php
 /**
- * Contains the analyze-module
+ * Contains the analyzer base class
  * 
  * @package			PHPCheck
- * @subpackage	module
+ * @subpackage	src.engine
  *
  * Copyright (C) 2008 - 2016 Nils Asmussen
  *
@@ -23,38 +23,45 @@
  */
 
 /**
- * The analyze-module
- * 
+ * The base class for all analyzers.
+ *
  * @package			PHPCheck
- * @subpackage	module
+ * @subpackage	src.engine
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-final class PC_Module_analyze extends PC_SubModuleContainer
+abstract class PC_Analyzer extends FWS_Object
 {
 	/**
-	 * Constructor
+	 * The environment
+	 *
+	 * @var PC_Engine_Env
 	 */
-	public function __construct()
+	protected $env;
+
+	/**
+	 * Constructor
+	 * 
+	 * @param PC_Engine_Env $env the environment
+	 */
+	public function __construct($env)
 	{
-		parent::__construct('analyze',array('default','scan','cliscan'),'default');
+		$this->env = $env;
 	}
 	
 	/**
-	 * @see FWS_Module::init()
-	 *
-	 * @param FWS_Document $doc
+	 * Reports the given error
+	 * 
+	 * @param PC_Obj_Location $locsrc an object from which the location will be copied (null = current)
+	 * @param string $msg the error-message
+	 * @param int $type the error-type
 	 */
-	public function init($doc)
+	protected function report($locsrc,$msg,$type)
 	{
-		parent::init($doc);
-		
-		$renderer = $doc->use_default_renderer();
-		$renderer->add_breadcrumb('Analyzer',PC_URL::build_mod_url('analyze'));
-		
-		// init submodule
-		$this->_sub->init($doc);
-		
-		if(FWS_Props::get()->project() === null)
-			$this->report_error(FWS_Document_Messages::ERROR,'Please create and select a project first!');
+		$this->env->get_errors()->report($locsrc,$msg,$type);
+	}
+	
+	protected function get_dump_vars()
+	{
+		return get_object_vars($this);
 	}
 }

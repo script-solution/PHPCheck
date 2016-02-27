@@ -34,8 +34,11 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 	public function run($args)
 	{
 		$project = FWS_Props::get()->project();
+		
 		$options = new PC_Engine_Options();
 		$options->set_report_unused(true);
+		$options->set_report_mixed($project->get_report_mixed());
+		$options->set_report_unknown($project->get_report_unknown());
 		foreach($project->get_req() as $r)
 		{
 			if($r['type'] == 'min')
@@ -44,10 +47,10 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 				$options->add_max_req($r['name'],$r['version']);
 		}
 		
-		$errors = array();
-		$types = new PC_Engine_TypeContainer($options);
-		$ascanner = new PC_Engine_StmtScannerFrontend($types,$options);
+		$env = new PC_Engine_Env($options);
+		$ascanner = new PC_Engine_StmtScannerFrontend($env);
 		
+		$msgs = array();
 		foreach($args as $file)
 		{
 			try
@@ -56,13 +59,13 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 			}
 			catch(PC_Engine_Exception $e)
 			{
-				$errors[] = $e->__toString();
+				$msgs[] = $e->__toString();
 			}
 		}
 		
-		if(count($types->get_calls()))
-			PC_DAO::get_calls()->create_bulk($types->get_calls());
-		foreach($types->get_errors() as $err)
+		if(count($env->get_types()->get_calls()))
+			PC_DAO::get_calls()->create_bulk($env->get_types()->get_calls());
+		foreach($env->get_errors()->get() as $err)
 			PC_DAO::get_errors()->create($err);
 		foreach($ascanner->get_vars() as $vars)
 		{
@@ -70,12 +73,12 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 				PC_DAO::get_vars()->create($var);
 		}
 		
-		// write errors to shared data
+		// write messages to shared data
 		$mutex = new FWS_MutexFile(PC_CLI_MUTEX_FILE);
 		$mutex->aquire();
 		$data = unserialize($mutex->read());
 		/* @var $data PC_JobData */
-		$data->add_errors($errors);
+		$data->add_errors($msgs);
 		$mutex->write(serialize($data));
 		$mutex->close();
 	}

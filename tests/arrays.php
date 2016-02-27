@@ -72,7 +72,7 @@ $g = f();
 $g[] = 1;
 ?>';
 		
-		list(,,$vars,$calls,,) = $this->analyze($code);
+		list(,,$vars,$calls,) = $this->analyze($code);
 		
 		$args = $calls[0]->get_arguments();
 		self::assert_equals((string)PC_Obj_MultiType::create_int(1),(string)$args[0]);
@@ -138,7 +138,7 @@ $c = list($c1,$c2,list($c3,$c4,list($c5)),$c6) = array(
 );
 ?>';
 		
-		list(,,$vars,$calls,,) = $this->analyze($code);
+		list(,,$vars,$calls,) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals(

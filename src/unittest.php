@@ -41,8 +41,7 @@ class PC_UnitTest extends FWS_Test_Case
 	 *  1 => <classes>,
 	 *  2 => <vars>,
 	 *  3 => <calls>,
-	 *  4 => <type errors>,
-	 *  5 => <analyzer errors>
+	 *  4 => <errors>,
 	 * )
 	 */
 	protected function analyze($code,$options = null)
@@ -54,27 +53,23 @@ class PC_UnitTest extends FWS_Test_Case
 			$options->set_use_phpref(false);
 		}
 		
-		$tscanner = new PC_Engine_TypeScannerFrontend($options);
+		$env = new PC_Engine_Env($options);
+		
+		$tscanner = new PC_Engine_TypeScannerFrontend($env);
 		$tscanner->scan($code);
 		
-		$typecon = $tscanner->get_types();
-		$fin = new PC_Engine_TypeFinalizer($typecon,new PC_Engine_TypeStorage_Null());
+		$fin = new PC_Engine_TypeFinalizer($env);
 		$fin->finalize();
 		
-		$stmt = new PC_Engine_StmtScannerFrontend($typecon,$options);
+		$stmt = new PC_Engine_StmtScannerFrontend($env);
 		$stmt->scan($code);
 		
-		$an = new PC_Engine_Analyzer($options);
-		$an->analyze_classes($typecon,$typecon->get_classes());
-		$an->analyze_calls($typecon,$typecon->get_calls());
-		
 		return array(
-			$typecon->get_functions(),
-			$typecon->get_classes(),
+			$env->get_types()->get_functions(),
+			$env->get_types()->get_classes(),
 			$stmt->get_vars(),
-			$typecon->get_calls(),
-			$typecon->get_errors(),
-			$an->get_errors(),
+			$env->get_types()->get_calls(),
+			$env->get_errors()->get(),
 		);
 	}
 	

@@ -36,7 +36,7 @@ cyrus_close(null);
 		$options->add_min_req('PHP','4.0.0');
 		$options->add_max_req('PHP','5.1.0');
 		$options->add_min_req('PECL cyrus','1.0.0');
-		list(,,,,$errors,) = $this->analyze($code,$options);
+		list(,,,,$errors) = $this->analyze($code,$options);
 		
 		self::assert_equals(2,count($errors));
 		
@@ -71,7 +71,7 @@ $count = $sth->columnCount();
 		$opt = clone $options;
 		$opt->add_min_req('PHP','5.2.0');
 		$opt->add_max_req('PHP','8.0.0');
-		list(,,,,$errors,) = $this->analyze($code,$opt);
+		list(,,,,$errors) = $this->analyze($code,$opt);
 		
 		self::assert_equals(3,count($errors));
 		
@@ -107,7 +107,7 @@ $count = $sth->columnCount();
 		$opt->add_min_req('PHP','5.2.0');
 		$opt->add_max_req('PHP','8.0.0');
 		$opt->add_min_req('PECL pdo','0.1.0');
-		list(,,,,$errors,) = $this->analyze($code,$opt);
+		list(,,,,$errors) = $this->analyze($code,$opt);
 		
 		self::assert_equals(1,count($errors));
 		

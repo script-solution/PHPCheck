@@ -16,6 +16,22 @@
 			<dd>{form.get_date_chooser('start_',def_start,false)}</dd>
 		</dl>
 		<dl>
+			<dt>Report mixed:</dt>
+			<dd>
+				{form.get_checkbox('report_mixed',report_mixed,'1','Treat potential problems in which
+				&quot;mixed&quot; types are involved as errors')}
+				<div class="pc_desc">Note: If disabled, they will be ignored.</div>
+			</dd>
+		</dl>
+		<dl>
+			<dt>Report unknown:</dt>
+			<dd>
+				{form.get_checkbox('report_unknown',report_unknown,'1','Treat potential problems in which
+				&quot;unknown&quot; types are involved as errors')}
+				<div class="pc_desc">Note: If disabled, they will be ignored.</div>
+			</dd>
+		</dl>
+		<dl>
 			<dt>Requirements:</dt>
 			<dd>
 				{if req.length == 0}

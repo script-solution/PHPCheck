@@ -33,9 +33,10 @@ final class PC_CLI_TypeScan implements PC_CLIJob
 {
 	public function run($args)
 	{
-		$errors = array();
-		$options = new PC_Engine_Options();
-		$tscanner = new PC_Engine_TypeScannerFrontend($options);
+		$env = new PC_Engine_Env();
+		$tscanner = new PC_Engine_TypeScannerFrontend($env);
+
+		$msgs = array();
 		foreach($args as $file)
 		{
 			try
@@ -44,26 +45,25 @@ final class PC_CLI_TypeScan implements PC_CLIJob
 			}
 			catch(PC_Engine_Exception $e)
 			{
-				$errors[] = $e->__toString();
+				$msgs[] = $e->__toString();
 			}
 		}
 		
-		$typecon = $tscanner->get_types();
-		foreach($typecon->get_classes() as $class)
+		foreach($env->get_types()->get_classes() as $class)
 			PC_DAO::get_classes()->create($class);
-		foreach($typecon->get_constants() as $const)
+		foreach($env->get_types()->get_constants() as $const)
 			PC_DAO::get_constants()->create($const);
-		foreach($typecon->get_functions() as $func)
+		foreach($env->get_types()->get_functions() as $func)
 			PC_DAO::get_functions()->create($func);
-		foreach($typecon->get_errors() as $err)
+		foreach($env->get_errors()->get() as $err)
 			PC_DAO::get_errors()->create($err);
 		
-		// write errors to shared data
+		// write msgs to shared data
 		$mutex = new FWS_MutexFile(PC_CLI_MUTEX_FILE);
 		$mutex->aquire();
 		$data = unserialize($mutex->read());
 		/* @var $data PC_JobData */
-		$data->add_errors($errors);
+		$data->add_errors($msgs);
 		$mutex->write(serialize($data));
 		$mutex->close();
 	}

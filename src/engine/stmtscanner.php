@@ -33,26 +33,73 @@
 class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 {
 	/**
-	 * @param string $file the filename
-	 * @param PC_Engine_TypeContainer $types the type-container
-	 * @param PC_Engine_Options $options the options
-	 * @return PC_Engine_StmtScanner the instance for lexing a file
+	 * The environment
+	 *
+	 * @var PC_Engine_Env
 	 */
-	public static function get_for_file($file,$types,$options)
-	{
-		return new self($file,true,$types,$options);
-	}
+	private $env;
+	/**
+	 * The variables
+	 * 
+	 * @var PC_Engine_VarContainer
+	 */
+	private $vars;
 	
 	/**
-	 * @param string $string the string
-	 * @param PC_Engine_TypeContainer $types the type-container
-	 * @param PC_Engine_Options $options the options
-	 * @return PC_Engine_StmtScanner the instance for lexing a string
+	 * Analyzes functions and methods
+	 *
+	 * @var PC_Analyzer_Methods
 	 */
-	public static function get_for_string($string,$types,$options)
-	{
-		return new self($string,false,$types,$options);
-	}
+	private $methods_analyzer;
+	/**
+	 * Analyzes function/method calls
+	 *
+	 * @var PC_Analyzer_Calls
+	 */
+	private $calls_analyzer;
+	/**
+	 * Analyzes classes
+	 *
+	 * @var PC_Analyzer_Classes
+	 */
+	private $classes_analyzer;
+	/**
+	 * Analyzes the requirements
+	 *
+	 * @var PC_Analyzer_Requirements
+	 */
+	private $req_analyzer;
+	/**
+	 * Analyzes the return types
+	 *
+	 * @var PC_Analyzer_Returns
+	 */
+	private $ret_analyzer;
+	/**
+	 * Analyzes the thrown exceptions
+	 *
+	 * @var PC_Analyzer_Throws
+	 */
+	private $throws_analyzer;
+	/**
+	 * Analyzes the modifiers of called methods
+	 *
+	 * @var PC_Analyzer_Modifiers
+	 */
+	private $modifiers_analyzer;
+	/**
+	 * Analyzes variables and parameters.
+	 *
+	 * @var PC_Analyzer_Vars
+	 */
+	private $vars_analyzer;
+	
+	/**
+	 * The current scope
+	 * 
+	 * @var PC_Engine_Scope
+	 */
+	private $scope;
 	
 	/**
 	 * The last comment we've checked for "@var $<name> <type>"
@@ -73,50 +120,6 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * @var bool
 	 */
 	private $lastWasElse = false;
-	/**
-	 * The current scope
-	 * 
-	 * @var PC_Engine_Scope
-	 */
-	private $scope;
-	
-	/**
-	 * The known types
-	 * 
-	 * @var PC_Engine_TypeContainer
-	 */
-	private $types;
-	/**
-	 * The variables
-	 * 
-	 * @var PC_Engine_VarContainer
-	 */
-	private $vars;
-	/**
-	 * Analyzes the requirements
-	 *
-	 * @var PC_Engine_ReqAnalyzer
-	 */
-	private $reqanalyzer;
-	/**
-	 * An array of all return-types of the current function/method
-	 * 
-	 * @var array
-	 */
-	private $allrettypes = array();
-	/**
-	 * An array of all throw types of the current function/method
-	 *
-	 * @var array
-	 */
-	private $allthrows = array();
-	
-	/**
-	 * The options
-	 *
-	 * @var PC_Engine_Options
-	 */
-	private $options;
 	
 	/**
 	 * The next id for anonymous functions
@@ -130,23 +133,26 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * 
 	 * @param string $str the file or string
 	 * @param bool $is_file wether $str is a file
-	 * @param PC_Engine_TypeContainer $types the type-container
-	 * @param PC_Engine_Options $options the options
+	 * @param PC_Engine_Env $env the environment
 	 */
-	protected function __construct($str,$is_file,$types,$options)
+	public function __construct($str,$is_file,$env)
 	{
 		parent::__construct($str,$is_file);
 		
-		if(!($types instanceof PC_Engine_TypeContainer))
-			FWS_Helper::def_error('instance','types',PC_Engine_TypeContainer,$types);
-		if(!($options instanceof PC_Engine_Options))
-			FWS_Helper::def_error('instance','options','PC_Engine_Options',$options);
+		if(!($env instanceof PC_Engine_Env))
+			FWS_Helper::def_error('instance','env','PC_Engine_Env',$env);
 		
-		$this->types = $types;
+		$this->env = $env;
 		$this->scope = new PC_Engine_Scope();
 		$this->vars = new PC_Engine_VarContainer();
-		$this->reqanalyzer = new PC_Engine_ReqAnalyzer($this->types);
-		$this->options = $options;
+		$this->methods_analyzer = new PC_Analyzer_Methods($env);
+		$this->calls_analyzer = new PC_Analyzer_Calls($env);
+		$this->classes_analyzer = new PC_Analyzer_Classes($env);
+		$this->req_analyzer = new PC_Analyzer_Requirements($env);
+		$this->ret_analyzer = new PC_Analyzer_Returns($env);
+		$this->throws_analyzer = new PC_Analyzer_Throws($env);
+		$this->modifiers_analyzer = new PC_Analyzer_Modifiers($env);
+		$this->vars_analyzer = new PC_Analyzer_Vars($env);
 	}
 	
 	/**
@@ -154,7 +160,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	public function __destruct()
 	{
-		$this->analyze_vars(PC_Obj_Variable::SCOPE_GLOBAL);
+		$this->vars_analyzer->analyze($this->vars,PC_Obj_Variable::SCOPE_GLOBAL);
 	}
 	
 	/**
@@ -207,7 +213,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				// parent-class
 				$call->set_object_creation(false);
 				$cname = $this->scope->get_name_of(T_CLASS_C);
-				$classobj = $this->types->get_class($cname);
+				$classobj = $this->env->get_types()->get_class($cname);
 				if($classobj === null || $classobj->get_super_class() == '')
 					return $this->create_unknown();
 				$cname = $classobj->get_super_class();
@@ -221,7 +227,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 					// if we're in a non-static method, its a static-call if the method we're calling is
 					// static, and not if its not. i.e. we basically don't detect errors here
 					$func = null;
-					$super = $this->types->get_class($cname);
+					$super = $this->env->get_types()->get_class($cname);
 					if($super !== null)
 						$func = $super->get_method($fname);
 					$static = $func !== null && $func->is_static();
@@ -247,11 +253,12 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			$call->add_argument(clone $arg);
 		}
 		$call->set_static($static);
-		$this->types->add_call($call);
+		$this->env->get_types()->add_call($call);
 		
-		$funcobj = $this->get_method_object($cname,$fname);
+		$funcobj = $this->env->get_types()->get_method_or_func($cname,$fname);
 		
-		$this->analyze_modifiers($call,$funcobj);
+		$this->calls_analyzer->analyze($call);
+		$this->modifiers_analyzer->analyze($this->scope,$call,$funcobj);
 		
 		if($funcobj === null)
 		{
@@ -261,14 +268,14 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			return $this->create_unknown();
 		}
 		
-		$this->reqanalyzer->analyze(
+		$this->req_analyzer->analyze(
 			$call,$funcobj->get_version()->get_min(),$funcobj->get_version()->get_max()
 		);
 		
 		// add the throws of the method to our throws
 		foreach(array_keys($funcobj->get_throws()) as $tclass)
 		{
-			$this->allthrows[] = array(
+			$this->throws_analyzer->add(
 				PC_Obj_Method::THROW_FUNC,
 				PC_Obj_MultiType::create_object($tclass)
 			);
@@ -313,7 +320,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			if($classname === null)
 				return $this->create_var();
 			// if we don't know the class, give up, as well
-			$class = $this->types->get_class($classname);
+			$class = $this->env->get_types()->get_class($classname);
 			if($class === null)
 				return $this->create_var();
 			
@@ -330,7 +337,6 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				if($field === null)
 				{
 					$this->report_error(
-						null,
 						'Access of not-existing field "'.$fieldname.'" of class "#'.$classname.'#"',
 						PC_Obj_Error::E_S_NOT_EXISTING_FIELD
 					);
@@ -378,7 +384,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	public function get_constant_type($name)
 	{
-		$const = $this->types->get_constant($name);
+		$const = $this->env->get_types()->get_constant($name);
 		if($const === null)
 			return $this->create_unknown();
 		return $const->get_type();
@@ -421,7 +427,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				
 				default:
 					$this->report_error(
-						null,'The variable "$'.$name.'" is undefined',PC_Obj_Error::E_S_UNDEFINED_VAR
+						'The variable "$'.$name.'" is undefined',PC_Obj_Error::E_S_UNDEFINED_VAR
 					);
 					break;
 			}
@@ -479,7 +485,6 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if($value->contains(new PC_Obj_Type(PC_Obj_Type::VOID)))
 		{
 			$this->report_error(
-				new PC_Obj_Location($this->get_file(),$this->get_line()),
 				'Assignment of void to $'.$varname,
 				PC_Obj_Error::E_S_VOID_ASSIGN
 			);
@@ -534,7 +539,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		
 		// if a variable-type is unknown and we're in a function/class, check if we know the type
 		// from the type-scanner
-		$func = $this->get_method_object(
+		$func = $this->env->get_types()->get_method_or_func(
 			$this->scope->get_name_of(T_CLASS_C),$this->scope->get_name_of(T_FUNC_C)
 		);
 		// if we have a doc, use it. otherwise use the default-value
@@ -731,7 +736,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			return;
 		}
 		
-		$this->allrettypes[] = $expr;
+		$this->ret_analyzer->add($expr);
 	}
 	
 	/**
@@ -749,7 +754,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		
 		// don't even collect unknown types here
 		if(!$expr->is_unknown())
-			$this->allthrows[] = array(PC_Obj_Method::THROW_SELF,$expr);
+			$this->throws_analyzer->add(PC_Obj_Method::THROW_SELF,$expr);
 	}
 	
 	/**
@@ -782,6 +787,13 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	{
 		if($name == '')
 			$name = PC_Obj_Method::ANON_PREFIX.($this->anon_id++);
+		else
+		{
+			$class = $this->env->get_types()->get_class($name);
+			if($class !== null)
+				$this->classes_analyzer->analyze($class);
+		}
+
 		$this->scope->enter_class($name);
 		return $name;
 	}
@@ -803,6 +815,14 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	{
 		if($name == '')
 			$name = PC_Obj_Method::ANON_PREFIX.($this->anon_id++);
+		else
+		{
+			$classname = $this->scope->get_name_of(T_CLASS_C);
+			$func = $this->env->get_types()->get_method_or_func($classname,$name);
+			if($func !== null)
+				$this->methods_analyzer->analyze($func,$classname);
+		}
+		
 		$this->scope->enter_function($name);
 	}
 	
@@ -811,12 +831,11 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 */
 	public function end_function()
 	{
-		$this->analyze_rettypes();
-		$this->analyze_throws();
-		$this->analyze_vars($this->scope->get_name());
+		$this->ret_analyzer->analyze($this->scope);
+		$this->throws_analyzer->analyze($this->scope);
+		$this->vars_analyzer->analyze($this->vars,$this->scope->get_name());
+		
 		$this->scope->leave_function();
-		$this->allrettypes = array();
-		$this->allthrows = array();
 	}
 	
 	/**
@@ -883,7 +902,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if($cname == 'self')
 			$cname = $this->scope->get_name_of(T_CLASS_C);
 		
-		$class = $this->types->get_class($cname);
+		$class = $this->env->get_types()->get_class($cname);
 		if($class === null)
 			return $this->create_unknown();
 		$const = $class->get_constant($constname);
@@ -907,7 +926,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$cname = $class->get_string();
 		if($cname == 'self')
 			$cname = $this->scope->get_name_of(T_CLASS_C);
-		$classobj = $this->types->get_class($cname);
+		$classobj = $this->env->get_types()->get_class($cname);
 		if($classobj === null)
 			return $this->create_var();
 		$fieldobj = $classobj->get_field($field);
@@ -1240,7 +1259,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			return PC_Obj_MultiType::create_bool(true);
 		
 		// if the class is unknown we can't say more
-		$class = $this->types->get_class($classname);
+		$class = $this->env->get_types()->get_class($classname);
 		if($class === null)
 			return PC_Obj_MultiType::create_bool();
 		
@@ -1250,7 +1269,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		{
 			if(strcasecmp($super,$name) == 0)
 				return PC_Obj_MultiType::create_bool(true);
-			$superobj = $this->types->get_class($super);
+			$superobj = $this->env->get_types()->get_class($super);
 			if($superobj === null)
 				break;
 			$super = $superobj->get_super_class();
@@ -1276,7 +1295,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			if(strcasecmp($if,$name) == 0)
 				return true;
 			// check super-interfaces
-			$ifobj = $this->types->get_class($if);
+			$ifobj = $this->env->get_types()->get_class($if);
 			if($ifobj !== null && $this->is_instof_interface($ifobj->get_interfaces(),$name))
 				return true;
 		}
@@ -1284,394 +1303,15 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
-	 * Analyzes the return-types of the current function and reports errors, if necessary
-	 */
-	private function analyze_rettypes()
-	{
-		$funcname = $this->scope->get_name_of(T_FUNC_C);
-		$classname = $this->scope->get_name_of(T_CLASS_C);
-		$func = $this->get_method_object($classname,$funcname);
-		if($func && !$func->is_abstract())
-		{
-			$hasnull = false;
-			$hasother = false;
-			foreach($this->allrettypes as $t)
-			{
-				if($t === null)
-					$hasnull = true;
-				else
-					$hasother = true;
-			}
-			
-			if(count($this->allrettypes) == 0)
-				$mtype = PC_Obj_MultiType::create_void();
-			else
-			{
-				$mtype = new PC_Obj_MultiType();
-				foreach($this->allrettypes as $t)
-				{
-					if($t !== null)
-						$mtype->merge($t,false);
-					else
-						$mtype->merge(PC_Obj_MultiType::create_void(),false);
-				}
-			}
-			
-			if($classname && $funcname == '__construct')
-			{
-				if($hasother)
-				{
-					$this->report_error(
-						$func,
-						'The constructor of "'.$classname.'" has a return-statement with expression',
-						PC_Obj_Error::E_S_CONSTR_RETURN
-					);
-				}
-			}
-			else
-			{
-				$name = ($classname ? '#'.$classname.'#::' : '').$funcname;
-				// empty return-expression and non-empty?
-				if($hasnull && $hasother)
-				{
-					$this->report_error(
-						$func,
-						'The function/method "'.$name.'" has return-'
-						.'statements without expression and return-statements with expression',
-						PC_Obj_Error::E_S_MIXED_RET_AND_NO_RET
-					);
-				}
-				
-				$void = new PC_Obj_Type(PC_Obj_Type::VOID);
-				$docreturn = $func->has_return_doc() && !$func->get_return_type()->contains($void);
-				if($docreturn && !$hasother)
-				{
-					$this->report_error(
-						$func,
-						'The function/method "'.$name.'" has a return-specification in PHPDoc'
-						.', but does not return a value',
-						PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET
-					);
-				}
-				else if(!$docreturn && !$func->is_anonymous() && $hasother)
-				{
-					$this->report_error(
-						$func,
-						'The function/method "'.$name.'" has no return-specification in PHPDoc'
-						.', but does return a value',
-						PC_Obj_Error::E_S_RET_BUT_NO_RET_SPEC
-					);
-				}
-				else if($this->has_forbidden($this->allrettypes,$func->get_return_type()))
-				{
-					$this->report_error(
-						$func,
-						'The return-specification (PHPDoc) of function/method "'.$name.'" does not match with '
-						.'the returned values (spec="'.$func->get_return_type().'", returns="'.$mtype.'")',
-						PC_Obj_Error::E_S_RETURNS_DIFFER_FROM_SPEC
-					);
-				}
-			}
-			
-			if($func->get_return_type()->is_unknown())
-				$func->set_return_type($mtype);
-		}
-	}
-	
-	/**
-	 * Analyzes all throw statements that have been found in the current function and checks their
-	 * validity against the PHPDoc throw specifications.
-	 */
-	private function analyze_throws()
-	{
-		$funcname = $this->scope->get_name_of(T_FUNC_C);
-		$classname = $this->scope->get_name_of(T_CLASS_C);
-		$func = $this->get_method_object($classname,$funcname);
-		if($func && !$func->is_abstract())
-		{
-			$name = ($classname ? '#'.$classname.'#::' : '').$funcname;
-			foreach($func->get_throws() as $tclass => $ttype)
-			{
-				// if only the parent function specifies it, we are not forced to throw it
-				if($ttype == PC_Obj_Method::THROW_PARENT)
-					continue;
-				
-				$found = false;
-				foreach($this->allthrows as list($origin,$mtype))
-				{
-					foreach($mtype->get_types() as $type)
-					{
-						if($type->get_class() == $tclass)
-						{
-							$found = true;
-							break;
-						}
-					}
-				}
-				
-				if(!$found)
-				{
-					$this->report_error(
-						$func,
-						'The function/method "'.$name.'" throws "'.$tclass.'" according to PHPDoc'
-						.', but does not throw it',
-						PC_Obj_Error::E_S_DOC_WITHOUT_THROW
-					);
-				}
-			}
-			
-			foreach($this->allthrows as list($origin,$mtype))
-			{
-				// ignore missing throws specifications that are only thrown by called functions
-				if($origin == PC_Obj_Method::THROW_FUNC)
-					continue;
-				
-				foreach($mtype->get_types() as $type)
-				{
-					if($type->get_type() == PC_Obj_Type::OBJECT)
-					{
-						if(!$func->contains_throw($type->get_class()))
-						{
-							$this->report_error(
-								$func,
-								'The function/method "'.$name.'" does not throw "'.$type.'" according to PHPDoc'
-								.', but throws it',
-								PC_Obj_Error::E_S_THROW_NOT_IN_DOC
-							);
-						}
-					}
-					else
-					{
-						$this->report_error(
-							$func,
-							'The function/method "'.$name.'" throws a non-object ('.$type.')',
-							PC_Obj_Error::E_S_THROW_INVALID
-						);
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Analyzes whether the given method is visible at the given call.
-	 *
-	 * @param PC_Obj_Call $call the method call
-	 * @param PC_Obj_Method $method the method object
-	 */
-	private function analyze_modifiers($call,$method)
-	{
-		if($method && $method->get_visibility() == PC_Obj_Method::V_PUBLIC)
-			return;
-		
-		// if we don't know it yet, search in the superclasses. in this case, it's always private
-		if(!$method && $call->get_class())
-			$method = $this->get_method_of_super($call->get_class(),$call->get_function());
-		else if($method)
-		{
-			$cur_class = $this->scope->get_name_of(T_CLASS_C);
-			if($cur_class)
-			{
-				// the owner is not restricted in any way
-				if($cur_class == $call->get_class())
-					return;
-				
-				// calling a protected method from a subclass is ok as well
-				$isprot = $method->get_visibility() == PC_Obj_Method::V_PROTECTED;
-				if($isprot && $this->is_subclass_of($cur_class,$call->get_class()))
-					return;
-			}
-		}
-		
-		if($method)
-		{
-			// everything else is not. i.e., calling a private/protected method from a non-subclass
-			$name = $call->get_class().'::'.$call->get_function();
-			$this->report_error(
-				$method,
-				'The function/method "'.$name.'" is '.$method->get_visibility().' at this location',
-				PC_Obj_Error::E_S_METHOD_VISIBILITY
-			);
-		}
-	}
-	
-	/**
-	 * Searches for the given method in any superclass.
-	 *
-	 * @param string $class the class name
-	 * @param string $name the method name
-	 * @return PC_Obj_Method the method or null
-	 */
-	private function get_method_of_super($class,$name)
-	{
-		$cobj = $this->types->get_class($class);
-		if(!$cobj)
-			return null;
-		if($cobj->contains_method($name))
-			return $cobj->get_method($name);
-		return $this->get_method_of_super($cobj->get_super_class(),$name);
-	}
-	
-	/**
-	 * Determines whether $class is a subclass of $super.
-	 *
-	 * @param string $class the class name
-	 * @param string $super the potential superclass name
-	 * @return bool true if so
-	 */
-	private function is_subclass_of($class,$super)
-	{
-		$cobj = $this->types->get_class($class);
-		if(!$cobj)
-			return false;
-		if($cobj->get_super_class() == $super)
-			return true;
-		return $this->is_subclass_of($cobj->get_super_class(),$super);
-	}
-	
-	/**
-	 * Finds variables that have not been read in the given scope.
-	 *
-	 * @param string $scope the scope
-	 */
-	private function analyze_vars($scope)
-	{
-		if(!$this->options->get_report_unused())
-			return;
-		
-		$accesses = $this->vars->get_accesses();
-		if(isset($accesses[$scope]))
-		{
-			// determine the parameters to handle them special
-			$params = array();
-			if($scope != PC_Obj_Variable::SCOPE_GLOBAL)
-			{
-				if(strstr($scope,'::'))
-				{
-					list($cname,$fname) = explode('::',$scope);
-					$func = $this->types->get_method($cname,$fname);
-				}
-				else
-					$func = $this->types->get_function($scope);
-				
-				if($func)
-				{
-					// don't report anything for abstract methods
-					if($func->is_abstract())
-						return;
-					
-					$params = $func->get_params();
-				}
-			}
-			
-			foreach($accesses[$scope] as $vname => $count)
-			{
-				if($count == 0)
-				{
-					if(isset($params[$vname]))
-					{
-						// if it's a method and this method exists in a superclass, too, don't report the error
-						// because it happens quite often that you don't use a parameter in subclasses, but you
-						// are still forced to specify it.
-						if(strstr($scope,'::'))
-						{
-							list($cname,$fname) = explode('::',$scope);
-							$class = $this->types->get_class($cname);
-							if($class)
-							{
-								if($this->get_method_of_super($class->get_super_class(),$fname) !== null)
-									return;
-								foreach($class->get_interfaces() as $if)
-								{
-									if($this->get_method_of_super($if,$fname))
-										return;
-								}
-							}
-						}
-						
-						$name = 'parameter';
-						$error = PC_Obj_Error::E_S_PARAM_UNUSED;
-					}
-					else
-					{
-						$name = 'variable';
-						$error = PC_Obj_Error::E_S_VAR_UNUSED;
-					}
-
-					$var = $this->vars->get($scope,$vname);
-					$this->report_error(
-						$var,
-						'The '.$name.' $'.$vname.' in #'.$scope.'# is unused',
-						$error
-					);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Checks wether $types contains a type, that is not contained in $mtype.
-	 * 
-	 * @param array $types the types
-	 * @param PC_Obj_MultiType $mtype the multitype
-	 * @return bool true if so
-	 */
-	private function has_forbidden($types,$mtype)
-	{
-		// if the type is unknown (mixed), its always ok
-		if($mtype->is_unknown())
-			return false;
-		foreach($types as $t)
-		{
-			if($t !== null)
-			{
-				foreach($t->get_types() as $t1)
-				{
-					if(!$mtype->contains($t1))
-						return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	/**
 	 * Reports the given error
 	 * 
-	 * @param PC_Obj_Location $locsrc an object from which the location will be copied (null = current)
 	 * @param string $msg the error-message
 	 * @param int $type the error-type
 	 */
-	private function report_error($locsrc,$msg,$type)
+	private function report_error($msg,$type)
 	{
-		if($locsrc === null)
-			$locsrc = new PC_Obj_Location($this->get_file(),$this->get_line());
-		else
-			$locsrc = new PC_Obj_Location($locsrc->get_file(),$locsrc->get_line());
-		$this->types->add_errors(array(new PC_Obj_Error($locsrc,$msg,$type)));
-	}
-	
-	/**
-	 * Returns the method-object for the given function or method
-	 * 
-	 * @param string $classname the class-name (may be empty)
-	 * @param string $funcname the function-name (may be empty)
-	 * @return PC_Obj_Method the method or null
-	 */
-	private function get_method_object($classname,$funcname)
-	{
-		if($funcname)
-		{
-			if($classname)
-			{
-				$classobj = $this->types->get_class($classname);
-				if($classobj === null)
-					return null;
-				return $classobj->get_method($funcname);
-			}
-			return $this->types->get_function($funcname);
-		}
-		return null;
+		$locsrc = new PC_Obj_Location($this->get_file(),$this->get_line());
+		$this->env->get_errors()->report($locsrc,$msg,$type);
 	}
 	
 	public function advance($parser)

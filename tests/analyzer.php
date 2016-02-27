@@ -41,9 +41,9 @@ $B->foo();
 $B->bar();
 
 /** @return C */
-function getc() {}
+function getc() { return new C; }
 /** @return I */
-function geti() {}
+function geti() { return new E; }
 
 interface I {}
 class C {}
@@ -61,24 +61,24 @@ $E->bar();			// ok, because there is a class that implements that interface. so 
 $E->foobar();		// not ok, because there is no class that implements that method
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		
 		self::assert_equals(4,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_METHOD_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_MISSING,$error->get_type());
 		self::assert_regex('/The method "bar" does not exist in the class "#A#"!/',$error->get_msg());
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_A_METHOD_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_MISSING,$error->get_type());
 		self::assert_regex('/The method "bar" does not exist in the class "#B#"!/',$error->get_msg());
 		
 		$error = $errors[2];
-		self::assert_equals(PC_Obj_Error::E_A_METHOD_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_MISSING,$error->get_type());
 		self::assert_regex('/The method "foobar" does not exist in the class "#C#"!/',$error->get_msg());
 		
 		$error = $errors[3];
-		self::assert_equals(PC_Obj_Error::E_A_METHOD_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_MISSING,$error->get_type());
 		self::assert_regex('/The method "foobar" does not exist in the class "#I#"!/',$error->get_msg());
 	}
 	
@@ -108,8 +108,7 @@ function d() {
 }
 ?>';
 		
-		list(,,,,$terrors,$aerrors) = $this->analyze($code);
-		$errors = array_merge($terrors,$aerrors);
+		list(,,,,$errors) = $this->analyze($code);
 		
 		self::assert_equals(2,count($errors));
 		
@@ -147,15 +146,15 @@ interface I {
 $I = new I();
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(2,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_ABSTRACT_CLASS_INSTANTIATION,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_ABSTRACT_CLASS_INSTANTIATION,$error->get_type());
 		self::assert_regex('/You can\'t instantiate the abstract class "#A#"!/',$error->get_msg());
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_A_ABSTRACT_CLASS_INSTANTIATION,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_ABSTRACT_CLASS_INSTANTIATION,$error->get_type());
 		self::assert_regex('/You can\'t instantiate the abstract class "#I#"!/',$error->get_msg());
 	}
 	
@@ -182,17 +181,17 @@ class B extends A {
 }
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(2,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_STATIC_CALL,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_STATIC_CALL,$error->get_type());
 		self::assert_regex(
 			'/Your call "#A#::bar\(\)" calls "bar" statically, but the method is not static!/',$error->get_msg()
 		);
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_A_STATIC_CALL,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_STATIC_CALL,$error->get_type());
 		self::assert_regex(
 			'/Your call "#A#::bar\(\)" calls "bar" statically, but the method is not static!/',$error->get_msg()
 		);
@@ -223,23 +222,23 @@ class B extends A {
 }
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(3,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_NONSTATIC_CALL,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_NONSTATIC_CALL,$error->get_type());
 		self::assert_regex(
 			'/Your call "#A#->foo\(\)" calls "foo" not statically, but the method is static!/',$error->get_msg()
 		);
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_A_NONSTATIC_CALL,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_NONSTATIC_CALL,$error->get_type());
 		self::assert_regex(
 			'/Your call "#B#->foo2\(\)" calls "foo2" not statically, but the method is static!/',$error->get_msg()
 		);
 		
 		$error = $errors[2];
-		self::assert_equals(PC_Obj_Error::E_A_NONSTATIC_CALL,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_NONSTATIC_CALL,$error->get_type());
 		self::assert_regex(
 			'/Your call "#B#->foo2\(\)" calls "foo2" not statically, but the method is static!/',$error->get_msg()
 		);
@@ -254,17 +253,17 @@ $C = A::bar();
 $D = A::$a->b();	// TODO same problem
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(2,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_CLASS_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CLASS_MISSING,$error->get_type());
 		self::assert_regex(
 			'/The class "#A#" does not exist!/',$error->get_msg()
 		);
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_A_CLASS_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CLASS_MISSING,$error->get_type());
 		self::assert_regex(
 			'/The class "#A#" does not exist!/',$error->get_msg()
 		);
@@ -280,7 +279,7 @@ $A = new ${$_ . "foo"}();
 		
 		$options = new PC_Engine_Options();
 		$options->set_report_unknown(true);
-		list(,,,,,$errors) = $this->analyze($code,$options);
+		list(,,,,$errors) = $this->analyze($code,$options);
 		self::assert_equals(0,count($errors));
 	}
 	
@@ -292,11 +291,11 @@ $name = "bar";
 $bar();					// TODO not yet detectable
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(1,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_FUNCTION_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_FUNCTION_MISSING,$error->get_type());
 		self::assert_regex(
 			'/The function "fooo" does not exist!/',$error->get_msg()
 		);
@@ -326,6 +325,7 @@ class A {
 	/** @param int $a @param int $b */
 	public static function test($a,$b) {}
 	public function foo() {}
+	/** @param string $a */
 	public function bar($a = "str") {}
 }
 A::test();
@@ -337,81 +337,81 @@ $A->bar("test");
 $A->bar("test","test2");
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(11,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT,$error->get_type());
 		self::assert_regex(
 			'/The \S+ called by "foo\(\)" requires 3 arguments but you have given 0/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT,$error->get_type());
 		self::assert_regex(
 			'/The \S+ called by "foo\(integer=1\)" requires 3 arguments but you have given 1/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[2];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT,$error->get_type());
 		self::assert_regex(
 			'/The \S+ called by "foo\(integer=1, integer=2\)" requires 3 arguments but you have given 2/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[3];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT,$error->get_type());
 		self::assert_regex(
 			'/The \S+ called by "foo\(integer=1, integer=2, integer=3, integer=4\)" requires 3 arguments but you have given 4/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[4];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT,$error->get_type());
 		self::assert_regex(
 			'/The \S+ called by "bar\(\)" requires 2 to 3 arguments but you have given 0/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[5];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT,$error->get_type());
 		self::assert_regex(
 			'/The \S+ called by "bar\(integer=1\)" requires 2 to 3 arguments but you have given 1/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[6];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT,$error->get_type());
 		self::assert_regex(
 			'/The \S+ called by "bar\(integer=1, integer=2, integer=3, integer=4\)" requires 2 to 3 arguments but you have given 4/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[7];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT,$error->get_type());
 		self::assert_regex(
 			'/The \S+ called by "#A#::test\(\)" requires 2 arguments but you have given 0/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[8];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT,$error->get_type());
 		self::assert_regex(
 			'/The \S+ called by "#A#->foo\(integer=1\)" requires 0 arguments but you have given 1/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[9];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT,$error->get_type());
 		self::assert_regex(
 			'/The \S+ called by "#A#->foo\(integer=1, integer=2\)" requires 0 arguments but you have given 2/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[10];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_COUNT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_COUNT,$error->get_type());
 		self::assert_regex(
 			'/The \S+ called by "#A#->bar\(string=test, string=test2\)" requires 0 to 1 arguments but you have given 2/',
 			$error->get_msg()
@@ -421,93 +421,106 @@ $A->bar("test","test2");
 	public function test_s_wrong_argtype()
 	{
 		$code = '<?php
-/** @param int $a @param int $b @param int $c */
+/**
+ * @param int $a
+ * @param int $b
+ * @param int $c
+ */
 function foo($a,$b,$c) {}
 foo(1,2,3);								// ok
 foo("str",12.3,array());	// all 3 wrong
 foo(true,false,3);				// 1 and 2 wrong
 
-/** @param string $a @param string $b */
+/**
+ * @param string $a
+ * @param string $b
+ * @param int $c
+ */
 function bar($a,$b,$c = 1) {}
 bar($_,$_,12.3);					// first 2 are unknown -> ok
 bar("str","str",1);				// third is ok, type is known by default-value
 bar("str","str",true);		// third is wrong
 
 class A {}
+
+/**
+ * @param A $a
+ * @param array $b
+ */
 function foobar(A $a,array $b) {}
 foobar(new A(),array());	// both ok
 foobar(null,12);					// first unknown -> ok, second wrong
 foobar("str",true);				// both wrong
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(10,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
 			'/argument 1 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "string=str"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
 			'/argument 2 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "float=12.3"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[2];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
 			'/argument 3 in "foo\(string=str, float=12.3, array={}\)" requires an "integer" .*? "array={}"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[3];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
 			'/argument 1 in "foo\(bool=1, bool=, integer=3\)" requires an "integer" .*? "bool=1"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[4];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
 			'/argument 2 in "foo\(bool=1, bool=, integer=3\)" requires an "integer" .*? "bool="/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[5];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
 			'/argument 3 in "bar\(unknown, unknown, float=12.3\)" requires an "integer" .*? "float=12.3"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[6];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
 			'/argument 3 in "bar\(string=str, string=str, bool=1\)" requires an "integer" .*? "bool=1"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[7];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
 			'/argument 2 in "foobar\(unknown, integer=12\)" requires an "array" .*? "integer=12"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[8];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
 			'/argument 1 in "foobar\(string=str, bool=1\)" requires an "A" .*? "string=str"/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[9];
-		self::assert_equals(PC_Obj_Error::E_A_WRONG_ARGUMENT_TYPE,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_WRONG_ARGUMENT_TYPE,$error->get_type());
 		self::assert_regex(
 			'/argument 2 in "foobar\(string=str, bool=1\)" requires an "array" .*? "bool=1"/',
 			$error->get_msg()
@@ -521,11 +534,11 @@ final class A {}
 class B extends A {}
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(1,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_FINAL_CLASS_INHERITANCE,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_FINAL_CLASS_INHERITANCE,$error->get_type());
 		self::assert_regex('/The class "#B#" inherits from the final class "#A#/',$error->get_msg());
 	}
 	
@@ -544,19 +557,19 @@ interface I {
 class C implements I {}
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(3,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_CLASS_NOT_ABSTRACT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CLASS_NOT_ABSTRACT,$error->get_type());
 		self::assert_regex('/The class "#A#" is NOT abstract but contains abstract methods!/',$error->get_msg());
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_A_CLASS_NOT_ABSTRACT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CLASS_NOT_ABSTRACT,$error->get_type());
 		self::assert_regex('/The class "#B#" is NOT abstract but contains abstract methods!/',$error->get_msg());
 		
 		$error = $errors[2];
-		self::assert_equals(PC_Obj_Error::E_A_CLASS_NOT_ABSTRACT,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CLASS_NOT_ABSTRACT,$error->get_type());
 		self::assert_regex('/The class "#C#" is NOT abstract but contains abstract methods!/',$error->get_msg());
 	}
 	
@@ -569,11 +582,11 @@ class B extends A {}
 class C extends UnknownClass {}
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(1,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_CLASS_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CLASS_MISSING,$error->get_type());
 		self::assert_regex('/The class "#UnknownClass#" does not exist!/',$error->get_msg());
 	}
 	
@@ -586,19 +599,19 @@ class E implements UnknownInterface {}
 class F implements I,UnknownInterface,Unknown2 {}
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(3,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_INTERFACE_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_INTERFACE_MISSING,$error->get_type());
 		self::assert_regex('/The interface "#UnknownInterface#" does not exist!/',$error->get_msg());
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_A_INTERFACE_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_INTERFACE_MISSING,$error->get_type());
 		self::assert_regex('/The interface "#UnknownInterface#" does not exist!/',$error->get_msg());
 		
 		$error = $errors[2];
-		self::assert_equals(PC_Obj_Error::E_A_INTERFACE_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_INTERFACE_MISSING,$error->get_type());
 		self::assert_regex('/The interface "#Unknown2#" does not exist!/',$error->get_msg());
 	}
 	
@@ -612,15 +625,15 @@ class E implements FakeI {}
 class F implements I,FakeI {}
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		self::assert_equals(2,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_IF_IS_NO_IF,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_IF_IS_NO_IF,$error->get_type());
 		self::assert_regex('/"#FakeI#" is no interface, but implemented by class #E#!/',$error->get_msg());
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_A_IF_IS_NO_IF,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_IF_IS_NO_IF,$error->get_type());
 		self::assert_regex('/"#FakeI#" is no interface, but implemented by class #F#!/',$error->get_msg());
 	}
 	
@@ -661,45 +674,45 @@ call(function() {});						// ok
 call(1);												// invalid
 ?>';
 		
-		list(,,,,,$errors) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		
 		self::assert_equals(9,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_A_FUNCTION_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_FUNCTION_MISSING,$error->get_type());
 		self::assert_regex('/The function "my_func2" does not exist!/',$error->get_msg());
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_A_CALLABLE_INVALID,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CALLABLE_INVALID,$error->get_type());
 		self::assert_regex('/Invalid callable: array={}!/',$error->get_msg());
 		
 		$error = $errors[2];
-		self::assert_equals(PC_Obj_Error::E_A_CALLABLE_INVALID,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CALLABLE_INVALID,$error->get_type());
 		self::assert_regex('/Invalid callable: array={0 = unknown;1 = integer=1;}!/',$error->get_msg());
 		
 		$error = $errors[3];
-		self::assert_equals(PC_Obj_Error::E_A_CALLABLE_INVALID,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CALLABLE_INVALID,$error->get_type());
 		self::assert_regex('/Invalid callable: array={0 = integer=1;1 = integer=2;}!/',$error->get_msg());
 		
 		$error = $errors[4];
-		self::assert_equals(PC_Obj_Error::E_A_CALLABLE_INVALID,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CALLABLE_INVALID,$error->get_type());
 		self::assert_regex('/Invalid callable: array={0 = A;1 = integer=1;}!/',$error->get_msg());
 		
 		$error = $errors[5];
-		self::assert_equals(PC_Obj_Error::E_A_METHOD_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_MISSING,$error->get_type());
 		self::assert_regex('/The method "foo" does not exist in the class "#A#"!/',$error->get_msg());
 		
 		$error = $errors[6];
-		self::assert_equals(PC_Obj_Error::E_A_CLASS_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CLASS_MISSING,$error->get_type());
 		self::assert_regex('/The class "#B#" does not exist!/',$error->get_msg());
 		
 		// twice because it is instantiated first and then we try to call a method on it
 		$error = $errors[7];
-		self::assert_equals(PC_Obj_Error::E_A_CLASS_MISSING,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CLASS_MISSING,$error->get_type());
 		self::assert_regex('/The class "#B#" does not exist!/',$error->get_msg());
 		
 		$error = $errors[8];
-		self::assert_equals(PC_Obj_Error::E_A_CALLABLE_INVALID,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_CALLABLE_INVALID,$error->get_type());
 		self::assert_regex('/Invalid callable: integer=1!/',$error->get_msg());
 	}
 }

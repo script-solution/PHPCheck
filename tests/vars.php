@@ -68,7 +68,7 @@ function x($a,MyClass $b) {
 }
 ?>';
 
-		list(,,$vars,,$errors,) = $this->analyze($code);
+		list(,,$vars,,$errors) = $this->analyze($code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_int(1),(string)$global['i1']->get_type());
@@ -173,7 +173,7 @@ class B extends A {
 		
 		$options = new PC_Engine_Options();
 		$options->set_report_unused(true);
-		list(,,,,$errors,) = $this->analyze($code,$options);
+		list(,,,,$errors) = $this->analyze($code,$options);
 		
 		self::assert_equals(5,count($errors));
 		

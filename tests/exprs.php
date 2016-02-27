@@ -152,7 +152,7 @@ $bi = array(
 	
 	public function test_exprs()
 	{
-		list(,,$vars,,,) = $this->analyze(self::$code);
+		list(,,$vars,,) = $this->analyze(self::$code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_int(5),(string)$global['a']->get_type());

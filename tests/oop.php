@@ -113,7 +113,7 @@ $r = $p[1]->test2($b);
 	
 	public function test_oop()
 	{
-		list(,$classes,$vars,$calls,,) = $this->analyze(self::$code);
+		list(,$classes,$vars,$calls,) = $this->analyze(self::$code);
 		
 		$a = $classes['a'];
 		/* @var $a PC_Obj_Class */
@@ -329,7 +329,7 @@ $a->asd = 4;
 $b = $a->foo;
 ?>';
 
-		list(,,,,$errors,) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		
 		self::assert_equals(5,count($errors));
 		
@@ -395,27 +395,35 @@ $a->prot();
 $b = new B();
 ?>';
 
-		list(,,,,$errors,) = $this->analyze($code);
+		list(,,,,$errors) = $this->analyze($code);
 		
-		self::assert_equals(5,count($errors));
+		self::assert_equals(7,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
-		self::assert_regex('/The function\/method "B::priv" is private at this location/',$error->get_msg());
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_MISSING,$error->get_type());
+		self::assert_regex('/The method "priv" does not exist in the class "#B#"!/',$error->get_msg());
 		
 		$error = $errors[1];
 		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
 		self::assert_regex('/The function\/method "B::priv" is private at this location/',$error->get_msg());
 		
 		$error = $errors[2];
-		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
-		self::assert_regex('/The function\/method "A::priv" is private at this location/',$error->get_msg());
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_MISSING,$error->get_type());
+		self::assert_regex('/The method "priv" does not exist in the class "#B#"!/',$error->get_msg());
 		
 		$error = $errors[3];
 		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
-		self::assert_regex('/The function\/method "A::prot" is protected at this location/',$error->get_msg());
+		self::assert_regex('/The function\/method "B::priv" is private at this location/',$error->get_msg());
 		
 		$error = $errors[4];
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
+		self::assert_regex('/The function\/method "A::priv" is private at this location/',$error->get_msg());
+		
+		$error = $errors[5];
+		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
+		self::assert_regex('/The function\/method "A::prot" is protected at this location/',$error->get_msg());
+		
+		$error = $errors[6];
 		self::assert_equals(PC_Obj_Error::E_S_METHOD_VISIBILITY,$error->get_type());
 		self::assert_regex('/The function\/method "B::__construct" is private at this location/',$error->get_msg());
 	}
@@ -431,7 +439,7 @@ $a = new class extends A implements I {
 $a->test();
 ?>';
 
-		list(,$classes,$vars,$calls,$errors,) = $this->analyze($code);
+		list(,$classes,$vars,$calls,$errors) = $this->analyze($code);
 		
 		self::assert_equals(0,count($errors));
 		

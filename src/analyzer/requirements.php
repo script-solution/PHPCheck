@@ -29,23 +29,16 @@
  * @subpackage	src.engine
  * @author			Nils Asmussen <nils@script-solution.de>
  */
-class PC_Engine_ReqAnalyzer
+class PC_Analyzer_Requirements extends PC_Analyzer
 {
-	/**
-	 * The type container
-	 *
-	 * @var PC_Engine_TypeContainer
-	 */
-	private $types;
-	
 	/**
 	 * Constructor
 	 * 
-	 * @param PC_Engine_TypeContainer $types the types
+	 * @param PC_Engine_Env $env the environment
 	 */
-	public function __construct($types)
+	public function __construct($env)
 	{
-		$this->types = $types;
+		parent::__construct($env);
 	}
 	
 	/**
@@ -57,8 +50,8 @@ class PC_Engine_ReqAnalyzer
 	 */
 	public function analyze($object,$need_min,$need_max)
 	{
-		$tgtmin = $this->types->get_options()->get_min_req();
-		$tgtmax = $this->types->get_options()->get_max_req();
+		$tgtmin = $this->env->get_options()->get_min_req();
+		$tgtmax = $this->env->get_options()->get_max_req();
 		
 		foreach($need_min as $nv)
 		{
@@ -66,7 +59,7 @@ class PC_Engine_ReqAnalyzer
 			
 			if(!isset($tgtmin[$nname]))
 			{
-				$this->report_error(
+				$this->report(
 					$object,
 					$object.' requires '.$nname.' >= '.$nversion,
 					PC_Obj_Error::E_S_REQUIRES_NEWER
@@ -77,7 +70,7 @@ class PC_Engine_ReqAnalyzer
 				$minv = $tgtmin[$nname];
 				if($this->compare_versions($nversion,$minv) > 0)
 				{
-					$this->report_error(
+					$this->report(
 						$object,
 						$object.' requires '.$nname.' >= '.$nversion.', but you target '.$nname.' >= '.$minv,
 						PC_Obj_Error::E_S_REQUIRES_NEWER
@@ -97,7 +90,7 @@ class PC_Engine_ReqAnalyzer
 					$maxv = $tgtmax[$nname];
 					if($this->compare_versions($nversion,$maxv) < 0)
 					{
-						$this->report_error(
+						$this->report(
 							$object,
 							$object.' exists only till '.$nname.' '.$nversion.', but you target '.$nname.' < '.$maxv,
 							PC_Obj_Error::E_S_REQUIRES_OLDER
@@ -155,16 +148,8 @@ class PC_Engine_ReqAnalyzer
 		return array($name1.' '.$name2,$version);
 	}
 	
-	/**
-	 * Reports the given error
-	 * 
-	 * @param PC_Obj_Location $locsrc an object from which the location will be copied (null = current)
-	 * @param string $msg the error-message
-	 * @param int $type the error-type
-	 */
-	private function report_error($locsrc,$msg,$type)
+	protected function get_dump_vars()
 	{
-		$locsrc = new PC_Obj_Location($locsrc->get_file(),$locsrc->get_line());
-		$this->types->add_errors(array(new PC_Obj_Error($locsrc,$msg,$type)));
+		return array_merge(parent::get_dump_vars(),get_object_vars($this));
 	}
 }

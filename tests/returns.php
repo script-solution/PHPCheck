@@ -27,7 +27,7 @@ class PC_Tests_Returns extends PC_UnitTest
 	public function test_returns()
 	{
 		$code = '<?php
-class superfoo {
+abstract class superfoo {
 	/* @return int */
 	abstract function a();
 }
@@ -93,7 +93,7 @@ class j {
 $x = i();
 ?>';
 		
-		list($functions,,,,$errors,) = $this->analyze($code);
+		list($functions,,,,$errors) = $this->analyze($code);
 		self::assert_equals(7,count($errors));
 		
 		self::assert_equals("function b(): integer=0",$functions['b']);

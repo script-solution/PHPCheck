@@ -55,7 +55,9 @@ class D {
 	/**
 	 * @return float
 	 */
-	public function __set($name,$value);
+	public function __set($name,$value) {
+		return 1.1;
+	}
 }
 class E {
 	public function __set($name,$value);
@@ -78,7 +80,7 @@ class H {
 }
 ?>';
 		
-		list(,$classes,,,$errors,) = $this->analyze($code);
+		list(,$classes,,,$errors) = $this->analyze($code);
 		
 		$params = array(
 			new PC_Obj_Parameter('name',PC_Obj_MultiType::create_string()),
@@ -90,7 +92,7 @@ class H {
 		self::assertParamsEqual($params,$classes['C']->get_method('__set')->get_params());
 		self::assertParamsEqual($params,$classes['D']->get_method('__set')->get_params());
 		
-		self::assert_equals(5,count($errors));
+		self::assert_equals(4,count($errors));
 		
 		$error = $errors[0];
 		self::assert_equals(PC_Obj_Error::E_T_MAGIC_NOT_PUBLIC,$error->get_type());
@@ -120,13 +122,6 @@ class H {
 			'/The magic method "#H#::__set" should not be static/',
 			$error->get_msg()
 		);
-		
-		$error = $errors[4];
-		self::assert_equals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
-		self::assert_regex(
-			'/The function\/method "#D#::__set" has a return-specification in PHPDoc, but does not return a value/',
-			$error->get_msg()
-		);
 	}
 	
 	public function test__get()
@@ -144,7 +139,7 @@ class B {
 }
 ?>';
 		
-		list(,$classes,,,$errors,) = $this->analyze($code);
+		list(,$classes,,,$errors) = $this->analyze($code);
 		$params = array(
 			new PC_Obj_Parameter('name',PC_Obj_MultiType::create_string())
 		);
@@ -189,7 +184,7 @@ class B {
 }
 ?>';
 		
-		list(,$classes,,,$errors,) = $this->analyze($code);
+		list(,$classes,,,$errors) = $this->analyze($code);
 		$params = array(
 			new PC_Obj_Parameter('name',PC_Obj_MultiType::create_string())
 		);
@@ -204,16 +199,16 @@ class B {
 		self::assert_equals(3,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_T_MAGIC_METHOD_RET_INVALID,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
 		self::assert_regex(
-			'/The return-type of the magic-method "#B#::__isset" is invalid \(expected="bool", found="integer"\)/',
+			'/The function\/method "#A#::__isset" has a return-specification in PHPDoc, but does not return a value/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_T_MAGIC_METHOD_RET_INVALID,$error->get_type());
 		self::assert_regex(
-			'/The function\/method "#A#::__isset" has a return-specification in PHPDoc, but does not return a value/',
+			'/The return-type of the magic-method "#B#::__isset" is invalid \(expected="bool", found="integer"\)/',
 			$error->get_msg()
 		);
 		
@@ -243,7 +238,7 @@ class D {
 }
 ?>';
 		
-		list(,$classes,,,$errors,) = $this->analyze($code);
+		list(,$classes,,,$errors) = $this->analyze($code);
 		$params = array();
 		
 		$m = $classes['A']->get_method('__sleep');
@@ -264,30 +259,30 @@ class D {
 		self::assert_equals(5,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_T_MAGIC_METHOD_PARAMS_INVALID,$error->get_type());
-		self::assert_regex(
-			'/The parameters of the magic-method "#D#::__sleep" are invalid \(expected="", found="unknown"\)/',
-			$error->get_msg()
-		);
-		
-		$error = $errors[1];
 		self::assert_equals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
 		self::assert_regex(
 			'/The function\/method "#A#::__sleep" has a return-specification in PHPDoc, but does not return a value/',
 			$error->get_msg()
 		);
 		
-		$error = $errors[2];
+		$error = $errors[1];
 		self::assert_equals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
 		self::assert_regex(
 			'/The function\/method "#B#::__sleep" has a return-specification in PHPDoc, but does not return a value/',
 			$error->get_msg()
 		);
 		
-		$error = $errors[3];
+		$error = $errors[2];
 		self::assert_equals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
 		self::assert_regex(
 			'/The function\/method "#C#::__sleep" has a return-specification in PHPDoc, but does not return a value/',
+			$error->get_msg()
+		);
+		
+		$error = $errors[3];
+		self::assert_equals(PC_Obj_Error::E_T_MAGIC_METHOD_PARAMS_INVALID,$error->get_type());
+		self::assert_regex(
+			'/The parameters of the magic-method "#D#::__sleep" are invalid \(expected="", found="unknown"\)/',
 			$error->get_msg()
 		);
 		
@@ -311,7 +306,7 @@ class B {
 }
 ?>';
 		
-		list(,$classes,,,$errors,) = $this->analyze($code);
+		list(,$classes,,,$errors) = $this->analyze($code);
 		$params = array(
 			new PC_Obj_Parameter('props',PC_Obj_MultiType::create_array())
 		);
@@ -327,16 +322,16 @@ class B {
 		self::assert_equals(3,count($errors));
 		
 		$error = $errors[0];
-		self::assert_equals(PC_Obj_Error::E_T_MAGIC_IS_STATIC,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
 		self::assert_regex(
-			'/The magic method "#B#::__set_state" should not be static/',
+			'/The function\/method "#A#::__set_state" has a return-specification in PHPDoc, but does not return a value/',
 			$error->get_msg()
 		);
 		
 		$error = $errors[1];
-		self::assert_equals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
+		self::assert_equals(PC_Obj_Error::E_T_MAGIC_IS_STATIC,$error->get_type());
 		self::assert_regex(
-			'/The function\/method "#A#::__set_state" has a return-specification in PHPDoc, but does not return a value/',
+			'/The magic method "#B#::__set_state" should not be static/',
 			$error->get_msg()
 		);
 		

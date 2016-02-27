@@ -36,7 +36,7 @@ catch(Exception $e) {
 }
 ?>';
 		
-		list(,,$vars,$calls,,) = $this->analyze($code);
+		list(,,$vars,$calls,) = $this->analyze($code);
 		
 		self::assert_equals('myfunc(Exception)',(string)$calls[0]->get_call(null,false));
 		
@@ -47,7 +47,9 @@ catch(Exception $e) {
 	public function test_throws()
 	{
 		$code = '<?php
-class A {
+class Exception {}
+
+abstract class A {
 	/**
 	 * @throws Exception
 	 */
@@ -77,7 +79,7 @@ function b() {
 }
 ?>';
 
-		list($functions,$classes,,,$errors,) = $this->analyze($code);
+		list($functions,$classes,,,$errors) = $this->analyze($code);
 		
 		$func = $functions['a'];
 		self::assert_equals('a',$func->get_name());

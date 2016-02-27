@@ -101,6 +101,8 @@ final class PC_Module_edit_project extends PC_Module
 			'action_type' => PC_ACTION_EDIT_PROJECT,
 			'def_name' => $proj->get_name(),
 			'def_start' => $proj->get_created(),
+			'report_mixed' => $proj->get_report_mixed(),
+			'report_unknown' => $proj->get_report_unknown(),
 			'req' => $req,
 			'add_type' => $add_type,
 			'add_name' => $add_name,

@@ -33,24 +33,11 @@
 class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 {
 	/**
-	 * @param string $file the filename
-	 * @param PC_Engine_Options $options the options
-	 * @return PC_Engine_TypeScanner the instance for lexing a file
+	 * The environment
+	 *
+	 * @var PC_Engine_Env
 	 */
-	public static function get_for_file($file,$options)
-	{
-		return new self($file,true,$options);
-	}
-	
-	/**
-	 * @param string $string the string
-	 * @param PC_Engine_Options $options the options
-	 * @return PC_Engine_TypeScanner the instance for lexing a string
-	 */
-	public static function get_for_string($string,$options)
-	{
-		return new self($string,false,$options);
-	}
+	private $env;
 	
 	/**
 	 * The last line in which we saw a function-declaration
@@ -85,13 +72,6 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	private $constComments = array();
 	
 	/**
-	 * The found types and errors
-	 * 
-	 * @var PC_Engine_TypeContainer
-	 */
-	private $types;
-	
-	/**
 	 * The next id for anonymous functions
 	 *
 	 * @var int
@@ -103,16 +83,16 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	 *
 	 * @param string $str the file or string
 	 * @param bool $is_file wether $str is a file
-	 * @param PC_Engine_Options $options the options
+	 * @param PC_Engine_Env $env the environment
 	 */
-	protected function __construct($str,$is_file,$options)
+	public function __construct($str,$is_file,$env)
 	{
 		parent::__construct($str,$is_file);
 		
-		if(!($options instanceof PC_Engine_Options))
-			FWS_Helper::def_error('instance','options','PC_Engine_Options',$options);
-		
-		$this->types = new PC_Engine_TypeContainer($options);
+		if(!($env instanceof PC_Engine_Env))
+			FWS_Helper::def_error('instance','env','PC_Engine_Env',$env);
+	
+		$this->env = $env;
 	}
 	
 	/**
@@ -129,14 +109,6 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	public function get_last_class_line()
 	{
 		return $this->lastClassLine;
-	}
-	
-	/**
-	 * @return PC_Engine_TypeContainer the found types and errors
-	 */
-	public function get_types()
-	{
-		return $this->types;
 	}
 	
 	/**
@@ -161,7 +133,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 		if($return !== null)
 			$func->set_return_type($return);
 		$this->parse_method_doc($func);
-		$this->types->add_functions(array($func));
+		$this->env->get_types()->add_functions(array($func));
 	}
 	
 	/**
@@ -194,7 +166,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 		foreach($implements as $if)
 			$class->add_interface($if);
 		$this->handle_class_stmts($class,$stmts);
-		$this->types->add_classes(array($class));
+		$this->env->get_types()->add_classes(array($class));
 	}
 	
 	/**
@@ -213,7 +185,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 		foreach($extends as $if)
 			$class->add_interface($if);
 		$this->handle_class_stmts($class,$stmts);
-		$this->types->add_classes(array($class));
+		$this->env->get_types()->add_classes(array($class));
 	}
 	
 	/**
@@ -317,7 +289,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 		if($name === null)
 			return;
 		$type = $args[1] !== null ? $args[1] : null;
-		$this->types->add_constants(array(
+		$this->env->get_types()->add_constants(array(
 			new PC_Obj_Constant($this->get_file(),$this->get_line(),$name,$type)
 		));
 	}
@@ -330,7 +302,7 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	 */
 	public function get_constant_type($name)
 	{
-		if(($const = $this->types->get_constant($name)) !== null)
+		if(($const = $this->env->get_types()->get_constant($name)) !== null)
 			return $const->get_type();
 		if(strcasecmp($name,'null') == 0)
 			return new PC_Obj_MultiType();
@@ -472,20 +444,6 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	}
 	
 	/**
-	 * Adds the given type and param to the potential errors we should process in the finalizer
-	 * 
-	 * @param int $type the error-type
-	 * @param array $info information about the pot-error
-	 * @param int $line if you know better than $this->get_line(), provide the line-number
-	 */
-	private function report_pot_error($type,$info,$line = 0)
-	{
-		$this->types->add_pot_errors(array(array(
-			$type,$info,$this->get_file(),$line === 0 ? $this->get_line() : $line
-		)));
-	}
-	
-	/**
 	 * Adds the given message and type to the errors
 	 * 
 	 * @param string $msg the message
@@ -494,9 +452,8 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 	 */
 	private function report_error($msg,$type,$line = 0)
 	{
-		$this->types->add_errors(array(new PC_Obj_Error(
-			new PC_Obj_Location($this->get_file(),$line === 0 ? $this->get_line() : $line),$msg,$type
-		)));
+		$loc = new PC_Obj_Location($this->get_file(),$line === 0 ? $this->get_line() : $line);
+		$this->env->get_errors()->report($loc,$msg,$type);
 	}
 	
 	public function advance($parser)

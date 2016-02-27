@@ -33,30 +33,22 @@
 final class PC_Engine_TypeFinalizer extends FWS_Object
 {
 	/**
-	 * The type-container
+	 * The environment
 	 *
-	 * @var PC_Engine_TypeContainer
+	 * @var PC_Engine_Env
 	 */
-	private $_types;
-	
-	/**
-	 * The storage-implementation
-	 *
-	 * @var PC_Engine_TypeStorage
-	 */
-	private $_storage;
+	private $env;
 	
 	/**
 	 * Constructor
 	 * 
-	 * @param PC_Engine_TypeContainer $types the type-container, containing the classes to finalize
-	 * @param PC_Engine_TypeStorage $storage the storage that handles the changes
+	 * @param PC_Engine_Env $env the environment
 	 */
-	public function __construct($types,$storage)
+	public function __construct($env)
 	{
 		parent::__construct();
-		$this->_types = $types;
-		$this->_storage = $storage;
+		
+		$this->env = $env;
 	}
 	
 	/**
@@ -66,13 +58,10 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 	 */
 	public function finalize()
 	{
-		foreach($this->_types->get_classes() as $c)
+		foreach($this->env->get_types()->get_classes() as $c)
 		{
 			/* @var $c PC_Obj_Class */
 			$this->_add_members($c,$c->get_name());
-			
-			foreach($c->get_methods() as $m)
-				$this->_check_method($m,$c->get_name());
 			
 			// add missing constructor
 			if(!$c->is_interface() && $c->get_method('__construct') === null &&
@@ -82,280 +71,9 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 				$method->set_name('__construct');
 				$method->set_visibility(PC_Obj_Visible::V_PUBLIC);
 				$c->add_method($method);
-				$this->_storage->create_function($method,$c->get_id());
+				$this->env->get_storage()->create_function($method,$c->get_id());
 			}
 		}
-		
-		foreach($this->_types->get_functions() as $func)
-			$this->_check_method($func);
-	}
-	
-	/**
-	 * Checks the method for missing PHPDoc-tags
-	 * 
-	 * @param PC_Obj_Method $method the method
-	 * @param string $class the class-name, if present
-	 */
-	private function _check_method($method,$class = '')
-	{
-		// check if its a "magic" method
-		if($class && $this->handle_magic($class,$method))
-			return;
-		
-		// don't require comments for anonymous functions
-		if($method->is_anonymous())
-			return;
-		
-		foreach($method->get_params() as $param)
-		{
-			if(!$param->has_doc())
-			{
-				$this->_types->add_errors(array(
-					new PC_Obj_Error(
-						new PC_Obj_Location($method->get_file(),$method->get_line()),
-						'The parameter "'.$param->get_name().'" ('.$param.')'
-						.' of "'.($class ? $class.'::' : '').$method->get_name().'" has no PHPDoc',
-						PC_Obj_Error::E_T_PARAM_WITHOUT_DOC
-					),
-				));
-			}
-		}
-	}
-	
-	/**
-	 * Checks if the given method is "magic". If so it adds automatically parameter-types (if not
-	 * already set).
-	 * 
-	 * @param string $classname the class-name
-	 * @param PC_Obj_Method $method the method
-	 * @return bool true if handled
-	 */
-	private function handle_magic($classname,$method)
-	{
-		// the magic-methods:
-		// public void __set ( string $name , mixed $value )
-		// public mixed __get ( string $name )
-		// public bool __isset ( string $name )
-		// public void __unset ( string $name )
-		// public mixed __call ( string $name , array $arguments )
-		// public mixed __callStatic ( string $name , array $arguments )
-		// * array __sleep( void )
-		// * void__wakeup( void )
-		// public string __toString( void )
-		// public void __invoke( ... )
-		// public static object __set_state( array $props )
-		// * void __clone( void )
-		
-		$ismagic = true;
-		$visibility = PC_Obj_Visible::V_PUBLIC;
-		$static = false;
-		$expected = null;
-		switch(strtolower($method->get_name()))
-		{
-			case '__set':
-				$expected = array(
-					new PC_Obj_Parameter('name',PC_Obj_MultiType::create_string()),
-					new PC_Obj_Parameter('value',new PC_Obj_MultiType())
-				);
-				break;
-			case '__isset':
-			case '__unset':
-			case '__get':
-				$expected = array(
-					new PC_Obj_Parameter('name',PC_Obj_MultiType::create_string())
-				);
-				break;
-			
-			case '__call':
-			case '__callstatic':
-				$expected = array(
-					new PC_Obj_Parameter('name',PC_Obj_MultiType::create_string()),
-					new PC_Obj_Parameter('arguments',PC_Obj_MultiType::create_array()),
-				);
-				break;
-				
-			case '__tostring':
-				$expected = array();
-				break;
-				
-			case '__sleep':
-			case '__wakeup':
-			case '__clone':
-				$visibility = null;	// may be private or protected
-				$expected = array();
-				break;
-				
-			case '__invoke':
-				$static = true;
-				break;
-				
-			case '__set_state':
-				$expected = array(
-					new PC_Obj_Parameter('props',PC_Obj_MultiType::create_array())
-				);
-				break;
-				
-			default:
-				$ismagic = false;
-				break;
-		}
-		
-		if(!$ismagic)
-			return false;
-		
-		if($visibility !== null && $method->get_visibility() != $visibility)
-		{
-			$this->report_error(
-				$method,
-				'The magic method "#'.$classname.'#::'.$method->get_name().'" should be public',
-				PC_Obj_Error::E_T_MAGIC_NOT_PUBLIC
-			);
-		}
-		
-		if($static && !$method->is_static())
-		{
-			$this->report_error(
-				$method,
-				'The magic method "#'.$classname.'#::'.$method->get_name().'" should be static',
-				PC_Obj_Error::E_T_MAGIC_NOT_STATIC
-			);
-		}
-		else if(!$static && $method->is_static())
-		{
-			$this->report_error(
-				$method,
-				'The magic method "#'.$classname.'#::'.$method->get_name().'" should not be static',
-				PC_Obj_Error::E_T_MAGIC_IS_STATIC
-			);
-		}
-		
-		if($expected !== null)
-		{
-			$changed = false;
-			if($this->check_params($classname,$method,$expected,$method->get_params()))
-			{
-				// set parameter-descriptions
-				$i = 0;
-				foreach($method->get_params() as $param)
-				{
-					$param->set_mtype($expected[$i++]->get_mtype());
-					$param->set_has_doc(true);
-					$changed = true;
-				}
-			}
-		
-			$return = new PC_Obj_MultiType();
-			switch(strtolower($method->get_name()))
-			{
-				case '__set':
-				case '__unset':
-				case '__wakeup':
-				case '__clone':
-					$return = PC_Obj_MultiType::create_void();
-					break;
-				case '__set_state':
-					$return = PC_Obj_MultiType::create_object();
-					break;
-				case '__isset':
-					$return = PC_Obj_MultiType::create_bool();
-					break;
-				case '__sleep':
-					$return = PC_Obj_MultiType::create_array();
-					break;
-				case '__tostring':
-					$return = PC_Obj_MultiType::create_string();
-					break;
-			}
-			
-			if($method->has_return_doc() && !$method->get_return_type()->equals($return))
-			{
-				// its ok to specify a more specific return-value if the expected one is "mixed"
-				if(!$return->is_unknown())
-				{
-					$this->report_error(
-						$method,
-						'The return-type of the magic-method "#'.$classname.'#::'.$method->get_name().'" is invalid '
-						.'(expected="'.$return.'", found="'.$method->get_return_type().'")',
-						PC_Obj_Error::E_T_MAGIC_METHOD_RET_INVALID
-					);
-				}
-			}
-			
-			if($return !== null && !$method->has_return_doc())
-			{
-				$method->set_return_type($return);
-				$method->set_has_return_doc(true);
-				$changed = true;
-			}
-			
-			if($changed)
-				$this->_storage->update_function($method,$method->get_class());
-		}
-		return true;
-	}
-	
-	/**
-	 * Checks wether the expected parameters match the actual
-	 * 
-	 * @param string $classname the class-name
-	 * @param PC_Obj_Method $method the method
-	 * @param array $expected an array of the expected parameters
-	 * @param array $actual an array of the actual parameters
-	 * @return bool true if are equal, false if they differ
-	 */
-	private function check_params($classname,$method,$expected,$actual)
-	{
-		if(!$this->compare_params($expected,$actual))
-		{
-			$this->report_error(
-				$method,
-				'The parameters of the magic-method "#'.$classname.'#::'.$method->get_name().'" are invalid '
-				.'(expected="'.implode(',',$expected).'", found="'.implode(',',$actual).'")',
-				PC_Obj_Error::E_T_MAGIC_METHOD_PARAMS_INVALID
-			);
-			return false;
-		}
-		return true;
-	}
-	
-	/**
-	 * Compares the given parameters
-	 * 
-	 * @param array $expected an array of the expected parameters
-	 * @param array $actual an array of the actual parameters
-	 * @return bool true if are equal, false if they differ
-	 */
-	private function compare_params($expected,$actual)
-	{
-		$ecount = count($expected);
-		if($ecount != count($actual))
-			return false;
-		$exp = array_values($expected);
-		$act = array_values($actual);
-		for($i = 0; $i < $ecount; $i++)
-		{
-			// just check, if we have a parameter-description via PHPDoc
-			// and if the expected is not unknown. since, if it is unknown (=mixed), the user may
-			// specify something more specific
-			if($exp[$i]->has_doc() && !$exp[$i]->get_mtype()->is_unknown() &&
-					!$exp[$i]->get_mtype()->equals($act[$i]))
-				return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Reports the given error
-	 * 
-	 * @param PC_Obj_Location $locsrc an object from which the location will be copied
-	 * @param string $msg the error-message
-	 * @param int $type the error-type
-	 */
-	private function report_error($locsrc,$msg,$type)
-	{
-		$this->_types->add_errors(array(
-			new PC_Obj_Error(new PC_Obj_Location($locsrc->get_file(),$locsrc->get_line()),$msg,$type)
-		));
 	}
 	
 	/**
@@ -368,7 +86,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 	 */
 	private function _add_members($data,$class,$overwrite = true)
 	{
-		$cobj = $this->_types->get_class($class);
+		$cobj = $this->env->get_types()->get_class($class);
 		if($cobj !== null)
 		{
 			if($class != $data->get_name())
@@ -417,7 +135,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 							}
 							
 							if($changed)
-								$this->_storage->update_function($f,$data->get_id());
+								$this->env->get_storage()->update_function($f,$data->get_id());
 						}
 						else
 						{
@@ -425,7 +143,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 							// change constructor-name, if it is an old-style-one
 							if($function->get_name() == $cobj->get_name())
 								$clone->set_name($data->get_name());
-							$clone->set_id($this->_storage->create_function($clone,$data->get_id()));
+							$clone->set_id($this->env->get_storage()->create_function($clone,$data->get_id()));
 							$data->add_method($clone);
 						}
 					}
@@ -438,7 +156,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 					{
 						$clone = clone $field;
 						$data->add_field($clone);
-						$this->_storage->create_field($clone,$data->get_id());
+						$this->env->get_storage()->create_field($clone,$data->get_id());
 					}
 				}
 				
@@ -447,7 +165,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 				{
 					$clone = clone $const;
 					$data->add_constant($clone);
-					$this->_storage->create_constant($clone,$data->get_id());
+					$this->env->get_storage()->create_constant($clone,$data->get_id());
 				}
 			}
 			

@@ -60,6 +60,9 @@ class PC_Action_edit_project_save extends FWS_Action_Base
 			$start_year = $input->get_var('start_year','post',FWS_Input::INTEGER);
 			$start = mktime(0,0,0,$start_month,$start_day,$start_year);
 			
+			$report_mixed = $input->isset_var('report_mixed','post');
+			$report_unknown = $input->isset_var('report_unknown','post');
+			
 			$edit_type = $input->get_var('edit_type','post');
 			$edit_name = $input->get_var('edit_name','post');
 			$edit_version = $input->get_var('edit_version','post');
@@ -70,6 +73,8 @@ class PC_Action_edit_project_save extends FWS_Action_Base
 			
 			$proj->set_name($name);
 			$proj->set_created($start);
+			$proj->set_report_mixed($report_mixed);
+			$proj->set_report_unknown($report_unknown);
 			$req = $proj->get_req();
 			foreach($req as &$r)
 			{

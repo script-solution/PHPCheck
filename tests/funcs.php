@@ -67,7 +67,7 @@ abstract class myc {
 }
 ?>';
 	
-		list($functions,$classes,,$calls,,) = $this->analyze($code);
+		list($functions,$classes,,$calls,) = $this->analyze($code);
 		
 		$func = $functions['a'];
 		/* @var $func PC_Obj_Method */
@@ -149,7 +149,7 @@ function e() {
 }
 ?>';
 		
-		list(,,$vars,$calls,,) = $this->analyze($code);
+		list(,,$vars,$calls,) = $this->analyze($code);
 		
 		self::assert_equals('f3(integer=3)',(string)$calls[0]->get_call(null,false));
 		self::assert_equals('f2(integer=2)',(string)$calls[1]->get_call(null,false));
@@ -192,7 +192,7 @@ class A {
 }
 ?>';
 		
-		list($functions,$classes,$vars,$calls,$errors,) = $this->analyze($code);
+		list($functions,$classes,$vars,$calls,$errors) = $this->analyze($code);
 
 		self::assert_equals(0,count($errors));
 		

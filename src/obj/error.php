@@ -33,39 +33,37 @@ final class PC_Obj_Error extends FWS_Object
 {
 	const R_TYPESCANNER													= 0;
 	const R_STMTSCANNER													= 1;
-	const R_ANALYZER														= 2;
 	
-	const E_A_METHOD_MISSING										= 0;
-	const E_A_ABSTRACT_CLASS_INSTANTIATION			= 1;
-	const E_A_STATIC_CALL												= 2;
-	const E_A_NONSTATIC_CALL										= 3;
-	const E_A_CLASS_MISSING											= 4;
-	const E_A_CLASS_UNKNOWN											= 5;
-	const E_A_FUNCTION_MISSING									= 6;
-	const E_A_WRONG_ARGUMENT_COUNT							= 7;
-	const E_A_WRONG_ARGUMENT_TYPE								= 8;
-	const E_A_FINAL_CLASS_INHERITANCE						= 9;
-	const E_A_CLASS_NOT_ABSTRACT								= 10;
-	const E_A_INTERFACE_MISSING									= 11;
-	const E_A_IF_IS_NO_IF												= 12;
-	const E_A_CALLABLE_INVALID									= 13;
-	
-	const E_S_MIXED_RET_AND_NO_RET							= 30;
-	const E_S_RETURNS_DIFFER_FROM_SPEC					= 31;
-	const E_S_RET_SPEC_BUT_NO_RET								= 32;
-	const E_S_RET_BUT_NO_RET_SPEC								= 33;
-	const E_S_UNDEFINED_VAR											= 34;
-	const E_S_NOT_EXISTING_FIELD								= 35;
-	const E_S_DOC_WITHOUT_THROW									= 36;
-	const E_S_THROW_NOT_IN_DOC									= 37;
-	const E_S_THROW_INVALID											= 38;
-	const E_S_CONSTR_RETURN											= 39;
-	const E_S_VOID_ASSIGN												= 40;
-	const E_S_METHOD_VISIBILITY									= 41;
-	const E_S_VAR_UNUSED												= 42;
-	const E_S_PARAM_UNUSED											= 43;
-	const E_S_REQUIRES_NEWER										= 44;
-	const E_S_REQUIRES_OLDER										= 45;
+	const E_S_METHOD_MISSING										= 0;
+	const E_S_ABSTRACT_CLASS_INSTANTIATION			= 1;
+	const E_S_STATIC_CALL												= 2;
+	const E_S_NONSTATIC_CALL										= 3;
+	const E_S_CLASS_MISSING											= 4;
+	const E_S_CLASS_UNKNOWN											= 5;
+	const E_S_FUNCTION_MISSING									= 6;
+	const E_S_WRONG_ARGUMENT_COUNT							= 7;
+	const E_S_WRONG_ARGUMENT_TYPE								= 8;
+	const E_S_FINAL_CLASS_INHERITANCE						= 9;
+	const E_S_CLASS_NOT_ABSTRACT								= 10;
+	const E_S_INTERFACE_MISSING									= 11;
+	const E_S_IF_IS_NO_IF												= 12;
+	const E_S_CALLABLE_INVALID									= 13;
+	const E_S_MIXED_RET_AND_NO_RET							= 14;
+	const E_S_RETURNS_DIFFER_FROM_SPEC					= 15;
+	const E_S_RET_SPEC_BUT_NO_RET								= 16;
+	const E_S_RET_BUT_NO_RET_SPEC								= 17;
+	const E_S_UNDEFINED_VAR											= 18;
+	const E_S_NOT_EXISTING_FIELD								= 19;
+	const E_S_DOC_WITHOUT_THROW									= 20;
+	const E_S_THROW_NOT_IN_DOC									= 21;
+	const E_S_THROW_INVALID											= 22;
+	const E_S_CONSTR_RETURN											= 23;
+	const E_S_VOID_ASSIGN												= 24;
+	const E_S_METHOD_VISIBILITY									= 25;
+	const E_S_VAR_UNUSED												= 26;
+	const E_S_PARAM_UNUSED											= 27;
+	const E_S_REQUIRES_NEWER										= 28;
+	const E_S_REQUIRES_OLDER										= 29;
 	
 	const E_T_MAGIC_IS_STATIC										= 50;
 	const E_T_DOC_WITHOUT_PARAM									= 51;
@@ -95,21 +93,20 @@ final class PC_Obj_Error extends FWS_Object
 	public static function get_types()
 	{
 		static $types = array(
-			self::E_A_METHOD_MISSING =>									'Method missing',
-			self::E_A_ABSTRACT_CLASS_INSTANTIATION =>		'Abstract class instantiation',
-			self::E_A_STATIC_CALL => 										'Static call',
-			self::E_A_NONSTATIC_CALL =>									'Nonstatic call',
-			self::E_A_CLASS_MISSING =>									'Class missing',
-			self::E_A_CLASS_UNKNOWN =>									'Class unknown',
-			self::E_A_FUNCTION_MISSING =>								'Function missing',
-			self::E_A_WRONG_ARGUMENT_COUNT =>						'Wrong arg count',
-			self::E_A_WRONG_ARGUMENT_TYPE =>						'Wrong arg type',
-			self::E_A_FINAL_CLASS_INHERITANCE =>				'Final class inheritance',
-			self::E_A_CLASS_NOT_ABSTRACT =>							'Class not abstract',
-			self::E_A_INTERFACE_MISSING =>							'Interface missing',
-			self::E_A_IF_IS_NO_IF =>										'Implemented class',
-			self::E_A_CALLABLE_INVALID =>								'Callable is invalid',
-			
+			self::E_S_METHOD_MISSING =>									'Method missing',
+			self::E_S_ABSTRACT_CLASS_INSTANTIATION =>		'Abstract class instantiation',
+			self::E_S_STATIC_CALL => 										'Static call',
+			self::E_S_NONSTATIC_CALL =>									'Nonstatic call',
+			self::E_S_CLASS_MISSING =>									'Class missing',
+			self::E_S_CLASS_UNKNOWN =>									'Class unknown',
+			self::E_S_FUNCTION_MISSING =>								'Function missing',
+			self::E_S_WRONG_ARGUMENT_COUNT =>						'Wrong arg count',
+			self::E_S_WRONG_ARGUMENT_TYPE =>						'Wrong arg type',
+			self::E_S_FINAL_CLASS_INHERITANCE =>				'Final class inheritance',
+			self::E_S_CLASS_NOT_ABSTRACT =>							'Class not abstract',
+			self::E_S_INTERFACE_MISSING =>							'Interface missing',
+			self::E_S_IF_IS_NO_IF =>										'Implemented class',
+			self::E_S_CALLABLE_INVALID =>								'Callable is invalid',
 			self::E_S_MIXED_RET_AND_NO_RET =>						'Mixed return',
 			self::E_S_RETURNS_DIFFER_FROM_SPEC =>				'Returns differ from spec',
 			self::E_S_RET_SPEC_BUT_NO_RET =>						'Return spec but no return',
@@ -173,23 +170,21 @@ final class PC_Obj_Error extends FWS_Object
 				self::E_S_PARAM_UNUSED,
 				self::E_S_REQUIRES_NEWER,
 				self::E_S_REQUIRES_OLDER,
-			),
-			self::R_ANALYZER => array(
-				self::E_A_METHOD_MISSING,
-				self::E_A_ABSTRACT_CLASS_INSTANTIATION,
-				self::E_A_STATIC_CALL,
-				self::E_A_NONSTATIC_CALL,
-				self::E_A_CLASS_MISSING,
-				self::E_A_CLASS_UNKNOWN,
-				self::E_A_FUNCTION_MISSING,
-				self::E_A_WRONG_ARGUMENT_COUNT,
-				self::E_A_WRONG_ARGUMENT_TYPE,
-				self::E_A_FINAL_CLASS_INHERITANCE,
-				self::E_A_CLASS_NOT_ABSTRACT,
-				self::E_A_CLASS_MISSING,
-				self::E_A_INTERFACE_MISSING,
-				self::E_A_IF_IS_NO_IF,
-				self::E_A_CALLABLE_INVALID,
+				self::E_S_METHOD_MISSING,
+				self::E_S_ABSTRACT_CLASS_INSTANTIATION,
+				self::E_S_STATIC_CALL,
+				self::E_S_NONSTATIC_CALL,
+				self::E_S_CLASS_MISSING,
+				self::E_S_CLASS_UNKNOWN,
+				self::E_S_FUNCTION_MISSING,
+				self::E_S_WRONG_ARGUMENT_COUNT,
+				self::E_S_WRONG_ARGUMENT_TYPE,
+				self::E_S_FINAL_CLASS_INHERITANCE,
+				self::E_S_CLASS_NOT_ABSTRACT,
+				self::E_S_CLASS_MISSING,
+				self::E_S_INTERFACE_MISSING,
+				self::E_S_IF_IS_NO_IF,
+				self::E_S_CALLABLE_INVALID,
 			)
 		);
 		return $rep2types[$reporter];

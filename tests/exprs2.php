@@ -121,7 +121,7 @@ $bg = "f" ?: "g";
 	
 	public function test_exprs2()
 	{
-		list(,,$vars,,,) = $this->analyze(self::$code);
+		list(,,$vars,,) = $this->analyze(self::$code);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['a']->get_type());
