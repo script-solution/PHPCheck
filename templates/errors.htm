@@ -60,8 +60,8 @@
 	{else}
 	{loop errors as err}
 	<tr>
-		<td class="pc_main">{err:type}</td>
-		<td class="pc_main">
+		<td class="pc_main" width="15%">{err:type}</td>
+		<td class="pc_main" width="60%">
 		<a href="{err:fileurl}"><img src="images/goto.gif" alt="-&gt;" /></a> {err:message}
 		<div style="float: right;">
 			<a href="#" onclick="javascript:toggleCode('{get_code_url}','error','{err:id}');">
@@ -70,7 +70,7 @@
 		</div>
 		<div id="error_area_{err:id}" class="pc_code" style="display: none;"></div>
 		</td>
-		<td class="pc_main">{err:file}, line {err:line}</td>
+		<td class="pc_main" width="25%">{err:file}, line {err:line}</td>
 	</tr>
 	{endloop}
 	{endif}
