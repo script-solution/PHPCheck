@@ -87,10 +87,10 @@ class H {
 			new PC_Obj_Parameter('value',new PC_Obj_MultiType())
 		);
 		
-		self::assertParamsEqual($params,$classes['A']->get_method('__set')->get_params());
+		self::assertParamsEqual($params,$classes['a']->get_method('__set')->get_params());
 		// in B the param-count is wrong, therefore no correction
-		self::assertParamsEqual($params,$classes['C']->get_method('__set')->get_params());
-		self::assertParamsEqual($params,$classes['D']->get_method('__set')->get_params());
+		self::assertParamsEqual($params,$classes['c']->get_method('__set')->get_params());
+		self::assertParamsEqual($params,$classes['d']->get_method('__set')->get_params());
 		
 		self::assert_equals(4,count($errors));
 		
@@ -146,11 +146,11 @@ class B {
 
 		self::assert_equals(2,count($errors));
 		
-		$m = $classes['A']->get_method('__get');
+		$m = $classes['a']->get_method('__get');
 		self::assertParamsEqual($params,$m->get_params());
 		self::assert_equals((string)PC_Obj_MultiType::create_void(),(string)$m->get_return_type());
 		
-		$m = $classes['B']->get_method('__get');
+		$m = $classes['b']->get_method('__get');
 		self::assertParamsEqual($params,$m->get_params());
 		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$m->get_return_type());
 		
@@ -189,11 +189,11 @@ class B {
 			new PC_Obj_Parameter('name',PC_Obj_MultiType::create_string())
 		);
 		
-		$m = $classes['A']->get_method('__isset');
+		$m = $classes['a']->get_method('__isset');
 		self::assertParamsEqual($params,$m->get_params());
 		self::assert_equals((string)PC_Obj_MultiType::create_bool(),(string)$m->get_return_type());
 		
-		$m = $classes['B']->get_method('__isset');
+		$m = $classes['b']->get_method('__isset');
 		self::assertParamsEqual($params,$m->get_params());
 		
 		self::assert_equals(3,count($errors));
@@ -241,19 +241,19 @@ class D {
 		list(,$classes,,,$errors) = $this->analyze($code);
 		$params = array();
 		
-		$m = $classes['A']->get_method('__sleep');
+		$m = $classes['a']->get_method('__sleep');
 		self::assertParamsEqual($params,$m->get_params());
 		self::assert_equals((string)PC_Obj_MultiType::create_array(),(string)$m->get_return_type());
 		
-		$m = $classes['B']->get_method('__sleep');
+		$m = $classes['b']->get_method('__sleep');
 		self::assertParamsEqual($params,$m->get_params());
 		self::assert_equals((string)PC_Obj_MultiType::create_array(),(string)$m->get_return_type());
 		
-		$m = $classes['C']->get_method('__sleep');
+		$m = $classes['c']->get_method('__sleep');
 		self::assertParamsEqual($params,$m->get_params());
 		self::assert_equals((string)PC_Obj_MultiType::create_array(),(string)$m->get_return_type());
 		
-		$m = $classes['D']->get_method('__sleep');
+		$m = $classes['d']->get_method('__sleep');
 		self::assert_equals((string)PC_Obj_MultiType::create_array(),(string)$m->get_return_type());
 		
 		self::assert_equals(5,count($errors));
@@ -311,11 +311,11 @@ class B {
 			new PC_Obj_Parameter('props',PC_Obj_MultiType::create_array())
 		);
 		
-		$m = $classes['A']->get_method('__set_state');
+		$m = $classes['a']->get_method('__set_state');
 		self::assertParamsEqual($params,$m->get_params());
 		self::assert_equals((string)PC_Obj_MultiType::create_object(),(string)$m->get_return_type());
 		
-		$m = $classes['B']->get_method('__set_state');
+		$m = $classes['b']->get_method('__set_state');
 		self::assertParamsEqual($params,$m->get_params());
 		self::assert_equals((string)PC_Obj_MultiType::create_object(),(string)$m->get_return_type());
 		

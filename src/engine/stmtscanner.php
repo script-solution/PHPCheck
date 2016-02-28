@@ -924,13 +924,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if(!($classname instanceof PC_Obj_MultiType))
 			return $this->handle_error('$classname is invalid');
 		
-		$cname = $classname->get_string();
-		if($cname === null)
-			return $this->create_unknown();
-		if($cname == 'self')
-			$cname = $this->scope->get_name_of(T_CLASS_C);
-		
-		$class = $this->env->get_types()->get_class($cname);
+		$class = $this->get_class_for_access($classname);
 		if($class === null)
 			return $this->create_unknown();
 		$const = $class->get_constant($constname);
@@ -951,16 +945,38 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if(!($class instanceof PC_Obj_MultiType))
 			return $this->create_var('',$this->handle_error('$class is invalid'));
 		
-		$cname = $class->get_string();
-		if($cname == 'self')
-			$cname = $this->scope->get_name_of(T_CLASS_C);
-		$classobj = $this->env->get_types()->get_class($cname);
+		$classobj = $this->get_class_for_access($class);
 		if($classobj === null)
 			return $this->create_var();
 		$fieldobj = $classobj->get_field($field);
 		if($fieldobj === null)
 			return $this->create_var();
 		return $this->create_var('',$fieldobj->get_type());
+	}
+	
+	/**
+	 * Returns the class object for the given class name, which can also be 'self' or 'parent'.
+	 *
+	 * @param string $class the class name
+	 * @return PC_Obj_Class the class or null
+	 */
+	private function get_class_for_access($class)
+	{
+		$cname = $class->get_string();
+		if($cname === null)
+			return null;
+		if(strcasecmp($cname,'self') == 0)
+			$cname = $this->scope->get_name_of(T_CLASS_C);
+		else if(strcasecmp($cname,'parent') == 0)
+		{
+			$cname = $this->scope->get_name_of(T_CLASS_C);
+			$class = $this->env->get_types()->get_class($cname);
+			if($class === null)
+				return null;
+			$cname = $class->get_super_class();
+		}
+		
+		return $this->env->get_types()->get_class($cname);
 	}
 	
 	/**

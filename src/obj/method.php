@@ -377,7 +377,12 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	 */
 	public function contains_throw($name)
 	{
-		return isset($this->throws[$name]);
+		foreach(array_keys($this->throws) as $t)
+		{
+			if(strcasecmp($t,$name) == 0)
+				return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -388,7 +393,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	 */
 	public function add_throw($name,$type)
 	{
-		if(!isset($this->throws[$name]))
+		if(!$this->contains_throw($name))
 			$this->throws[$name] = $type;
 	}
 	

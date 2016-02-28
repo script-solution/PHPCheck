@@ -340,4 +340,22 @@ function c($a = "") {
 		self::assert_equals(PC_Obj_Error::E_T_PARAM_DIFFERS_FROM_DOC,$error->get_type());
 		self::assert_equals('PHPDoc (integer) does not match the parameter $y (&unknown)',$error->get_msg());
 	}
+	
+	public function test_case()
+	{
+		$code = '<?php
+function A() {}
+function b() {}
+
+a();
+B();
+?>';
+		
+		list($funcs,,,,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
+		
+		self::assert_equals('function A(): void',$funcs['a']);
+		self::assert_equals('function b(): void',$funcs['b']);
+	}
 }

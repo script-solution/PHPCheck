@@ -203,6 +203,20 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	}
 	
 	/**
+	 * @param string $interface the name
+	 * @return boolean true if this class implements the given interface
+	 */
+	public function is_implementing($interface)
+	{
+		foreach($this->interfaces as $if)
+		{
+			if(strcasecmp($if,$interface) == 0)
+				return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * @return array a numeric array with the interface-names that are implemented
 	 */
 	public function get_interfaces()
@@ -228,7 +242,8 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	public function get_constant($name)
 	{
 		$this->load_constants();
-		return isset($this->constants[$name]) ? $this->constants[$name] : null;
+		$lname = strtolower($name);
+		return isset($this->constants[$lname]) ? $this->constants[$lname] : null;
 	}
 	
 	/**
@@ -242,7 +257,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 			FWS_Helper::def_error('instance','const','PC_Obj_Constant',$const);
 		
 		$this->load_constants();
-		$this->constants[$const->get_name()] = $const;
+		$this->constants[strtolower($const->get_name())] = $const;
 	}
 	
 	/**
@@ -254,7 +269,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 		{
 			$this->constants = array();
 			foreach(PC_DAO::get_constants()->get_list($this->id,'','',$this->pid) as $const)
-				$this->constants[$const->get_name()] = $const;
+				$this->constants[strtolower($const->get_name())] = $const;
 		}
 	}
 	
@@ -276,7 +291,8 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	public function get_field($name)
 	{
 		$this->load_fields();
-		return isset($this->fields[$name]) ? $this->fields[$name] : null;
+		$lname = strtolower($name);
+		return isset($this->fields[$lname]) ? $this->fields[$lname] : null;
 	}
 	
 	/**
@@ -290,7 +306,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 			FWS_Helper::def_error('instance','field','PC_Obj_Field',$field);
 		
 		$this->load_fields();
-		$this->fields[$field->get_name()] = $field;
+		$this->fields[strtolower($field->get_name())] = $field;
 	}
 	
 	/**
@@ -302,7 +318,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 		{
 			$this->fields = array();
 			foreach(PC_DAO::get_classfields()->get_all($this->id,$this->pid) as $field)
-				$this->fields[$field->get_name()] = $field;
+				$this->fields[strtolower($field->get_name())] = $field;
 		}
 	}
 	
@@ -324,7 +340,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	public function contains_method($name)
 	{
 		$this->load_methods();
-		return isset($this->methods[$name]);
+		return isset($this->methods[strtolower($name)]);
 	}
 	
 	/**
@@ -336,9 +352,10 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	public function get_method($name)
 	{
 		$this->load_methods();
-		if(!isset($this->methods[$name]))
+		$lname = strtolower($name);
+		if(!isset($this->methods[$lname]))
 			return null;
-		return $this->methods[$name];
+		return $this->methods[$lname];
 	}
 	
 	/**
@@ -352,7 +369,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 			FWS_Helper::def_error('instance','method','PC_Obj_Method',$method);
 		
 		$this->load_methods();
-		$this->methods[$method->get_name()] = $method;
+		$this->methods[strtolower($method->get_name())] = $method;
 	}
 	
 	/**
@@ -364,7 +381,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 		{
 			$this->methods = array();
 			foreach(PC_DAO::get_functions()->get_list($this->id,0,0,'','',$this->pid) as $method)
-				$this->methods[$method->get_name()] = $method;
+				$this->methods[strtolower($method->get_name())] = $method;
 		}
 	}
 	

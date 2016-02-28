@@ -130,8 +130,8 @@ $bc = (double)1;
 $bd = (string)12;
 $be = (array)4;
 $bf = (object)5;
-$bg = (bool)1234;
-$bh = (unset)1;
+$bg = (BOOL)1234;
+$bh = (UNset)1;
 
 $ca = isset($foo);
 $cb = empty($bar);

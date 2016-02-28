@@ -509,4 +509,55 @@ d(new E,new B,new E);
 
 		self::assert_equals(0,count($errors));
 	}
+	
+	public function test_case()
+	{
+		$code = '<?php
+class B {
+	const XYZ = 3;
+	protected $AB = 1;
+}
+interface i {}
+class A extends b implements I {
+	const ABC = 2;
+	
+	private static $x = 4;
+	PRIVATE $vAr = 1;
+	
+	Public function __CONSTRuct() {}
+	
+	PUBLIC STATIC function FOO() {
+		$a = SELF::abc + sElf::$x + PARENT::XYZ + 1;
+	}
+	/**
+	 * @return b
+	 * @throws B
+	 */
+	public function bar() {
+		$a = parent::$AB;
+		throw new b();
+		
+		return new b();
+	}
+}
+
+$a = new A();
+?>';
+		
+		list(,$classes,$vars,,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
+		
+		$a = $classes['a'];
+		self::assert_true($a->is_implementing('I'));
+		
+		self::assert_equals('const ABC[integer=2]',$a->get_constant('abc'));
+		self::assert_equals('private vAr[integer=1]',$a->get_field('var'));
+		self::assert_equals('public static function FOO(): void',$a->get_method('foo'));
+		self::assert_equals('public function bar(): b throws B',$a->get_method('bar'));
+		self::assert_equals('public function __CONSTRuct(): void',$a->get_method('__construct'));
+		
+		self::assert_equals('A::FOO[a = integer=10]',$vars['A::FOO']['a']);
+		self::assert_equals('A::bar[a = integer=1]',$vars['A::bar']['a']);
+	}
 }

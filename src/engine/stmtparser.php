@@ -6105,7 +6105,7 @@ static public $yy_action = array(
 #line 6110 "src/engine/stmtparser.php"
 #line 524 "src/engine/stmtparser.y"
     function yy_r262(){
-	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
+	$this->_retvalue = strtolower($this->yystack[$this->yyidx + 0]->minor);
     }
 #line 6115 "src/engine/stmtparser.php"
 #line 528 "src/engine/stmtparser.y"

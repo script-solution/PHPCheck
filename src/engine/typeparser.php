@@ -5971,7 +5971,7 @@ static public $yy_action = array(
 #line 5976 "src/engine/typeparser.php"
 #line 497 "src/engine/typeparser.y"
     function yy_r260(){
-	$this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
+	$this->_retvalue = strtolower($this->yystack[$this->yyidx + 0]->minor);
     }
 #line 5981 "src/engine/typeparser.php"
 #line 501 "src/engine/typeparser.y"

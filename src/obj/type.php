@@ -193,7 +193,7 @@ final class PC_Obj_Type extends FWS_Object
 		if($o->get_type() != $this->get_type())
 			return false;
 		
-		return $o->get_class() == $this->get_class();
+		return strcasecmp($o->get_class(),$this->get_class()) == 0;
 	}
 	
 	/**

@@ -84,7 +84,7 @@ class PC_Analyzer_Throws extends PC_Analyzer
 				{
 					foreach($mtype->get_types() as $type)
 					{
-						if($type->get_class() == $tclass)
+						if(strcasecmp($type->get_class(),$tclass) == 0)
 						{
 							$found = true;
 							break;

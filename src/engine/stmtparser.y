@@ -522,7 +522,7 @@ non_empty_member_modifiers(A) ::= non_empty_member_modifiers(mods) member_modifi
 }
 
 member_modifier(A) ::= T_PUBLIC|T_PROTECTED|T_PRIVATE|T_STATIC|T_ABSTRACT|T_FINAL(mod) . {
-	A = mod;
+	A = strtolower(mod);
 }
 
 property_list(A) ::= property_list(list) COMMA property(p) . { A = list; A[] = p; }

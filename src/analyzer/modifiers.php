@@ -62,7 +62,7 @@ class PC_Analyzer_Modifiers extends PC_Analyzer
 			if($cur_class)
 			{
 				// the owner is not restricted in any way
-				if($cur_class == $call->get_class())
+				if(strcasecmp($cur_class,$call->get_class()) == 0)
 					return;
 				
 				// calling a protected method from a subclass is ok as well
@@ -96,7 +96,7 @@ class PC_Analyzer_Modifiers extends PC_Analyzer
 		$cobj = $this->env->get_types()->get_class($class);
 		if(!$cobj)
 			return false;
-		if($cobj->get_super_class() == $super)
+		if(strcasecmp($cobj->get_super_class(),$super) == 0)
 			return true;
 		return $this->is_subclass_of($cobj->get_super_class(),$super);
 	}

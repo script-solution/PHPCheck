@@ -326,8 +326,8 @@ class PC_Analyzer_Calls extends PC_Analyzer
 		$isif = $class->is_interface();
 		foreach($this->env->get_types()->get_classes() as $sub)
 		{
-			if($sub && ((!$isif && $sub->get_super_class() == $cname) ||
-				($isif && in_array($cname,$sub->get_interfaces()))))
+			if($sub && ((!$isif && strcasecmp($sub->get_super_class(),$cname) == 0) ||
+				($isif && $sub->is_implementing($cname))))
 			{
 				if($sub->contains_method($name))
 					return true;

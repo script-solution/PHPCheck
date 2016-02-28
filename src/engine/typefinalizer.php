@@ -87,7 +87,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 		$cobj = $this->env->get_types()->get_class($class);
 		if($cobj !== null)
 		{
-			if($class != $data->get_name())
+			if(strcasecmp($class,$data->get_name()) != 0)
 			{
 				// methods
 				foreach($cobj->get_methods() as $function)
@@ -95,7 +95,8 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 					if($function->get_visibility() != PC_Obj_Visible::V_PRIVATE)
 					{
 						// don't inherit a constructor if the class has a old-style-one
-						if($function->get_name() == '__construct' && $data->get_method($data->get_name()) !== null)
+						if(strcasecmp($function->get_name(),'__construct') == 0 &&
+							$data->get_method($data->get_name()) !== null)
 							continue;
 						
 						// if we don't want to overwrite the methods and the method is already there
@@ -139,7 +140,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 						{
 							$clone = clone $function;
 							// change constructor-name, if it is an old-style-one
-							if($function->get_name() == $cobj->get_name())
+							if(strcasecmp($function->get_name(),$cobj->get_name()) == 0)
 								$clone->set_name($data->get_name());
 							$clone->set_id($this->env->get_storage()->create_function($clone,$data->get_id()));
 							$data->add_method($clone);
@@ -169,11 +170,11 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 			
 			// protect ourself from recursion here. in fact, Iterator implements itself, so that this is
 			// actually necessary.
-			if($class != $cobj->get_super_class())
+			if(strcasecmp($class,$cobj->get_super_class()) != 0)
 				$this->add_members($data,$cobj->get_super_class(),false);
 			foreach($cobj->get_interfaces() as $interface)
 			{
-				if($class != $interface)
+				if(strcasecmp($class,$interface) != 0)
 					$this->add_members($data,$interface,false);
 			}
 		}
