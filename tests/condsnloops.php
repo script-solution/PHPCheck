@@ -86,7 +86,9 @@ else
 // that its still an integer with value 1
 ?>';
 		
-		list(,,$vars,$calls,) = $this->analyze($code);
+		list(,,$vars,$calls,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
@@ -151,7 +153,9 @@ while(1);
 // $f wasnt known before, therefore unknown.
 ?>';
 		
-		list(,,$vars,$calls,) = $this->analyze($code);
+		list(,,$vars,$calls,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
@@ -169,6 +173,9 @@ while(1);
 	public function test_nesting()
 	{
 		$code = '<?php
+/** @param mixed $a */
+function func($a) {}
+
 $a = 0;
 while(true)
 {
@@ -233,15 +240,15 @@ if($_)
 			if($_)
 			{
 				$e = true;
-				func1($e);
+				func($e);
 			}
-			func2($e);
+			func($e);
 		}
-		func3($e);
+		func($e);
 	}
-	func4($e);
+	func($e);
 }
-func5($e);
+func($e);
 // $e is an int, string, float or bool. note that we even know the value except for the int
 
 if($_)
@@ -254,15 +261,17 @@ if($_)
 		else
 			$f = 4;
 		// here we know that f is an int
-		func6($f);
+		func($f);
 	}
 	// here we still know that because $f was assigned in this block before
-	func7($f);
+	func($f);
 }
 // here we dont know that anymore since it didnt exist before
 ?>';
 		
-		list(,,$vars,$calls,) = $this->analyze($code);
+		list(,,$vars,$calls,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_int(),(string)$global['a']->get_type());
@@ -287,31 +296,31 @@ if($_)
 		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['f']->get_type());
 		
 		self::assert_equals(
-			'func1(bool=1)',
+			'func(bool=1)',
 			(string)$calls[0]->get_call(null,false)
 		);
 		self::assert_equals(
-			'func2(bool=1 or string=str)',
+			'func(bool=1 or string=str)',
 			(string)$calls[1]->get_call(null,false)
 		);
 		self::assert_equals(
-			'func3(bool=1 or string=str or float=12.3)',
+			'func(bool=1 or string=str or float=12.3)',
 			(string)$calls[2]->get_call(null,false)
 		);
 		self::assert_equals(
-			'func4(bool=1 or string=str or float=12.3 or integer=2)',
+			'func(bool=1 or string=str or float=12.3 or integer=2)',
 			(string)$calls[3]->get_call(null,false)
 		);
 		self::assert_equals(
-			'func5(bool=1 or string=str or float=12.3 or integer)',
+			'func(bool=1 or string=str or float=12.3 or integer)',
 			(string)$calls[4]->get_call(null,false)
 		);
 		self::assert_equals(
-			'func6(integer)',
+			'func(integer)',
 			(string)$calls[5]->get_call(null,false)
 		);
 		self::assert_equals(
-			'func7(integer)',
+			'func(integer)',
 			(string)$calls[6]->get_call(null,false)
 		);
 	}
@@ -319,27 +328,34 @@ if($_)
 	public function test_foreach()
 	{
 		$code = '<?php
+/**
+ * @param mixed $a
+ * @param mixed $b
+ * @param mixed $c
+ */
+function f($a,$b = 0,$c = 0) {}
+
 foreach(array(1,2,3) as $k => $v)
-	f1($k,$v);
+	f($k,$v);
 
 $a = array("foo","bar","test");
 foreach($a as &$v)
-	f2($v);
+	f($v);
 
 foreach(array() as $v)
-	f3($v);
+	f($v);
 
 foreach(array(1,"str",12.3) as $v)
-	f4($v);
+	f($v);
 
 foreach(array(0 => 1,"a" => 2,12 => 3) as $k => $v)
-	f5($k,$v);
+	f($k,$v);
 
 foreach(array(0 => 1,2 => "2",12 => 3) as $k => $v)
-	f6($k,$v);
+	f($k,$v);
 
 foreach($_ as $k => $v)
-	f7($k,$v);
+	f($k,$v);
 
 $b = array(
 	array(1,2,3),
@@ -347,10 +363,12 @@ $b = array(
 	array(3,4,5),
 );
 foreach($b as list($x,$y,$z))
-	f8($x,$y,$z);
+	f($x,$y,$z);
 ?>';
 		
-		list(,,$vars,$calls,) = $this->analyze($code);
+		list(,,$vars,$calls,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		
@@ -359,35 +377,35 @@ foreach($b as list($x,$y,$z))
 		self::assert_equals((string)$type,(string)$global['v']->get_type());
 		
 		self::assert_equals(
-			'f1(integer, integer)',
+			'f(integer, integer)',
 			(string)$calls[0]->get_call(null,false)
 		);
 		self::assert_equals(
-			'f2(string)',
+			'f(string)',
 			(string)$calls[1]->get_call(null,false)
 		);
 		self::assert_equals(
-			'f3(unknown)',
+			'f(unknown)',
 			(string)$calls[2]->get_call(null,false)
 		);
 		self::assert_equals(
-			'f4(unknown)',
+			'f(unknown)',
 			(string)$calls[3]->get_call(null,false)
 		);
 		self::assert_equals(
-			'f5(unknown, integer)',
+			'f(unknown, integer)',
 			(string)$calls[4]->get_call(null,false)
 		);
 		self::assert_equals(
-			'f6(integer, unknown)',
+			'f(integer, unknown)',
 			(string)$calls[5]->get_call(null,false)
 		);
 		self::assert_equals(
-			'f7(unknown, unknown)',
+			'f(unknown, unknown)',
 			(string)$calls[6]->get_call(null,false)
 		);
 		self::assert_equals(
-			'f8(unknown, unknown, unknown)',
+			'f(unknown, unknown, unknown)',
 			(string)$calls[7]->get_call(null,false)
 		);
 	}

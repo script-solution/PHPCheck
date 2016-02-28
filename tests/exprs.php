@@ -152,7 +152,9 @@ $bi = array(
 );
 ?>';
 		
-		list(,,$vars,,) = $this->analyze($code);
+		list(,,$vars,,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_int(5),(string)$global['a']->get_type());
@@ -242,11 +244,11 @@ $bi = array(
 	{
 		$code = '<?php
 /** @return float */
-function getfloat() {}
+function getfloat() { return 1.0; }
 /** @return int */
-function getint() {}
+function getint() { return 0; }
 /** @return bool */
-function getbool() {}
+function getbool() { return true; }
 
 // unknown -> float|int
 $a = $_;
@@ -311,7 +313,9 @@ $s = (bool)$_;
 $t = (unset)$_;
 ?>';
 		
-		list(,,$vars,,) = $this->analyze($code);
+		list(,,$vars,,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['a']->get_type());
@@ -364,7 +368,9 @@ $bf = 1 ?: -1;
 $bg = "f" ?: "g";
 ?>';
 		
-		list(,,$vars,,) = $this->analyze($code);
+		list(,,$vars,,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_string(),(string)$global['u']->get_type());

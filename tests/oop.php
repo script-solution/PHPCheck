@@ -25,6 +25,10 @@
 class PC_Tests_OOP extends PC_UnitTest
 {
 	private static $code = '<?php
+/** @param int $a @param string $b */
+function strstr($a,$b) {
+}
+	
 class a {
 	/* @var int|string */
 	private $foo,$bar = -1;
@@ -42,9 +46,9 @@ class a {
   /** @var a */
   public $pubobj;
   public function __construct() {}
-  private function test() {}
-  /** @return a */
-  protected function test2(a $arg) {
+  protected function test() {}
+  /** @param a $arg @return a */
+  public function test2(a $arg) {
   	return $arg;
   }
   
@@ -53,9 +57,11 @@ class a {
   }
 }
 
+interface j {}
+
 abstract class b extends a implements i,j {
-	/** @return b */
-	protected function test2(b $arg) {
+	/** @param b $arg @return b */
+	public function test2(b $arg) {
 		return $arg;
 	}
 	/** @return int */
@@ -66,11 +72,13 @@ abstract class b extends a implements i,j {
 	public static function sdf() {
 		return self::get42();
 	}
-	/** @return a */
 	public function partest() {
-		return parent::test();
+		parent::test();
 	}
 }
+
+interface i1 {}
+interface i2 {}
 
 interface i extends i1,i2 {
 	/**
@@ -78,17 +86,22 @@ interface i extends i1,i2 {
 	 */
 	public function doSomething();
 }
+
+/** @param int $a */
+function dummy($a) {}
+
 final class x extends b implements i {
 	private static $var = 4;
 	public static $array1 = array(1,2,3);
 	public static $array2 = array(array(4,5,6));
 	public function doSomething() {
 		// nothing
-		dummy1(self::$array1[1]);
-		dummy2(x::$array1[2]);
-		dummy3(x::$array2[0][2]);
-		dummy4(x::$array2[0][4]);
-		dummy5(x::$array2[1][2]);
+		dummy(self::$array1[1]);
+		dummy(x::$array1[2]);
+		dummy(x::$array2[0][2]);
+		dummy(x::$array2[0][4]);
+		dummy(x::$array2[1][2]);
+		return "";
 	}
 	public static function mystatic() {}
 }
@@ -101,19 +114,21 @@ $e = $d->test2($d);
 $f = $b->pubint;
 $g = $b->pubarr[0];
 $h = $b->pubobj->pubint;
-$i = $d->test2($b)->test2(1);
+$i = $d->test2($b)->test2($b);
 $j = b::sdf();
 $k = $d->partest();
 $n = __FILE__;
 $o = __LINE__;
-$p = array(new a(),new b());
+$p = array(new a(),new x());
 $q = $p[0]->test2($b);
 $r = $p[1]->test2($b);
 ?>';
 	
 	public function test_oop()
 	{
-		list(,$classes,$vars,$calls,) = $this->analyze(self::$code);
+		list(,$classes,$vars,$calls,$errors) = $this->analyze(self::$code);
+		
+		self::assert_equals(0,count($errors));
 		
 		$a = $classes['a'];
 		/* @var $a PC_Obj_Class */
@@ -178,11 +193,11 @@ $r = $p[1]->test2($b);
 			(string)$a->get_method('__construct')
 		);
 		self::assert_equals(
-			'private function test(): void',
+			'protected function test(): void',
 			(string)$a->get_method('test')
 		);
 		self::assert_equals(
-			'protected function test2(a): a',
+			'public function test2(a): a',
 			(string)$a->get_method('test2')
 		);
 		
@@ -226,7 +241,7 @@ $r = $p[1]->test2($b);
 			(string)$x->get_method('doSomething')
 		);
 		self::assert_equals(
-			'protected function test2(b): b',
+			'public function test2(b): b',
 			(string)$x->get_method('test2')
 		);
 		self::assert_equals(
@@ -271,7 +286,7 @@ $r = $p[1]->test2($b);
 			(string)$global['n']->get_type()
 		);
 		self::assert_equals(
-			(string)PC_Obj_MultiType::create_int(82),
+			(string)PC_Obj_MultiType::create_int(95),
 			(string)$global['o']->get_type()
 		);
 		self::assert_equals(
@@ -288,11 +303,11 @@ $r = $p[1]->test2($b);
 		self::assert_equals((string)$calls[$i++]->get_call(null,false),'strstr(integer=4, string=str)');
 		self::assert_call($calls[$i++],'b','get42',true);
 		self::assert_call($calls[$i++],'a','test',false);
-		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy1(integer=2)');
-		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy2(integer=3)');
-		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy3(integer=6)');
-		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy4(unknown)');
-		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy5(unknown)');
+		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy(integer=2)');
+		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy(integer=3)');
+		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy(integer=6)');
+		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy(unknown)');
+		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy(unknown)');
 		self::assert_call($calls[$i++],'a','__construct',false);
 		self::assert_call($calls[$i++],'a','test2',false);
 		self::assert_call($calls[$i++],'x','__construct',false);
@@ -302,9 +317,9 @@ $r = $p[1]->test2($b);
 		self::assert_call($calls[$i++],'b','sdf',true);
 		self::assert_call($calls[$i++],'x','partest',false);
 		self::assert_call($calls[$i++],'a','__construct',false);
-		self::assert_call($calls[$i++],'b','__construct',false);
+		self::assert_call($calls[$i++],'x','__construct',false);
 		self::assert_call($calls[$i++],'a','test2',false);
-		self::assert_call($calls[$i++],'b','test2',false);
+		self::assert_call($calls[$i++],'x','test2',false);
 	}
 
 	private static function assert_call($call,$class,$method,$static)

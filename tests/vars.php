@@ -58,17 +58,24 @@ unset($a9,$a10);
 
 /**
  * @param array $a
+ * @param MyClass $b
  * @return int
  */
 function x($a,MyClass $b) {
 	global $b1;
 	$i1 = $a;
 	$i2 = $i1;
-	return $a;
+	return 1;
 }
 ?>';
 
-		list(,,$vars,,$errors) = $this->analyze($code);
+		$options = new PC_Engine_Options();
+		$options->set_use_db(true);
+		$options->set_use_phpref(true);
+		$options->add_min_req('PHP','5');
+		list(,,$vars,,$errors) = $this->analyze($code,$options);
+		
+		self::assert_equals(0,count($errors));
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)PC_Obj_MultiType::create_int(1),(string)$global['i1']->get_type());

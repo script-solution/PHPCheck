@@ -27,6 +27,14 @@ class PC_Tests_Arrays extends PC_UnitTest
 	public function test_arrays()
 	{
 		$code = '<?php
+/** @param mixed $a */
+function func($a) {}
+
+class a {
+	/** @param int $x */
+	function a($x) {}
+}
+
 $x = array();
 $x[] = 4;
 $x[] = 5;
@@ -72,7 +80,9 @@ $g = f();
 $g[] = 1;
 ?>';
 		
-		list(,,$vars,$calls,) = $this->analyze($code);
+		list(,,$vars,$calls,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		$args = $calls[0]->get_arguments();
 		self::assert_equals((string)PC_Obj_MultiType::create_int(1),(string)$args[0]);
@@ -138,7 +148,9 @@ $c = list($c1,$c2,list($c3,$c4,list($c5)),$c6) = array(
 );
 ?>';
 		
-		list(,,$vars,$calls,) = $this->analyze($code);
+		list(,,$vars,$calls,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals(

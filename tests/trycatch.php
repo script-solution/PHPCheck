@@ -27,6 +27,10 @@ class PC_Tests_TryCatch extends PC_UnitTest
 	public function test_try_catch()
 	{
 		$code = '<?php
+class Exception {}
+/** @param Exception $e */
+function myfunc(Exception $e) {}
+
 try {
 	echo "foo";
 }
@@ -36,7 +40,9 @@ catch(Exception $e) {
 }
 ?>';
 		
-		list(,,$vars,$calls,) = $this->analyze($code);
+		list(,,$vars,$calls,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		self::assert_equals('myfunc(Exception)',(string)$calls[0]->get_call(null,false));
 		

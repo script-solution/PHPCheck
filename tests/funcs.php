@@ -38,7 +38,7 @@ class myc2 extends myc {
 	public function doit() {
 		parent::doit();
 		self::mystatic();
-		$this->c(1,2);
+		$this->c(array(),2);
 	}
 	/**
 	 * @param array $a
@@ -56,6 +56,7 @@ class myc2 extends myc {
 		return $a;
 	}
 	/**
+	 * @param MyClass $c
 	 * @param int $d
 	 */
 	public function doit(MyClass $c,$d) {
@@ -67,7 +68,9 @@ abstract class myc {
 }
 ?>';
 	
-		list($functions,$classes,,$calls,) = $this->analyze($code);
+		list($functions,$classes,,$calls,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		$func = $functions['a'];
 		/* @var $func PC_Obj_Method */
@@ -117,6 +120,13 @@ abstract class myc {
 	public function test_nesting()
 	{
 		$code = '<?php
+/** @param int $a */
+function f1(int $a) {}
+/** @param int $a */
+function f2(int $a) {}
+/** @param int $a */
+function f3(int $a) {}
+
 class A {
 	function a() {
 		$a = 1;
@@ -149,7 +159,9 @@ function e() {
 }
 ?>';
 		
-		list(,,$vars,$calls,) = $this->analyze($code);
+		list(,,$vars,$calls,$errors) = $this->analyze($code);
+		
+		self::assert_equals(0,count($errors));
 		
 		self::assert_equals('f3(integer=3)',(string)$calls[0]->get_call(null,false));
 		self::assert_equals('f2(integer=2)',(string)$calls[1]->get_call(null,false));
