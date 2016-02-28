@@ -76,7 +76,6 @@ else
 		'PC_Tests_OOP',
 		'PC_Tests_Arrays',
 		'PC_Tests_Exprs',
-		'PC_Tests_Exprs2',
 		'PC_Tests_Analyzer',
 		'PC_Tests_CondsNLoops',
 		'PC_Tests_Returns',
