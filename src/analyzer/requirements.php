@@ -44,7 +44,7 @@ class PC_Analyzer_Requirements extends PC_Analyzer
 	/**
 	 * Analyzes the requirements for given object
 	 *
-	 * @param object $object the object to convert to string for the error message
+	 * @param PC_Obj_Location $object the object to convert to string for the error message
 	 * @param array $need_min the minimally needed versions
 	 * @param array $need_max the maximally needed versions
 	 */

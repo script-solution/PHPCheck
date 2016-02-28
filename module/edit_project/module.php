@@ -34,7 +34,7 @@ final class PC_Module_edit_project extends PC_Module
 	/**
 	 * @see FWS_Module::init($doc)
 	 * 
-	 * @param TDL_Document $doc
+	 * @param PC_Document $doc
 	 */
 	public function init($doc)
 	{
@@ -111,4 +111,3 @@ final class PC_Module_edit_project extends PC_Module
 		));
 	}
 }
-?>

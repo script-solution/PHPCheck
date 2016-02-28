@@ -74,7 +74,7 @@ final class PC_PropLoader extends FWS_PropLoader
 	}
 	
 	/**
-	 * @return FWS_DB_MySQL_Connection the property
+	 * @return FWS_DB_Connection the property
 	 */
 	protected function db()
 	{

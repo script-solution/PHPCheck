@@ -36,7 +36,7 @@ final class FWS_Props extends FWS_UtilBase
 	/**
 	 * The property-accessor
 	 *
-	 * @var FWS_PropAccessor
+	 * @var PC_PropAccessor
 	 */
 	private static $accessor;
 	

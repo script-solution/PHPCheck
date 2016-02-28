@@ -175,7 +175,7 @@ class PC_Engine_VarContainer extends FWS_Object
 	 * 
 	 * @param string $file the current file
 	 * @param int $line the current line
-	 * @param PC_Obj_Scope $scope the current scope
+	 * @param PC_Engine_Scope $scope the current scope
 	 */
 	public function leave_loop($file,$line,$scope)
 	{
@@ -216,7 +216,7 @@ class PC_Engine_VarContainer extends FWS_Object
 	 * 
 	 * @param string $file the current file
 	 * @param int $line the current line
-	 * @param PC_Obj_Scope $scope the current scope
+	 * @param PC_Engine_Scope $scope the current scope
 	 */
 	public function leave_cond($file,$line,$scope)
 	{
@@ -241,7 +241,7 @@ class PC_Engine_VarContainer extends FWS_Object
 	 * Creates a backup of the given variable, if necessary
 	 * 
 	 * @param PC_Obj_Variable $var the variable
-	 * @param PC_Obj_Scope $scope the current scope
+	 * @param PC_Engine_Scope $scope the current scope
 	 */
 	public function backup($var,$scope)
 	{
@@ -272,7 +272,7 @@ class PC_Engine_VarContainer extends FWS_Object
 	 * 
 	 * @param string $file the current file
 	 * @param int $line the current line
-	 * @param PC_Obj_Scope $scope the current scope
+	 * @param PC_Engine_Scope $scope the current scope
 	 */
 	private function perform_pending_changes($file,$line,$scope)
 	{
@@ -327,7 +327,7 @@ class PC_Engine_VarContainer extends FWS_Object
 	 * 
 	 * @param string $file the current file
 	 * @param int $line the current line
-	 * @param PC_Obj_Scope $scope the current scope
+	 * @param PC_Engine_Scope $scope the current scope
 	 * @param array $layer the current layer
 	 * @param string $name the var-name
 	 * @param PC_Obj_Variable $backup the backup (0 if not present before the layer)
