@@ -31,8 +31,7 @@ cyrus_close(null);
 ?>';
 
 		$options = new PC_Engine_Options();
-		$options->set_use_db(true);
-		$options->set_use_phpref(true);
+		$options->add_project(PC_Project::PHPREF_ID);
 		$options->add_min_req('PHP','4.0.0');
 		$options->add_max_req('PHP','5.1.0');
 		$options->add_min_req('PECL cyrus','1.0.0');
@@ -58,8 +57,7 @@ cyrus_close(null);
 	public function test_pecl_versions()
 	{
 		$options = new PC_Engine_Options();
-		$options->set_use_db(true);
-		$options->set_use_phpref(true);
+		$options->add_project(PC_Project::PHPREF_ID);
 		
 		$code = '<?php
 $pdo = new PDO("host","login","pw");

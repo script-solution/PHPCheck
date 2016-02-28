@@ -16,6 +16,20 @@
 			<dd>{form.get_date_chooser('start_',def_start,false)}</dd>
 		</dl>
 		<dl>
+			<dt>Dependencies:</dt>
+			<dd>
+				<div>{form.get_checkbox('projdeps[0]',1,'1','PHP builtins',true)}</div>
+				{loop projects as p}
+				<div>{form.get_checkbox('projdeps['~p:id~']',p:value,'1',p:name)}</div>
+				{endloop}
+				
+				<div class="pc_desc">
+				Adding a project as dependencies means that all types (classes, functions, ...) of it are
+				available in your project.
+				</div>
+			</dd>
+		</dl>
+		<dl>
 			<dt>Report arguments/returns strictly:</dt>
 			<dd>
 				{form.get_checkbox('report_argret_strictly',report_argret_strictly,'1','Report an error if <i>not all</i>

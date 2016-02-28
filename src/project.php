@@ -101,6 +101,13 @@ final class PC_Project extends FWS_Object
 	private $report_argret_strictly;
 	
 	/**
+	 * The other projects it depends on.
+	 *
+	 * @var array
+	 */
+	private $proj_deps;
+	
+	/**
 	 * The lower and upper bounds for versions.
 	 *
 	 * @var array
@@ -138,6 +145,7 @@ final class PC_Project extends FWS_Object
 		$this->stmt_exclude = $stmt_exclude;
 		$this->report_argret_strictly = $report_argret_strictly;
 		$this->req = array();
+		$this->set_project_deps(array());
 	}
 	
 	/**
@@ -272,6 +280,37 @@ final class PC_Project extends FWS_Object
 	public function set_report_argret_strictly($b)
 	{
 		$this->report_argret_strictly = $b;
+	}
+	
+	/**
+	 * @return array an array with the project ids this project depends on
+	 */
+	public function get_project_deps()
+	{
+		return $this->proj_deps;
+	}
+	
+	/**
+	 * Sets the given projects as dependencies.
+	 *
+	 * @param array $deps the project ids
+	 */
+	public function set_project_deps($deps)
+	{
+		// add the PHP builtins as implicit dependencies (and ensure that they come first)
+		$deps = array_merge(array(self::PHPREF_ID),$deps);
+		$this->proj_deps = $deps;
+	}
+	
+	/**
+	 * Adds the given project id as a dependency to this one.
+	 *
+	 * @param int $id the id
+	 */
+	public function add_project_dep($id)
+	{
+		assert(!in_array($id,$this->proj_deps));
+		$this->proj_deps[] = $id;
 	}
 	
 	/**

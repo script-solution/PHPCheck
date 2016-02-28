@@ -33,13 +33,18 @@ final class PC_CLI_TypeFin implements PC_CLIJob
 {
 	public function run($args)
 	{
+		$project = FWS_Props::get()->project();
+		
 		$options = new PC_Engine_Options();
+		$options->add_project($project->get_id());
+		foreach($project->get_project_deps() as $pid)
+			$options->add_project($pid);
+		
 		$types = new PC_Engine_TypeContainer($options);
 		$storage = new PC_Engine_TypeStorage_DB();
 		$env = new PC_Engine_Env($options,$types,$storage);
 
-		// preload the classes; we need all of them anyway		
-		$types->add_classes(PC_DAO::get_classes()->get_list());
+		$types->prefetch();
 
 		$fin = new PC_Engine_TypeFinalizer($env);
 		$fin->finalize();

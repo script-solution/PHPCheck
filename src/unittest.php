@@ -47,11 +47,7 @@ class PC_UnitTest extends FWS_Test_Case
 	protected function analyze($code,$options = null)
 	{
 		if($options === null)
-		{
 			$options = new PC_Engine_Options();
-			$options->set_use_db(false);
-			$options->set_use_phpref(false);
-		}
 		
 		$env = new PC_Engine_Env($options);
 		

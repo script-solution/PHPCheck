@@ -90,7 +90,7 @@ class PC_DAO_Functions extends FWS_Singleton
 			 LEFT JOIN '.PC_TB_CLASSES.' c ON f.class = c.id AND f.project_id = c.project_id
 			 WHERE
 			 	f.project_id = :pid AND
-			 	((:class = "" AND c.id IS NULL) OR (:class != "" AND c.name = :class)) AND
+			 	((:class = "" AND f.class = 0) OR (:class != "" AND c.name = :class)) AND
 			 	f.name = :funcname'
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));

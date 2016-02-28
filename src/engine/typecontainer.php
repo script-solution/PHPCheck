@@ -97,6 +97,18 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	}
 	
 	/**
+	 * Prefetches all classes and functions from DB.
+	 */
+	public function prefetch()
+	{
+		foreach($this->options->get_projects() as $pid)
+		{
+			$this->add_classes(PC_DAO::get_classes()->get_list(0,0,'','',$pid));
+			$this->add_functions(PC_DAO::get_functions()->get_list(0,0,0,'','',$pid));
+		}
+	}
+	
+	/**
 	 * Adds all from the given type-container into this one (does not make clones of the objects!)
 	 * 
 	 * @param PC_Engine_TypeContainer $typecon the container
@@ -142,25 +154,24 @@ final class PC_Engine_TypeContainer extends FWS_Object
 		
 		if(!isset($this->missing['classes'][$lname]))
 		{
-			if(!isset($this->classes[$lname]) && $this->options->get_use_db())
+			if(!isset($this->classes[$lname]))
 			{
-				$c = PC_DAO::get_classes()->get_by_name($name,$this->options->get_pid());
-				if($c)
-					$this->classes[$lname] = $c;
-				else
-					$this->missing['classes'][$lname] = true;
-			}
-			if(!isset($this->classes[$lname]) && $this->options->get_use_phpref())
-			{
-				$c = PC_DAO::get_classes()->get_by_name($name,PC_Project::PHPREF_ID);
-				if($c)
-					$this->classes[$lname] = $c;
-				else
-					$this->missing['classes'][$lname] = true;
+				foreach($this->options->get_projects() as $pid)
+				{
+					$c = PC_DAO::get_classes()->get_by_name($name,$pid);
+					if($c)
+					{
+						$this->classes[$lname] = $c;
+						break;
+					}
+				}
 			}
 		}
+		
 		if(isset($this->classes[$lname]))
 			return $this->classes[$lname];
+		
+		$this->missing['classes'][$lname] = true;
 		return null;
 	}
 	
@@ -190,26 +201,24 @@ final class PC_Engine_TypeContainer extends FWS_Object
 		
 		if(!isset($this->missing['funcs'][$lname]))
 		{
-			if(!isset($this->functions[$lname]) && $this->options->get_use_db())
+			if(!isset($this->functions[$lname]))
 			{
-				$f = PC_DAO::get_functions()->get_by_name($name,$this->options->get_pid());
-				if($f)
-					$this->functions[$lname] = $f;
-				else
-					$this->missing['funcs'][$lname] = true;
-			}
-			if(!isset($this->functions[$lname]) && $this->options->get_use_phpref())
-			{
-				$f = PC_DAO::get_functions()->get_by_name($name,PC_Project::PHPREF_ID);
-				if($f)
-					$this->functions[$lname] = $f;
-				else
-					$this->missing['funcs'][$lname] = true;
+				foreach($this->options->get_projects() as $pid)
+				{
+					$f = PC_DAO::get_functions()->get_by_name($name,$pid);
+					if($f)
+					{
+						$this->functions[$lname] = $f;
+						break;
+					}
+				}
 			}
 		}
 		
 		if(isset($this->functions[$lname]))
 			return $this->functions[$lname];
+		
+		$this->missing['funcs'][$lname] = true;
 		return null;
 	}
 	
@@ -257,26 +266,24 @@ final class PC_Engine_TypeContainer extends FWS_Object
 					$this->methods[$lclass.'::'.$lmethod] = $cobj->get_method($lmethod);
 			}
 			
-			if(!isset($this->methods[$lclass.'::'.$lmethod]) && $this->options->get_use_db())
+			if(!isset($this->methods[$lclass.'::'.$lmethod]))
 			{
-				$f = PC_DAO::get_functions()->get_by_name($method,$this->options->get_pid(),$class);
-				if($f)
-					$this->methods[$lclass.'::'.$lmethod] = $f;
-				else
-					$this->missing['methods'][$lclass.'::'.$lmethod] = true;
-			}
-			if(!isset($this->methods[$lclass.'::'.$lmethod]) && $this->options->get_use_phpref())
-			{
-				$f = PC_DAO::get_functions()->get_by_name($method,PC_Project::PHPREF_ID,$class);
-				if($f)
-					$this->methods[$lclass.'::'.$lmethod] = $f;
-				else
-					$this->missing['methods'][$lclass.'::'.$lmethod] = true;
+				foreach($this->options->get_projects() as $pid)
+				{
+					$f = PC_DAO::get_functions()->get_by_name($method,$pid,$class);
+					if($f)
+					{
+						$this->methods[$lclass.'::'.$lmethod] = $f;
+						break;
+					}
+				}
 			}
 		}
 		
 		if(isset($this->methods[$lclass.'::'.$lmethod]))
 			return $this->methods[$lclass.'::'.$lmethod];
+		
+		$this->missing['methods'][$lclass.'::'.$lmethod] = true;
 		return null;
 	}
 	
@@ -402,26 +409,24 @@ final class PC_Engine_TypeContainer extends FWS_Object
 		
 		if(!isset($this->missing['consts'][$lname]))
 		{
-			if(!isset($this->constants[$lname]) && $this->options->get_use_db())
+			if(!isset($this->constants[$lname]))
 			{
-				$c = PC_DAO::get_constants()->get_by_name($name,$this->options->get_pid());
-				if($c)
-					$this->constants[$lname] = $c;
-				else
-					$this->missing['consts'][$lname] = true;
-			}
-			if(!isset($this->constants[$lname]) && $this->options->get_use_phpref())
-			{
-				$c = PC_DAO::get_constants()->get_by_name($name,PC_Project::PHPREF_ID);
-				if($c)
-					$this->constants[$lname] = $c;
-				else
-					$this->missing['consts'][$lname] = true;
+				foreach($this->options->get_projects() as $pid)
+				{
+					$c = PC_DAO::get_constants()->get_by_name($name,$pid);
+					if($c)
+					{
+						$this->constants[$lname] = $c;
+						break;
+					}
+				}
 			}
 		}
 		
 		if(isset($this->constants[$lname]))
 			return $this->constants[$lname];
+		
+		$this->missing['consts'][$lname] = true;
 		return null;
 	}
 	

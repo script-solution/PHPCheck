@@ -58,6 +58,9 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 	{
 		foreach($this->env->get_types()->get_classes() as $c)
 		{
+			if($c->get_pid() != $this->env->get_options()->get_current_project())
+				continue;
+			
 			/* @var $c PC_Obj_Class */
 			$this->add_members($c,$c->get_name());
 			

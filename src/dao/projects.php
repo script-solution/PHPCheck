@@ -153,6 +153,8 @@ class PC_DAO_Projects extends FWS_Singleton
 			'report_argret_strictly' => $project->get_report_argret_strictly(),
 		));
 		
+		$this->update_deps($project->get_id(),$project->get_project_deps());
+		
 		foreach($project->get_req() as $r)
 		{
 			$db->update(PC_TB_REQUIREMENTS,'WHERE id = '.$r['id'],array(
@@ -177,6 +179,29 @@ class PC_DAO_Projects extends FWS_Singleton
 		$db = FWS_Props::get()->db();
 		$db->execute('DELETE FROM '.PC_TB_PROJECTS.' WHERE id IN ('.implode(',',$ids).')');
 		return $db->get_affected_rows();
+	}
+	
+	/**
+   * Sets the given dependencies for the given project.
+   *
+   * @param int $id the project id
+   * @param array $deps an array with all dependencies
+   */
+	public function update_deps($id,$deps)
+	{
+		$db = FWS_Props::get()->db();
+		$db->execute('DELETE FROM '.PC_TB_PROJECT_DEPS.' WHERE project_id = '.$id);
+		
+		foreach($deps as $did)
+		{
+			if($did == PC_Project::PHPREF_ID)
+				continue;
+			
+			$db->insert(PC_TB_PROJECT_DEPS,array(
+				'project_id' => $id,
+				'dep_id' => $did,
+			));
+		}
 	}
 	
 	/**
@@ -222,12 +247,15 @@ class PC_DAO_Projects extends FWS_Singleton
 			return null;
 		
 		$db = FWS_Props::get()->db();
+		$deps = $db->get_rows('SELECT * FROM '.PC_TB_PROJECT_DEPS.' WHERE project_id = '.$row['id']);
 		$req = $db->get_rows('SELECT * FROM '.PC_TB_REQUIREMENTS.' WHERE project_id = '.$row['id']);
 		
 		$proj = new PC_Project(
 			$row['id'],$row['name'],$row['created'],$row['type_folders'],$row['type_exclude'],
 			$row['stmt_folders'],$row['stmt_exclude'],$row['report_argret_strictly']
 		);
+		foreach($deps as $d)
+			$proj->add_project_dep($d['dep_id']);
 		foreach($req as $v)
 			$proj->add_req($v['id'],$v['type'],$v['name'],$v['version']);
 		return $proj;

@@ -33,7 +33,12 @@ final class PC_CLI_TypeScan implements PC_CLIJob
 {
 	public function run($args)
 	{
-		$env = new PC_Engine_Env();
+		$project = FWS_Props::get()->project();
+		
+		$options = new PC_Engine_Options();
+		foreach($project->get_project_deps() as $pid)
+			$options->add_project($pid);
+		$env = new PC_Engine_Env($options);
 		$tscanner = new PC_Engine_TypeScannerFrontend($env);
 
 		$msgs = array();

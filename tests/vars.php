@@ -70,8 +70,7 @@ function x($a,MyClass $b) {
 ?>';
 
 		$options = new PC_Engine_Options();
-		$options->set_use_db(true);
-		$options->set_use_phpref(true);
+		$options->add_project(PC_Project::PHPREF_ID);
 		$options->add_min_req('PHP','5');
 		list(,,$vars,,$errors) = $this->analyze($code,$options);
 		
@@ -190,8 +189,7 @@ echo $n;
 ?>';
 		
 		$options = new PC_Engine_Options();
-		$options->set_use_db(true);
-		$options->set_use_phpref(true);
+		$options->add_project(PC_Project::PHPREF_ID);
 		$options->set_report_unused(true);
 		$options->add_min_req('PHP','5');
 		list(,,$vars,,$errors) = $this->analyze($code,$options);

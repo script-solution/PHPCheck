@@ -46,13 +46,18 @@ final class PC_Module_Class extends FWS_Module
 	public function init($doc)
 	{
 		$input = FWS_Props::get()->input();
+		$project = FWS_Props::get()->project();
 		
 		$renderer = $doc->use_default_renderer();
 		
 		$name = $input->get_var('name','get',FWS_Input::STRING);
-		$this->class = PC_DAO::get_classes()->get_by_name($name);
-		if($this->class === null)
-			$this->class = PC_DAO::get_classes()->get_by_name($name,PC_Project::PHPREF_ID);
+		$pids = array_merge(array($project->get_id()),$project->get_project_deps());
+		foreach($pids as $pid)
+		{
+			$this->class = PC_DAO::get_classes()->get_by_name($name,$pid);
+			if($this->class !== null)
+				break;
+		}
 		
 		$renderer->add_breadcrumb('Types',PC_URL::build_submod_url('types'));
 		$renderer->add_breadcrumb('Classes',PC_URL::build_submod_url('types','classes'));

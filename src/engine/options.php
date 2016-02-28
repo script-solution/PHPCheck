@@ -32,11 +32,11 @@
 class PC_Engine_Options extends FWS_Object
 {
 	/**
-	 * The project-id
+	 * The projects to get types from.
 	 *
-	 * @var int
+	 * @var array
 	 */
-	private $pid = PC_Project::CURRENT_ID;
+	private $projects = array();
 	
 	/**
 	 * Report an error if only one possible type of arguments/returns violates the spec.
@@ -52,19 +52,6 @@ class PC_Engine_Options extends FWS_Object
 	private $report_unused = false;
 	
 	/**
-	 * Whether the db should be queried if a type can't be found
-	 *
-	 * @var bool
-	 */
-	private $use_db = true;
-	/**
-	 * Whether to query also the phpref-entries in the db
-	 *
-	 * @var bool
-	 */
-	private $use_phpref = true;
-	
-	/**
 	 * The minimum requirement (PHP, PECL modules, ...)
 	 *
 	 * @var array
@@ -78,21 +65,32 @@ class PC_Engine_Options extends FWS_Object
 	private $max_req = array();
 	
 	/**
-	 * @return int the project id
+	 * @return array an array with the project ids to get types from
 	 */
-	public function get_pid()
+	public function get_projects()
 	{
-		return $this->pid;
+		return $this->projects;
 	}
 	
 	/**
-	 * Sets the project id
-	 *
-	 * @param int $pid the project id
+	 * @return int the current project id
 	 */
-	public function set_pid($pid)
+	public function get_current_project()
 	{
-		$this->pid = $pid;
+		if(count($this->projects) > 0)
+			return $this->projects[0];
+		return 0;
+	}
+	
+	/**
+	 * Adds the given project id to the list. Note that the first one should be the current project.
+	 *
+	 * @param int $id the id
+	 */
+	public function add_project($id)
+	{
+		assert(!in_array($id,$this->projects));
+		$this->projects[] = $id;
 	}
 	
 	/**
@@ -129,42 +127,6 @@ class PC_Engine_Options extends FWS_Object
 	public function set_report_unused($report)
 	{
 		$this->report_unused = $report;
-	}
-	
-	/**
-	 * @return bool whether the DB should be used
-	 */
-	public function get_use_db()
-	{
-		return $this->use_db;
-	}
-	
-	/**
-	 * Sets whether the DB should be used.
-	 * 
-	 * @param bool $use the new value
-	 */
-	public function set_use_db($use)
-	{
-		$this->use_db = $use;
-	}
-	
-	/**
-	 * @return bool whether the PHP reference should be used
-	 */
-	public function get_use_phpref()
-	{
-		return $this->use_phpref;
-	}
-	
-	/**
-	 * Sets whether the PHP reference should be used.
-	 * 
-	 * @param bool $use the new value
-	 */
-	public function set_use_phpref($use)
-	{
-		$this->use_phpref = $use;
 	}
 	
 	/**

@@ -96,11 +96,25 @@ final class PC_Module_edit_project extends PC_Module
 			$r['del_url'] = $del_url->to_url();
 		}
 		
+		$projects = array();
+		foreach(PC_DAO::get_projects()->get_all() as $p)
+		{
+			if($p->get_id() == $proj->get_id())
+				continue;
+			
+			$projects[] = array(
+				'id' => $p->get_id(),
+				'value' => in_array($p->get_id(),$proj->get_project_deps()),
+				'name' => $p->get_name()
+			);
+		}
+		
 		$tpl->add_variables(array(
 			'target_url' => $target_url->to_url(),
 			'action_type' => PC_ACTION_EDIT_PROJECT,
 			'def_name' => $proj->get_name(),
 			'def_start' => $proj->get_created(),
+			'projects' => $projects,
 			'report_argret_strictly' => $proj->get_report_argret_strictly(),
 			'req' => $req,
 			'add_type' => $add_type,

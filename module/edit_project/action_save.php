@@ -60,6 +60,8 @@ class PC_Action_edit_project_save extends FWS_Action_Base
 			$start_year = $input->get_var('start_year','post',FWS_Input::INTEGER);
 			$start = mktime(0,0,0,$start_month,$start_day,$start_year);
 			
+			$projdeps = $input->get_var('projdeps','post');
+			
 			$report_argret_strictly = $input->isset_var('report_argret_strictly','post');
 			
 			$edit_type = $input->get_var('edit_type','post');
@@ -73,6 +75,7 @@ class PC_Action_edit_project_save extends FWS_Action_Base
 			$proj->set_name($name);
 			$proj->set_created($start);
 			$proj->set_report_argret_strictly($report_argret_strictly);
+			$proj->set_project_deps(is_array($projdeps) ? array_keys($projdeps) : array());
 			$req = $proj->get_req();
 			foreach($req as &$r)
 			{

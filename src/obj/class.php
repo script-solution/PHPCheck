@@ -139,6 +139,14 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 	}
 	
 	/**
+	 * @return int the project id (if loaded from DB)
+	 */
+	public function get_pid()
+	{
+		return $this->pid;
+	}
+	
+	/**
 	 * @return boolean whether it is an interface
 	 */
 	public function is_interface()
