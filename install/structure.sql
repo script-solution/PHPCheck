@@ -149,6 +149,20 @@ CREATE TABLE `pc_projects` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `pc_requirements`
+--
+
+CREATE TABLE `pc_requirements` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `type` enum('min','max') CHARACTER SET utf8 NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `version` varchar(10) CHARACTER SET utf8 NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `pc_vars`
 --
 
@@ -160,20 +174,6 @@ CREATE TABLE `pc_vars` (
   `name` varchar(255) NOT NULL,
   `scope` varchar(255) NOT NULL,
   `type` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pc_versions`
---
-
-CREATE TABLE `pc_versions` (
-  `id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL,
-  `type` enum('min','max') NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `version` varchar(10) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -228,15 +228,15 @@ ALTER TABLE `pc_projects`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `pc_vars`
+-- Indexes for table `pc_requirements`
 --
-ALTER TABLE `pc_vars`
+ALTER TABLE `pc_requirements`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `pc_versions`
+-- Indexes for table `pc_vars`
 --
-ALTER TABLE `pc_versions`
+ALTER TABLE `pc_vars`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -279,12 +279,12 @@ ALTER TABLE `pc_functions`
 ALTER TABLE `pc_projects`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
+-- AUTO_INCREMENT for table `pc_requirements`
+--
+ALTER TABLE `pc_requirements`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
 -- AUTO_INCREMENT for table `pc_vars`
 --
 ALTER TABLE `pc_vars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT for table `pc_versions`
---
-ALTER TABLE `pc_versions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
