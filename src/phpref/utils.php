@@ -414,6 +414,14 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 							'Parameter description has not 2 parts: "'.$part.'"');
 					list($type,$name) = $parts;
 				}
+				
+				// detect references
+				if(substr($name,0,1) == '&')
+				{
+					$param->set_reference(true);
+					$name = substr($name,1);
+				}
+				
 				$param->set_name(trim($name));
 				$param->set_mtype(self::get_param_type($type,$default));
 				$param->set_has_doc(true);

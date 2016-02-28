@@ -72,6 +72,8 @@ final class PC_Obj_Error extends FWS_Object
 	const E_T_MAGIC_METHOD_RET_INVALID					= 54;
 	const E_T_MAGIC_NOT_PUBLIC									= 55;
 	const E_T_MAGIC_NOT_STATIC									= 56;
+	const E_T_PARAM_DIFFERS_FROM_DOC						= 57;
+	const E_T_RETURN_DIFFERS_FROM_DOC						= 58;
 	
 	/**
 	 * Determines the name of the given type
@@ -131,6 +133,8 @@ final class PC_Obj_Error extends FWS_Object
 			self::E_T_MAGIC_IS_STATIC =>								'Magic is static',
 			self::E_T_DOC_WITHOUT_PARAM =>							'Doc without param',
 			self::E_T_PARAM_WITHOUT_DOC =>							'Param without doc',
+			self::E_T_PARAM_DIFFERS_FROM_DOC =>					'Param differs from doc',
+			self::E_T_RETURN_DIFFERS_FROM_DOC =>				'Return differs from doc',
 		);
 		return $types;
 	}
@@ -152,6 +156,8 @@ final class PC_Obj_Error extends FWS_Object
 				self::E_T_MAGIC_NOT_PUBLIC,
 				self::E_T_MAGIC_NOT_STATIC,
 				self::E_T_MAGIC_IS_STATIC,
+				self::E_T_PARAM_DIFFERS_FROM_DOC,
+				self::E_T_RETURN_DIFFERS_FROM_DOC,
 			),
 			self::R_STMTSCANNER => array(
 				self::E_S_MIXED_RET_AND_NO_RET,

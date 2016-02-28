@@ -46,6 +46,13 @@ class PC_Obj_Parameter extends FWS_Object
 	private $optional = false;
 	
 	/**
+	 * Is it a reference?
+	 * 
+	 * @var boolean
+	 */
+	private $reference = false;
+	
+	/**
 	 * Whether its the first variable argument of the function
 	 * 
 	 * @var boolean
@@ -65,6 +72,13 @@ class PC_Obj_Parameter extends FWS_Object
 	 * @var PC_Obj_MultiType
 	 */
 	private $mtype;
+	
+	/**
+	 * Whether the current mtype is from the default value.
+	 *
+	 * @var boolean
+	 */
+	private $mtype_is_default = false;
 	
 	/**
 	 * Constructor
@@ -125,7 +139,7 @@ class PC_Obj_Parameter extends FWS_Object
 	}
 	
 	/**
-	 * Sets the multi-type-instance for this parameter
+	 * Sets the multi-type-instance for this parameter. Will reset is_mtype_default() to false.
 	 *
 	 * @param PC_Obj_MultiType $mtype the new value
 	 */
@@ -135,6 +149,25 @@ class PC_Obj_Parameter extends FWS_Object
 			FWS_Helper::def_error('instance','mtype','PC_Obj_MultiType',$mtype);
 		
 		$this->mtype = $mtype;
+		$this->mtype_is_default = false;
+	}
+	
+	/**
+	 * @return boolean whether the current mtype is from the default value
+	 */
+	public function is_mtype_default()
+	{
+		return $this->mtype_is_default;
+	}
+	
+	/**
+	 * Sets whether the current mtype is from the default value
+	 *
+	 * @param boolean $def the new value
+	 */
+	public function set_mtype_default($def)
+	{
+		$this->mtype_is_default = $def;
 	}
 	
 	/**
@@ -155,6 +188,24 @@ class PC_Obj_Parameter extends FWS_Object
 		$this->optional = (bool)$opt;
 		if($this->optional)
 			$this->first_var_arg = false;
+	}
+	
+	/**
+	 * @return boolean whether the parameter is a reference
+	 */
+	public function is_reference()
+	{
+		return $this->reference;
+	}
+	
+	/**
+	 * Sets whether the parameter is a reference
+	 *
+	 * @param boolean $ref the new value
+	 */
+	public function set_reference($ref)
+	{
+		$this->reference = (bool)$ref;
 	}
 	
 	/**
@@ -184,6 +235,10 @@ class PC_Obj_Parameter extends FWS_Object
 	
 	public function __ToString()
 	{
-		return $this->mtype.($this->optional ? '?' : ($this->first_var_arg ? '*' : ''));
+		$str = '';
+		if($this->reference)
+			$str .= '&';
+		$str .= $this->mtype.($this->optional ? '?' : ($this->first_var_arg ? '*' : ''));
+		return $str;
 	}
 }

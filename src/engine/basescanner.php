@@ -178,9 +178,10 @@ class PC_Engine_BaseScanner
 	 * @param PC_Obj_MultiType $type the type from type hinting (or null)
 	 * @param PC_Obj_MultiType $val the default value (or null)
 	 * @param bool $optional whether it's optional
+	 * @param bool $ref whether it's a reference
 	 * @return PC_Obj_Parameter the parameter
 	 */
-	public function create_parameter($name,$type,$val,$optional)
+	public function create_parameter($name,$type,$val,$optional,$ref)
 	{
 		$p = new PC_Obj_Parameter($name);
 		if($val)
@@ -188,8 +189,12 @@ class PC_Engine_BaseScanner
 		if($type && !$type->is_unknown())
 			$p->set_mtype($type);
 		else if($val)
+		{
 			$p->set_mtype($val);
+			$p->set_mtype_default(true);
+		}
 		$p->set_optional($optional);
+		$p->set_reference($ref);
 		return $p;
 	}
 	

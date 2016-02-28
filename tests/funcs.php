@@ -288,4 +288,56 @@ class A {
 		$x = $vars['#anon8'];
 		self::assert_equals('float=3.2',(string)$x['x']->get_type());
 	}
+	
+	public function test_doc()
+	{
+		$code = '<?php
+/**
+ * @param int $a
+ * @return int
+ */
+function a(array $a): string {
+	return "";
+}
+
+/**
+ * @param int|string $x
+ * @param int $y
+ */
+function b(int $x,&$y) {
+}
+
+/**
+ * @param int $a
+ */
+function c($a = "") {
+}
+?>';
+		
+		list($funcs,,,,$errors) = $this->analyze($code);
+		
+		self::assert_equals(3,count($funcs));
+		
+		self::assert_equals('function a(integer): string',$funcs['a']);
+		self::assert_equals('function b(integer or string, &integer): void',$funcs['b']);
+		self::assert_equals('function c(integer?): void',$funcs['c']);
+		
+		self::assert_equals(4,count($errors));
+		
+		$error = $errors[0];
+		self::assert_equals(PC_Obj_Error::E_T_PARAM_DIFFERS_FROM_DOC,$error->get_type());
+		self::assert_equals('PHPDoc (integer) does not match the parameter $a (array)',$error->get_msg());
+		
+		$error = $errors[1];
+		self::assert_equals(PC_Obj_Error::E_T_RETURN_DIFFERS_FROM_DOC,$error->get_type());
+		self::assert_equals('PHPDoc (integer) does not match the return type (string)',$error->get_msg());
+		
+		$error = $errors[2];
+		self::assert_equals(PC_Obj_Error::E_T_PARAM_DIFFERS_FROM_DOC,$error->get_type());
+		self::assert_equals('PHPDoc (integer or string) does not match the parameter $x (integer)',$error->get_msg());
+		
+		$error = $errors[3];
+		self::assert_equals(PC_Obj_Error::E_T_PARAM_DIFFERS_FROM_DOC,$error->get_type());
+		self::assert_equals('PHPDoc (integer) does not match the parameter $y (&unknown)',$error->get_msg());
+	}
 }

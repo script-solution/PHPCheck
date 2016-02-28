@@ -162,6 +162,15 @@ class PC_Obj_MultiType extends FWS_Object
 	private $types = array();
 	
 	/**
+	 * The name of the variable for which this multitype has been created. This is only used if a
+	 * variable does not exist, to remember it's name and use that later to implicitly create it
+	 * if it's an argument for a reference parameter.
+	 *
+	 * @var string
+	 */
+	private $varname = null;
+	
+	/**
 	 * Constructor
 	 *
 	 * @param PC_Obj_Type|array $types the types to set
@@ -182,6 +191,24 @@ class PC_Obj_MultiType extends FWS_Object
 		
 		foreach($this->types as $k => $t)
 			$this->types[$k] = clone $t;
+	}
+	
+	/**
+	 * @return string the variable name (non-null if we missed the variable to which this type belongs)
+	 */
+	public function get_missing_varname()
+	{
+		return $this->varname;
+	}
+	
+	/**
+	 * Remembers the given variable name.
+	 *
+	 * @param string $name
+	 */
+	public function set_missing_varname($name)
+	{
+		$this->varname = $name;
 	}
 	
 	/**

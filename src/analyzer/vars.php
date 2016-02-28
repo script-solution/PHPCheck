@@ -104,6 +104,10 @@ class PC_Analyzer_Vars extends PC_Analyzer
 							}
 						}
 						
+						// for references, write-only is ok
+						if($params[$vname]->is_reference())
+							return;
+						
 						$name = 'parameter';
 						$error = PC_Obj_Error::E_S_PARAM_UNUSED;
 					}

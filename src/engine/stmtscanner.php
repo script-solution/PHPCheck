@@ -268,6 +268,30 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			return $this->create_unknown();
 		}
 		
+		// reference parameters implicitly create variables
+		$i = 0;
+		foreach($funcobj->get_params() as $name => $param)
+		{
+			if($i >= count($args))
+				break;
+			
+			// this is a hack: we store the variable name for missing variable names when the variable
+			// appears. when detecting calls, we check whether there are reference parameters and then
+			// use the name to implicitly create the variable
+			if($param->is_reference() && $args[$i]->get_missing_varname() !== null)
+			{
+				$var = new PC_Obj_Variable(
+					$this->get_file(),
+					$this->get_line(),
+					$args[$i]->get_missing_varname(),
+					clone $param->get_mtype()
+				);
+				$this->vars->set($this->scope->get_name(),$var);
+				$args[$i]->set_missing_varname(null);
+			}
+			$i++;
+		}
+		
 		$this->req_analyzer->analyze(
 			$call,$funcobj->get_version()->get_min(),$funcobj->get_version()->get_max()
 		);
@@ -459,7 +483,11 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		}
 		$scopename = $this->scope->get_name($parent);
 		if(!$this->vars->exists($scopename,$name))
-			return $this->create_var($name,$this->create_unknown());
+		{
+			$type = $this->create_unknown();
+			$type->set_missing_varname($name);
+			return $this->create_var($name,$type);
+		}
 		return $this->vars->get($scopename,$name);
 	}
 	

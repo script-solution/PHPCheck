@@ -299,8 +299,8 @@ function_declaration_statement ::= function returns_ref T_STRING(name)
 	$this->state->declare_function(name,params,ret);
 }
 
-is_reference ::= /* empty */ .
-is_reference ::= AMPERSAND .
+is_reference(A) ::= /* empty */ . { A = false; }
+is_reference(A) ::= AMPERSAND . { A = true; }
 
 is_variadic ::= /* empty */ .
 is_variadic ::= T_ELLIPSIS .
@@ -385,11 +385,11 @@ non_empty_parameter_list(A) ::= non_empty_parameter_list(list) COMMA parameter(p
 	A[] = p;
 }
 
-parameter(A) ::= optional_type(vtype) is_reference is_variadic T_VARIABLE(vname) . {
-	A = $this->state->create_parameter(substr(vname,1),vtype,null,false);
+parameter(A) ::= optional_type(vtype) is_reference(ref) is_variadic T_VARIABLE(vname) . {
+	A = $this->state->create_parameter(substr(vname,1),vtype,null,false,ref);
 }
-parameter(A) ::= optional_type(vtype) is_reference is_variadic T_VARIABLE(vname) EQUALS expr(vval) . {
-	A = $this->state->create_parameter(substr(vname,1),vtype,vval,true);
+parameter(A) ::= optional_type(vtype) is_reference(ref) is_variadic T_VARIABLE(vname) EQUALS expr(vval) . {
+	A = $this->state->create_parameter(substr(vname,1),vtype,vval,true,ref);
 }
 
 optional_type(A) ::= /* empty */ . { A = new PC_Obj_MultiType(); }

@@ -169,12 +169,26 @@ class B extends A {
 		return 1;
 	}
 }
+
+if(preg_match("/foo/",$_,$m))
+	echo $m[0];
+
+/** @param int &$a */
+function myref(&$a) {
+	$a = 1;
+}
+
+myref($n);
+echo $n;
 ?>';
 		
 		$options = new PC_Engine_Options();
+		$options->set_use_db(true);
+		$options->set_use_phpref(true);
 		$options->set_report_unused(true);
-		list(,,,,$errors) = $this->analyze($code,$options);
-		
+		$options->add_min_req('PHP','5');
+		list(,,$vars,,$errors) = $this->analyze($code,$options);
+
 		self::assert_equals(5,count($errors));
 		
 		$error = $errors[0];
@@ -196,5 +210,8 @@ class B extends A {
 		$error = $errors[4];
 		self::assert_equals(PC_Obj_Error::E_S_VAR_UNUSED,$error->get_type());
 		self::assert_regex('/The variable \$i in ##global# is unused/',$error->get_msg());
+		
+		$var = $vars[PC_Obj_Variable::SCOPE_GLOBAL]['m'];
+		self::assert_equals('array',(string)$var->get_type());
 	}
 }

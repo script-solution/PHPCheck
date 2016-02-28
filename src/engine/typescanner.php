@@ -403,14 +403,30 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 			$doc = $this->funcComments[$func->get_name()];
 			// look for params
 			$matches = array();
-			preg_match_all('/\@param\s+([^\s]+)\s+&?\s*([^\s]+)/',$doc,$matches);
+			preg_match_all('/\@param\s+([^\s]+)\s+(&)?\s*([^\s]+)/',$doc,$matches);
 			foreach($matches[1] as $k => $match)
 			{
-				$param = substr($matches[2][$k],1);
+				$param = substr($matches[3][$k],1);
+				
 				// does the param exist?
 				if(($fp = $func->get_param($param)) !== null)
 				{
-					$fp->set_mtype(PC_Obj_MultiType::get_type_by_name($match));
+					$mtype = PC_Obj_MultiType::get_type_by_name($match);
+					$fptype = $fp->get_mtype();
+					$isref = $matches[2][$k] != '';
+					
+					// don't report that if we only know the type from the default value
+					if($fp->is_reference() != $isref ||
+						(!$fp->is_mtype_default() && !$fptype->is_unknown() && !$fptype->equals($mtype)))
+					{
+						$docstr = ($isref ? '&' : '').$mtype;
+						$this->report_error(
+							'PHPDoc ('.$docstr.') does not match the parameter $'.$param.' ('.$fp.')',
+							PC_Obj_Error::E_T_PARAM_DIFFERS_FROM_DOC,
+							$func->get_line()
+						);
+					}
+					$fp->set_mtype($mtype);
 					$fp->set_has_doc(true);
 				}
 				else
@@ -435,7 +451,18 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 				$mtype = PC_Obj_MultiType::get_type_by_name($matches[1]);
 				if($mtype !== null)
 				{
-					$func->set_return_type($mtype);
+					$rettype = $func->get_return_type();
+					if($rettype && !$rettype->is_unknown() && !$rettype->equals($mtype))
+					{
+						$this->report_error(
+							'PHPDoc ('.$mtype.') does not match the return type ('.$rettype.')',
+							PC_Obj_Error::E_T_RETURN_DIFFERS_FROM_DOC,
+							$func->get_line()
+						);
+					}
+					
+					if(!$rettype || $rettype->is_unknown())
+						$func->set_return_type($mtype);
 					$func->set_has_return_doc(true);
 				}
 			}
