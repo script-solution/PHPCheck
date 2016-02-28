@@ -120,7 +120,7 @@ class PC_Renderer_HTML extends FWS_Document_Renderer_HTML_Default
 		
 		$projects = PC_DAO::get_projects()->get_all();
 		$pronames = array();
-		$pronames[0] = '- PHP builtin -';
+		$pronames[0] = 'PHP builtins';
 		foreach($projects as $project)
 			$pronames[$project->get_id()] = $project->get_name();
 		

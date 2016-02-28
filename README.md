@@ -50,7 +50,7 @@ Just perform the following steps:
 How to use it:
 --------------
 
-Before you start, choose the project "-PHP builtin-" and parse the PHP manual. Afterwards, PHPCheck
+Before you start, choose the project "PHP builtin" and parse the PHP manual. Afterwards, PHPCheck
 knows the builtin functions and classes, so that it can tell you when you're using them in a wrong
 way.
 
