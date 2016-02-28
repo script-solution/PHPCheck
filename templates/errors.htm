@@ -2,6 +2,20 @@
 
 {if module_error == false}
 <script type="text/javascript" src="{gjs.get_file('src/functions.js')}"></script>
+<script type="text/javascript">
+<!--
+var err_ids = [
+{loop typecbs as rows}{loop rows as cb}{if cb:value !== ''}  'types_' + {cb:value} + '_',{endif}
+{endloop}{endloop}
+];
+	
+function selectAll(checked)
+{
+	for(var i = 0; i < err_ids.length; i++)
+		document.getElementById(err_ids[i]).checked = checked;
+}
+//-->
+</script>
 
 <div class="pc_padbottom">
 	<form method="post" action="{search_target}">
@@ -27,6 +41,10 @@
 						</tr>
 					{endloop}
 					</table>
+					<div style="padding-top: 1em;">
+					<input type="button" onclick="selectAll(true);" value="Select all" />
+					<input type="button" onclick="selectAll(false);" value="Select none" />
+					</div>
 					</dd>
 				</dl>
 				<dl>
