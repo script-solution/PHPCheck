@@ -33,7 +33,7 @@ final class PC_Action_projects_add extends FWS_Action_Base
 {
 	public function perform_action()
 	{
-		PC_DAO::get_projects()->create(new PC_Project(1,'',time(),'','','','',false,false));
+		PC_DAO::get_projects()->create(new PC_Project(1,'',time(),'','','','',false));
 		
 		$this->set_redirect(false);
 		$this->set_show_status_page(false);
