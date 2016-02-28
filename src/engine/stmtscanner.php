@@ -451,7 +451,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 				
 				default:
 					$this->report_error(
-						'The variable "$'.$name.'" is undefined',PC_Obj_Error::E_S_UNDEFINED_VAR
+						'The variable $'.$name.' is undefined',PC_Obj_Error::E_S_UNDEFINED_VAR
 					);
 					break;
 			}
