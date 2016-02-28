@@ -270,7 +270,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		
 		// reference parameters implicitly create variables
 		$i = 0;
-		foreach($funcobj->get_params() as $name => $param)
+		foreach($funcobj->get_params() as $param)
 		{
 			if($i >= count($args))
 				break;
@@ -957,7 +957,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	/**
 	 * Returns the class object for the given class name, which can also be 'self' or 'parent'.
 	 *
-	 * @param string $class the class name
+	 * @param PC_Obj_MultiType $class the class name
 	 * @return PC_Obj_Class the class or null
 	 */
 	private function get_class_for_access($class)
