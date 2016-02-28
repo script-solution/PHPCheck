@@ -295,34 +295,13 @@ if($_)
 		self::assert_equals((string)$type,(string)$global['e']->get_type());
 		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['f']->get_type());
 		
-		self::assert_equals(
-			'func(bool=1)',
-			(string)$calls[0]->get_call(null,false)
-		);
-		self::assert_equals(
-			'func(bool=1 or string=str)',
-			(string)$calls[1]->get_call(null,false)
-		);
-		self::assert_equals(
-			'func(bool=1 or string=str or float=12.3)',
-			(string)$calls[2]->get_call(null,false)
-		);
-		self::assert_equals(
-			'func(bool=1 or string=str or float=12.3 or integer=2)',
-			(string)$calls[3]->get_call(null,false)
-		);
-		self::assert_equals(
-			'func(bool=1 or string=str or float=12.3 or integer)',
-			(string)$calls[4]->get_call(null,false)
-		);
-		self::assert_equals(
-			'func(integer)',
-			(string)$calls[5]->get_call(null,false)
-		);
-		self::assert_equals(
-			'func(integer)',
-			(string)$calls[6]->get_call(null,false)
-		);
+		self::assert_equals('func(bool=1)',(string)$calls[0]);
+		self::assert_equals('func(bool=1 or string=str)',(string)$calls[1]);
+		self::assert_equals('func(bool=1 or string=str or float=12.3)',(string)$calls[2]);
+		self::assert_equals('func(bool=1 or string=str or float=12.3 or integer=2)',(string)$calls[3]);
+		self::assert_equals('func(bool=1 or string=str or float=12.3 or integer)',(string)$calls[4]);
+		self::assert_equals('func(integer)',(string)$calls[5]);
+		self::assert_equals('func(integer)',(string)$calls[6]);
 	}
 	
 	public function test_foreach()
@@ -376,37 +355,13 @@ foreach($b as list($x,$y,$z))
 		self::assert_equals((string)$type,(string)$global['k']->get_type());
 		self::assert_equals((string)$type,(string)$global['v']->get_type());
 		
-		self::assert_equals(
-			'f(integer, integer)',
-			(string)$calls[0]->get_call(null,false)
-		);
-		self::assert_equals(
-			'f(string)',
-			(string)$calls[1]->get_call(null,false)
-		);
-		self::assert_equals(
-			'f(unknown)',
-			(string)$calls[2]->get_call(null,false)
-		);
-		self::assert_equals(
-			'f(unknown)',
-			(string)$calls[3]->get_call(null,false)
-		);
-		self::assert_equals(
-			'f(unknown, integer)',
-			(string)$calls[4]->get_call(null,false)
-		);
-		self::assert_equals(
-			'f(integer, unknown)',
-			(string)$calls[5]->get_call(null,false)
-		);
-		self::assert_equals(
-			'f(unknown, unknown)',
-			(string)$calls[6]->get_call(null,false)
-		);
-		self::assert_equals(
-			'f(unknown, unknown, unknown)',
-			(string)$calls[7]->get_call(null,false)
-		);
+		self::assert_equals('f(integer, integer)',(string)$calls[0]);
+		self::assert_equals('f(string)',(string)$calls[1]);
+		self::assert_equals('f(unknown)',(string)$calls[2]);
+		self::assert_equals('f(unknown)',(string)$calls[3]);
+		self::assert_equals('f(unknown, integer)',(string)$calls[4]);
+		self::assert_equals('f(integer, unknown)',(string)$calls[5]);
+		self::assert_equals('f(unknown, unknown)',(string)$calls[6]);
+		self::assert_equals('f(unknown, unknown, unknown)',(string)$calls[7]);
 	}
 }

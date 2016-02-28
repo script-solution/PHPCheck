@@ -85,7 +85,7 @@ final class PC_Module_calls extends PC_Module
 			$func = $typecon->get_method_or_func($call->get_class(),$call->get_function());
 			$calls[] = array(
 				'id' => $call->get_id(),
-				'call' => $call->get_call($typecon),
+				'call' => $this->get_call($call,$typecon),
 				'file' => $call->get_file(),
 				'line' => $call->get_line(),
 				'url' => $url->to_url(),
@@ -109,5 +109,33 @@ final class PC_Module_calls extends PC_Module
 			'display_search' => $cookies->get_cookie('calls_search') ? 'block' : 'none',
 			'cookie_name' => $cookies->get_prefix().'calls_search',
 		));
+	}
+	
+	private function get_call($call,$types)
+	{
+		if($call->get_class() && $call->get_class() == PC_Obj_Class::UNKNOWN)
+			$classname = '<i>UNKNOWN</i>';
+		else
+			$classname = $call->get_class();
+		
+		$url = PC_URL::get_mod_url('class');
+		$url->set('name',$classname);
+		
+		$str = '';
+		if($classname)
+		{
+			$str .= '<a href="'.$url->to_url().'">'.$classname.'</a>';
+			$str .= $call->is_static() ? '::' : '->';
+		}
+		
+		$func = $types->get_method_or_func($call->get_class(),$call->get_function());
+		if($func && $func->get_line())
+			$str .= '<a href="'.PC_Utils::get_code_url($func).'">'.$call->get_function().'</a>(';
+		else
+			$str .= $call->get_function().'(';
+		$str .= implode(', ',$call->get_arguments());
+		$str .= ')';
+		
+		return $str;
 	}
 }

@@ -61,6 +61,29 @@ class PC_Utils extends FWS_UtilBase
 	}
 	
 	/**
+	 * Builds an URL to the code for given location.
+	 *
+	 * @param PC_Obj_Location $loc the location
+	 * @return string the URL
+	 */
+	public static function get_code_url($loc)
+	{
+		$file = $loc->get_file();
+		$line = $loc->get_line();
+		if($file)
+		{
+			$classes = PC_DAO::get_classes()->get_by_file($file);
+			if(count($classes) == 1)
+				$url = PC_URL::get_mod_url('class')->set('name',$classes[0]->get_name());
+			else
+				$url = PC_URL::get_mod_url('file')->set('path',$file);
+			$url->set_anchor('l'.$line);
+			return $url->to_url();
+		}
+		return '#';
+	}
+	
+	/**
 	 * Highlights the given file
 	 *
 	 * @param string $file the file

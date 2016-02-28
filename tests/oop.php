@@ -300,14 +300,14 @@ $r = $p[1]->test2($b);
 		
 		// check calls
 		$i = 0;
-		self::assert_equals((string)$calls[$i++]->get_call(null,false),'strstr(integer=4, string=str)');
+		self::assert_equals((string)$calls[$i++],'strstr(integer=4, string=str)');
 		self::assert_call($calls[$i++],'b','get42',true);
 		self::assert_call($calls[$i++],'a','test',false);
-		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy(integer=2)');
-		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy(integer=3)');
-		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy(integer=6)');
-		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy(unknown)');
-		self::assert_equals((string)$calls[$i++]->get_call(null,false),'dummy(unknown)');
+		self::assert_equals((string)$calls[$i++],'dummy(integer=2)');
+		self::assert_equals((string)$calls[$i++],'dummy(integer=3)');
+		self::assert_equals((string)$calls[$i++],'dummy(integer=6)');
+		self::assert_equals((string)$calls[$i++],'dummy(unknown)');
+		self::assert_equals((string)$calls[$i++],'dummy(unknown)');
 		self::assert_call($calls[$i++],'a','__construct',false);
 		self::assert_call($calls[$i++],'a','test2',false);
 		self::assert_call($calls[$i++],'x','__construct',false);

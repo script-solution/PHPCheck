@@ -100,7 +100,7 @@ class PC_DAO_Classes extends FWS_Singleton
 	}
 	
 	/**
-	 * Returns the classes with given file in the given project
+	 * Returns the classes with given file in the given project or project dependencies.
 	 *
 	 * @param string $file the file-name
 	 * @param int $pid the project-id (default = current)
@@ -115,10 +115,13 @@ class PC_DAO_Classes extends FWS_Singleton
 		
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASSES.'
-			 WHERE project_id = ? AND file = ?'
+			 WHERE file = :file AND '
+			 .'(project_id = :pid OR project_id in ('
+			 .'  SELECT dep_id FROM '.PC_TB_PROJECT_DEPS.' WHERE project_id = :pid'
+			 .'))'
 		);
-		$stmt->bind(0,PC_Utils::get_project_id($pid));
-		$stmt->bind(1,$file);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		$stmt->bind(':file',$file);
 		$classes = array();
 		foreach($db->get_rows($stmt->get_statement()) as $row)
 			$classes[] = $this->build_class($row,$pid);

@@ -44,7 +44,7 @@ catch(Exception $e) {
 		
 		self::assert_equals(0,count($errors));
 		
-		self::assert_equals('myfunc(Exception)',(string)$calls[0]->get_call(null,false));
+		self::assert_equals('myfunc(Exception)',(string)$calls[0]);
 		
 		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
 		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['e']->get_type());

@@ -42,14 +42,14 @@ cyrus_close(null);
 		$error = $errors[0];
 		self::assert_equals(PC_Obj_Error::E_S_REQUIRES_NEWER,$error->get_type());
 		self::assert_equals(
-			'cyrus_close(unknown) in "", line 2 requires PHP >= 4.1.0, but you target PHP >= 4.0.0',
+			'cyrus_close(unknown) requires PHP >= 4.1.0, but you target PHP >= 4.0.0',
 			$error->get_msg()
 		);
 		
 		$error = $errors[1];
 		self::assert_equals(PC_Obj_Error::E_S_REQUIRES_OLDER,$error->get_type());
 		self::assert_equals(
-			'cyrus_close(unknown) in "", line 2 exists only till PHP 5, but you target PHP < 5.1.0',
+			'cyrus_close(unknown) exists only till PHP 5, but you target PHP < 5.1.0',
 			$error->get_msg()
 		);
 	}
@@ -76,21 +76,21 @@ $count = $sth->columnCount();
 		$error = $errors[0];
 		self::assert_equals(PC_Obj_Error::E_S_REQUIRES_NEWER,$error->get_type());
 		self::assert_equals(
-			'PDO->__construct(string=host, string=login, string=pw) in "", line 2 requires PECL pdo >= 0.1.0',
+			'PDO->__construct(string=host, string=login, string=pw) requires PECL pdo >= 0.1.0',
 			$error->get_msg()
 		);
 		
 		$error = $errors[1];
 		self::assert_equals(PC_Obj_Error::E_S_REQUIRES_NEWER,$error->get_type());
 		self::assert_equals(
-			'PDO->prepare(string=SELECT * FROM mytable) in "", line 4 requires PECL pdo >= 0.1.0',
+			'PDO->prepare(string=SELECT * FROM mytable) requires PECL pdo >= 0.1.0',
 			$error->get_msg()
 		);
 		
 		$error = $errors[2];
 		self::assert_equals(PC_Obj_Error::E_S_REQUIRES_NEWER,$error->get_type());
 		self::assert_equals(
-			'PDOStatement->columnCount() in "", line 5 requires PECL pdo >= 0.2.0',
+			'PDOStatement->columnCount() requires PECL pdo >= 0.2.0',
 			$error->get_msg()
 		);
 		
@@ -112,7 +112,7 @@ $count = $sth->columnCount();
 		$error = $errors[0];
 		self::assert_equals(PC_Obj_Error::E_S_REQUIRES_NEWER,$error->get_type());
 		self::assert_equals(
-			'PDOStatement->columnCount() in "", line 5 requires PECL pdo >= 0.2.0, but you target PECL pdo >= 0.1.0',
+			'PDOStatement->columnCount() requires PECL pdo >= 0.2.0, but you target PECL pdo >= 0.1.0',
 			$error->get_msg()
 		);
 	}

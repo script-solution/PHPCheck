@@ -113,8 +113,8 @@ abstract class myc {
 		self::assert_equals('MyClass',(string)$func->get_param('c'));
 		self::assert_equals('integer',(string)$func->get_param('d'));
 		
-		self::assert_equals('myc->doit()',(string)$calls[0]->get_call(null,false));
-		self::assert_equals('myc2::mystatic()',(string)$calls[1]->get_call(null,false));
+		self::assert_equals('myc->doit()',(string)$calls[0]);
+		self::assert_equals('myc2::mystatic()',(string)$calls[1]);
 	}
 	
 	public function test_nesting()
@@ -163,9 +163,9 @@ function e() {
 		
 		self::assert_equals(0,count($errors));
 		
-		self::assert_equals('f3(integer=3)',(string)$calls[0]->get_call(null,false));
-		self::assert_equals('f2(integer=2)',(string)$calls[1]->get_call(null,false));
-		self::assert_equals('f1(integer=1)',(string)$calls[2]->get_call(null,false));
+		self::assert_equals('f3(integer=3)',(string)$calls[0]);
+		self::assert_equals('f2(integer=2)',(string)$calls[1]);
+		self::assert_equals('f1(integer=1)',(string)$calls[2]);
 		
 		self::assert_equals((string)PC_Obj_MultiType::create_int(1),(string)$vars['A::a']['a']->get_type());
 		self::assert_equals((string)PC_Obj_MultiType::create_int(2),(string)$vars['b']['b']->get_type());

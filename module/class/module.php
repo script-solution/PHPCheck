@@ -182,6 +182,6 @@ final class PC_Module_Class extends FWS_Module
 			return $loc->get_file();
 		if($loc->get_file() == $classfile)
 			return '#l'.$loc->get_line();
-		return PC_URL::get_code_url($loc);
+		return PC_Utils::get_code_url($loc);
 	}
 }

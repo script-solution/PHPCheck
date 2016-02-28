@@ -194,40 +194,6 @@ class PC_Obj_Call extends PC_Obj_Location
 		$this->arguments[] = clone $type;
 	}
 	
-	/**
-	 * Builds a string-representation of the call
-	 * 
-	 * @param PC_Engine_TypeContainer $types the type container to use or null
-	 * @param bool $use_links use links?
-	 * @return string
-	 */
-	public function get_call($types = null,$use_links = true)
-	{
-		$classname = $this->class && $this->class == PC_Obj_Class::UNKNOWN ? '<i>UNKNOWN</i>' : $this->class;
-		if($use_links)
-		{
-			$url = PC_URL::get_mod_url('class');
-			$url->set('name',$classname);
-		}
-		$str = '';
-		if($classname)
-		{
-			$str .= $use_links ? '<a href="'.$url->to_url().'">'.$classname.'</a>' : $classname;
-			$str .= $this->static ? '::' : '->';
-		}
-		if($types !== null && $use_links)
-			$func = $types->get_method_or_func($this->class,$this->function);
-		else
-			$func = null;
-		if($func && $func->get_line())
-			$str .= '<a href="'.PC_URL::get_code_url($func).'">'.$this->function.'</a>(';
-		else
-			$str .= $this->function.'(';
-		$str .= implode(', ',$this->arguments);
-		$str .= ')';
-		return $str;
-	}
-	
 	protected function get_dump_vars()
 	{
 		return array_merge(parent::get_dump_vars(),get_object_vars($this));
@@ -235,6 +201,16 @@ class PC_Obj_Call extends PC_Obj_Location
 	
 	public function __ToString()
 	{
-		return $this->get_call(null,false).' in "'.$this->get_file().'", line '.$this->get_line();
+		if($this->class && $this->class == PC_Obj_Class::UNKNOWN)
+			$classname = '<i>UNKNOWN</i>';
+		else
+			$classname = $this->class;
+		
+		$str = '';
+		if($classname)
+			$str .= $classname.($this->static ? '::' : '->');
+		$str .= $this->function.'('.implode(', ',$this->arguments).')';
+		
+		return $str;
 	}
 }
