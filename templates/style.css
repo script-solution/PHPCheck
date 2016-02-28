@@ -149,6 +149,7 @@ h1.pc_topic {
 }
 
 .pc_desc {
+	padding-top: 0.5em;
 	font-size: 0.9em;
 }
 
