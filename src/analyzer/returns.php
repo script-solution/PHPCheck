@@ -171,14 +171,8 @@ class PC_Analyzer_Returns extends PC_Analyzer
 			return false;
 		foreach($types as $t)
 		{
-			if($t !== null)
-			{
-				foreach($t->get_types() as $t1)
-				{
-					if(!$mtype->contains($t1))
-						return true;
-				}
-			}
+			if($t !== null && !$this->env->get_types()->is_type_conforming($t,$mtype))
+				return true;
 		}
 		return false;
 	}

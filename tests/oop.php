@@ -460,4 +460,53 @@ $a->test();
 		$a = $vars[PC_Obj_Variable::SCOPE_GLOBAL]['a'];
 		self::assert_equals('#anon1',$a->get_type());
 	}
+	
+	public function test_spec()
+	{
+		$code = '<?php
+class A {}
+class B extends A {}
+interface I {}
+interface J extends I {}
+class C implements I {}
+class D implements J {}
+class E extends B implements J {}
+
+/** @return A */
+function a() {
+	return new A;
+	return new B;
+	return new E;
+}
+
+/** @return B */
+function b() {
+	return new B;
+	return new E;
+}
+
+/** @return I */
+function c() {
+	return new C;
+	return new D;
+	return new E;
+}
+
+/**
+ * @param A $a
+ * @param B $b
+ * @param I $c
+ */
+function d($a,$b,$c) {
+}
+
+d(new A,new B,new C);
+d(new B,new E,new D);
+d(new E,new B,new E);
+?>';
+
+		list(,,,,$errors) = $this->analyze($code);
+
+		self::assert_equals(0,count($errors));
+	}
 }

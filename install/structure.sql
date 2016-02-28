@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.4.1
+-- version 4.5.5
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 26, 2016 at 10:56 PM
+-- Generation Time: Feb 28, 2016 at 07:00 AM
 -- Server version: 10.1.11-MariaDB-log
 -- PHP Version: 7.0.3
 
@@ -141,8 +141,7 @@ CREATE TABLE `pc_projects` (
   `type_exclude` text NOT NULL,
   `stmt_folders` text NOT NULL,
   `stmt_exclude` text NOT NULL,
-  `report_mixed` tinyint(1) NOT NULL,
-  `report_unknown` tinyint(1) NOT NULL,
+  `report_argret_strictly` tinyint(1) NOT NULL,
   `current` tinyint(1) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 

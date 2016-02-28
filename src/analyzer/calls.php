@@ -113,14 +113,6 @@ class PC_Analyzer_Calls extends PC_Analyzer
 				$this->check_params($call,$m);
 			}
 		}
-		else if($this->env->get_options()->get_report_unknown() && $classname == PC_Obj_Class::UNKNOWN)
-		{
-			$this->report(
-				$call,
-				'The class of the object in the call "'.$this->get_call_link($call).'" is unknown!',
-				PC_Obj_Error::E_S_CLASS_UNKNOWN
-			);
-		}
 		else
 		{
 			$this->report(
@@ -185,8 +177,7 @@ class PC_Analyzer_Calls extends PC_Analyzer
 				/* @var $param PC_Obj_Parameter */
 				$arg = isset($arguments[$i]) ? $arguments[$i] : null;
 				// arg- or param-type unknown?
-				if(!$this->env->get_options()->get_report_unknown() &&
-					($arg === null || $arg->is_unknown() || $param->get_mtype()->is_unknown()))
+				if($arg === null || $arg->is_unknown() || $param->get_mtype()->is_unknown())
 				{
 					$i++;
 					continue;
@@ -238,16 +229,7 @@ class PC_Analyzer_Calls extends PC_Analyzer
 		}
 		
 		// arg in the allowed types?
-		foreach($arg->get_types() as $type)
-		{
-			// every int can be converted to float
-			if($type->get_type() == PC_Obj_Type::INT &&
-					$param->get_mtype()->contains(new PC_Obj_Type(PC_Obj_Type::FLOAT)))
-				return true;
-			if($param->get_mtype()->contains($type))
-				return true;
-		}
-		return false;
+		return $this->env->get_types()->is_type_conforming($arg,$param->get_mtype());
 	}
 	
 	/**
@@ -261,7 +243,7 @@ class PC_Analyzer_Calls extends PC_Analyzer
 		$first = $arg->get_first();
 		if($first->get_type() == PC_Obj_Type::STRING)
 		{
-			if(!$this->env->get_options()->get_report_unknown() && $first->is_val_unknown())
+			if($first->is_val_unknown())
 				return;
 			
 			$func = $this->env->get_types()->get_function($first->get_value());
@@ -276,7 +258,7 @@ class PC_Analyzer_Calls extends PC_Analyzer
 		}
 		else if($first->get_type() == PC_Obj_Type::TARRAY)
 		{
-			if(!$this->env->get_options()->get_report_unknown() && $first->is_val_unknown())
+			if($first->is_val_unknown())
 				return;
 			
 			$callable = $first->get_value();
@@ -292,8 +274,7 @@ class PC_Analyzer_Calls extends PC_Analyzer
 			}
 			else
 			{
-				if(!$this->env->get_options()->get_report_unknown() && ($callable[0]->is_unknown() ||
-					 $callable[1]->is_unknown()))
+				if($callable[0]->is_unknown() || $callable[1]->is_unknown())
 					return;
 				
 				$obj = $callable[0]->get_first();

@@ -150,8 +150,7 @@ class PC_DAO_Projects extends FWS_Singleton
 			'type_exclude' => $project->get_type_exclude(),
 			'stmt_folders' => $project->get_stmt_folders(),
 			'stmt_exclude' => $project->get_stmt_exclude(),
-			'report_mixed' => $project->get_report_mixed(),
-			'report_unknown' => $project->get_report_unknown()
+			'report_argret_strictly' => $project->get_report_argret_strictly(),
 		));
 		
 		foreach($project->get_req() as $r)
@@ -227,7 +226,7 @@ class PC_DAO_Projects extends FWS_Singleton
 		
 		$proj = new PC_Project(
 			$row['id'],$row['name'],$row['created'],$row['type_folders'],$row['type_exclude'],
-			$row['stmt_folders'],$row['stmt_exclude'],$row['report_mixed'],$row['report_unknown']
+			$row['stmt_folders'],$row['stmt_exclude'],$row['report_argret_strictly']
 		);
 		foreach($req as $v)
 			$proj->add_req($v['id'],$v['type'],$v['name'],$v['version']);

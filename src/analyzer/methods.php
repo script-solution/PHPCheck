@@ -216,7 +216,8 @@ class PC_Analyzer_Methods extends PC_Analyzer
 					break;
 			}
 			
-			if($method->has_return_doc() && !$method->get_return_type()->equals($return))
+			if($method->has_return_doc() &&
+				!$this->env->get_types()->is_type_conforming($method->get_return_type(),$return))
 			{
 				// its ok to specify a more specific return-value if the expected one is "mixed"
 				if(!$return->is_unknown())
@@ -284,10 +285,8 @@ class PC_Analyzer_Methods extends PC_Analyzer
 		for($i = 0; $i < $ecount; $i++)
 		{
 			// just check, if we have a parameter-description via PHPDoc
-			// and if the expected is not unknown. since, if it is unknown (=mixed), the user may
-			// specify something more specific
-			if($exp[$i]->has_doc() && !$exp[$i]->get_mtype()->is_unknown() &&
-					!$exp[$i]->get_mtype()->equals($act[$i]))
+			if($exp[$i]->has_doc() &&
+				!$this->env->get_types()->is_type_conforming($act[i],$exp[$i]->get_mtype()))
 				return false;
 		}
 		return true;

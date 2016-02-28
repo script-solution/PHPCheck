@@ -16,19 +16,15 @@
 			<dd>{form.get_date_chooser('start_',def_start,false)}</dd>
 		</dl>
 		<dl>
-			<dt>Report mixed:</dt>
+			<dt>Report arguments/returns strictly:</dt>
 			<dd>
-				{form.get_checkbox('report_mixed',report_mixed,'1','Treat potential problems in which
-				&quot;mixed&quot; types are involved as errors')}
-				<div class="pc_desc">Note: If disabled, they will be ignored.</div>
-			</dd>
-		</dl>
-		<dl>
-			<dt>Report unknown:</dt>
-			<dd>
-				{form.get_checkbox('report_unknown',report_unknown,'1','Treat potential problems in which
-				&quot;unknown&quot; types are involved as errors')}
-				<div class="pc_desc">Note: If disabled, they will be ignored.</div>
+				{form.get_checkbox('report_argret_strictly',report_argret_strictly,'1','Report an error if <i>not all</i>
+				possible types of arguments and return values are conforming to the specification.')}
+				<div class="pc_desc">
+				That is, if e.g. an argument has multiple possible types and one of them is not expected by
+				the parameter, an error is reported. These are often false positives, because PHPCheck is
+				not (yet) able to detect that, e.g., the code exits early for the unexpected type.
+				</div>
 			</dd>
 		</dl>
 		<dl>
@@ -65,4 +61,3 @@
 {endif}
 {endif}
 
-{include "inc_footer.htm"}

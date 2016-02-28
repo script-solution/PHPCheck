@@ -39,17 +39,11 @@ class PC_Engine_Options extends FWS_Object
 	private $pid = PC_Project::CURRENT_ID;
 	
 	/**
-	 * Whether errors with mixed types involved should be reported
+	 * Report an error if only one possible type of arguments/returns violates the spec.
 	 * 
 	 * @var boolean
 	 */
-	private $report_mixed = false;
-	/**
-	 * Whether errors with unknown types involved should be reported
-	 * 
-	 * @var boolean
-	 */
-	private $report_unknown = false;
+	private $report_argret_strictly = false;
 	/**
 	 * Whether unused variables should be reported.
 	 *
@@ -102,39 +96,21 @@ class PC_Engine_Options extends FWS_Object
 	}
 	
 	/**
-	 * @return bool whether errors with mixed types involved should be reported
+	 * @return bool whether to report an error if only one possible type violates the spec.
 	 */
-	public function get_report_mixed()
+	public function get_report_argret_strictly()
 	{
-		return $this->report_mixed;
+		return $this->report_argret_strictly;
 	}
 	
 	/**
-	 * Sets whether errors with mixed types involved should be reported
+	 * Sets whether to report an error if only one possible type violates the spec.
 	 * 
 	 * @param bool $report the new value
 	 */
-	public function set_report_mixed($report)
+	public function set_report_argret_strictly($report)
 	{
-		$this->report_mixed = $report;
-	}
-	
-	/**
-	 * @return bool whether errors with unknown types involved should be reported
-	 */
-	public function get_report_unknown()
-	{
-		return $this->report_unknown;
-	}
-	
-	/**
-	 * Sets whether errors with unknown types involved should be reported
-	 * 
-	 * @param bool $report the new value
-	 */
-	public function set_report_unknown($report)
-	{
-		$this->report_unknown = $report;
+		$this->report_argret_strictly = $report;
 	}
 	
 	/**

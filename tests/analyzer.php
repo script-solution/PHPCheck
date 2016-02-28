@@ -269,20 +269,6 @@ $D = A::$a->b();	// TODO same problem
 		);
 	}
 	
-	public function test_s_class_unknown()
-	{
-		$code = '<?php
-$x = $_ . "str";
-$A = new $x();
-$A = new ${$_ . "foo"}();
-?>';
-		
-		$options = new PC_Engine_Options();
-		$options->set_report_unknown(true);
-		list(,,,,$errors) = $this->analyze($code,$options);
-		self::assert_equals(0,count($errors));
-	}
-	
 	public function test_s_function_missing()
 	{
 		$code = '<?php

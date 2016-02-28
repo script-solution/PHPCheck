@@ -287,6 +287,85 @@ final class PC_Engine_TypeContainer extends FWS_Object
 	}
 	
 	/**
+	 * Determines whether $class is a subclass of $super or if $super is an implemented interface.
+	 *
+	 * @param string $class the class name
+	 * @param string $super the potential superclass name
+	 * @return bool true if so
+	 */
+	public function is_subclass_of($class,$super)
+	{
+		$cobj = $this->get_class($class);
+		if(!$cobj)
+			return false;
+		if($cobj->get_super_class() == $super)
+			return true;
+		foreach($cobj->get_interfaces() as $if)
+		{
+			if($if == $super || $this->is_subclass_of($if,$super))
+				return true;
+		}
+		return $this->is_subclass_of($cobj->get_super_class(),$super);
+	}
+	
+	/**
+	 * Checks whether $actual is okay for $spec.
+	 *
+	 * @param PC_Obj_MultiType $actual the actual type
+	 * @param PC_Obj_MultiType $spec the specified type, i.e., the one to check against
+	 * @return bool true if ok
+	 */
+	public function is_type_conforming($actual,$spec)
+	{
+		if($actual->is_unknown() || $spec->is_unknown())
+			return true;
+		
+		// every actual type has to be contained in at least one of the specified types
+		$count = 0;
+		foreach($actual->get_types() as $atype)
+		{
+			$ok = false;
+			foreach($spec->get_types() as $stype)
+			{
+				if($atype->equals($stype))
+				{
+					$ok = true;
+					break;
+				}
+				
+				// floats can accept ints
+				if($atype->get_type() == PC_Obj_Type::INT && $stype->get_type() == PC_Obj_Type::FLOAT)
+				{
+					$ok = true;
+					break;
+				}
+				
+				// if both are objects, check if the actual is the same or a subclass of the spec
+				$objs = $atype->get_type() == PC_Obj_Type::OBJECT &&
+					$stype->get_type() == PC_Obj_Type::OBJECT;
+				if($objs &&
+					($stype->get_class() == '' ||
+					 ($atype->get_class() == $stype->get_class() ||
+					 $this->is_subclass_of($atype->get_class(),$stype->get_class()))))
+				{
+					$ok = true;
+					break;
+				}
+			}
+			
+			// early exit?
+			if(!$ok && $this->options->get_report_argret_strictly())
+				return false;
+			if($ok && !$this->options->get_report_argret_strictly())
+				return true;
+			
+			if($ok)
+				$count++;
+		}
+		return $count > 0;
+	}
+	
+	/**
 	 * Adds all given constants to the container
 	 *
 	 * @param array $consts an array of constants

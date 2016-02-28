@@ -37,8 +37,7 @@ final class PC_CLI_StmtScan implements PC_CLIJob
 		
 		$options = new PC_Engine_Options();
 		$options->set_report_unused(true);
-		$options->set_report_mixed($project->get_report_mixed());
-		$options->set_report_unknown($project->get_report_unknown());
+		$options->set_report_argret_strictly($project->get_report_argret_strictly());
 		foreach($project->get_req() as $r)
 		{
 			if($r['type'] == 'min')

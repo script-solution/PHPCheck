@@ -91,10 +91,17 @@ class j {
 }
 
 $x = i();
+
+/** @return int */
+function k() {
+	if(true)
+		return "foo";
+	return 1;
+}
 ?>';
 		
 		list($functions,,,,$errors) = $this->analyze($code);
-		self::assert_equals(7,count($errors));
+		self::assert_equals(8,count($errors));
 		
 		self::assert_equals("function b(): integer=0",$functions['b']);
 		self::assert_equals("function c(): integer or string",$functions['c']);
@@ -152,6 +159,13 @@ $x = i();
 		self::assert_equals(PC_Obj_Error::E_S_VOID_ASSIGN,$error->get_type());
 		self::assert_regex(
 			'/Assignment of void to \$x/',
+			$error->get_msg()
+		);
+		
+		$error = $errors[7];
+		self::assert_equals(PC_Obj_Error::E_S_RETURNS_DIFFER_FROM_SPEC,$error->get_type());
+		self::assert_equals(
+			'The return-specification (PHPDoc) of function/method "k" does not match with the returned values (spec="integer", returns="string=foo or integer=1")',
 			$error->get_msg()
 		);
 	}

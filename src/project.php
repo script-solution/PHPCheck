@@ -94,18 +94,11 @@ final class PC_Project extends FWS_Object
 	private $stmt_exclude;
 	
 	/**
-	 * Whether potential problems in which mixed types are involved should be treaten as errors
+	 * Report an error if only one possible type of arguments/returns violates the spec.
 	 * 
 	 * @var boolean
 	 */
-	private $report_mixed;
-	
-	/**
-	 * Whether potential problems in which unknown types are involved should be treaten as errors
-	 * 
-	 * @var boolean
-	 */
-	private $report_unknown;
+	private $report_argret_strictly;
 	
 	/**
 	 * The lower and upper bounds for versions.
@@ -124,11 +117,10 @@ final class PC_Project extends FWS_Object
 	 * @param string $type_exclude the excluded items for the type-scanner
 	 * @param string $stmt_folders the folders for the statement-scanner
 	 * @param string $stmt_exclude the excluded items for the statement-scanner
-	 * @param boolean $report_mixed report errors with mixed types?
-	 * @param boolean $report_unknown report errors with unknown types?
+	 * @param boolean $report_argret_strictly report errors strictly?
 	 */
 	public function __construct($id,$name,$created,$type_folders,$type_exclude,$stmt_folders,
-		$stmt_exclude,$report_mixed,$report_unknown)
+		$stmt_exclude,$report_argret_strictly)
 	{
 		parent::__construct();
 		
@@ -144,8 +136,7 @@ final class PC_Project extends FWS_Object
 		$this->type_exclude = $type_exclude;
 		$this->stmt_folders = $stmt_folders;
 		$this->stmt_exclude = $stmt_exclude;
-		$this->report_mixed = $report_mixed;
-		$this->report_unknown = $report_unknown;
+		$this->report_argret_strictly = $report_argret_strictly;
 		$this->req = array();
 	}
 	
@@ -266,39 +257,21 @@ final class PC_Project extends FWS_Object
 	}
 	
 	/**
-	 * @return boolean whether errors with mixed types should be treaten as errors (or ignored)
+	 * @return boolean whether to report an error if only one possible type violates the spec.
 	 */
-	public function get_report_mixed()
+	public function get_report_argret_strictly()
 	{
-		return $this->report_mixed;
+		return $this->report_argret_strictly;
 	}
 	
 	/**
-	 * Sets the report-mixed-value
+	 * Sets whether to report an error if only one possible type violates the spec.
 	 *
 	 * @param boolean $b the new value
 	 */
-	public function set_report_mixed($b)
+	public function set_report_argret_strictly($b)
 	{
-		$this->report_mixed = $b;
-	}
-	
-	/**
-	 * @return boolean whether errors with unknown types should be treaten as errors (or ignored)
-	 */
-	public function get_report_unknown()
-	{
-		return $this->report_unknown;
-	}
-	
-	/**
-	 * Sets the report-unknown-value
-	 *
-	 * @param boolean $b the new value
-	 */
-	public function set_report_unknown($b)
-	{
-		$this->report_unknown = $b;
+		$this->report_argret_strictly = $b;
 	}
 	
 	/**
