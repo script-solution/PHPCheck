@@ -49,7 +49,7 @@ class PC_DAO_Projects extends FWS_Singleton
 		$res = array();
 		$rows = $db->get_rows('SELECT * FROM '.PC_TB_PROJECTS);
 		foreach($rows as $row)
-			$res[] = $this->build_project($row);
+			$res[] = $this->build_project($row,false);
 		return $res;
 	}
 	
@@ -80,7 +80,7 @@ class PC_DAO_Projects extends FWS_Singleton
 		$res = array();
 		$rows = $db->get_rows('SELECT * FROM '.PC_TB_PROJECTS.' WHERE id IN ('.implode(',',$ids).')');
 		foreach($rows as $row)
-			$res[] = $this->build_project($row);
+			$res[] = $this->build_project($row,true);
 		return $res;
 	}
 	
@@ -91,7 +91,7 @@ class PC_DAO_Projects extends FWS_Singleton
 	{
 		$db = FWS_Props::get()->db();
 		$row = $db->get_row('SELECT * FROM '.PC_TB_PROJECTS.' WHERE current = 1');
-		return $this->build_project($row);
+		return $this->build_project($row,true);
 	}
 	
 	/**
@@ -239,25 +239,30 @@ class PC_DAO_Projects extends FWS_Singleton
 	 * Builds an instance of PC_Project from the given row
 	 *
 	 * @param array $row the row from db
+	 * @param boolean $full whether to fetch data from other tables
 	 * @return PC_Project the project
 	 */
-	private function build_project($row)
+	private function build_project($row,$full)
 	{
 		if(!$row)
 			return null;
 		
 		$db = FWS_Props::get()->db();
-		$deps = $db->get_rows('SELECT * FROM '.PC_TB_PROJECT_DEPS.' WHERE project_id = '.$row['id']);
-		$req = $db->get_rows('SELECT * FROM '.PC_TB_REQUIREMENTS.' WHERE project_id = '.$row['id']);
 		
 		$proj = new PC_Project(
 			$row['id'],$row['name'],$row['created'],$row['type_folders'],$row['type_exclude'],
 			$row['stmt_folders'],$row['stmt_exclude'],$row['report_argret_strictly']
 		);
-		foreach($deps as $d)
-			$proj->add_project_dep($d['dep_id']);
-		foreach($req as $v)
-			$proj->add_req($v['id'],$v['type'],$v['name'],$v['version']);
+		
+		if($full)
+		{
+			$deps = $db->get_rows('SELECT * FROM '.PC_TB_PROJECT_DEPS.' WHERE project_id = '.$row['id']);
+			foreach($deps as $d)
+				$proj->add_project_dep($d['dep_id']);
+			$req = $db->get_rows('SELECT * FROM '.PC_TB_REQUIREMENTS.' WHERE project_id = '.$row['id']);
+			foreach($req as $v)
+				$proj->add_req($v['id'],$v['type'],$v['name'],$v['version']);
+		}
 		return $proj;
 	}
 }
