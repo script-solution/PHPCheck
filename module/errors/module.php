@@ -92,7 +92,8 @@ final class PC_Module_errors extends PC_Module
 				'message' => $this->get_msg($err),
 				'file' => $err->get_loc()->get_file(),
 				'line' => $err->get_loc()->get_line(),
-				'fileurl' => $url->to_url()
+				'fileurl' => $url->to_url(),
+				'typeurl' => PC_URL::get_mod_url()->set('types',array($err->get_type()))->to_url()
 			);
 		}
 		

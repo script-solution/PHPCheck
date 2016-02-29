@@ -78,7 +78,7 @@ function selectAll(checked)
 	{else}
 	{loop errors as err}
 	<tr>
-		<td class="pc_main" width="15%">{err:type}</td>
+		<td class="pc_main" width="15%"><a href="{err:typeurl}">{err:type}</a></td>
 		<td class="pc_main" width="60%">
 		<a href="{err:fileurl}"><img src="images/goto.gif" alt="-&gt;" /></a> {err:message}
 		<div style="float: right;">
