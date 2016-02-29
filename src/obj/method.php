@@ -209,6 +209,14 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 	}
 	
 	/**
+	 * @return boolean true if it is a constructor
+	 */
+	public function is_constructor()
+	{
+		return !$this->free && strcasecmp($this->get_name(),'__construct') == 0;
+	}
+	
+	/**
 	 * @return boolean whether the method is static
 	 */
 	public function is_static()
@@ -436,7 +444,7 @@ class PC_Obj_Method extends PC_Obj_Modifiable implements PC_Obj_Visible
 		$str .= '(';
 		$str .= implode(', ',$this->get_params());
 		$str .= ')';
-		if($this->get_name() != '__construct')
+		if(!$this->is_constructor())
 			$str .= ': '.$this->get_return_type();
 		if(count($this->throws) > 0)
 			$str .= ' throws '.implode(', ',array_keys($this->throws));

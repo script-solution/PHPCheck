@@ -200,7 +200,10 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		
 		// determine class- and function-name
 		$call->set_function($fname);
-		$call->set_object_creation(strcasecmp($fname,'__construct') == 0);
+		// do it manually here because we might not know the method
+		$call->set_object_creation(strcasecmp($fname,'__construct') == 0 ||
+			strcasecmp($fname,$cname) == 0);
+		
 		if($class !== null)
 		{
 			// support for php4 constructors
@@ -237,7 +240,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			{
 				$cname = $this->scope->get_name_of(T_CLASS_C);
 				// self is static if its not a constructor-call
-				$static = strcasecmp($fname,'__construct') != 0 && strcasecmp($fname,$cname) != 0;
+				$static = !$call->is_object_creation();
 			}
 			$call->set_class($cname);
 		}
@@ -263,7 +266,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if($funcobj === null)
 		{
 			// if it's a constructor, we still know the type
-			if(strcasecmp($fname,'__construct') == 0 || strcasecmp($fname,$cname) == 0)
+			if($call->is_object_creation())
 				return PC_Obj_MultiType::create_object($cname);
 			return $this->create_unknown();
 		}
@@ -306,7 +309,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		}
 		
 		// if its a constructor we know the type directly
-		if(strcasecmp($fname,'__construct') == 0 || strcasecmp($fname,$cname) == 0)
+		if($call->is_object_creation())
 			return PC_Obj_MultiType::create_object($cname);
 		return clone $funcobj->get_return_type();
 	}

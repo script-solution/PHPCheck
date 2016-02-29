@@ -531,6 +531,9 @@ d(new E,new B,new E);
 class B {
 	const XYZ = 3;
 	protected $AB = 1;
+	
+	public function b() {
+	}
 }
 interface i {}
 class A extends b implements I {
@@ -563,6 +566,11 @@ $a = new A();
 		
 		self::assert_equals(0,count($errors));
 		
+		$b = $classes['b'];
+		self::assert_equals('const XYZ[integer=3]',$b->get_constant('xyz'));
+		self::assert_equals('protected AB[integer=1]',$b->get_field('ab'));
+		self::assert_equals('public function __construct()',$b->get_method('__construct'));
+		
 		$a = $classes['a'];
 		self::assert_true($a->is_implementing('I'));
 		
@@ -570,7 +578,7 @@ $a = new A();
 		self::assert_equals('private vAr[integer=1]',$a->get_field('var'));
 		self::assert_equals('public static function FOO(): void',$a->get_method('foo'));
 		self::assert_equals('public function bar(): b throws B',$a->get_method('bar'));
-		self::assert_equals('public function __CONSTRuct(): void',$a->get_method('__construct'));
+		self::assert_equals('public function __CONSTRuct()',$a->get_method('__construct'));
 		
 		self::assert_equals('A::FOO[a = integer=10]',$vars['A::FOO']['a']);
 		self::assert_equals('A::bar[a = integer=1]',$vars['A::bar']['a']);

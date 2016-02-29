@@ -65,8 +65,7 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 			$this->add_members($c,$c->get_name());
 			
 			// add missing constructor
-			if(!$c->is_interface() && $c->get_method('__construct') === null &&
-				$c->get_method($c->get_name()) === null)
+			if(!$c->is_interface() && $c->get_method('__construct') === null)
 			{
 				$method = new PC_Obj_Method($c->get_file(),-1,false);
 				$method->set_name('__construct');
@@ -97,11 +96,6 @@ final class PC_Engine_TypeFinalizer extends FWS_Object
 				{
 					if($function->get_visibility() != PC_Obj_Visible::V_PRIVATE)
 					{
-						// don't inherit a constructor if the class has a old-style-one
-						if(strcasecmp($function->get_name(),'__construct') == 0 &&
-							$data->get_method($data->get_name()) !== null)
-							continue;
-						
 						// if we don't want to overwrite the methods and the method is already there
 						// we add just the types that are not known yet
 						if(!$overwrite && ($f = $data->get_method($function->get_name())) !== null)

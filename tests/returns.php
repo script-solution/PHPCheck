@@ -85,6 +85,9 @@ function i() {
 }
 
 class j {
+	/**
+	 * @return j
+	*/
 	public function __construct() {
 		return 1;
 	}
@@ -101,7 +104,7 @@ function k() {
 ?>';
 		
 		list($functions,,,,$errors) = $this->analyze($code);
-		self::assert_equals(8,count($errors));
+		self::assert_equals(9,count($errors));
 		
 		self::assert_equals("function b(): integer=0",$functions['b']);
 		self::assert_equals("function c(): integer or string",$functions['c']);
@@ -113,20 +116,27 @@ function k() {
 		self::assert_equals("function i(): void",$functions['i']);
 		
 		$error = $errors[0];
+		self::assert_equals(PC_Obj_Error::E_T_RETURN_DIFFERS_FROM_DOC,$error->get_type());
+		self::assert_regex(
+			'/The constructor of class j specifies return type j/',
+			$error->get_msg()
+		);
+		
+		$error = $errors[1];
 		self::assert_equals(PC_Obj_Error::E_S_RET_SPEC_BUT_NO_RET,$error->get_type());
 		self::assert_regex(
 			'/The function\/method "#foo#::a" has a return-specification in PHPDoc, but does not return a value/',
 			$error->get_msg()
 		);
 		
-		$error = $errors[1];
+		$error = $errors[2];
 		self::assert_equals(PC_Obj_Error::E_S_RET_BUT_NO_RET_SPEC,$error->get_type());
 		self::assert_regex(
 			'/The function\/method "b" has no return-specification in PHPDoc, but does return a value/',
 			$error->get_msg()
 		);
 		
-		$error = $errors[2];
+		$error = $errors[3];
 		self::assert_equals(PC_Obj_Error::E_S_RETURNS_DIFFER_FROM_SPEC,$error->get_type());
 		self::assert_regex(
 			'/The return-specification \(PHPDoc\) of function\/method "c" does not match with the returned'
@@ -134,35 +144,35 @@ function k() {
 			$error->get_msg()
 		);
 		
-		$error = $errors[3];
+		$error = $errors[4];
 		self::assert_equals(PC_Obj_Error::E_S_MIXED_RET_AND_NO_RET,$error->get_type());
 		self::assert_regex(
 			'/The function\/method "d" has return-statements without expression and return-statements with expression/',
 			$error->get_msg()
 		);
 		
-		$error = $errors[4];
+		$error = $errors[5];
 		self::assert_equals(PC_Obj_Error::E_S_RET_BUT_NO_RET_SPEC,$error->get_type());
 		self::assert_regex(
 			'/The function\/method "d" has no return-specification in PHPDoc, but does return a value/',
 			$error->get_msg()
 		);
 		
-		$error = $errors[5];
+		$error = $errors[6];
 		self::assert_equals(PC_Obj_Error::E_S_CONSTR_RETURN,$error->get_type());
 		self::assert_regex(
 			'/The constructor of "j" has a return-statement with expression/',
 			$error->get_msg()
 		);
 		
-		$error = $errors[6];
+		$error = $errors[7];
 		self::assert_equals(PC_Obj_Error::E_S_VOID_ASSIGN,$error->get_type());
 		self::assert_regex(
 			'/Assignment of void to \$x/',
 			$error->get_msg()
 		);
 		
-		$error = $errors[7];
+		$error = $errors[8];
 		self::assert_equals(PC_Obj_Error::E_S_RETURNS_DIFFER_FROM_SPEC,$error->get_type());
 		self::assert_equals(
 			'The return-specification (PHPDoc) of function/method "k" does not match with the returned values (spec="integer", returns="string=foo or integer=1")',

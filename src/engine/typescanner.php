@@ -328,6 +328,23 @@ class PC_Engine_TypeScanner extends PC_Engine_BaseScanner
 				// methods in interfaces are implicitly abstract
 				if($class->is_interface())
 					$stmt->set_abstract(true);
+				
+				// convert old-style constructors to the new ones
+				if(strcasecmp($stmt->get_name(),$class->get_name()) == 0)
+					$stmt->set_name('__construct');
+				
+				// constructors return an object of the class
+				if($stmt->is_constructor() &&
+					($stmt->get_return_type() && !$stmt->get_return_type()->is_unknown()))
+				{
+					$spec = $stmt->get_return_type();
+					$this->report_error(
+						'The constructor of class '.$class->get_name().' specifies return type '.$spec,
+						PC_Obj_Error::E_T_RETURN_DIFFERS_FROM_DOC,
+						$stmt->get_line()
+					);
+				}
+				
 				$class->add_method($stmt);
 			}
 			else

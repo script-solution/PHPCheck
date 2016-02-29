@@ -94,7 +94,7 @@ class PC_Analyzer_Returns extends PC_Analyzer
 				}
 			}
 			
-			if($classname && strcasecmp($funcname,'__construct') == 0)
+			if($func->is_constructor())
 			{
 				if($hasother)
 				{
