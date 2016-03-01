@@ -46,9 +46,11 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 		$method->set_static($first->is_static());
 		$method->set_final($first->is_final());
 		$method->set_abstract($first->is_abstract());
+		
 		$mobjs = array();
 		foreach($methods as $m)
 			$mobjs[] = $m[2];
+		
 		$ret = $first->get_return_type();
 		for($i = 1; $i < count($mobjs); $i++)
 			$ret->merge($mobjs[$i]->get_return_type());
@@ -67,10 +69,11 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 	 */
 	private static function merge_params($methods)
 	{
-		$merged = array();
 		$mparams = array();
 		foreach($methods as $m)
 			$mparams[] = array_values($m->get_params());
+		
+		$merged = array();
 		for($i = 0; ; $i++)
 		{
 			$optional = false;
@@ -89,6 +92,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 			}
 			if(count($mtypes) == 0)
 				break;
+			
 			$mtype = self::merge_types($mtypes);
 			$param = new PC_Obj_Parameter();
 			// the name doesn't really matter. to be safe, use a unique name for each param
@@ -115,6 +119,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 		{
 			if($mt->is_unknown())
 				return new PC_Obj_MultiType();
+			
 			foreach($mt->get_types() as $t)
 				$types[$t->get_type()] = $t;
 		}
@@ -241,6 +246,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 		// prepare description
 		$desc = trim(strip_tags($desc));
 		$desc = FWS_StringHelper::htmlspecialchars_back($desc);
+		
 		// filter out modifier, return-type, name and params
 		$match = array();
 		$res = preg_match(
@@ -257,6 +263,7 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 		);
 		if(!$res)
 			throw new PC_PHPRef_Exception('Unable to parse "'.$desc.'"');
+		
 		list(,$modifier1,$modifier2,$modifier3,$type,$name) = $match;
 		
 		if($modifier1 == 'const' || $modifier2 == 'const' || $modifier3 == 'const')
@@ -273,8 +280,10 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 			else if(in_array($modifier3,array('private','protected')))
 				$field->set_visibility($modifier3);
 		}
+		
 		if($type)
 			$field->set_type(PC_Obj_MultiType::get_type_by_name($type));
+		
 		if(isset($match[6]) && $match[6] !== '' && !$field->get_type()->is_multiple())
 		{
 			if($type)
@@ -390,9 +399,11 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 				$part = trim($part);
 				if($part == '')
 					continue;
+				
 				$default = null;
 				$param = new PC_Obj_Parameter();
 				$param->set_optional(true);
+				
 				// has it a known default-value?
 				if(($pos = strpos($part,'=')) !== false)
 				{
@@ -413,10 +424,11 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 						// sometimes there is a space bewteen $ and ...
 						$part = preg_replace('/\$\s+\.\.\./','$...',$part);
 					}
+					
 					$parts = preg_split('/\s+/',$part);
 					if(count($parts) != 2)
-						throw new PC_PHPRef_Exception(
-							'Parameter description has not 2 parts: "'.$part.'"');
+						throw new PC_PHPRef_Exception('Parameter description has not 2 parts: "'.$part.'"');
+					
 					list($type,$name) = $parts;
 				}
 				
