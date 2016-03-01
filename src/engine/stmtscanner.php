@@ -522,6 +522,10 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		}
 		
 		$this->vars->backup($var,$this->scope);
+		// if we are putting the value into an array, tell the var container about that, too
+		if($var->get_array_ref() !== null)
+			$this->vars->backup($var->get_array_ref(),$this->scope);
+		
 		if($isref)
 			$var->set_type($value);
 		else

@@ -180,7 +180,7 @@ class PC_Obj_Variable extends PC_Obj_Location
 	 * put the value into the array as soon as we assign it to it. Before the array doesn't know
 	 * about this value (if it didn't exist before)
 	 * 
-	 * @var PC_Obj_Type
+	 * @var PC_Obj_Variable
 	 */
 	private $arrayref = null;
 	/**
@@ -294,8 +294,19 @@ class PC_Obj_Variable extends PC_Obj_Location
 			FWS_Helper::def_error('instance','type','PC_Obj_MultiType',$type);
 		
 		if($this->arrayref !== null)
-			$this->arrayref->set_array_type($this->arrayoff,$type);
+		{
+			assert(!$this->arrayref->type->is_multiple() && !$this->arrayref->type->is_unknown());
+			$this->arrayref->type->get_first()->set_array_type($this->arrayoff,$type);
+		}
 		$this->type = $type;
+	}
+	
+	/**
+	 * @return PC_Obj_Variable the array reference, if set_type() will set the type there
+	 */
+	public function get_array_ref()
+	{
+		return $this->arrayref;
 	}
 	
 	/**
@@ -322,7 +333,7 @@ class PC_Obj_Variable extends PC_Obj_Location
 		}
 		$var = new self($this->get_file(),$this->get_line(),'',$key);
 		// connect the var to us
-		$var->arrayref = $first;
+		$var->arrayref = $this;
 		$var->arrayoff = $akey;
 		return $var;
 	}

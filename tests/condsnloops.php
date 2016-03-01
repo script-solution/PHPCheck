@@ -115,6 +115,9 @@ else
 	public function test_loops()
 	{
 		$code = '<?php
+/** @param array $x */
+function func($x) {}
+
 $a = 0;
 while(true)
 	$a++;
@@ -151,6 +154,29 @@ do {
 }
 while(1);
 // $f wasnt known before, therefore unknown.
+
+$g = array();
+while($_)
+{
+	$g[] = 1;
+	$g[44] = 2;
+	echo $g[3];
+	
+	$h = array();
+	$h[] = 1;
+	// $h is known here
+	func($h);
+}
+// the array content of $g is now unknown
+
+$i = array();
+while($_)
+{
+	$i[] = 1;
+	func($i);
+	$i = 1;
+}
+// $i is now either array() or integer=1
 ?>';
 		
 		list(,,$vars,$calls,$errors) = $this->analyze($code);
@@ -168,6 +194,17 @@ while(1);
 		self::assert_equals((string)$type,(string)$global['d']->get_type());
 		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['e']->get_type());
 		self::assert_equals((string)new PC_Obj_MultiType(),(string)$global['f']->get_type());
+		self::assert_equals((string)PC_Obj_MultiType::create_array(),(string)$global['g']->get_type());
+		$type = new PC_Obj_MultiType(array(
+			new PC_Obj_Type(PC_Obj_Type::INT,1),
+			new PC_Obj_Type(PC_Obj_Type::TARRAY,array()),
+		));
+		self::assert_equals((string)$type,(string)$global['i']->get_type());
+		
+		self::assert_equals(2,count($calls));
+		
+		self::assert_equals('func(array={0 = integer=1;})',$calls[0]);
+		self::assert_equals('func(array={0 = integer=1;})',$calls[1]);
 	}
 	
 	public function test_nesting()

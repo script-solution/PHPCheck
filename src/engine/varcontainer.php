@@ -259,11 +259,6 @@ class PC_Engine_VarContainer extends FWS_Object
 					$layer['vars'][$blockno][$varname] = $clone;
 				}
 			}
-			else
-			{
-				// if its an array-element, simply set it to unknown
-				$var->set_type(new PC_Obj_MultiType());
-			}
 		}
 	}
 	
