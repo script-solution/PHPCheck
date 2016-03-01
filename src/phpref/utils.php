@@ -49,6 +49,11 @@ final class PC_PHPRef_Utils extends FWS_UtilBase
 		$mobjs = array();
 		foreach($methods as $m)
 			$mobjs[] = $m[2];
+		$ret = $first->get_return_type();
+		for($i = 1; $i < count($mobjs); $i++)
+			$ret->merge($mobjs[$i]->get_return_type());
+		$method->set_return_type($ret);
+		
 		foreach(self::merge_params($mobjs) as $param)
 			$method->put_param($param);
 		return $method;
