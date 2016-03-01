@@ -561,7 +561,7 @@ anonymous_class(A) ::= anon_class_head(name) ctor_arguments extends_from impleme
 
 new_expr(A) ::= T_NEW class_name_reference(name) ctor_arguments(args) . {
     A = $this->state->add_call(
-    	PC_Obj_MultiType::create_string(name),
+    	name,
     	PC_Obj_MultiType::create_string('__construct'),
     	args
     );
@@ -846,8 +846,8 @@ function_call(A) ::= callable_expr(expr) argument_list(args) . {
 class_name(A) ::= T_STATIC . { A = 'static'; }
 class_name(A) ::= name(n) . { A = n; }
 
-class_name_reference(A) ::= class_name(n) . { A = n; }
-class_name_reference(A) ::= new_variable .
+class_name_reference(A) ::= class_name(n) . { A = PC_Obj_MultiType::create_string(n); }
+class_name_reference(A) ::= new_variable(v) . { A = v->get_type(); }
 
 exit_expr ::= /* empty */ .
 exit_expr ::= LPAREN optional_expr RPAREN .
@@ -929,11 +929,10 @@ callable_variable(A) ::= dereferencable(v) LCURLY expr(off) RCURLY . {
     A = $this->state->handle_array_access(v,off);
 }
 callable_variable(A) ::= dereferencable(obj) T_OBJECT_OPERATOR property_name(vprop) argument_list(a) . {
-    $chain = array();
-    $chain[] = array(
+    $chain = array(array(
         'prop' => vprop,
         'args' => a
-    );
+    ));
     A = $this->state->handle_object_prop_chain(obj,$chain);
 }
 callable_variable(A) ::= function_call(call) . {
@@ -943,11 +942,10 @@ callable_variable(A) ::= function_call(call) . {
 variable(A) ::= callable_variable(v) . { A = v; }
 variable(A) ::= static_member(m) . { A = m; }
 variable(A) ::= dereferencable(obj) T_OBJECT_OPERATOR property_name(vprop) . {
-    $chain = array();
-    $chain[] = array(
+    $chain = array(array(
         'prop' => vprop,
         'args' => null
-    );
+    ));
     A = $this->state->handle_object_prop_chain(obj,$chain);
 }
 
@@ -968,12 +966,26 @@ static_member(A) ::= variable_class_name(name) T_PAAMAYIM_NEKUDOTAYIM simple_var
     A = $this->state->handle_field_access(name,var->get_name());
 }
 
-new_variable ::= simple_variable .
-new_variable ::= new_variable LBRACKET optional_expr RBRACKET .
-new_variable ::= new_variable LCURLY expr RCURLY .
-new_variable ::= new_variable T_OBJECT_OPERATOR property_name .
-new_variable ::= class_name T_PAAMAYIM_NEKUDOTAYIM simple_variable .
-new_variable ::= new_variable T_PAAMAYIM_NEKUDOTAYIM simple_variable .
+new_variable(A) ::= simple_variable(v) . { A = v; }
+new_variable(A) ::= new_variable(v) LBRACKET optional_expr(off) RBRACKET . {
+	A = $this->state->handle_array_access(v,off);
+}
+new_variable(A) ::= new_variable(v) LCURLY expr(off) RCURLY . {
+	A = $this->state->handle_array_access(v,off);
+}
+new_variable(A) ::= new_variable(obj) T_OBJECT_OPERATOR property_name(vprop) . {
+    $chain = array(array(
+        'prop' => vprop,
+        'args' => null
+    ));
+    A = $this->state->handle_object_prop_chain(obj,$chain);
+}
+new_variable(A) ::= class_name(name) T_PAAMAYIM_NEKUDOTAYIM simple_variable(var) . {
+    A = $this->state->handle_field_access(name,var->get_name());
+}
+new_variable(A) ::= new_variable(v) T_PAAMAYIM_NEKUDOTAYIM simple_variable(var) . {
+    A = $this->state->handle_field_access(v,var->get_name());
+}
 
 member_name(A) ::= identifier(i) . { A = PC_Obj_MultiType::create_string(i); }
 member_name(A) ::= LCURLY expr(e) RCURLY . { A = e; }

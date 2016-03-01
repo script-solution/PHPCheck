@@ -1284,7 +1284,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 	 * Handles the instanceof-operator
 	 * 
 	 * @param PC_Obj_MultiType $e the expression
-	 * @param string $name the name of the class
+	 * @param PC_Obj_MultiType $name the name of the class
 	 * @return PC_Obj_MultiType the result
 	 */
 	public function handle_instanceof($e,$name)
@@ -1292,8 +1292,10 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		if(!($e instanceof PC_Obj_MultiType))
 			return $this->handle_error('$e is invalid');
 		
+		$cname = $name->get_string();
+		
 		// if we're in a loop or the name is not a string, give up
-		if($this->vars->is_in_loop() || $name === null)
+		if($this->vars->is_in_loop() || $cname === null)
 			return PC_Obj_MultiType::create_bool();
 		
 		// if we don't know the type or its class we can't say wether its a superclass
@@ -1302,7 +1304,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 			return PC_Obj_MultiType::create_bool();
 		
 		// class-name equal?
-		if(strcasecmp($classname,$name) == 0)
+		if(strcasecmp($classname,$cname) == 0)
 			return PC_Obj_MultiType::create_bool(true);
 		
 		// if the class is unknown we can't say more
@@ -1314,7 +1316,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		$super = $class->get_super_class();
 		while($super != '')
 		{
-			if(strcasecmp($super,$name) == 0)
+			if(strcasecmp($super,$cname) == 0)
 				return PC_Obj_MultiType::create_bool(true);
 			$superobj = $this->env->get_types()->get_class($super);
 			if($superobj === null)
@@ -1323,7 +1325,7 @@ class PC_Engine_StmtScanner extends PC_Engine_BaseScanner
 		}
 		
 		// check interfaces
-		if($this->is_instof_interface($class->get_interfaces(),$name))
+		if($this->is_instof_interface($class->get_interfaces(),$cname))
 			return PC_Obj_MultiType::create_bool(true);
 		return PC_Obj_MultiType::create_bool(false);
 	}

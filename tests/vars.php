@@ -219,4 +219,85 @@ echo $n;
 		$var = $vars[PC_Obj_Variable::SCOPE_GLOBAL]['m'];
 		self::assert_equals('array',(string)$var->get_type());
 	}
+	
+	public function test_varvars()
+	{
+		$code = '<?php
+class foo {
+	const ABC = 5;
+	public $XYZ = 4;
+	public static function test() {
+	}
+}
+class bar {}
+function foo() {}
+function bar() {}
+
+$a = "foo";
+${$a} = "bar";
+${"bar"} = 2;
+${"foo"."bar"} = 3;
+${$a + 1} = $a::$XYZ;
+${1.2} = $a::ABC;
+
+${$_} = 1;
+
+$a();
+${$a}();
+$_();
+
+new $a();
+new ${$a}();
+new $_();
+$a::test();
+
+$Bar = "b";
+$Foo = "Bar";
+$World = "Foo";
+$Hello = "World";
+$b = "Hello";
+
+$c = $b;
+$d = $$b;
+$e = $$$b;
+$f = $$$$b;
+$g = $$$$$b;
+$h = $$$$$$b;
+$i = $$$$$$$b;
+?>';
+		
+		$options = new PC_Engine_Options();
+		$options->add_project(PC_Project::PHPREF_ID);
+		$options->add_min_req('PHP','5');
+		list(,,$vars,$calls,$errors) = $this->analyze($code,$options);
+		
+		self::assert_equals(0,count($errors));
+		
+		$global = $vars[PC_Obj_Variable::SCOPE_GLOBAL];
+		self::assert_equals(18,count($global));
+		
+		self::assert_equals('string=foo',(string)$global['a']->get_type());
+		self::assert_equals('string=bar',(string)$global['foo']->get_type());
+		self::assert_equals('integer=2',(string)$global['bar']->get_type());
+		self::assert_equals('integer=3',(string)$global['foobar']->get_type());
+		self::assert_equals('integer=4',(string)$global['1']->get_type());
+		self::assert_equals('integer=5',(string)$global['1.2']->get_type());
+		
+		self::assert_equals('string=Hello',(string)$global['b']->get_type());
+		self::assert_equals('string=Hello',(string)$global['c']->get_type());
+		self::assert_equals('string=World',(string)$global['d']->get_type());
+		self::assert_equals('string=Foo',(string)$global['e']->get_type());
+		self::assert_equals('string=Bar',(string)$global['f']->get_type());
+		self::assert_equals('string=b',(string)$global['g']->get_type());
+		self::assert_equals('string=Hello',(string)$global['h']->get_type());
+		self::assert_equals('string=World',(string)$global['i']->get_type());
+		
+		self::assert_equals(5,count($calls));
+		
+		self::assert_equals('foo()',(string)$calls[0]);
+		self::assert_equals('bar()',(string)$calls[1]);
+		self::assert_equals('foo->__construct()',(string)$calls[2]);
+		self::assert_equals('bar->__construct()',(string)$calls[3]);
+		self::assert_equals('foo::test()',(string)$calls[4]);
+	}
 }
