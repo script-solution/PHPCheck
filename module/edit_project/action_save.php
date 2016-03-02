@@ -72,6 +72,9 @@ class PC_Action_edit_project_save extends FWS_Action_Base
 			if(!$proj)
 				return '';
 			
+			if($name == '')
+				return 'Please specify the project name';
+			
 			$proj->set_name($name);
 			$proj->set_created($start);
 			$proj->set_report_argret_strictly($report_argret_strictly);
