@@ -425,6 +425,12 @@ class PC_Obj_MultiType extends FWS_Object
 	{
 		return get_object_vars($this);
 	}
+
+	public function __sleep()
+	{
+		// we don't need to store varname
+		return array('types');
+	}
 	
 	public function __ToString()
 	{
