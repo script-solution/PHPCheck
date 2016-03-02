@@ -14,6 +14,8 @@ define('PC_TB_CONSTANTS','pc_constants');
 define('PC_TB_ERRORS','pc_errors');
 define('PC_TB_FUNCTIONS','pc_functions');
 define('PC_TB_PROJECTS','pc_projects');
+define('PC_TB_PROJECT_DEPS','pc_project_deps');
 define('PC_TB_VARS','pc_vars');
+define('PC_TB_REQUIREMENTS','pc_requirements');
 ##########################################
 ?>
