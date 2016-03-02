@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.5
+-- version 4.5.5.1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 28, 2016 at 07:00 AM
+-- Generation Time: Mar 02, 2016 at 06:39 PM
 -- Server version: 10.1.11-MariaDB-log
 -- PHP Version: 7.0.3
 
@@ -143,6 +143,17 @@ CREATE TABLE `pc_projects` (
   `stmt_exclude` text NOT NULL,
   `report_argret_strictly` tinyint(1) NOT NULL,
   `current` tinyint(1) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pc_project_deps`
+--
+
+CREATE TABLE `pc_project_deps` (
+  `project_id` int(11) NOT NULL,
+  `dep_id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
