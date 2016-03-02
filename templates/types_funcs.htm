@@ -37,12 +37,12 @@
 	</tr>
 	{if funcs.length == 0}
 	<tr>
-		<td colspan="3" class="pc_main" align="center">No functions found</td>
+		<td colspan="3" class="hlCol" align="center">No functions found</td>
 	</tr>
 	{else}
 	{loop funcs as f}
-	<tr>
-		<td class="pc_main" width="60%">
+	<tr class="hlRow">
+		<td class="hlCol" width="60%">
 		{if f:line}
 		<a href="{f:url}"><img src="images/goto.gif" alt="-&gt;" /></a>
 		{endif}
@@ -56,7 +56,7 @@
 		<div id="func_area_{f:id}" class="pc_code" style="display: none;"></div>
 		{endif}
 		</td>
-		<td class="pc_main">
+		<td class="hlCol">
 		{if f:file && f:line}
 		{f:file}, line {f:line}
 		{else}
@@ -67,7 +67,7 @@
 		{endif}
 		{endif}
 		</td>
-		<td class="pc_main" align="center">
+		<td class="hlCol" align="center">
 		{if f:since}&gt;= {f:since}{endif}
 		{if f:till}
 		{if f:since} and {endif}

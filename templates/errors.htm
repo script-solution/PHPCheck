@@ -73,13 +73,13 @@ function selectAll(checked)
 	</tr>
 	{if errors.length == 0}
 	<tr>
-		<td colspan="3" class="pc_main" align="center">No errors found</td>
+		<td colspan="3" class="hlCol" align="center">No errors found</td>
 	</tr>
 	{else}
 	{loop errors as err}
-	<tr>
-		<td class="pc_main" width="15%"><a href="{err:typeurl}">{err:type}</a></td>
-		<td class="pc_main" width="60%">
+	<tr class="hlRow">
+		<td class="hlCol" width="15%"><a href="{err:typeurl}">{err:type}</a></td>
+		<td class="hlCol" width="60%">
 		<a href="{err:fileurl}"><img src="images/goto.gif" alt="-&gt;" /></a> {err:message}
 		<div style="float: right;">
 			<a href="#" onclick="javascript:toggleCode('{get_code_url}','error','{err:id}');">
@@ -88,7 +88,7 @@ function selectAll(checked)
 		</div>
 		<div id="error_area_{err:id}" class="pc_code" style="display: none;"></div>
 		</td>
-		<td class="pc_main" width="25%">{err:file}, line {err:line}</td>
+		<td class="hlCol" width="25%">{err:file}, line {err:line}</td>
 	</tr>
 	{endloop}
 	{endif}

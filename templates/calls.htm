@@ -41,12 +41,12 @@
 	</tr>
 	{if calls.length == 0}
 	<tr>
-		<td colspan="2" class="pc_main" align="center">No calls found</td>
+		<td colspan="2" class="hlCol" align="center">No calls found</td>
 	</tr>
 	{else}
 	{loop calls as call}
-	<tr>
-		<td class="pc_main" width="60%">
+	<tr class="hlRow">
+		<td class="hlCol" width="60%">
 		<a href="{call:url}"><img src="images/goto.gif" alt="-&gt;" /></a> {call:call}
 		<div style="float: right;">
 			<a href="#" onclick="javascript:toggleCode('{get_code_url}','call','{call:id}');">
@@ -55,8 +55,8 @@
 		</div>
 		<div id="call_area_{call:id}" class="pc_code" style="display: none;"></div>
 		</td>
-		<td class="pc_main">{call:file}, line {call:line}</td>
-		<td class="pc_main">
+		<td class="hlCol">{call:file}, line {call:line}</td>
+		<td class="hlCol">
 		{if call:since}&gt;= {call:since}{endif}
 		{if call:till}
 		{if call:since} and {endif}

@@ -37,12 +37,12 @@
 	</tr>
 	{if vars.length == 0}
 	<tr>
-		<td colspan="3" class="pc_main" align="center">No variables found</td>
+		<td colspan="3" class="hlCol" align="center">No variables found</td>
 	</tr>
 	{else}
 	{loop vars as var}
-	<tr>
-		<td width="40%" class="pc_main">
+	<tr class="hlRow">
+		<td width="40%" class="hlCol">
 		<a href="{var:url}"><img src="images/goto.gif" alt="-&gt;" /></a> {var:name} : {var:type}
 		<div style="float: right;">
 			<a href="#" onclick="javascript:toggleCode('{get_code_url}','var','{var:id}');">
@@ -51,8 +51,8 @@
 		</div>
 		<div id="var_area_{var:id}" class="pc_code" style="display: none;"></div>
 		</td>
-		<td class="pc_main">{var:scope}</td>
-		<td class="pc_main">{var:file}, line {var:line}</td>
+		<td class="hlCol">{var:scope}</td>
+		<td class="hlCol">{var:file}, line {var:line}</td>
 	</tr>
 	{endloop}
 	{endif}

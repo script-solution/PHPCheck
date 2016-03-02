@@ -37,13 +37,13 @@
 	</tr>
 	{if classes.length == 0}
 	<tr>
-		<td colspan="3" class="pc_main" align="center">No classes found</td>
+		<td colspan="3" class="hlCol" align="center">No classes found</td>
 	</tr>
 	{else}
 	{loop classes as c}
-	<tr>
-		<td class="pc_main" width="60%">{c:name}</td>
-		<td class="pc_main">
+	<tr class="hlRow">
+		<td class="hlCol" width="60%">{c:name}</td>
+		<td class="hlCol">
 		{if c:file && c:line}
 		{c:file}, line {c:line}
 		{else}
@@ -54,7 +54,7 @@
 		{endif}
 		{endif}
 		</td>
-		<td class="pc_main" align="center">
+		<td class="hlCol" align="center">
 		{if c:since}&gt;= {c:since}{endif}
 		{if c:till}
 		{if c:since} and {endif}

@@ -36,12 +36,12 @@
 	</tr>
 	{if consts.length == 0}
 	<tr>
-		<td colspan="2" class="pc_main" align="center">No constants found</td>
+		<td colspan="2" class="hlCol" align="center">No constants found</td>
 	</tr>
 	{else}
 	{loop consts as const}
-	<tr>
-		<td class="pc_main" width="60%">
+	<tr class="hlRow">
+		<td class="hlCol" width="60%">
 		{if const:line}
 		<a href="{const:url}"><img src="images/goto.gif" alt="-&gt;" /></a>
 		{endif}
@@ -55,7 +55,7 @@
 		<div id="const_area_{const:id}" class="pc_code" style="display: none;"></div>
 		{endif}
 		</td>
-		<td class="pc_main">
+		<td class="hlCol">
 		{if const:file}{const:file}{else}<i>Unknown</i>{endif}
 		{if const:line > 0}, line {const:line}{endif}
 		</td>
