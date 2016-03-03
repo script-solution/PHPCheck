@@ -178,12 +178,13 @@ class PC_DAO_Constants extends FWS_Singleton
 		$consts = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CONSTANTS.'
-			 WHERE project_id = :pid AND class IN ('.implode(',',$cids).')'
+			 WHERE project_id = :pid AND class IN (:cids)'
 			 .($file ? ' AND file LIKE :file' : '')
 			 .($name ? ' AND name LIKE :name' : '')
 			.($count > 0 ? ' LIMIT :start,:count' : '')
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		$stmt->bind(':cids',$cids);
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($name)

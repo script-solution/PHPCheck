@@ -61,9 +61,10 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASS_FIELDS.'
-			 WHERE project_id = :pid AND class IN ('.implode(',',$cids).')'
+			 WHERE project_id = :pid AND class IN (:cids)'
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		$stmt->bind(':cids',$cids);
 		
 		$fields = array();
 		$rows = $db->get_rows($stmt->get_statement());

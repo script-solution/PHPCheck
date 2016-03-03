@@ -77,8 +77,13 @@ class PC_DAO_Projects extends FWS_Singleton
 			FWS_Helper::def_error('numarray>0','ids',$ids);
 		
 		$db = FWS_Props::get()->db();
+		
+		$stmt = $db->get_prepared_statement(
+			'SELECT * FROM '.PC_TB_PROJECTS.' WHERE id IN (:ids)'
+		);
+		$stmt->bind(':ids',$ids);
+		$rows = $db->get_rows($stmt->get_statement());
 		$res = array();
-		$rows = $db->get_rows('SELECT * FROM '.PC_TB_PROJECTS.' WHERE id IN ('.implode(',',$ids).')');
 		foreach($rows as $row)
 			$res[] = $this->build_project($row,true);
 		return $res;
@@ -177,13 +182,19 @@ class PC_DAO_Projects extends FWS_Singleton
 			FWS_Helper::def_error('numarray>0','ids',$ids);
 		
 		$db = FWS_Props::get()->db();
-		$db->execute(
+		
+		$stmt = $db->get_prepared_statement(
 			'DELETE FROM '.PC_TB_PROJECT_DEPS.'
-			 WHERE project_id IN ('.implode(',',$ids).') OR dep_id IN ('.implode(',',$ids).')'
+			 WHERE project_id IN (:ids) OR dep_id IN (:ids)'
 		);
-		$db->execute(
-			'DELETE FROM '.PC_TB_PROJECTS.' WHERE id IN ('.implode(',',$ids).')'
+		$stmt->bind(':ids',$ids);
+		$db->execute($stmt->get_statement());
+		
+		$stmt = $db->get_prepared_statement(
+			'DELETE FROM '.PC_TB_PROJECTS.' WHERE id IN (:ids)'
 		);
+		$stmt->bind(':ids',$ids);
+		$db->execute($stmt->get_statement());
 		return $db->get_affected_rows();
 	}
 	

@@ -155,13 +155,14 @@ class PC_DAO_Functions extends FWS_Singleton
 		$funcs = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_FUNCTIONS.'
-			 WHERE project_id = :pid AND class IN ('.implode(',',$cids).')
+			 WHERE project_id = :pid AND class IN (:cids)
 			 '.($file ? ' AND file LIKE :file' : '').'
 			 '.($name ? ' AND name LIKE :name' : '').'
 			 ORDER BY name
 			 '.($count > 0 ? ' LIMIT :start,:count' : '')
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		$stmt->bind(':cids',$cids);
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($name)

@@ -68,13 +68,15 @@ class PC_DAO_Errors extends FWS_Singleton
 			 WHERE project_id = :pid'
 				.($file ? ' AND file LIKE :file' : '')
 				.($msg ? ' AND message LIKE :msg' : '')
-				.(count($types) ? ' AND type IN ('.implode(',',$types).')' : '')
+				.(count($types) ? ' AND type IN (:types)' : '')
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($msg)
 			$stmt->bind(':msg','%'.$msg.'%');
+		if(count($types))
+			$stmt->bind(':types',$types);
 		$row = $db->get_row($stmt->get_statement());
 		return $row['num'];
 	}
@@ -131,7 +133,7 @@ class PC_DAO_Errors extends FWS_Singleton
 			 WHERE project_id = :pid'
 				.($file ? ' AND file LIKE :file' : '')
 				.($msg ? ' AND message LIKE :msg' : '')
-				.(count($types) ? ' AND type IN ('.implode(',',$types).')' : '')
+				.(count($types) ? ' AND type IN (:types)' : '')
 				.' ORDER BY file ASC, line ASC'
 				.($count > 0 ? ' LIMIT :start,:count' : '')
 		);
@@ -140,6 +142,8 @@ class PC_DAO_Errors extends FWS_Singleton
 			$stmt->bind(':file','%'.$file.'%');
 		if($msg)
 			$stmt->bind(':msg','%'.$msg.'%');
+		if(count($types))
+			$stmt->bind(':types',$types);
 		if($count > 0)
 		{
 			$stmt->bind(':start',$start);
@@ -188,9 +192,10 @@ class PC_DAO_Errors extends FWS_Singleton
 			FWS_Helper::def_error('intarray>0','types',$types);
 		
 		$stmt = $db->get_prepared_statement(
-			'DELETE FROM '.PC_TB_ERRORS.' WHERE project_id = :id AND type IN ('.implode(',',$types).')'
+			'DELETE FROM '.PC_TB_ERRORS.' WHERE project_id = :id AND type IN (:types)'
 		);
 		$stmt->bind(':id',PC_Utils::get_project_id($pid));
+		$stmt->bind(':types',$types);
 		$db->execute($stmt->get_statement());
 		return $db->get_affected_rows();
 	}
