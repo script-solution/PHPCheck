@@ -177,7 +177,13 @@ class PC_DAO_Projects extends FWS_Singleton
 			FWS_Helper::def_error('numarray>0','ids',$ids);
 		
 		$db = FWS_Props::get()->db();
-		$db->execute('DELETE FROM '.PC_TB_PROJECTS.' WHERE id IN ('.implode(',',$ids).')');
+		$db->execute(
+			'DELETE FROM '.PC_TB_PROJECT_DEPS.'
+			 WHERE project_id IN ('.implode(',',$ids).') OR dep_id IN ('.implode(',',$ids).')'
+		);
+		$db->execute(
+			'DELETE FROM '.PC_TB_PROJECTS.' WHERE id IN ('.implode(',',$ids).')'
+		);
 		return $db->get_affected_rows();
 	}
 	
