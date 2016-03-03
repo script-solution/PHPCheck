@@ -276,7 +276,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 		if($this->constants === null)
 		{
 			$this->constants = array();
-			foreach(PC_DAO::get_constants()->get_list($this->id,'','',$this->pid) as $const)
+			foreach(PC_DAO::get_constants()->get_list(array($this->id),'','',$this->pid) as $const)
 				$this->constants[strtolower($const->get_name())] = $const;
 		}
 	}
@@ -325,7 +325,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 		if($this->fields === null)
 		{
 			$this->fields = array();
-			foreach(PC_DAO::get_classfields()->get_all($this->id,$this->pid) as $field)
+			foreach(PC_DAO::get_classfields()->get_all(array($this->id),$this->pid) as $field)
 				$this->fields[strtolower($field->get_name())] = $field;
 		}
 	}
@@ -388,7 +388,7 @@ class PC_Obj_Class extends PC_Obj_Modifiable
 		if($this->methods === null)
 		{
 			$this->methods = array();
-			foreach(PC_DAO::get_functions()->get_list($this->id,0,0,'','',$this->pid) as $method)
+			foreach(PC_DAO::get_functions()->get_list(array($this->id),0,0,'','',$this->pid) as $method)
 				$this->methods[strtolower($method->get_name())] = $method;
 		}
 	}

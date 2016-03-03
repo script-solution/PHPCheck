@@ -133,13 +133,18 @@ class PC_DAO_Errors extends FWS_Singleton
 				.($msg ? ' AND message LIKE :msg' : '')
 				.(count($types) ? ' AND type IN ('.implode(',',$types).')' : '')
 				.' ORDER BY file ASC, line ASC'
-				.($count > 0 ? ' LIMIT '.$start.','.$count : '')
+				.($count > 0 ? ' LIMIT :start,:count' : '')
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($msg)
 			$stmt->bind(':msg','%'.$msg.'%');
+		if($count > 0)
+		{
+			$stmt->bind(':start',$start);
+			$stmt->bind(':count',$count);
+		}
 		foreach($db->get_rows($stmt->get_statement()) as $row)
 			$errs[] = $this->build_error($row);
 		return $errs;
@@ -182,10 +187,11 @@ class PC_DAO_Errors extends FWS_Singleton
 		if(!FWS_Array_Utils::is_integer($types) || count($types) == 0)
 			FWS_Helper::def_error('intarray>0','types',$types);
 		
-		$pid = PC_Utils::get_project_id($pid);
-		$db->execute(
-			'DELETE FROM '.PC_TB_ERRORS.' WHERE project_id = '.$pid.' AND type IN ('.implode(',',$types).')'
+		$stmt = $db->get_prepared_statement(
+			'DELETE FROM '.PC_TB_ERRORS.' WHERE project_id = :id AND type IN ('.implode(',',$types).')'
 		);
+		$stmt->bind(':id',PC_Utils::get_project_id($pid));
+		$db->execute($stmt->get_statement());
 		return $db->get_affected_rows();
 	}
 	
@@ -202,9 +208,11 @@ class PC_DAO_Errors extends FWS_Singleton
 		if(!PC_Utils::is_valid_project_id($id))
 			FWS_Helper::def_error('intge0','id',$id);
 		
-		$db->execute(
-			'DELETE FROM '.PC_TB_ERRORS.' WHERE project_id = '.$id
+		$stmt = $db->get_prepared_statement(
+			'DELETE FROM '.PC_TB_ERRORS.' WHERE project_id = :id'
 		);
+		$stmt->bind(':id',$id);
+		$db->execute($stmt->get_statement());
 		return $db->get_affected_rows();
 	}
 	

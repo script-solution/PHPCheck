@@ -55,13 +55,14 @@ class PC_DAO_Functions extends FWS_Singleton
 			FWS_Helper::def_error('intge0','class',$class);
 		
 		$db = FWS_Props::get()->db();
-		$pid = PC_Utils::get_project_id($pid);
 		$stmt = $db->get_prepared_statement(
 			'SELECT COUNT(*) num FROM '.PC_TB_FUNCTIONS.'
-			 WHERE project_id = '.$pid.' AND class = '.$class
+			 WHERE project_id = :pid AND class = :class'
 			 .($file ? ' AND file LIKE :file' : '')
 			 .($name ? ' AND name LIKE :name' : '')
 		);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		$stmt->bind(':class',$class);
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($name)
@@ -128,7 +129,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	/**
 	 * Returns all functions
 	 *
-	 * @param int|array $class the class-id (0 = free functions) (or ids, if its an array)
+	 * @param array $cids the class ids (0 = free functions)
 	 * @param int $start the start-position (for the LIMIT-statement)
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
 	 * @param string $file the file-name to search for
@@ -136,7 +137,7 @@ class PC_DAO_Functions extends FWS_Singleton
 	 * @param int $pid the project-id (current by default)
 	 * @return array all found functions
 	 */
-	public function get_list($class = 0,$start = 0,$count = 0,$file = '',$name = '',
+	public function get_list($cids,$start = 0,$count = 0,$file = '',$name = '',
 		$pid = PC_PRoject::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
@@ -145,26 +146,31 @@ class PC_DAO_Functions extends FWS_Singleton
 			FWS_Helper::def_error('intge0','start',$start);
 		if(!FWS_Helper::is_integer($count) || $count < 0)
 			FWS_Helper::def_error('intge0','count',$count);
-		if(!FWS_Array_Utils::is_integer($class) && (!FWS_Helper::is_integer($class) || $class < 0))
-			FWS_Helper::def_error('intge0','class',$class);
+		if(!FWS_Array_Utils::is_integer($cids))
+			FWS_Helper::def_error('intarray','cids',$cids);
 		
-		if(is_array($class) && count($class) == 0)
+		if(count($cids) == 0)
 			return array();
 		
 		$funcs = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_FUNCTIONS.'
-			 WHERE project_id = '.PC_Utils::get_project_id($pid).' AND'
-			 .(is_array($class) ? ' class IN ('.implode(',',$class).')' : ' class = '.$class).'
+			 WHERE project_id = :pid AND class IN ('.implode(',',$cids).')
 			 '.($file ? ' AND file LIKE :file' : '').'
 			 '.($name ? ' AND name LIKE :name' : '').'
 			 ORDER BY name
-			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
+			 '.($count > 0 ? ' LIMIT :start,:count' : '')
 		);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($name)
 			$stmt->bind(':name','%'.$name.'%');
+		if($count > 0)
+		{
+			$stmt->bind(':start',$start);
+			$stmt->bind(':count',$count);
+		}
 		$rows = $db->get_rows($stmt->get_statement());
 		foreach($rows as $row)
 			$funcs[] = $this->build_func($row);
@@ -223,9 +229,11 @@ class PC_DAO_Functions extends FWS_Singleton
 		if(!PC_Utils::is_valid_project_id($id))
 			FWS_Helper::def_error('intge0','id',$id);
 		
-		$db->execute(
-			'DELETE FROM '.PC_TB_FUNCTIONS.' WHERE project_id = '.$id
+		$stmt = $db->get_prepared_statement(
+			'DELETE FROM '.PC_TB_FUNCTIONS.' WHERE project_id = :id'
 		);
+		$stmt->bind(':id',$id);
+		$db->execute($stmt->get_statement());
 		return $db->get_affected_rows();
 	}
 	

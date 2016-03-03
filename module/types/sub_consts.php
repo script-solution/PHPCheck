@@ -68,7 +68,7 @@ final class PC_SubModule_types_consts extends PC_SubModule
 		
 		$consts = array();
 		$constants = PC_DAO::get_constants()->get_list(
-			0,$file,$name,PC_Project::CURRENT_ID,$start,PC_ENTRIES_PER_PAGE
+			array(0),$file,$name,PC_Project::CURRENT_ID,$start,PC_ENTRIES_PER_PAGE
 		);
 		foreach($constants as $const)
 		{

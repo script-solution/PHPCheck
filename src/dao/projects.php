@@ -196,7 +196,12 @@ class PC_DAO_Projects extends FWS_Singleton
 	public function update_deps($id,$deps)
 	{
 		$db = FWS_Props::get()->db();
-		$db->execute('DELETE FROM '.PC_TB_PROJECT_DEPS.' WHERE project_id = '.$id);
+		
+		$stmt = $db->get_prepared_statement(
+			'DELETE FROM '.PC_TB_PROJECT_DEPS.' WHERE project_id = :id'
+		);
+		$stmt->bind(':id',$id);
+		$db->execute($stmt->get_statement());
 		
 		foreach($deps as $did)
 		{
@@ -238,7 +243,12 @@ class PC_DAO_Projects extends FWS_Singleton
 	public function del_req($vid)
 	{
 		$db = FWS_Props::get()->db();
-		$db->execute('DELETE FROM '.PC_TB_REQUIREMENTS.' WHERE id = '.$vid);
+		
+		$stmt = $db->get_prepared_statement(
+			'DELETE FROM '.PC_TB_REQUIREMENTS.' WHERE id = :id'
+		);
+		$stmt->bind(':id',$vid);
+		$db->execute($stmt->get_statement());
 	}
 	
 	/**
@@ -262,10 +272,19 @@ class PC_DAO_Projects extends FWS_Singleton
 		
 		if($full)
 		{
-			$deps = $db->get_rows('SELECT * FROM '.PC_TB_PROJECT_DEPS.' WHERE project_id = '.$row['id']);
+			$stmt = $db->get_prepared_statement(
+				'SELECT * FROM '.PC_TB_PROJECT_DEPS.' WHERE project_id = :id'
+			);
+			$stmt->bind(':id',$row['id']);
+			$deps = $db->get_rows($stmt->get_statement());
 			foreach($deps as $d)
 				$proj->add_project_dep($d['dep_id']);
-			$req = $db->get_rows('SELECT * FROM '.PC_TB_REQUIREMENTS.' WHERE project_id = '.$row['id']);
+			
+			$stmt = $db->get_prepared_statement(
+				'SELECT * FROM '.PC_TB_REQUIREMENTS.' WHERE project_id = :id'
+			);
+			$stmt->bind(':id',$row['id']);
+			$req = $db->get_rows($stmt->get_statement());
 			foreach($req as $v)
 				$proj->add_req($v['id'],$v['type'],$v['name'],$v['version']);
 		}

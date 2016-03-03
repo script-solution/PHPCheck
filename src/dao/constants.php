@@ -51,12 +51,19 @@ class PC_DAO_Constants extends FWS_Singleton
 	 */
 	public function get_count($class = 0,$pid = PC_Project::CURRENT_ID)
 	{
+		$db = FWS_Props::get()->db();
+		
 		if(!FWS_Helper::is_integer($class) || $class < 0)
 			FWS_Helper::def_error('intge0','class',$class);
 		
-		$db = FWS_Props::get()->db();
-		$pid = PC_Utils::get_project_id($pid);
-		return $db->get_row_count(PC_TB_CONSTANTS,'*',' WHERE class = '.$class.' AND project_id = '.$pid);
+		$stmt = $db->get_prepared_statement(
+			'SELECT COUNT(*) num FROM '.PC_TB_CONSTANTS.'
+			 WHERE project_id = :pid AND class = :class'
+		);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		$stmt->bind(':class',$class);
+		$row = $db->get_row($stmt->get_statement());
+		return $row['num'];
 	}
 	
 	/**
@@ -109,9 +116,10 @@ class PC_DAO_Constants extends FWS_Singleton
 		
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CONSTANTS.'
-			 WHERE project_id = '.PC_Utils::get_project_id($pid).' AND class = 0 AND name = ?'
+			 WHERE project_id = :pid AND class = 0 AND name = :name'
 		);
-		$stmt->bind(0,$name);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		$stmt->bind(':name',$name);
 		$row = $db->get_row($stmt->get_statement());
 		if($row)
 			return $this->build_const($row);
@@ -144,7 +152,7 @@ class PC_DAO_Constants extends FWS_Singleton
 	/**
 	 * Returns all constants
 	 *
-	 * @param int|array $class the class-id (0 = freestanding) (or ids, if its an array)
+	 * @param array $cids the class ids (0 = freestanding)
 	 * @param string $file the file to search for
 	 * @param string $name the name to search for
 	 * @param int $pid the project-id (0 = current)
@@ -152,35 +160,39 @@ class PC_DAO_Constants extends FWS_Singleton
 	 * @param int $count the max. number of rows (for the LIMIT-statement) (0 = unlimited)
 	 * @return array all found constants
 	 */
-	public function get_list($class = 0,$file = '',$name = '',$pid = PC_Project::CURRENT_ID,
+	public function get_list($cids,$file = '',$name = '',$pid = PC_Project::CURRENT_ID,
 		$start = 0,$count = 0)
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!FWS_Array_Utils::is_integer($class) && (!FWS_Helper::is_integer($class) || $class < 0))
-			FWS_Helper::def_error('intge0','class',$class);
+		if(!FWS_Array_Utils::is_integer($cids))
+			FWS_Helper::def_error('intarray','cids',$cids);
 		if(!FWS_Helper::is_integer($start) || $start < 0)
 			FWS_Helper::def_error('intge0','start',$start);
 		if(!FWS_Helper::is_integer($count) || $count < 0)
 			FWS_Helper::def_error('intge0','count',$count);
 		
-		if(is_array($class) && count($class) == 0)
+		if(count($cids) == 0)
 			return array();
 		
 		$consts = array();
 		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CONSTANTS.'
-			 WHERE project_id = :pid AND'
-			 .(is_array($class) ? ' class IN ('.implode(',',$class).')' : ' class = '.$class)
+			 WHERE project_id = :pid AND class IN ('.implode(',',$cids).')'
 			 .($file ? ' AND file LIKE :file' : '')
 			 .($name ? ' AND name LIKE :name' : '')
-			.($count > 0 ? ' LIMIT '.$start.','.$count : '')
+			.($count > 0 ? ' LIMIT :start,:count' : '')
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($name)
 			$stmt->bind(':name','%'.$name.'%');
+		if($count > 0)
+		{
+			$stmt->bind(':start',$start);
+			$stmt->bind(':count',$count);
+		}
 		foreach($db->get_rows($stmt->get_statement()) as $row)
 			$consts[] = $this->build_const($row);
 		return $consts;
@@ -229,9 +241,11 @@ class PC_DAO_Constants extends FWS_Singleton
 		if(!PC_Utils::is_valid_project_id($id))
 			FWS_Helper::def_error('intge0','id',$id);
 		
-		$db->execute(
-			'DELETE FROM '.PC_TB_CONSTANTS.' WHERE project_id = '.$id
+		$stmt = $db->get_prepared_statement(
+			'DELETE FROM '.PC_TB_CONSTANTS.' WHERE project_id = :id'
 		);
+		$stmt->bind(':id',$id);
+		$db->execute($stmt->get_statement());
 		return $db->get_affected_rows();
 	}
 	

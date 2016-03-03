@@ -135,7 +135,7 @@ class PC_DAO_Calls extends FWS_Singleton
 				.($class ? ' AND class LIKE :class' : '')
 				.($function ? ' AND function LIKE :func' : '')
 			 .' ORDER BY id ASC
-			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
+			'.($count > 0 ? 'LIMIT :start,:count' : '')
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
@@ -144,6 +144,11 @@ class PC_DAO_Calls extends FWS_Singleton
 			$stmt->bind(':class','%'.$class.'%');
 		if($function)
 			$stmt->bind(':func','%'.$function.'%');
+		if($count > 0)
+		{
+			$stmt->bind(':start',$start);
+			$stmt->bind(':count',$count);
+		}
 		foreach($db->get_rows($stmt->get_statement()) as $row)
 			$calls[] = $this->build_call($row);
 		return $calls;
@@ -195,9 +200,11 @@ class PC_DAO_Calls extends FWS_Singleton
 		if(!PC_Utils::is_valid_project_id($id))
 			FWS_Helper::def_error('intge0','id',$id);
 		
-		$db->execute(
-			'DELETE FROM '.PC_TB_CALLS.' WHERE project_id = '.$id
+		$stmt = $db->get_prepared_statement(
+			'DELETE FROM '.PC_TB_CALLS.' WHERE project_id = :id'
 		);
+		$stmt->bind(':id',$id);
+		$db->execute($stmt->get_statement());
 		return $db->get_affected_rows();
 	}
 	

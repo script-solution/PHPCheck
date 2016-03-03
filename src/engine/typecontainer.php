@@ -104,7 +104,7 @@ final class PC_Engine_TypeContainer extends FWS_Object
 		foreach($this->options->get_projects() as $pid)
 		{
 			$this->add_classes(PC_DAO::get_classes()->get_list(0,0,'','',$pid));
-			$this->add_functions(PC_DAO::get_functions()->get_list(0,0,0,'','',$pid));
+			$this->add_functions(PC_DAO::get_functions()->get_list(array(0),0,0,'','',$pid));
 		}
 	}
 	

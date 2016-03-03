@@ -45,26 +45,28 @@ class PC_DAO_ClassFields extends FWS_Singleton
 	/**
 	 * Returns all fields of the given class
 	 *
-	 * @param int|array $class the class-id (or ids, if its an array)
+	 * @param array $cids the class ids
 	 * @param int $pid the project-id (default = current)
 	 * @return array an array of PC_Obj_Field objects
 	 */
-	public function get_all($class,$pid = PC_Project::CURRENT_ID)
+	public function get_all($cids,$pid = PC_Project::CURRENT_ID)
 	{
 		$db = FWS_Props::get()->db();
 
-		if(!FWS_Array_Utils::is_integer($class) && (!FWS_Helper::is_integer($class) || $class < 0))
-			FWS_Helper::def_error('intge0','class',$class);
+		if(!FWS_Array_Utils::is_integer($cids))
+			FWS_Helper::def_error('intarray','cids',$cids);
 		
-		if(is_array($class) && count($class) == 0)
+		if(count($cids) == 0)
 			return array();
 		
-		$fields = array();
-		$rows = $db->get_rows(
+		$stmt = $db->get_prepared_statement(
 			'SELECT * FROM '.PC_TB_CLASS_FIELDS.'
-			 WHERE project_id = '.PC_Utils::get_project_id($pid).' AND'
-			 .(is_array($class) ? ' class IN ('.implode(',',$class).')' : ' class = '.$class)
+			 WHERE project_id = :pid AND class IN ('.implode(',',$cids).')'
 		);
+		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
+		
+		$fields = array();
+		$rows = $db->get_rows($stmt->get_statement());
 		foreach($rows as $row)
 		{
 			$field = new PC_Obj_Field(
@@ -121,9 +123,11 @@ class PC_DAO_ClassFields extends FWS_Singleton
 		if(!PC_Utils::is_valid_project_id($id))
 			FWS_Helper::def_error('intge0','id',$id);
 		
-		$db->execute(
-			'DELETE FROM '.PC_TB_CLASS_FIELDS.' WHERE project_id = '.$id
+		$stmt = $db->get_prepared_statement(
+			'DELETE FROM '.PC_TB_CLASS_FIELDS.' WHERE project_id = :id'
 		);
+		$stmt->bind(':id',$id);
+		$db->execute($stmt->get_statement());
 		return $db->get_affected_rows();
 	}
 }

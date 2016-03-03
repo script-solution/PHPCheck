@@ -128,13 +128,18 @@ class PC_DAO_Vars extends FWS_Singleton
 				.($scope ? ' AND scope LIKE :scope' : '')
 				.($name ? ' AND name LIKE :name' : '')
 			 .' ORDER BY id ASC
-			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
+			'.($count > 0 ? 'LIMIT :start,:count' : '')
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($scope)
 			$stmt->bind(':scope','%'.$scope.'%');
 		if($name)
 			$stmt->bind(':name','%'.$name.'%');
+		if($count > 0)
+		{
+			$stmt->bind(':start',$start);
+			$stmt->bind(':count',$count);
+		}
 		foreach($db->get_rows($stmt->get_statement()) as $row)
 			$vars[] = $this->build_var($row);
 		return $vars;
@@ -183,9 +188,11 @@ class PC_DAO_Vars extends FWS_Singleton
 		if(!PC_Utils::is_valid_project_id($id))
 			FWS_Helper::def_error('intge0','id',$id);
 		
-		$db->execute(
-			'DELETE FROM '.PC_TB_VARS.' WHERE project_id = '.$id
+		$stmt = $db->get_prepared_statement(
+			'DELETE FROM '.PC_TB_VARS.' WHERE project_id = :id'
 		);
+		$stmt->bind(':id',$id);
+		$db->execute($stmt->get_statement());
 		return $db->get_affected_rows();
 	}
 	

@@ -179,13 +179,18 @@ class PC_DAO_Classes extends FWS_Singleton
 				.($file ? ' AND file LIKE :file' : '')
 				.($class ? ' AND (name LIKE :class OR superclass LIKE :class OR interfaces LIKE :class)' : '')
 			.' ORDER BY name ASC
-			'.($count > 0 ? 'LIMIT '.$start.','.$count : '')
+			'.($count > 0 ? 'LIMIT :start,:count' : '')
 		);
 		$stmt->bind(':pid',PC_Utils::get_project_id($pid));
 		if($file)
 			$stmt->bind(':file','%'.$file.'%');
 		if($class)
 			$stmt->bind(':class','%'.$class.'%');
+		if($count > 0)
+		{
+			$stmt->bind(':start',$start);
+			$stmt->bind(':count',$count);
+		}
 		$rows = $db->get_rows($stmt->get_statement());
 		return $this->build_complete_classes($rows,$pid);
 	}
@@ -247,9 +252,11 @@ class PC_DAO_Classes extends FWS_Singleton
 		if(!PC_Utils::is_valid_project_id($id))
 			FWS_Helper::def_error('intge0','id',$id);
 		
-		$db->execute(
-			'DELETE FROM '.PC_TB_CLASSES.' WHERE project_id = '.$id
+		$stmt = $db->get_prepared_statement(
+			'DELETE FROM '.PC_TB_CLASSES.' WHERE project_id = :id'
 		);
+		$stmt->bind(':id',$id);
+		$db->execute($stmt->get_statement());
 		return $db->get_affected_rows();
 	}
 	

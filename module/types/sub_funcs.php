@@ -67,7 +67,7 @@ final class PC_SubModule_types_funcs extends PC_SubModule
 		$start = $pagination->get_start();
 		
 		$funcs = array();
-		foreach(PC_DAO::get_functions()->get_list(0,$start,PC_ENTRIES_PER_PAGE,$file,$func) as $f)
+		foreach(PC_DAO::get_functions()->get_list(array(0),$start,PC_ENTRIES_PER_PAGE,$file,$func) as $f)
 		{
 			$url = PC_URL::get_mod_url('file');
 			$url->set('path',$f->get_file());
