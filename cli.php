@@ -31,8 +31,6 @@ FWS_AutoLoader::register_loader('PC_autoloader');
 // set error-handling
 error_reporting((E_ALL | E_STRICT) & ~E_DEPRECATED);
 
-define('PC_UNITTESTS',0);
-
 // set our loader and accessor
 $accessor = new PC_PropAccessor();
 $accessor->set_loader(new PC_PropLoader());

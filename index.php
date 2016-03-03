@@ -28,8 +28,6 @@ include_once(FWS_PATH.'init.php');
 include_once('src/autoloader.php');
 FWS_AutoLoader::register_loader('PC_autoloader');
 
-define('PC_UNITTESTS',0);
-
 // set error-handling
 error_reporting((E_ALL | E_STRICT) & ~E_DEPRECATED);
 
